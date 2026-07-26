@@ -1,12 +1,3 @@
---[[
-    THE VOIDZ — Script Launcher Hub
-    ─────────────────────────────────────────────
-    Central launcher for all VOIDZ scripts.
-    Press RightShift to toggle the hub.
-    
-    GitHub: https://github.com/fungamer1234/The-voidz
-]]
-
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
 local UIS = game:GetService("UserInputService")

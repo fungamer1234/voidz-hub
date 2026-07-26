@@ -20,7 +20,7 @@ Press **RightShift** to toggle the hub.
 | MM2 HUB | Murder Mystery 2 | 10 tabs. ESP, combat, farm, roles, full GUI. |
 | FE6 ADMIN | Universal | ~200 commands, full admin GUI. |
 | SKILZ HUB (de11x) | FTAP | SKILZ HUB by de11x. Compact OP features. |
-| BASEPLATE HUB | Fight on a Baseplate | Kill Aura, Auto Weave, Hitbox Expander, ESP, Speed, 25+ features. |
+| BASEPLATE HUB | Fight on a Baseplate | Kill Aura, Auto Weave, Hitbox, ESP, Speed, 30+ features. |
 
 ## Features
 

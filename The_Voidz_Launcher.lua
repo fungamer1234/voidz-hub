@@ -65,6 +65,13 @@ local SCRIPTS = {
         url = "https://raw.githubusercontent.com/fungamer1234/FE6-admin/main/FE6xDE11_FTAP_OP.lua",
         color = Color3.fromRGB(255, 100, 50),
     },
+    {
+        name = "BASEPLATE HUB",
+        desc = "Fight on a Baseplate — Kill Aura, Auto Weave, Hitbox, ESP, Speed, 25+ features.",
+        game = "Fight on a Baseplate",
+        url = "https://raw.githubusercontent.com/fungamer1234/Voidz-Baseplate/main/VOIDZ_BASEPLATE.lua",
+        color = Color3.fromRGB(255, 80, 80),
+    },
 }
 
 -- ═══════════════════════════════════════════════════════════════

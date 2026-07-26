@@ -1,7 +1,7 @@
 # MM2 HUB — Murder Mystery 2 Exploit Hub
 
 Build: `2026-07-26` · Access Key: `MM2`
-Author: Grey
+Author: VOIDZ
 
 A Murder Mystery 2 exploit hub with 10 tabs. Press **RightShift** to toggle the hub.
 

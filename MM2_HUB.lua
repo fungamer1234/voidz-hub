@@ -308,7 +308,7 @@ Instance.new("UICorner",GlowDot).CornerRadius=UDim.new(1,0)
 local LogoLabel=Instance.new("TextLabel"); LogoLabel.Size=UDim2.new(0,150,0,50); LogoLabel.Position=UDim2.new(0,14,0,0); LogoLabel.BackgroundTransparency=1; LogoLabel.Text="MM2 HUB"; LogoLabel.Font=Enum.Font.GothamBlack; LogoLabel.TextSize=24; LogoLabel.TextColor3=C.text; LogoLabel.TextXAlignment=Enum.TextXAlignment.Left; LogoLabel.Parent=Header
 local GlowFrame=Instance.new("Frame"); GlowFrame.Size=UDim2.new(0,34,0,34); GlowFrame.Position=UDim2.new(0,10,0,8); GlowFrame.BackgroundTransparency=1; GlowFrame.ZIndex=5; GlowFrame.Parent=Header
 local GlowCircle=Instance.new("ImageLabel"); GlowCircle.Size=UDim2.new(1,0,1,0); GlowCircle.BackgroundTransparency=1; GlowCircle.Image="rbxassetid://7912134082"; GlowCircle.ImageColor3=C.accent; GlowCircle.ImageTransparency=0.55; GlowCircle.ZIndex=5; GlowCircle.Parent=GlowFrame
-local StatusLabel=Instance.new("TextLabel"); StatusLabel.Size=UDim2.new(1,-120,0,14); StatusLabel.Position=UDim2.new(0,14,0,34); StatusLabel.BackgroundTransparency=1; StatusLabel.Text="by Grey | Build 2026-07-26"; StatusLabel.Font=Enum.Font.GothamMedium; StatusLabel.TextSize=9; StatusLabel.TextColor3=C.muted; StatusLabel.TextXAlignment=Enum.TextXAlignment.Left; StatusLabel.Parent=Header
+local StatusLabel=Instance.new("TextLabel"); StatusLabel.Size=UDim2.new(1,-120,0,14); StatusLabel.Position=UDim2.new(0,14,0,34); StatusLabel.BackgroundTransparency=1; StatusLabel.Text="by VOIDZ | Build 2026-07-26"; StatusLabel.Font=Enum.Font.GothamMedium; StatusLabel.TextSize=9; StatusLabel.TextColor3=C.muted; StatusLabel.TextXAlignment=Enum.TextXAlignment.Left; StatusLabel.Parent=Header
 
 local HeaderRight=Instance.new("Frame"); HeaderRight.Size=UDim2.new(0,84,0,30); HeaderRight.Position=UDim2.new(1,-92,0,10); HeaderRight.BackgroundTransparency=1; HeaderRight.Parent=Header
 local MinBtn=Instance.new("TextButton"); MinBtn.Size=UDim2.new(0,36,0,30); MinBtn.Position=UDim2.new(0,0,0,0); MinBtn.BackgroundColor3=C.card; MinBtn.Text="-"; MinBtn.Font=Enum.Font.GothamBold; MinBtn.TextSize=16; MinBtn.TextColor3=C.muted; MinBtn.BorderSizePixel=0; MinBtn.Parent=HeaderRight; corner(MinBtn,8)
@@ -334,11 +334,11 @@ local Sidebar=Instance.new("Frame"); Sidebar.Size=UDim2.new(0,56,1,-50); Sidebar
 Instance.new("UICorner",Sidebar).CornerRadius=UDim.new(0,14)
 stroke(Sidebar,C.strokeSoft,0.75,0.5)
 local SideLine=Instance.new("Frame"); SideLine.Size=UDim2.new(0,2,1,0); SideLine.Position=UDim2.new(1,-1,0,0); SideLine.BackgroundColor3=C.strokeSoft; SideLine.BackgroundTransparency=0.55; SideLine.BorderSizePixel=0; SideLine.Parent=Sidebar
-local SideGlow=Instance.new("Frame"); SideGlow.Size=UDim2.new(0,2,0,36); SideGlow.Position=UDim2.new(1,-1,0,6); SideGlow.BackgroundColor3=C.accent2; SideGlow.BorderSizePixel=0; SideGlow.ZIndex=4; SideGlow.Parent=Sidebar
+local SideGlow=Instance.new("Frame"); SideGlow.Size=UDim2.new(0,2,0,32); SideGlow.Position=UDim2.new(1,-1,0,6); SideGlow.BackgroundColor3=C.accent2; SideGlow.BorderSizePixel=0; SideGlow.ZIndex=4; SideGlow.Parent=Sidebar
 Instance.new("UICorner",SideGlow).CornerRadius=UDim.new(1,0)
 
 local TabBtns={}
-local TabIndicator=Instance.new("Frame"); TabIndicator.Size=UDim2.new(1,0,0,36); TabIndicator.Position=UDim2.new(0,0,0,6); TabIndicator.BackgroundColor3=C.card; TabIndicator.BorderSizePixel=0; TabIndicator.ZIndex=1; TabIndicator.Parent=Sidebar
+local TabIndicator=Instance.new("Frame"); TabIndicator.Size=UDim2.new(1,0,0,32); TabIndicator.Position=UDim2.new(0,0,0,6); TabIndicator.BackgroundColor3=C.card; TabIndicator.BorderSizePixel=0; TabIndicator.ZIndex=1; TabIndicator.Parent=Sidebar
 Instance.new("UICorner",TabIndicator).CornerRadius=UDim.new(0,10)
 
 local ContentHolder=Instance.new("Frame"); ContentHolder.Size=UDim2.new(1,-72,1,-56); ContentHolder.Position=UDim2.new(0,64,0,54); ContentHolder.BackgroundTransparency=1; ContentHolder.ClipsDescendants=true; ContentHolder.Parent=Main
@@ -349,14 +349,14 @@ local tabOrder={"home","combat","movement","visuals","farm","roles","troll","ser
 
 for i,def in ipairs(TAB_DEFS) do
     local b=Instance.new("TextButton")
-    b.Size=UDim2.new(1,-6,0,36); b.Position=UDim2.new(0,3,0,(i-1)*40+6)
+    b.Size=UDim2.new(1,-6,0,32); b.Position=UDim2.new(0,3,0,(i-1)*36+6)
     b.BackgroundColor3=def.id=="home" and C.card or Color3.fromRGB(0,0,0)
     b.BackgroundTransparency=def.id=="home" and 0 or 1
     b.Text=""; b.BorderSizePixel=0; b.ZIndex=6; b.Parent=Sidebar
     corner(b,10)
-    local lb=Instance.new("TextLabel"); lb.Size=UDim2.new(1,0,0,14); lb.Position=UDim2.new(0,0,0,1); lb.BackgroundTransparency=1; lb.Text="|"..string.rep("_",tonumber(def.icon) and tonumber(def.icon)-1 or 0); lb.Font=Enum.Font.Code; lb.TextSize=7; lb.TextColor3=C.strokeSoft; lb.TextTransparency=0.4; lb.ZIndex=8; lb.Parent=b
-    local ic=Instance.new("TextLabel"); ic.Size=UDim2.new(1,0,0,14); ic.Position=UDim2.new(0,0,0,11); ic.BackgroundTransparency=1; ic.Text=def.icon; ic.Font=Enum.Font.GothamBlack; ic.TextSize=12; ic.TextColor3=def.id=="home" and C.accent or C.muted; ic.ZIndex=8; ic.Parent=b
-    local tx=Instance.new("TextLabel"); tx.Size=UDim2.new(1,0,0,8); tx.Position=UDim2.new(0,0,0,25); tx.BackgroundTransparency=1; tx.Text=def.label; tx.Font=Enum.Font.GothamMedium; tx.TextSize=7; tx.TextColor3=def.id=="home" and C.text or C.muted; tx.ZIndex=8; tx.Parent=b
+    local lb=Instance.new("TextLabel"); lb.Size=UDim2.new(1,0,0,12); lb.Position=UDim2.new(0,0,0,1); lb.BackgroundTransparency=1; lb.Text="|"..string.rep("_",tonumber(def.icon) and tonumber(def.icon)-1 or 0); lb.Font=Enum.Font.Code; lb.TextSize=6; lb.TextColor3=C.strokeSoft; lb.TextTransparency=0.4; lb.ZIndex=8; lb.Parent=b
+    local ic=Instance.new("TextLabel"); ic.Size=UDim2.new(1,0,0,12); ic.Position=UDim2.new(0,0,0,9); ic.BackgroundTransparency=1; ic.Text=def.icon; ic.Font=Enum.Font.GothamBlack; ic.TextSize=11; ic.TextColor3=def.id=="home" and C.accent or C.muted; ic.ZIndex=8; ic.Parent=b
+    local tx=Instance.new("TextLabel"); tx.Size=UDim2.new(1,0,0,8); tx.Position=UDim2.new(0,0,0,22); tx.BackgroundTransparency=1; tx.Text=def.label; tx.Font=Enum.Font.GothamMedium; tx.TextSize=6; tx.TextColor3=def.id=="home" and C.text or C.muted; tx.ZIndex=8; tx.Parent=b
     TabBtns[def.id]={btn=b,icon=ic,label=tx,badge=lb}
 
     local sf=Instance.new("ScrollingFrame"); sf.Name=def.id; sf.Size=UDim2.new(1,0,1,0); sf.BackgroundTransparency=1; sf.BorderSizePixel=0; sf.ScrollBarThickness=5; sf.ScrollBarImageColor3=C.accentDim; sf.CanvasSize=UDim2.new(0,0,0,0); sf.AutomaticCanvasSize=Enum.AutomaticSize.Y; sf.Visible=def.id=="home"; sf.ZIndex=5; sf.Parent=ContentHolder
@@ -372,7 +372,7 @@ local function switchTab(id)
         tween(btns.icon,{TextColor3=active and C.accent or C.muted},0.18)
         tween(btns.label,{TextColor3=active and C.text or C.muted},0.18)
     end
-    if id~="settings" and id~="home" and id~="troll" then SideGlow.Position=UDim2.new(1,-1,0,6+(table.find(tabOrder,id)-1)*40) end
+    if id~="settings" and id~="home" and id~="troll" then SideGlow.Position=UDim2.new(1,-1,0,6+(table.find(tabOrder,id)-1)*36) end
     activeTabId=id
 end
 
@@ -539,7 +539,7 @@ do
     corner(welcome,12); stroke(welcome,C.accent,1.1,0.3)
     local wl=Instance.new("TextLabel"); wl.Size=UDim2.new(1,-16,0,20); wl.Position=UDim2.new(0,8,0,10); wl.BackgroundTransparency=1; wl.Text="Welcome to MM2 HUB"; wl.Font=Enum.Font.GothamBlack; wl.TextSize=16; wl.TextColor3=C.text; wl.TextXAlignment=Enum.TextXAlignment.Left; wl.ZIndex=7; wl.Parent=welcome
     local ws=Instance.new("TextLabel"); ws.Size=UDim2.new(1,-16,0,14); ws.Position=UDim2.new(0,8,0,30); ws.BackgroundTransparency=1; ws.Text="Murder Mystery 2 | VOIDZ-style UI | 10 Tabs"; ws.Font=Enum.Font.GothamMedium; ws.TextSize=10; ws.TextColor3=C.muted; ws.TextXAlignment=Enum.TextXAlignment.Left; ws.ZIndex=7; ws.Parent=welcome
-    local wb=Instance.new("TextLabel"); wb.Size=UDim2.new(1,-16,0,14); wb.Position=UDim2.new(0,8,0,46); wb.BackgroundTransparency=1; wb.Text="Build: 2026-07-26 | by Grey"; wb.Font=Enum.Font.GothamMedium; wb.TextSize=10; ws.TextColor3=C.muted; wb.ZIndex=7; wb.Parent=welcome
+    local wb=Instance.new("TextLabel"); wb.Size=UDim2.new(1,-16,0,14); wb.Position=UDim2.new(0,8,0,46); wb.BackgroundTransparency=1;     wb.Text="Build: 2026-07-26 | by VOIDZ"; wb.Font=Enum.Font.GothamMedium; wb.TextSize=10; ws.TextColor3=C.muted; wb.ZIndex=7; wb.Parent=welcome
     
     local cs=section("home","Stats","icons","",1)
     makeLabel(cs,"Players: "..#Players:GetPlayers().." | Role: Loading...",C.text,1)

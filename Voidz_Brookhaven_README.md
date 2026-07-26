@@ -1,6 +1,6 @@
 # VOIDZ Brookhaven RP Hub
 
-Build: `2026-07-26` · Author: Grey
+Build: `2026-07-26` · Author: VOIDZ
 
 Based on Sander's Premium + SP Hub + Hexagon + Dragon + Cartola + all top Brookhaven hubs.
 12 tabs, 100+ features. No key required.

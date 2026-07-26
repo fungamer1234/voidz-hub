@@ -4,6 +4,14 @@ Build: `2026-07-24-register-fix` · Access Key: `TESTRUN`
 
 A full-featured FTAP exploit hub with 19 tabs, 270+ features. Press **RightShift** to toggle the hub.
 
+## How to Use
+
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
+```
+
+Press **RightShift** to toggle the hub.
+
 ---
 
 ## Tabs Overview

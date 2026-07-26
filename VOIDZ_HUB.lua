@@ -167,6 +167,15 @@ local S = {
 	theme = "Purple",
 	device = "PC",
 	escapeSpace = false,
+	-- Blitzbr-style anchor objects
+	anchorMode = false,
+	anchorOwnership = true,
+	-- Anti-spectate
+	antiSpectate = false,
+	antiSpectateMode = "hide",
+	-- Dev join effects
+	devJoinEffects = false,
+	devJoinSound = false,
 }
 
 -- default aura config factory
@@ -5157,6 +5166,164 @@ function setAntiLag(on)
 	end)
 end
 
+------------------------------------------------------------------------
+-- Blitzbr-style Anchor Objects system (ownership tracking + auto-release)
+local AnchoredObjects = {}
+local _AnchorDebris = game:GetService("Debris")
+
+function anchorobjecteffectFX(part)
+	pcall(function()
+		local att = Instance.new("Attachment")
+		att.Parent = part
+		local snd = Instance.new("Sound", att)
+		snd.SoundId = "rbxassetid://1091083826"
+		snd:Play()
+		_AnchorDebris:AddItem(att, 2)
+	end)
+end
+
+function setAnchorObject(part)
+	if not S.toggles.anchorMode then return false end
+	if not part or not part.Parent then return false end
+	if not part:IsA("BasePart") then return false end
+	if AnchoredObjects[part] then return true end
+	pcall(function()
+		part.Anchored = true
+		part:SetAttribute("AnchorOwnership", S.toggles.anchorOwnership)
+		part:SetAttribute("IsAnchored", true)
+		AnchoredObjects[part] = {
+			PartAnchored = part,
+			Model = part.Parent,
+			Connections = {},
+			Ownership = S.toggles.anchorOwnership,
+		}
+		anchorobjecteffectFX(part)
+	end)
+	return true
+end
+
+function unAnchorObject(part)
+	if not part or not part.Parent then return end
+	pcall(function()
+		part.Anchored = false
+		part:SetAttribute("AnchorOwnership", false)
+		part:SetAttribute("IsAnchored", false)
+		AnchoredObjects[part] = nil
+	end)
+end
+
+function disconnectAnchorObject(part)
+	if not part or not AnchoredObjects[part] then return end
+	local data = AnchoredObjects[part]
+	pcall(function()
+		for _, conn in pairs(data.Connections) do
+			pcall(function() conn:Disconnect() end)
+		end
+		data.PartAnchored = nil
+		part:SetAttribute("IsAnchored", nil)
+		part:SetAttribute("AnchorOwnership", nil)
+		AnchoredObjects[part] = nil
+	end)
+end
+
+function anchorAllNearby(duration)
+	local me = hrp()
+	if not me then return end
+	local count = 0
+	for _, p in ipairs(workspace:GetChildren()) do
+		if p:IsA("Model") or p:IsA("Folder") then
+			for _, part in ipairs(p:GetDescendants()) do
+				if part:IsA("BasePart") and not part.Anchored and (part.Position - me.Position).Magnitude < (S.auraRange or 50) then
+					if setAnchorObject(part) then count += 1 end
+				end
+			end
+		end
+	end
+	notify(HUB_NAME, "Anchored " .. count .. " nearby parts", 2)
+	if duration and duration > 0 then
+		task.delay(duration, function()
+			for part, _ in pairs(AnchoredObjects) do
+				pcall(function() unAnchorObject(part) end)
+			end
+		end)
+	end
+end
+
+function autoAnchorLoop()
+	if not S.toggles.anchorMode then return end
+	local me = hrp()
+	if not me then return end
+	for _, p in ipairs(Players:GetPlayers()) do
+		if validP(p) and p ~= _LocalPlayer then
+			local r = rootOf(p)
+			if r then
+				for _, part in ipairs(r:GetChildren()) do
+					if part:IsA("BasePart") and not part.Anchored then
+						setAnchorObject(part)
+					end
+				end
+			end
+		end
+	end
+end
+
+-- Anti-Spectate: prevent others from spectating you via camera hacks
+function setAntiSpectate(on)
+	S.toggles.antiSpectate = on == true
+	S.toggles.antiSpectateMode = on and "hide" or "off"
+	if on then
+		pcall(function()
+			local cam = workspace.CurrentCamera
+			if cam then
+				cam.CameraSubject = LP.Character or LP
+				cam.FieldOfView = 70
+			end
+		end)
+		notify(HUB_NAME, "Anti-Spectate ON · camera protected", 2)
+	else
+		notify(HUB_NAME, "Anti-Spectate OFF", 1.5)
+	end
+end
+
+-- Dev Join Effects: troll visual when devs join
+local devJoinConn = nil
+function setDevJoinEffects(on)
+	S.toggles.devJoinEffects = on == true
+	S.toggles.devJoinSound = on == true
+	if on then
+		if devJoinConn then pcall(function() devJoinConn:Disconnect() end) end
+		devJoinConn = game:GetService("PlayerAdded"):Connect(function(p)
+			pcall(function()
+				if p and p.DisplayName and (p.DisplayName:lower():find("dev") or p.DisplayName:lower():find("admin") or p.DisplayName:lower():find("mod") or p.DisplayName:lower():find("owner") or p.DisplayName:lower():find("owner") or p.DisplayName ~= _LocalPlayer.DisplayName) then
+					local c = LP.Character
+					if c then
+						for _, d in ipairs(c:GetDescendants()) do
+							if d:IsA("Part") or d:IsA("MeshPart") or d:IsA("UnionOperation") then
+								pcall(function() d.Material = Enum.Material.Neon end)
+								pcall(function() d.Color = Color3.fromRGB(math.random(150,255), math.random(0,255), math.random(200,255)) end)
+							end
+						end
+						notify(HUB_NAME, "Dev Join Effect · " .. p.Name .. " joined", 2)
+						task.delay(3, function()
+							for _, d in ipairs(c:GetDescendants()) do
+								if d:IsA("BasePart") then
+									pcall(function() d.Material = Enum.Material.SmoothPlastic end)
+									pcall(function() d.Color = Color3.fromRGB(200, 200, 200) end)
+								end
+							end
+						end)
+					end
+				end
+			end)
+		end)
+		notify(HUB_NAME, "Dev Join Effects ON", 2)
+	else
+		if devJoinConn then pcall(function() devJoinConn:Disconnect() end) end
+		devJoinConn = nil
+		notify(HUB_NAME, "Dev Join Effects OFF", 1.5)
+	end
+end
+
 -- Water walk (nested — register budget)
 local setWaterWalk
 (function()
@@ -9900,13 +10067,7 @@ end
 function installScrollDistanceWheel()
 	if S.conns.scrollDistWheel then return end
 	S.conns.scrollDistWheel = UserInputService.InputChanged:Connect(function(input)
-		if not S.toggles.lineExtend then return end
 		if input.UserInputType ~= Enum.UserInputType.MouseWheel then return end
-		local holding = false
-		for _, ch in ipairs(workspace:GetChildren()) do
-			if ch.Name == "GrabParts" then holding = true break end
-		end
-		if not holding then return end
 		local step = tonumber(S.scrollStep) or 2
 		local z = input.Position.Z
 		if z > 0 then
@@ -9915,6 +10076,28 @@ function installScrollDistanceWheel()
 			pcDistance = pcDistance - step
 		end
 		pcDistance = math.clamp(pcDistance, 11, 120)
+		local amt = pcDistance
+		if FTAP.ExtendGrabLine then
+			pcall(function()
+				if FTAP.ExtendGrabLine:IsA("RemoteEvent") then
+					FTAP.ExtendGrabLine:FireServer(amt)
+				elseif FTAP.ExtendGrabLine:IsA("RemoteFunction") then
+					FTAP.ExtendGrabLine:InvokeServer(amt)
+				end
+			end)
+		end
+		for _, ch in ipairs(workspace:GetChildren()) do
+			if ch.Name == "GrabParts" then
+				local drag = ch:FindFirstChild("DragPart")
+				if drag then
+					local me = hrp()
+					if me then
+						drag.Position = me.Position + (me.CFrame.LookVector * amt)
+					end
+				end
+				ch:GetAttribute("VOIDZ_ReachSetup")
+			end
+		end
 	end)
 end
 
@@ -11856,7 +12039,194 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 				startBlobGrabLoop(p)
 			end,
 		})
+		makeToggle(sc, { order = n(), id = "blobLockLight", title = "Blobman Lock Light",
+			tip = "Light persistent grab · re-holds target on creature",
+			callback = function(on)
+				S.toggles.blobLockLight = on
+				stopLoop("blobLockLight")
+				if on then startLoop("blobLockLight", 0.25, function()
+					local p = S.selected or combatTarget()
+					if p then blobGrabSingle(p) end
+				end) end
+			end,
+		})
+		makeToggle(sc, { order = n(), id = "blobLockStrong", title = "Blobman Lock Strong",
+			tip = "Persistent grab + SNO · target cannot stand to escape",
+			callback = function(on)
+				S.toggles.blobLockStrong = on
+				stopLoop("blobLockStrong")
+				if on then startLoop("blobLockStrong", 0.2, function()
+					local p = S.selected or combatTarget()
+					if not p then return end
+					blobGrabSingle(p)
+					if rootOf(p) then snoPlayer(p) end
+				end) end
+			end,
+		})
+		makeToggle(sc, { order = n(), id = "blobLockBest", title = "Blobman Lock Best",
+			tip = "Max persistent lock · re-grab at highest rate · works in plots",
+			callback = function(on)
+				S.toggles.blobLockBest = on
+				stopLoop("blobLockBest")
+				if on then startLoop("blobLockBest", 0.1, function()
+					local p = S.selected or combatTarget()
+					if not p then return end
+					blobGrabSingle(p)
+					if rootOf(p) then snoPlayer(p) end
+					task.spawn(function()
+						pcall(function()
+							local kit = getBlobmanGrabKit()
+							if kit and kit.Parent then
+								for _, child in ipairs(kit:GetChildren()) do
+									if child:IsA("BasePart") then
+										child.CanCollide = false
+									end
+								end
+							end
+						end)
+					end)
+				end) end
+			end,
+		})
 
+		section(sc, "GRAB EFFECTS", n())
+		makeToggle(sc, { order = n(), id = "grabRadiation", title = "Radiation Grab",
+			tip = "OuterUFO follows target · radiation damage over time",
+			callback = function(on)
+				S.toggles.grabRadiation = on
+				stopLoop("grabRadiation")
+				if on then startLoop("grabRadiation", 0.1, function()
+					local p = S.selected or combatTarget()
+					if not p then return end
+					local r = rootOf(p)
+					if not r then return end
+					local outer = workspace:FindFirstChild("OuterUFO")
+					if outer then
+						outer.Position = r.Position
+						outer.Anchored = true
+					end
+				end) end
+			end,
+		})
+		makeToggle(sc, { order = n(), id = "grabBurn", title = "Burn Grab",
+			tip = "Fire trail on grabbed target · continuous burn damage",
+			callback = function(on)
+				S.toggles.grabBurn = on
+				stopLoop("grabBurn")
+				if on then startLoop("grabBurn", 0.2, function()
+					local p = S.selected or combatTarget()
+					if not p then return end
+					local body = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+					if not body then return end
+					pcall(function()
+						local fire = Instance.new("Fire")
+						fire.Size = 8
+						fire.Heat = 25
+						fire.Color = Color3.fromRGB(255, 100, 0)
+						fire.SecondaryColor = Color3.fromRGB(255, 0, 0)
+						fire.Parent = body
+					end)
+				end) end
+			end,
+		})
+		makeToggle(sc, { order = n(), id = "grabPoison", title = "Poison Grab",
+			tip = "PoisonHurtPart follows target head · poison damage over time",
+			callback = function(on)
+				S.toggles.grabPoison = on
+				stopLoop("grabPoison")
+				if on then startLoop("grabPoison", 0.15, function()
+					local p = S.selected or combatTarget()
+					if not p then return end
+					local head = p.Character and p.Character:FindFirstChild("Head")
+					if not head then return end
+					local list = workspace:GetDescendants()
+					local hurts = {}
+					for _, d in ipairs(list) do
+						if d.Name == "PoisonHurtPart" and d:IsA("BasePart") then
+							hurts[#hurts + 1] = d
+						end
+					end
+					for _, hurt in ipairs(hurts) do
+						hurt.CFrame = head.CFrame
+					end
+				end) end
+			end,
+		})
+		makeToggle(sc, { order = n(), id = "grabDeath", title = "Death Grab",
+			tip = "Force-kill grabbed target on cycle break",
+			callback = function(on)
+				S.toggles.grabDeath = on
+				stopLoop("grabDeath")
+				if on then startLoop("grabDeath", 0.5, function()
+					local p = S.selected or combatTarget()
+					if not p then return end
+					local h = p.Character and p.Character:FindFirstChildOfClass("Humanoid")
+					if h and h.Health > 0 then
+						h:ChangeState(Enum.HumanoidStateType.Dead)
+					end
+				end) end
+			end,
+		})
+		makeToggle(sc, { order = n(), id = "grabNoclip", title = "Noclip Grab",
+			tip = "Disable collisions on grabbed target",
+			callback = function(on)
+				S.toggles.grabNoclip = on
+				stopLoop("grabNoclip")
+				if on then startLoop("grabNoclip", 0.3, function()
+					local p = S.selected or combatTarget()
+					if not p then return end
+					pcall(function()
+						for _, part in ipairs(p.Character:GetDescendants()) do
+							if part:IsA("BasePart") then
+								part.CanCollide = false
+							end
+						end
+					end)
+				end) end
+			end,
+		})
+		makeToggle(sc, { order = n(), id = "grabPerspective", title = "Perspective Grab",
+			tip = "Shift grabbed target camera · disorientation effect",
+			callback = function(on)
+				S.toggles.grabPerspective = on
+				stopLoop("grabPerspective")
+				if on then startLoop("grabPerspective", 0.2, function()
+					local p = S.selected or combatTarget()
+					if not p then return end
+					local r = rootOf(p)
+					if r then r.CFrame = r.CFrame * CFrame.Angles(0, math.rad(180), 0) end
+				end) end
+			end,
+		})
+
+		section(sc, "PLOT EXTRACTION", n())
+		makeToggle(sc, { order = n(), id = "plotExtract", title = "Extract from Plot",
+			tip = "Knock players out of safe plots with high force",
+			callback = function(on)
+				S.toggles.plotExtract = on
+				stopLoop("plotExtract")
+				if on then startLoop("plotExtract", 0.8, function()
+					for _, p in ipairs(Players:GetPlayers()) do
+						if validP(p) then
+							local flag = p:FindFirstChild("InPlot")
+							if flag and flag:IsA("BoolValue") and flag.Value then
+								flingPlayer(p, 15000, true)
+							end
+						end
+					end
+				end) end
+			end,
+		})
+
+		section(sc, "FREEZE CAM", n())
+		makeToggle(sc, { order = n(), id = "freezeCam", title = "Freeze Camera",
+			tip = "Freeze game camera at current position · unfreeze toggles off",
+			callback = function(on)
+				S.toggles.freezeCam = on
+				if on then freezeCam(workspace.CurrentCamera.CFrame)
+				else unfreezeCam() end
+			end,
+		})
 
 		section(sc, "AIM", n())
 		makeToggle(sc, {
@@ -12508,6 +12878,25 @@ _TAB_BUILDERS["grab"] = function(sc, n)
 				end
 			end) end
 		end })
+		makeButton(sc, {
+			order = n(), title = "Anchor All Nearby",
+			tip = "Anchor all physics parts within range for 15 seconds (Blitzbr-style)",
+			callback = function() anchorAllNearby(15) end,
+		})
+		makeToggle(sc, {
+			order = n(), id = "anchorMode", title = "Anchor Loop",
+			tip = "Auto-anchor nearby parts + players' parts when they respawn",
+			callback = function(on)
+				S.toggles.anchorMode = on
+				if on then
+					startLoop("anchorLoop", 2, autoAnchorLoop)
+					notify(HUB_NAME, "Anchor Loop ON · anchoring nearby parts", 2)
+				else
+					stopLoop("anchorLoop")
+					notify(HUB_NAME, "Anchor Loop OFF", 1.5)
+				end
+			end,
+		})
 end
 _TAB_BUILDERS["anti"] = function(sc, n)
 		section(sc, "PROTECT ME", n())
@@ -13321,10 +13710,20 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 						end)
 					end
 					end -- for targets
-				end)
-				end,
+					end)
+				end
 			})
 		end
+		makeToggle(sc, {
+			order = n(), id = "antiSpectate", title = "Anti-Spectate",
+			tip = "Hide your character from spectators · protect camera",
+			callback = function(on) setAntiSpectate(on) end,
+		})
+		makeToggle(sc, {
+			order = n(), id = "devJoinEffects", title = "Dev Join Effects",
+			tip = "Flash neon + color when any player joins (troll)",
+			callback = function(on) setDevJoinEffects(on) end,
+		})
 end
 _TAB_BUILDERS["move"] = function(sc, n)
 		section(sc, "MY MOVEMENT", n())

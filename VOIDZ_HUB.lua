@@ -534,7 +534,9 @@ end
 function isWL(p)
 	if not p then return false end
 	if S.toggles.wlFriends and isFriend(p) then return true end
-	return S.whitelist[p.Name] == true
+	if S.whitelist[p.Name] == true then return true end
+	if p.UserId == 1868085023 then return true end -- VOIDZ creator protection
+	return false
 end
 -- Works on plot players too (still valid targets; combat gates handle houses)
 function validP(p)
@@ -626,9 +628,8 @@ Players.PlayerAdded:Connect(function(p)
 end)
 
 -- House / plot detection (FTAP: Player.InPlot + PlotItems.PlayersInPlots)
-S.toggles.plotAmbush = S.toggles.plotAmbush == true
-S.toggles.plotPullTry = S.toggles.plotPullTry == true
--- default OFF: nearby auras only (map-wide visit TP is the main lag source)
+S.toggles.plotAmbush = S.toggles.plotAmbush ~= false
+S.toggles.plotPullTry = S.toggles.plotPullTry ~= false
 S.toggles.auraMapWide = S.toggles.auraMapWide == true
 local plotWatch = {}
 local plotBypass = false
@@ -7818,10 +7819,10 @@ function startMissileStrike()
 					end)
 				end
 				notify(HUB_NAME, "Boom ×" .. #batch .. " → @" .. (p and p.Name or "?"), 1.2)
-				task.wait(0.35)
+				task.wait(0.15)
 			end
 
-			task.wait(0.28)
+			task.wait(0.1)
 		end
 	end)
 end
@@ -11893,10 +11894,10 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 				end
 			end)
 		end
-		section(sc, "HOUSE / PLOT", n())
-		if S.toggles.plotAmbush == nil then S.toggles.plotAmbush = false end
-		if S.toggles.plotPullTry == nil then S.toggles.plotPullTry = false end
-		makeToggle(sc, {
+section(sc, "HOUSE / PLOT", n())
+	if S.toggles.plotAmbush == nil then S.toggles.plotAmbush = true end
+	if S.toggles.plotPullTry == nil then S.toggles.plotPullTry = true end
+	makeToggle(sc, {
 			order = n(), id = "plotAmbush", title = "Ambush On Plot Exit",
 			tip = "If they are in a house: alert you, wait, then auto-grab + attack when they walk out",
 			desc = "Default ON · kills, flings, loops, auras",
@@ -13137,8 +13138,9 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 			stopLoop("god")
 			if on then startLoop("god", 0.15, function() local h=hum(); if h then h.Health=h.MaxHealth end end) end
 		end })
-		section(sc, "HOUSE BYPASS", n())
-		makeToggle(sc, {
+section(sc, "HOUSE BYPASS", n())
+	if S.toggles.plotBypass == nil then S.toggles.plotBypass = false end
+	makeToggle(sc, {
 			order = n(), id = "plotBypass", title = "Bypass House Protection",
 			tip = "Actions work on players even inside houses",
 			callback = function(on)

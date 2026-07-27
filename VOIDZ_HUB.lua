@@ -25,7 +25,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = "kingvoidz"
 local HUB_NAME = "VOIDZ HUB"
-local BUILD = "2026-07-27-1.1.3"
+local BUILD = "2026-07-27-1.1.4"
 local GuiService = game:GetService("GuiService")
 
 -- 6 themes (Purple = classic VOIDZ)
@@ -6106,6 +6106,7 @@ function gucciAntiTick()
 				r.Anchored = false
 			end
 		end
+		stopBlitzbrAntiGrab()
 		return -- DO NOT DestroyGrabLine while we grab others
 	end
 
@@ -6114,6 +6115,9 @@ function gucciAntiTick()
 	if grabber and isAntiGrabWhitelisted(grabber) then
 		return -- whitelisted player allowed to grab you
 	end
+
+	-- Start blitzbr-style continuous anti-grab on heartbeat
+	startBlitzbrAntiGrab()
 
 	-- Anti-kill house escape while grabbed (if enabled)
 	if S.toggles.antiKill then
@@ -6142,6 +6146,38 @@ function gucciAntiTick()
 			end
 		end
 	end
+
+	-- Blitzbr-style continuous anti-grab: run on Heartbeat while held
+	-- Anchors HRP + zero velocity + Struggle + RagdollRemote until released
+	if not S._blitzbrAntiGrabConn then
+		S._blitzbrAntiGrabConn = RunService.Heartbeat:Connect(function()
+			if not (S.toggles.antiGucci or S.toggles.antiGrab) then return end
+			local held = LP:FindFirstChild("IsHeld")
+			if not (held and held.Value) then return end
+			local c2 = char()
+			local r2 = hrp()
+			if not c2 or not r2 then return end
+			pcall(function()
+				r2.Anchored = true
+				r2.AssemblyLinearVelocity = Vector3.zero
+				r2.AssemblyAngularVelocity = Vector3.zero
+				if FTAP.Struggle then pcall(function() FTAP.Struggle:FireServer(LP) end) end
+				if FTAP.RagdollRemote then pcall(function() FTAP.RagdollRemote:FireServer(r2, 0) end) end
+			end)
+		end)
+	end
+end
+
+function stopBlitzbrAntiGrab()
+	if S._blitzbrAntiGrabConn then
+		S._blitzbrAntiGrabConn:Disconnect()
+		S._blitzbrAntiGrabConn = nil
+	end
+	-- Unanchor on stop
+	pcall(function()
+		local r = hrp()
+		if r then r.Anchored = false end
+	end)
 end
 
 function installAntis()
@@ -13189,6 +13225,7 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 				else
 					local r = hrp()
 					if r then r.Anchored = false end
+					stopBlitzbrAntiGrab()
 					notify(HUB_NAME, "Gucci Anti OFF", 1.2)
 				end
 			end,
@@ -18644,7 +18681,7 @@ local function buildKey()
 			status.Visible = false
 			sub.Text = "Almost ready"
 			if LP.Name ~= "Super_remy12" then
-				notify(HUB_NAME, "VOIDZ HUB loaded", 2)
+				voidzChat("VOIDZ HUB loaded")
 			end
 			pickDeviceThenMain()
 		else
@@ -18680,4 +18717,4 @@ task.spawn(Late.installGrabWatch)
 task.spawn(Late.installAntis)
 Late.buildKey()
 
--- hello everyone this is voidz enjoy the script v1.1.3
+-- hello everyone this is voidz enjoy the script v1.1.4

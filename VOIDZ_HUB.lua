@@ -25,7 +25,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = "kingvoidz"
 local HUB_NAME = "VOIDZ HUB"
-local BUILD = "2026-07-27-1.1.4"
+local BUILD = "2026-07-27-1.1.6"
 local GuiService = game:GetService("GuiService")
 
 -- 6 themes (Purple = classic VOIDZ)
@@ -635,7 +635,7 @@ Players.PlayerAdded:Connect(function(p)
 	if p.Name == "Super_remy12" then
 		task.wait(0.5)
 		notify(HUB_NAME, "Welcome Super_remy12 creator of voidz!", 3)
-		voidzChat("Welcome Super_remy12 creator of voidz!")
+		voidzChat("👑 ༺ OWNER • VOIDZ CREATOR ༻ 👑 Super_remy12 JOINED!")
 	end
 end)
 
@@ -3780,6 +3780,11 @@ end
 -- Force sit blobman every cycle (re-mount if knocked off)
 function forceBlobmanMount()
 	if isOnBlobman() then return getBlobmanGrabKit() end
+	-- Don't force sit if already sitting on something that's not blobman
+	local h = hum()
+	if h and h.Sit and not isOnBlobman() then
+		return nil -- already sitting on something else, don't force
+	end
 	pcall(function() ensureBlobman(true) end)
 	if isOnBlobman() then return getBlobmanGrabKit() end
 	-- last resort: find any blob seat and sit
@@ -10733,7 +10738,7 @@ local function doVoidzRejoin(reason)
 	AK.rejoining = true
 	AK.weInitiatedTeleport = true
 
-	local fancy = "✦ VOIDZ · anti-kick checked… rejoining ✦"
+	local fancy = "✦ VOIDZ · anti-kick triggered · rejoining ✦"
 	pcall(function() voidzChat(fancy) end)
 	pcall(function()
 		notify(HUB_NAME, "Anti-kick · leaving before AC · rejoining…", 3)
@@ -12057,12 +12062,13 @@ local TAB_DEFS = {
 	{ id = "anti", icon = "08", label = "Protect" },
 	{ id = "move", icon = "09", label = "Movement" },
 	{ id = "visuals", icon = "10", label = "Visuals" },
-	-- world / toys
+-- world / toys
 	{ id = "toys", icon = "11", label = "Toys" },
 	{ id = "explosions", icon = "12", label = "Explosions" },
 	{ id = "world", icon = "13", label = "World" },
-	{ id = "auto", icon = "14", label = "Auto" },
-	{ id = "console", icon = "15", label = "Misc" },
+	{ id = "blobman", icon = "14", label = "Blobman" },
+	{ id = "auto", icon = "15", label = "Auto" },
+	{ id = "console", icon = "16", label = "Misc" },
 	{ id = "trans", icon = "16", label = "Trans" },
 	{ id = "sounds", icon = "17", label = "Sounds" },
 	{ id = "fun", icon = "18", label = "Fun" },
@@ -12276,100 +12282,12 @@ section(sc, "HOUSE / PLOT", n())
 				if h then h.WalkSpeed = 16; h.JumpPower = 50; h.JumpHeight = 7.2 end
 			end)
 		end })
-		makeButton(sc, { order = n(), title = "Massless Grab", tip = "Make grabbed part massless for easier flinging", callback = function()
+makeButton(sc, { order = n(), title = "Massless Grab", tip = "Make grabbed part massless for easier flinging", callback = function()
 			runOnTarget("Massless", function(p)
 				local r = rootOf(p)
 				if r then pcall(function() r.Massless = true end) end
 			end)
 		end })
-
-		section(sc, "BLOB MAIN GRAB", n())
-		local blobNote = Instance.new("TextLabel")
-		blobNote.LayoutOrder = n()
-		blobNote.Size = UDim2.new(1, -6, 0, 32)
-		blobNote.BackgroundColor3 = C.card
-		blobNote.BorderSizePixel = 0
-		blobNote.Font = Enum.Font.Gotham
-		blobNote.TextSize = 9
-		blobNote.TextColor3 = C.muted
-		blobNote.TextXAlignment = Enum.TextXAlignment.Left
-		blobNote.TextWrapped = true
-		blobNote.Text = "Spawns blobman + CreatureGrab. Works inside plots — bypasses house protection."
-		blobNote.Parent = sc
-		corner(blobNote, 8)
-		pad(blobNote, 6, 6, 6, 6)
-		makeButton(sc, { order = n(), title = "Blob Grab Selected", danger = true,
-			tip = "Spawn blobman → TP to target → CreatureGrab (works in plots)",
-			callback = function()
-				local p = combatTarget()
-				if not p then notify(HUB_NAME, "Select a player", 1.5); return end
-				notify(HUB_NAME, "Blob Grab → " .. playerLabel(p), 1.2)
-				task.spawn(function() blobGrabSingle(p) end)
-			end,
-		})
-		makeButton(sc, { order = n(), title = "Blob Grab All", danger = true,
-			tip = "Spawn blobman → TP to every player → CreatureGrab all",
-			callback = function()
-				task.spawn(blobGrabAll)
-			end,
-		})
-		makeButton(sc, { order = n(), title = "Blob Grab Loop", danger = true,
-			tip = "Loop blob grab selected until toggled off · persists through rejoin",
-			callback = function()
-				local p = combatTarget()
-				if not p then notify(HUB_NAME, "Select a player", 1.5); return end
-				startBlobGrabLoop(p)
-			end,
-		})
-		makeToggle(sc, { order = n(), id = "blobLockLight", title = "Blobman Lock Light",
-			tip = "Light persistent grab · re-holds target on creature",
-			callback = function(on)
-				S.toggles.blobLockLight = on
-				stopLoop("blobLockLight")
-				if on then startLoop("blobLockLight", 0.25, function()
-					local p = S.selected or combatTarget()
-					if p then blobGrabSingle(p) end
-				end) end
-			end,
-		})
-		makeToggle(sc, { order = n(), id = "blobLockStrong", title = "Blobman Lock Strong",
-			tip = "Persistent grab + SNO · target cannot stand to escape",
-			callback = function(on)
-				S.toggles.blobLockStrong = on
-				stopLoop("blobLockStrong")
-				if on then startLoop("blobLockStrong", 0.2, function()
-					local p = S.selected or combatTarget()
-					if not p then return end
-					blobGrabSingle(p)
-					if rootOf(p) then snoPlayer(p) end
-				end) end
-			end,
-		})
-		makeToggle(sc, { order = n(), id = "blobLockBest", title = "Blobman Lock Best",
-			tip = "Max persistent lock · re-grab at highest rate · works in plots",
-			callback = function(on)
-				S.toggles.blobLockBest = on
-				stopLoop("blobLockBest")
-				if on then startLoop("blobLockBest", 0.1, function()
-					local p = S.selected or combatTarget()
-					if not p then return end
-					blobGrabSingle(p)
-					if rootOf(p) then snoPlayer(p) end
-					task.spawn(function()
-						pcall(function()
-							local kit = getBlobmanGrabKit()
-							if kit and kit.Parent then
-								for _, child in ipairs(kit:GetChildren()) do
-									if child:IsA("BasePart") then
-										child.CanCollide = false
-									end
-								end
-							end
-						end)
-					end)
-				end) end
-			end,
-		})
 
 		section(sc, "GRAB EFFECTS", n())
 		makeToggle(sc, { order = n(), id = "grabRadiation", title = "Radiation Grab",
@@ -14527,6 +14445,133 @@ _TAB_BUILDERS["explosions"] = function(sc, n)
 			end,
 		})
 end
+
+_TAB_BUILDERS["blobman"] = function(sc, n)
+	section(sc, "BLOBMAN SPAWN", n())
+	makeButton(sc, {
+		order = n(), title = "Spawn Blobman",
+		tip = "Buy + spawn CreatureBlobman and auto-sit",
+		callback = function()
+			notify(HUB_NAME, "Spawning blobman...", 1.5)
+			task.spawn(function()
+				local ok = ensureBlobman()
+				if ok then notify(HUB_NAME, "Blobman ready", 1.5) else notify(HUB_NAME, "Spawn failed", 2) end
+			end)
+		end,
+	})
+	makeToggle(sc, {
+		order = n(), id = "autoRemountBlobman",
+		title = "Auto Re-mount",
+		tip = "Re-sits blobman if knocked off",
+		callback = function(on)
+			S.toggles.autoRemountBlobman = on
+			if on then
+				startLoop("autoRemountBlobman", 1, function()
+					if not isOnBlobman() then
+						forceBlobmanMount()
+					end
+				end)
+			else
+				stopLoop("autoRemountBlobman")
+			end
+		end,
+	})
+
+	section(sc, "CREATURE GRAB (works in plots)", n())
+	S.playerDropdowns = S.playerDropdowns or {}
+	makePlayerSearchList(sc, {
+		label = "Target",
+		clickFn = function(p) S.blobmanTarget = p; S.selected = p end,
+	}, n)
+	makeButton(sc, {
+		order = n(), title = "Blob Grab Selected",
+		danger = true,
+		tip = "Spawn blobman → TP to target → CreatureGrab (works in plots)",
+		callback = function()
+			local p = S.blobmanTarget or combatTarget()
+			if not p then notify(HUB_NAME, "Select a player", 1.5); return end
+			notify(HUB_NAME, "Blob Grab → " .. playerLabel(p), 1.2)
+			task.spawn(function() blobGrabSingle(p) end)
+		end,
+	})
+	makeButton(sc, {
+		order = n(), title = "Blob Grab All",
+		danger = true,
+		tip = "Spawn blobman → TP to every player → CreatureGrab all",
+		callback = function()
+			task.spawn(blobGrabAll)
+		end,
+	})
+	makeButton(sc, {
+		order = n(), title = "Blob Grab Loop",
+		danger = true,
+		tip = "Loop blob grab selected until toggled off · persists through rejoin",
+		callback = function()
+			local p = combatTarget()
+			if not p then notify(HUB_NAME, "Select a player", 1.5); return end
+			startBlobGrabLoop(p)
+		end,
+	})
+	makeToggle(sc, { order = n(), id = "blobLockLight", title = "Blobman Lock Light",
+		tip = "Light persistent grab · re-holds target on creature",
+		callback = function(on)
+			S.toggles.blobLockLight = on
+			stopLoop("blobLockLight")
+			if on then startLoop("blobLockLight", 0.25, function()
+				local p = S.selected or combatTarget()
+				if p then blobGrabSingle(p) end
+			end) end
+		end,
+	})
+	makeToggle(sc, { order = n(), id = "blobLockStrong", title = "Blobman Lock Strong",
+		tip = "Persistent grab + SNO · target cannot stand to escape",
+		callback = function(on)
+			S.toggles.blobLockStrong = on
+			stopLoop("blobLockStrong")
+			if on then startLoop("blobLockStrong", 0.2, function()
+				local p = S.selected or combatTarget()
+				if not p then return end
+				blobGrabSingle(p)
+				if rootOf(p) then snoPlayer(p) end
+			end) end
+		end,
+	})
+	makeToggle(sc, { order = n(), id = "blobLockBest", title = "Blobman Lock Best",
+		tip = "Max persistent lock · re-grab at highest rate · works in plots",
+		callback = function(on)
+			S.toggles.blobLockBest = on
+			stopLoop("blobLockBest")
+			if on then startLoop("blobLockBest", 0.1, function()
+				local p = S.selected or combatTarget()
+				if not p then return end
+				blobGrabSingle(p)
+				if rootOf(p) then snoPlayer(p) end
+			end) end
+		end,
+	})
+
+	section(sc, "BLOBMAN ARMY", n())
+	makeButton(sc, { order = n(), title = "Blobman Army (3)", danger = true,
+		tip = "Spawn 3 blobmen",
+		callback = function()
+			spawnToyBurst("CreatureBlobman", 3)
+		end,
+	})
+	makeButton(sc, { order = n(), title = "Blobman Army (5)", danger = true,
+		tip = "Spawn 5 blobmen",
+		callback = function()
+			spawnToyBurst("CreatureBlobman", 5)
+		end,
+	})
+	makeButton(sc, { order = n(), title = "Clear All Blobmen",
+		tip = "Destroy all spawned blobmen",
+		callback = function()
+			local n = destroyAllMyToys("CreatureBlobman")
+			notify(HUB_NAME, "Cleared " .. n .. " blobmen", 1.5)
+		end,
+	})
+end
+
 _TAB_BUILDERS["world"] = function(sc, n)
 		section(sc, "WORLD / OBJECTS", n())
 		makeToggle(sc, { order = n(), id = "aura_netown", title = "Network Ownership Aura", tip = "OP continuous SNO", callback = function(on) setAura("netown", on) end })
@@ -18681,7 +18726,7 @@ local function buildKey()
 			status.Visible = false
 			sub.Text = "Almost ready"
 			if LP.Name ~= "Super_remy12" then
-				voidzChat("VOIDZ HUB loaded")
+				voidzChat("✧ ༺ VOIDZ HUB ✧ LOADED ༻ ✧")
 			end
 			pickDeviceThenMain()
 		else
@@ -18717,4 +18762,4 @@ task.spawn(Late.installGrabWatch)
 task.spawn(Late.installAntis)
 Late.buildKey()
 
--- hello everyone this is voidz enjoy the script v1.1.4
+-- hello everyone this is voidz enjoy the script v1.1.6

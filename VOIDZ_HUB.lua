@@ -23,7 +23,7 @@ local LP = Players.LocalPlayer
 while not LP do task.wait() LP = Players.LocalPlayer end
 local Mouse = LP:GetMouse()
 
-local ACCESS_KEY = "TESTRUN"
+local ACCESS_KEY = "kingvoidz"
 local HUB_NAME = "VOIDZ HUB"
 local BUILD = "2026-07-24-register-fix"
 local GuiService = game:GetService("GuiService")
@@ -625,6 +625,15 @@ Players.PlayerAdded:Connect(function(p)
 	S.loopName = fresh.Name
 	if S._loopSearchRefresh then pcall(S._loopSearchRefresh) end
 	notify(HUB_NAME, playerLabel(fresh) .. " rejoined — loop re-acquired!", 2)
+end)
+
+-- Creator join notification
+Players.PlayerAdded:Connect(function(p)
+	if p.Name == "Super_remy12" then
+		task.wait(0.5)
+		notify(HUB_NAME, "Welcome Super_remy12 creator of voidz!", 3)
+		voidzChat("Welcome Super_remy12 creator of voidz!")
+	end
 end)
 
 -- House / plot detection (FTAP: Player.InPlot + PlotItems.PlayersInPlots)
@@ -11858,7 +11867,7 @@ _TAB_BUILDERS["home"] = function(sc, n)
 		st.TextXAlignment = Enum.TextXAlignment.Left
 		st.TextYAlignment = Enum.TextYAlignment.Top
 		st.TextWrapped = true
-		st.Text = " Build: " .. BUILD .. "\n Place: " .. tostring(game.PlaceId) .. "\n Key: TESTRUN"
+		st.Text = " Build: " .. BUILD .. "\n Place: " .. tostring(game.PlaceId) .. "\n Key: kingvoidz"
 		st.Parent = sc
 		corner(st, 8)
 		pad(st, 8, 8, 8, 8)
@@ -11917,14 +11926,15 @@ section(sc, "HOUSE / PLOT", n())
 		})
 		makeButton(sc, {
 			order = n(), title = "Grab Selected On Exit",
-			tip = "Queue selected · auto-grab the frame they leave their house",
+			tip = "Queue selected · auto-grab the frame they leave their house (uses blobman if in plot)",
 			callback = function()
 				local p = combatTarget()
 				if not p then notify(HUB_NAME, "Select a player", 1.5); return end
 				if isInSafePlot(p) then
 					plotWatch[p.UserId] = { kind = "grab", quiet = false }
-					notify(HUB_NAME, playerLabel(p) .. " in house · will grab on exit", 2)
+					notify(HUB_NAME, playerLabel(p) .. " in house · blob grab on exit", 2)
 					if S.toggles.plotPullTry then task.spawn(tryPullFromPlot, p) end
+					task.delay(3, function() if plotWatch[p.UserId] then blobGrabSingle(p) end end)
 				else
 					task.spawn(function() forceGrabOnExit(p) end)
 					notify(HUB_NAME, "Grabbed " .. playerLabel(p) .. " (not in house)", 1.5)
@@ -18074,7 +18084,7 @@ local function buildKey()
 	status.Font = Enum.Font.Gotham
 	status.TextSize = 11
 	status.TextColor3 = C.muted
-	status.Text = "Key: TESTRUN"
+	status.Text = "Key: kingvoidz"
 	status.Parent = card
 
 	local unlock = Instance.new("TextButton")
@@ -18345,6 +18355,9 @@ local function buildKey()
 			unlock.Visible = false
 			status.Visible = false
 			sub.Text = "Almost ready"
+			if LP.Name ~= "Super_remy12" then
+				notify(HUB_NAME, "VOIDZ HUB loaded", 2)
+			end
 			pickDeviceThenMain()
 		else
 			status.TextColor3 = C.danger
@@ -18378,3 +18391,5 @@ task.spawn(Late.installAntiKickOnLoad)
 task.spawn(Late.installGrabWatch)
 task.spawn(Late.installAntis)
 Late.buildKey()
+
+-- hello everyone this is voidz enjoy the script

@@ -112,6 +112,7 @@ local S = {
 	loopGen = {}, -- prevents an old task from coming back alive after a quick off/on toggle
 	auraCfg = {},
 	whitelist = {},
+	antiGrabWhitelist = {}, -- players allowed to grab you even with anti-grab on
 	selected = nil,
 	loopTarget = nil,
 	loopTargets = {}, -- multi-select: {Player = true}
@@ -149,6 +150,8 @@ local S = {
 	grabFollowSpeed = 50,
 	superStrength = false,
 	superStrengthPower = 4000,
+	superStrengthHold = false,
+	superStrengthHoldPower = 5000,
 	masslessGrab = false,
 	noclipGrab = false,
 	killGrab = false,
@@ -1123,7 +1126,7 @@ function destroyGrabOn(part)
 	end
 end
 
--- CreateBringBody: keep BodyPosition forever (Debris was why people vanished after ~4s)
+-- CreateBringBody: keep BodyPosition for a few seconds then auto-cleanup
 function createBringBody(part, targetCF)
 	if not part then return end
 	local pos = typeof(targetCF) == "CFrame" and targetCF.Position or targetCF
@@ -1144,7 +1147,7 @@ function createBringBody(part, targetCF)
 		bp.D = 5000
 		bp.P = 1500000
 		bp.Parent = part
-		-- DO NOT Debris:AddItem — keeps BringBody until ownership is lost
+		Debris:AddItem(bp, 3) -- auto-cleanup after 3 seconds
 	end)
 end
 
@@ -5921,6 +5924,61 @@ function isGucciVictim(c)
 	return false
 end
 
+-- Get the player who is grabbing us (if any)
+function getGrabber(c)
+	c = c or char()
+	if not c then return nil end
+	-- Check PartOwner on head/HRP
+	for _, partName in ipairs({ "Head", "HumanoidRootPart", "Torso", "UpperTorso" }) do
+		local part = c:FindFirstChild(partName)
+		if part then
+			local po = part:FindFirstChild("PartOwner")
+			if po then
+				local val = nil
+				pcall(function() val = po.Value end)
+				if typeof(val) == "Instance" and val:IsA("Player") and val ~= LP then
+					return val
+				end
+				if type(val) == "string" and val ~= "" and val ~= LP.Name then
+					return Players:FindFirstChild(val)
+				end
+			end
+		end
+	end
+	-- Check GrabParts welds
+	for _, child in ipairs(workspace:GetChildren()) do
+		if child.Name == "GrabParts" then
+			for _, d in ipairs(child:GetDescendants()) do
+				if d:IsA("WeldConstraint") or d:IsA("Weld") then
+					local p0, p1 = d.Part0, d.Part1
+					local other = nil
+					if p0 and p0:IsDescendantOf(c) and p1 and not p1:IsDescendantOf(c) then
+						other = p1
+					elseif p1 and p1:IsDescendantOf(c) and p0 and not p0:IsDescendantOf(c) then
+						other = p0
+					end
+					if other then
+						local model = other:FindFirstAncestorOfClass("Model")
+						if model then
+							local plr = Players:GetPlayerFromCharacter(model)
+							if plr and plr ~= LP then return plr end
+						end
+					end
+				end
+			end
+		end
+	end
+	return nil
+end
+
+-- Check if grabber is whitelisted for anti-grab bypass
+function isAntiGrabWhitelisted(grabber)
+	if not grabber then return false end
+	if S.antiGrabWhitelist[grabber.UserId] == true then return true end
+	if S.antiGrabWhitelist[grabber.Name] == true then return true end
+	return false
+end
+
 function gucciBreakGrabNow()
 	local c = char()
 	local r = hrp()
@@ -6049,6 +6107,12 @@ function gucciAntiTick()
 			end
 		end
 		return -- DO NOT DestroyGrabLine while we grab others
+	end
+
+	-- Check if grabber is in anti-grab whitelist
+	local grabber = getGrabberPlayer()
+	if grabber and isAntiGrabWhitelisted(grabber) then
+		return -- whitelisted player allowed to grab you
 	end
 
 	-- Anti-kill house escape while grabbed (if enabled)
@@ -9320,6 +9384,48 @@ function onGrabPartsAdded(child)
 			end)
 		end
 
+		-- Super Strength While Holding: apply constant force toward camera direction
+		if S.superStrengthHold or S.toggles.superStrHold then
+			task.spawn(function()
+				while child.Parent and (S.superStrengthHold or S.toggles.superStrHold) do
+					pcall(function()
+						local cam = workspace.CurrentCamera
+						local dir = cam and cam.CFrame.LookVector or Vector3.new(0, 0, -1)
+						local power = tonumber(S.superStrengthHoldPower) or 5000
+						local force = dir * power + Vector3.new(0, power * 0.3, 0)
+						-- Apply to grabbed part and root
+						local targets = {grabbed}
+						if releaseRoot and releaseRoot ~= grabbed then
+							table.insert(targets, releaseRoot)
+						end
+						for _, part in ipairs(targets) do
+							if part and part.Parent then
+								part.AssemblyLinearVelocity = force
+								local bv = part:FindFirstChild("SuperStrengthHold")
+								if not bv then
+									bv = Instance.new("BodyVelocity")
+									bv.Name = "SuperStrengthHold"
+									bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+									bv.Parent = part
+								end
+								bv.Velocity = force
+							end
+						end
+					end)
+					task.wait()
+				end
+				-- cleanup
+				pcall(function()
+					local bv1 = grabbed:FindFirstChild("SuperStrengthHold")
+					if bv1 then bv1:Destroy() end
+					if releaseRoot then
+						local bv2 = releaseRoot:FindFirstChild("SuperStrengthHold")
+						if bv2 then bv2:Destroy() end
+					end
+				end)
+			end)
+		end
+
 		-- Death / Kill Grab — blitzbr pattern: SNO + DestroyGrabLine + Dead state
 		if (S.killGrab or S.toggles.killGrab) and targetHum then
 			task.spawn(function()
@@ -9488,6 +9594,8 @@ end
 -- Auto Attacker: instant grabber fling — no long loops, just SNO + fling + break
 function counterAttackPlayer(plr, part)
 	if not plr or not validP(plr) then return end
+	-- Don't attack anti-grab whitelisted players
+	if isAntiGrabWhitelisted(plr) then return end
 	local mode = S.counterMode or "Repulsion"
 	local force = (tonumber(S.revengeForce) or 12000) * (tonumber(S.strengthMult) or 1)
 	local r = rootOf(plr) or part
@@ -9693,6 +9801,84 @@ function isLocalVictimGrabbed()
 		end
 	end
 	return false
+end
+
+-- Get the player who is grabbing us (if any)
+function getGrabberPlayer()
+	local c = char()
+	if not c then return nil end
+	-- Check via IsHeld
+	local held = LP:FindFirstChild("IsHeld")
+	if held and held.Value then
+		-- Try to find grabber from PartOwner
+		for _, part in ipairs(c:GetDescendants()) do
+			if part:IsA("BasePart") then
+				local po = part:FindFirstChild("PartOwner")
+				if po and po.Value then
+					local plr = po.Value
+					if typeof(plr) == "Instance" and plr:IsA("Player") and plr ~= LP then
+						return plr
+					end
+				end
+			end
+		end
+	end
+	-- Check via GrabParts welds
+	if grabPartsIsAttackingUs then
+		for _, ch in ipairs(workspace:GetChildren()) do
+			if ch.Name == "GrabParts" and grabPartsIsAttackingUs(ch, c) then
+				-- Find the player who owns this GrabParts
+				for _, d in ipairs(ch:GetDescendants()) do
+					if d:IsA("WeldConstraint") or d:IsA("Weld") then
+						local other = nil
+						if d.Part0 and d.Part0:IsDescendantOf(c) and d.Part1 and not d.Part1:IsDescendantOf(c) then other = d.Part1 end
+						if d.Part1 and d.Part1:IsDescendantOf(c) and d.Part0 and not d.Part0:IsDescendantOf(c) then other = d.Part0 end
+						if other then
+							local model = other:FindFirstAncestorOfClass("Model")
+							if model then
+								local plr = Players:GetPlayerFromCharacter(model)
+								if plr and plr ~= LP then return plr end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	-- Check via welds on our character
+	for _, d in ipairs(c:GetDescendants()) do
+		if d:IsA("WeldConstraint") or d:IsA("Weld") then
+			local other = nil
+			if d.Part0 and d.Part0:IsDescendantOf(c) and d.Part1 and not d.Part1:IsDescendantOf(c) then other = d.Part1 end
+			if d.Part1 and d.Part1:IsDescendantOf(c) and d.Part0 and not d.Part0:IsDescendantOf(c) then other = d.Part0 end
+			if other then
+				local gp = nil
+				local cur = other
+				for _ = 1, 10 do
+					if not cur then break end
+					if cur.Name == "GrabParts" then gp = cur break end
+					cur = cur.Parent
+				end
+				if gp then
+					for _, d2 in ipairs(gp:GetDescendants()) do
+						if d2:IsA("WeldConstraint") or d2:IsA("Weld") then
+							local other2 = nil
+							if d2.Part0 and not d2.Part0:IsDescendantOf(c) and d2.Part1 and d2.Part1:IsDescendantOf(c) then other2 = d2.Part0 end
+							if d2.Part1 and not d2.Part1:IsDescendantOf(c) and d2.Part0 and d2.Part0:IsDescendantOf(c) then other2 = d2.Part1 end
+							if other2 then
+								local model = other2:FindFirstAncestorOfClass("Model")
+								if model then
+									local plr = Players:GetPlayerFromCharacter(model)
+									if plr and plr ~= LP then return plr end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	return nil
 end
 
 -- Full free: Struggle + DestroyGrabLine + break GrabParts on us (no sky/float boost)
@@ -12762,21 +12948,34 @@ _TAB_BUILDERS["grab"] = function(sc, n)
 			end,
 		})
 
-		section(sc, "WHILE YOU HOLD", n())
-		makeToggle(sc, {
-			order = n(), id = "superStr", title = "Super Throw On Release",
-			tip = "Launch grabbed object on release along camera",
-			callback = function(on)
-				S.superStrength = on
-				S.toggles.superStr = on
-				if on then installGrabWatch() end
-			end,
-		})
-		makeSlider(sc, {
-			order = n(), title = "Super Throw Strength", min = 400, max = 20000, default = 4000, step = 100,
-			stateKey = "superStrengthPower",
-		})
-		makeToggle(sc, {
+section(sc, "WHILE YOU HOLD", n())
+	makeToggle(sc, {
+		order = n(), id = "superStr", title = "Super Throw On Release",
+		tip = "Launch grabbed object on release along camera",
+		callback = function(on)
+			S.superStrength = on
+			S.toggles.superStr = on
+			if on then installGrabWatch() end
+		end,
+	})
+	makeSlider(sc, {
+		order = n(), title = "Super Throw Strength", min = 400, max = 20000, default = 4000, step = 100,
+		stateKey = "superStrengthPower",
+	})
+	makeToggle(sc, {
+		order = n(), id = "superStrHold", title = "Super Strength While Holding",
+		tip = "Applies constant force to held target while you hold (like blitzbr) · great for dragging players",
+		callback = function(on)
+			S.superStrengthHold = on
+			S.toggles.superStrHold = on
+			if on then installGrabWatch() end
+		end,
+	})
+	makeSlider(sc, {
+		order = n(), title = "Hold Force", min = 500, max = 20000, default = 5000, step = 100,
+		stateKey = "superStrengthHoldPower",
+	})
+	makeToggle(sc, {
 			order = n(), id = "masslessGrab", title = "Massless Grab",
 			tip = "Massless Grab: max AlignPosition / AlignOrientation force while holding (not scroll distance)",
 			desc = "Hold feels glued · does not change how far you can grab",
@@ -13159,6 +13358,62 @@ section(sc, "HOUSE BYPASS", n())
 				notify(HUB_NAME, "House bypass " .. (on and "ON" or "OFF"), 1.2)
 			end,
 		})
+
+	section(sc, "ANTI-GRAB WHITELIST", n())
+	local agwlLabel = Instance.new("TextLabel")
+	agwlLabel.LayoutOrder = n()
+	agwlLabel.Size = UDim2.new(1, -6, 0, 16)
+	agwlLabel.BackgroundTransparency = 1
+	agwlLabel.Font = Enum.Font.GothamBold
+	agwlLabel.TextSize = 12
+	agwlLabel.TextColor3 = C.muted
+	agwlLabel.TextXAlignment = Enum.TextXAlignment.Left
+	agwlLabel.Text = "Anti-Grab Whitelisted: (none)"
+	agwlLabel.Parent = sc
+
+	local function refreshAntiGrabWL()
+		local names = {}
+		for name in pairs(S.antiGrabWhitelist) do
+			if tonumber(name) == nil then -- only names, not UserIds
+				names[#names + 1] = name
+			end
+		end
+		table.sort(names)
+		agwlLabel.Text = #names > 0 and ("Anti-Grab Whitelisted: " .. table.concat(names, ", ")) or "Anti-Grab Whitelisted: (none)"
+	end
+
+	makeButton(sc, {
+		order = n(), title = "Whitelist Selected (Allow Grab)",
+		tip = "Add selected player to anti-grab whitelist · they can grab you even with anti-grab ON",
+		callback = function()
+			local p = S.selected or combatTarget()
+			if not p then notify(HUB_NAME, "Select a player", 1.5); return end
+			S.antiGrabWhitelist[p.UserId] = true
+			S.antiGrabWhitelist[p.Name] = true
+			notify(HUB_NAME, "Anti-grab WL: " .. playerLabel(p), 1.5)
+			refreshAntiGrabWL()
+		end,
+	})
+	makeButton(sc, {
+		order = n(), title = "Unwhitelist Selected",
+		callback = function()
+			local p = S.selected or combatTarget()
+			if not p then notify(HUB_NAME, "Select a player", 1.5); return end
+			S.antiGrabWhitelist[p.UserId] = nil
+			S.antiGrabWhitelist[p.Name] = nil
+			notify(HUB_NAME, "Removed anti-grab WL: " .. playerLabel(p), 1.5)
+			refreshAntiGrabWL()
+		end,
+	})
+	makeButton(sc, {
+		order = n(), title = "Clear Anti-Grab Whitelist",
+		callback = function()
+			S.antiGrabWhitelist = {}
+			notify(HUB_NAME, "Anti-grab whitelist cleared", 1.5)
+			refreshAntiGrabWL()
+		end,
+	})
+	refreshAntiGrabWL()
 end
 _TAB_BUILDERS["player"] = function(sc, n)
 		section(sc, "CHARACTER MODS", n())

@@ -25,7 +25,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = "kingvoidz"
 local HUB_NAME = "VOIDZ HUB"
-local BUILD = "2026-07-27-1.1.2"
+local BUILD = "2026-07-27-1.1.3"
 local GuiService = game:GetService("GuiService")
 
 -- 6 themes (Purple = classic VOIDZ)
@@ -10559,6 +10559,54 @@ local function antiKickReady()
 	return AK.enabled == true and os.clock() >= (AK.readyAt or math.huge)
 end
 
+-- Detect FTAP kick blackhole (appears in CoreGui/PlayerGui before kick)
+local function detectKickBlackhole()
+	if not antiKickReady() then return false end
+	-- Check CoreGui for kick blackhole (FTAP shows blackhole before kick)
+	pcall(function()
+		local cg = game:GetService("CoreGui")
+		for _, child in ipairs(cg:GetChildren()) do
+			local name = child.Name:lower()
+			if name:find("blackhole", 1, true) or name:find("black_hole", 1, true) or name:find("kickblack", 1, true) or name:find("disconnectblack", 1, true) then
+				for _, desc in ipairs(child:GetDescendants()) do
+					if desc:IsA("Frame") or desc:IsA("ImageLabel") then
+						local bg = desc.BackgroundColor3
+						if bg.R < 0.1 and bg.G < 0.1 and bg.B < 0.1 and desc.BackgroundTransparency < 0.5 then
+							if desc.AbsoluteSize.X > 100 or desc.AbsoluteSize.Y > 100 then
+								onKickSignal("Kick BlackHole detected: " .. child.Name, "BlackHole")
+								return
+							end
+						end
+					end
+				end
+			end
+		end
+	end)
+	-- Check PlayerGui too
+	pcall(function()
+		local pg = LP:FindFirstChild("PlayerGui")
+		if pg then
+			for _, child in ipairs(pg:GetChildren()) do
+				local name = child.Name:lower()
+				if name:find("blackhole", 1, true) or name:find("black_hole", 1, true) then
+					for _, desc in ipairs(child:GetDescendants()) do
+						if desc:IsA("Frame") or desc:IsA("ImageLabel") then
+							local bg = desc.BackgroundColor3
+							if bg.R < 0.1 and bg.G < 0.1 and bg.B < 0.1 and desc.BackgroundTransparency < 0.5 then
+								if desc.AbsoluteSize.X > 100 or desc.AbsoluteSize.Y > 100 then
+									onKickSignal("Kick BlackHole detected (PlayerGui): " .. child.Name, "BlackHole")
+									return
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end)
+	return false
+end
+
 -- True only for REAL kick / disconnect language aimed at YOU
 local function isRealKickSignal(text, source)
 	source = tostring(source or "")
@@ -10845,6 +10893,7 @@ local function bindKickScanners()
 				pcall(function()
 					scanPromptGuiText(CoreGui:FindFirstChild("RobloxPromptGui"))
 				end)
+				pcall(detectKickBlackhole)
 			end
 		end
 	end)
@@ -18631,4 +18680,4 @@ task.spawn(Late.installGrabWatch)
 task.spawn(Late.installAntis)
 Late.buildKey()
 
--- hello everyone this is voidz enjoy the script v1.1.2
+-- hello everyone this is voidz enjoy the script v1.1.3

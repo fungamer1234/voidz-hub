@@ -25,7 +25,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = "kingvoidz"
 local HUB_NAME = "VOIDZ HUB"
-local BUILD = "2026-07-24-register-fix"
+local BUILD = "2026-07-27-1.1.2"
 local GuiService = game:GetService("GuiService")
 
 -- 6 themes (Purple = classic VOIDZ)
@@ -13157,35 +13157,6 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "antiTrain", title = "Anti Train / Blobman Seat",
-			tip = "Force unsit if someone sticks you on a train or blob seat",
-			callback = function(on)
-				S.toggles.antiBlobman = on
-				stopLoop("antiBlob")
-				if on then startLoop("antiBlob", 0.15, antiBlobmanTick) end
-			end,
-		})
-		makeToggle(sc, {
-			order = n(), id = "antiGrab", title = "Stop Being Grabbed",
-			tip = "Struggle + destroy GrabParts + IsHeld break",
-			callback = function(on)
-				S.antiWanted = S.antiWanted or {}
-				S.antiWanted.antiGrab = on
-				S.toggles.antiGrab = on
-				stopLoop("antiGrab")
-				installAntis()
-				notify(HUB_NAME, "Anti-grab " .. (on and "ON" or "OFF"), 1.5)
-				if on then
-					if FTAP.Struggle then pcall(function() FTAP.Struggle:FireServer(LP) end) end
-					startLoop("antiGrab", 0.1, antiGrabTick)
-					doAntiGrabHard()
-				else
-					local r = hrp()
-					if r then r.Anchored = false end
-				end
-			end,
-		})
-		makeToggle(sc, {
 			order = n(), id = "autoCounter", title = "Auto Attacker",
 			tip = "When someone grabs you or you're low HP: instantly attack them (mode below)",
 			callback = function(on)
@@ -13381,6 +13352,19 @@ section(sc, "HOUSE BYPASS", n())
 		table.sort(names)
 		agwlLabel.Text = #names > 0 and ("Anti-Grab Whitelisted: " .. table.concat(names, ", ")) or "Anti-Grab Whitelisted: (none)"
 	end
+
+	-- Searchable player dropdown for whitelist
+	local agwlPlayerDropdown = nil
+	makePlayerSearchList(sc, {
+		label = "Select Player for Whitelist",
+		clickFn = function(p)
+			if not p then return end
+			S.antiGrabWhitelist[p.UserId] = true
+			S.antiGrabWhitelist[p.Name] = true
+			notify(HUB_NAME, "Anti-grab WL: " .. playerLabel(p), 1.5)
+			refreshAntiGrabWL()
+		end,
+	}, n)
 
 	makeButton(sc, {
 		order = n(), title = "Whitelist Selected (Allow Grab)",
@@ -18647,4 +18631,4 @@ task.spawn(Late.installGrabWatch)
 task.spawn(Late.installAntis)
 Late.buildKey()
 
--- hello everyone this is voidz enjoy the script
+-- hello everyone this is voidz enjoy the script v1.1.2

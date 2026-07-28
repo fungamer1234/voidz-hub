@@ -44,7 +44,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,88,91})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,88,92})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -232,8 +232,6 @@ function tween(o, props, t, style)
 	tw:Play()
 	return tw
 end
-do local _z210=(3*6); if _z210<0 and _Vj() then _z210=_z210+1 end end
-
 function corner(i, r)
 	local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, r or 8); c.Parent = i; return c
 end
@@ -252,6 +250,8 @@ function pad(i, a,b,c,d)
 	p.PaddingTop=UDim.new(0,a or 6); p.PaddingRight=UDim.new(0,b or 6)
 	p.PaddingBottom=UDim.new(0,c or 6); p.PaddingLeft=UDim.new(0,d or 6); p.Parent=i; return p
 end
+do local _z210=(3*6); if _z210<0 and _Vj() then _z210=_z210+1 end end
+
 function grad(i, a, b, rot)
 	local g = Instance.new("UIGradient"); g.Color = ColorSequence.new(a or C.accentDim, b or C.bg); g.Rotation = rot or 90; g.Parent = i; return g
 end
@@ -846,27 +846,23 @@ function showVoidzSplash(device, onDone)
 end
 
 function char() return LP.Character end
-do local _z137=(7*7); if _z137<0 and _Vj() then _z137=_z137+1 end end
-
 function hum() local c=char(); return c and c:FindFirstChildOfClass("Humanoid") end
 function hrp()
 	local c = char()
 	if not c then return end
 	return c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Torso") or c:FindFirstChild("UpperTorso")
 end
-do local _z322=(6*10); if _z322<0 and _Vj() then _z322=_z322+1 end end
-
 function camPart()
 	local c = char()
 	return (c and c:FindFirstChild(_Vzd({104,134,146,117,134,151,153}))) or hrp()
 end
+do local _z137=(7*7); if _z137<0 and _Vj() then _z137=_z137+1 end end
+
 function rootOf(p)
 	local c = p and p.Character
 	if not c then return end
 	return c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Torso") or c:FindFirstChild("UpperTorso")
 end
-
-do local _z148=(2*8); if _z148<0 and _Vj() then _z148=_z148+1 end end
 
 function lookAt(fromPos, toPos)
 	local u = toPos - fromPos
@@ -877,6 +873,8 @@ function lookAt(fromPos, toPos)
 	r = r.Unit
 	return CFrame.fromMatrix(fromPos, r, r:Cross(u))
 end
+
+do local _z322=(6*10); if _z322<0 and _Vj() then _z322=_z322+1 end end
 
 function isFriend(p)
 	local ok, v = pcall(function() return p:IsFriendsWith(LP.UserId) end)
@@ -889,7 +887,7 @@ function isWL(p)
 	if p.UserId == 1868085023 then return true end
 	return false
 end
-do local _z663=(8*9); if _z663<0 and _Vj() then _z663=_z663+1 end end
+do local _z148=(2*8); if _z148<0 and _Vj() then _z148=_z148+1 end end
 
 function validP(p)
 	if not p or p == LP or isWL(p) then return false end
@@ -900,8 +898,6 @@ function validP(p)
 	if not h or not r then return false end
 	return h.Health > 0 or (h:FindFirstChild(_Vzd({119,134,140,137,148,145,145,138,137})) ~= nil)
 end
-
-do local _z235=(6*9); if _z235<0 and _Vj() then _z235=_z235+1 end end
 
 function getLoopTargets()
 	local out = {}
@@ -979,6 +975,8 @@ local plotBypass = false
 local plotAlertAt = {}
 local plotWatchInstalled = false
 
+do local _z663=(8*9); if _z663<0 and _Vj() then _z663=_z663+1 end end
+
 function isInSafePlot(p)
 	if not p or p == LP then return false end
 	local ip = p:FindFirstChild("InPlot")
@@ -999,7 +997,7 @@ function isInSafePlot(p)
 	return false
 end
 
-do local _z217=(9*6); if _z217<0 and _Vj() then _z217=_z217+1 end end
+do local _z235=(6*9); if _z235<0 and _Vj() then _z235=_z235+1 end end
 
 function allTargets(opts)
 	opts = opts or {}
@@ -1038,8 +1036,6 @@ function findPlayer(q)
 	return nil
 end
 
-do local _z715=(2*10); if _z715<0 and _Vj() then _z715=_z715+1 end end
-
 function playerNames()
 	local t = {}
 	for _, p in ipairs(Players:GetPlayers()) do
@@ -1048,6 +1044,8 @@ function playerNames()
 	table.sort(t)
 	return t
 end
+
+do local _z217=(9*6); if _z217<0 and _Vj() then _z217=_z217+1 end end
 
 function playerLabel(p)
 	if not p then return "?" end
@@ -1071,6 +1069,8 @@ function playerLabels(filter)
 	table.sort(t)
 	return t
 end
+
+do local _z715=(2*10); if _z715<0 and _Vj() then _z715=_z715+1 end end
 
 function findPlayerFromLabel(label)
 	label = tostring(label or "")
@@ -1453,8 +1453,6 @@ function isPlayerHeldByUs(p)
 	return false
 end
 
-do local _z483=(6*5); if _z483<0 and _Vj() then _z483=_z483+1 end end
-
 function startHeldBringClearLoop()
 	if S._heldBringClearConn then return end
 	S._heldBringClearConn = RunService.Heartbeat:Connect(function()
@@ -1530,8 +1528,6 @@ function createBringBody(part, targetCF)
 	end)
 end
 
-do local _z376=(3*8); if _z376<0 and _Vj() then _z376=_z376+1 end end
-
 function clearBringBodyOnPart(part)
 	if not part then return end
 	pcall(function()
@@ -1557,6 +1553,8 @@ function clearBringBodyOnPart(part)
 	end)
 end
 
+do local _z483=(6*5); if _z483<0 and _Vj() then _z483=_z483+1 end end
+
 function clearBringBodyOnPlayer(p)
 	if not p or not p.Character then return end
 	for _, d in ipairs(p.Character:GetDescendants()) do
@@ -1578,8 +1576,6 @@ function clearBringBodyOnPlayer(p)
 	end
 end
 
-do local _z438=(6*10); if _z438<0 and _Vj() then _z438=_z438+1 end end
-
 function cancelBringOnPlayer(p)
 	if not p then return end
 	S._bringGen[p.UserId] = (S._bringGen[p.UserId] or 0) + 1
@@ -1587,6 +1583,8 @@ function cancelBringOnPlayer(p)
 end
 
 -- Soft bring: short follow, then free. Cancelled if you grab them mid-hold.
+do local _z376=(3*8); if _z376<0 and _Vj() then _z376=_z376+1 end end
+
 function releaseBringAfter(p, holdSec)
 	if not p then return end
 	holdSec = holdSec or 0.45
@@ -1626,6 +1624,8 @@ function plotAlert(p, msg)
 	plotAlertAt[p.UserId] = now
 	notify(HUB_NAME, msg, 2.4)
 end
+
+do local _z438=(6*10); if _z438<0 and _Vj() then _z438=_z438+1 end end
 
 function tryPullFromPlot(p)
 	if not p or not validP(p) then return false end
@@ -1760,8 +1760,6 @@ function flingPlayer(p, power, quiet, mapWide)
 	return true
 end
 
-do local _z423=(3*10); if _z423<0 and _Vj() then _z423=_z423+1 end end
-
 function ragdoll(p, hard)
 	if not isAliveP(p) then return end
 	if not gatePlotAction(p, _Vzd({151,134,140,137,148,145,145}), { kind = "ragdoll", quiet = true }) then return end
@@ -1852,6 +1850,8 @@ function killPlayer(p, quiet)
 	if not quiet then notify(HUB_NAME, "Killed That Fool " .. playerLabel(p), 1.5) end
 	return true
 end
+
+do local _z423=(3*10); if _z423<0 and _Vj() then _z423=_z423+1 end end
 
 function voidPlayer(p, quiet)
 	if not p or not validP(p) then
@@ -2010,8 +2010,6 @@ function ensureFreezePart()
 	return freezePart
 end
 
-do local _z987=(7*5); if _z987<0 and _Vj() then _z987=_z987+1 end end
-
 function freezeCam(cf)
 	local p = ensureFreezePart()
 	p.CFrame = typeof(cf) == "CFrame" and cf or CFrame.new(cf)
@@ -2036,6 +2034,8 @@ function teleportSelf(cf)
 	local me = hrp()
 	if me then pcall(function() me.CFrame = cf end) end
 end
+
+do local _z987=(7*5); if _z987<0 and _Vj() then _z987=_z987+1 end end
 
 function visitForSNO(p, tries)
 	tries = tries or 40
@@ -2068,8 +2068,6 @@ local controlState = {
 	running = false,
 	queryParts = nil,
 }
-
-do local _z803=(9*5); if _z803<0 and _Vj() then _z803=_z803+1 end end
 
 function clearControlConns()
 	for _, c in pairs(controlState.conns) do
@@ -2123,6 +2121,8 @@ function stopControl(quiet)
 	controlState.model = nil
 	if not quiet then notify(HUB_NAME, "Control Off, That MF Is Free Now", 1.2) end
 end
+
+do local _z803=(9*5); if _z803<0 and _Vj() then _z803=_z803+1 end end
 
 function isControlNPC(model)
 	if not model or not model:IsA("Model") then return false end
@@ -2517,8 +2517,6 @@ function installControlKeyC(on, quiet)
 	if not quiet then notify(HUB_NAME, _Vzd({104,148,147,153,151,148,145,69,135,142,147,137,69,148,147,69,161,69,149,151,138,152,152,69,98}), 1) end
 end
 
-do local _z239=(4*11); if _z239<0 and _Vj() then _z239=_z239+1 end end
-
 function installControlKeyK(on, quiet)
 	installControlKeyC(on, quiet)
 end
@@ -2534,6 +2532,8 @@ function syncToggleUI(id)
 	local fn = S._toggleRenderers and S._toggleRenderers[id]
 	if fn then pcall(fn) end
 end
+
+do local _z239=(4*11); if _z239<0 and _Vj() then _z239=_z239+1 end end
 
 function stopMass(name)
 	MASS[name] = false
@@ -2614,8 +2614,6 @@ end
 
 local statusToyCache = {}
 
-do local _z535=(3*6); if _z535<0 and _Vj() then _z535=_z535+1 end end
-
 function getStatusToy(toyName)
 	local cached = statusToyCache[toyName]
 	if cached and cached.model and cached.model.Parent and cached.primary and cached.primary.Parent then
@@ -2693,6 +2691,8 @@ function touchToyPartToPlayer(toyName, targetRoot)
 end
 
 local poisonHurtCache = nil
+do local _z535=(3*6); if _z535<0 and _Vj() then _z535=_z535+1 end end
+
 function getPoisonHurtParts()
 	if poisonHurtCache then
 		local ok = true
@@ -2793,8 +2793,6 @@ function applyMapPaint(targetRoot)
 	return false
 end
 
-do local _z389=(5*9); if _z389<0 and _Vj() then _z389=_z389+1 end end
-
 function firePlayerBlitz(p)
 	if not p or not validP(p) then return false end
 	local r = rootOf(p)
@@ -2840,8 +2838,6 @@ function firePlayerBlitz(p)
 	end)
 	return true
 end
-
-do local _z859=(8*9); if _z859<0 and _Vj() then _z859=_z859+1 end end
 
 function applyStatusToPlayer(kind, p)
 	if not p or not validP(p) then return false end
@@ -2941,7 +2937,7 @@ function setMassToggle(name, on, runner)
 	end)
 end
 
-do local _z600=(2*5); if _z600<0 and _Vj() then _z600=_z600+1 end end
+do local _z389=(5*9); if _z389<0 and _Vj() then _z389=_z389+1 end end
 
 function massBringLoop(keep)
 	local me = hrp()
@@ -2996,6 +2992,8 @@ function massBringLoop(keep)
 	unfreezeCam()
 	notify(HUB_NAME, "Bring All OFF", 1.5)
 end
+
+do local _z859=(8*9); if _z859<0 and _Vj() then _z859=_z859+1 end end
 
 function massKickLoop(keep)
 	local home = hrp() and hrp().CFrame
@@ -3084,6 +3082,8 @@ function massKillLoop(keep)
 	unfreezeCam()
 	notify(HUB_NAME, _Vzd({112,142,145,145,69,102,145,145,69,116,107,107}), 1.5)
 end
+
+do local _z600=(2*5); if _z600<0 and _Vj() then _z600=_z600+1 end end
 
 function massFlingLoop(keep)
 	local home = hrp() and hrp().CFrame
@@ -4113,8 +4113,6 @@ function installPlotWatch()
 end
 task.spawn(installPlotWatch)
 
-do local _z700=(2*6); if _z700<0 and _Vj() then _z700=_z700+1 end end
-
 function getBlobmanGrabKit()
 	local h = hum()
 	if not h or not h.SeatPart or not h.SeatPart.Parent then return nil end
@@ -4192,6 +4190,8 @@ function fireCreatureGrab(kit, targetRoot)
 	end)
 end
 
+do local _z700=(2*6); if _z700<0 and _Vj() then _z700=_z700+1 end end
+
 function forceBlobmanMount()
 	if isOnBlobman() then return getBlobmanGrabKit() end
 	pcall(function() ensureBlobman(true) end)
@@ -4240,8 +4240,6 @@ blobmanGrabAllOnce = function()
 	return true
 end
 
-
-do local _z464=(8*6); if _z464<0 and _Vj() then _z464=_z464+1 end end
 
 function blobGrabSingle(p)
 	if not p or not validP(p) then return false end
@@ -4392,6 +4390,8 @@ destroyServerHybridLoop = function(keep)
 end
 
 Late = {}
+do local _z464=(8*6); if _z464<0 and _Vj() then _z464=_z464+1 end end
+
 function _voidzLateInit()
 Late = Late or {}
 Late._phase = _Vzd({138,147,153,138,151,138,137})
@@ -4446,8 +4446,6 @@ function inRange(pos, range)
 end
 
 local auraHomeCF = nil
-do local _z305=(3*8); if _z305<0 and _Vj() then _z305=_z305+1 end end
-
 function eachAuraTarget(cfg, fnPlayers, fnObjects, serverWide)
 	if type(cfg) ~= "table" then cfg = auraDefaults() end
 	if cfg._id then cfg = getAura(cfg._id) end
@@ -4590,6 +4588,8 @@ function applyVelBurst(part, power, up)
 	end)
 end
 
+do local _z305=(3*8); if _z305<0 and _Vj() then _z305=_z305+1 end end
+
 function tick_netown(cfg, serverWide)
 	cfg = getAura("netown")
 	if not hrp() or not FTAP.SetNetworkOwner then return end
@@ -4656,8 +4656,6 @@ function tick_anchor(cfg, serverWide)
 	end, serverWide)
 end
 
-do local _z641=(8*8); if _z641<0 and _Vj() then _z641=_z641+1 end end
-
 function tick_attract(cfg, serverWide)
 	cfg = getAura("attract")
 	eachAuraTarget(cfg, function(p, r, power)
@@ -4701,6 +4699,8 @@ function tick_spin(cfg, serverWide)
 		pcall(function() part.AssemblyAngularVelocity = Vector3.new(10, power / 50, 10) end)
 	end, serverWide)
 end
+
+do local _z641=(8*8); if _z641<0 and _Vj() then _z641=_z641+1 end end
 
 function tick_ragdoll(cfg, serverWide)
 	cfg = getAura("ragdoll")
@@ -4972,8 +4972,6 @@ function tick_soft(cfg, serverWide)
 	end, serverWide)
 end
 
-do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
-
 function tick_chaos(cfg, serverWide)
 	cfg = getAura(_Vzd({136,141,134,148,152}))
 	eachAuraTarget(cfg, function(p, r, power)
@@ -5034,6 +5032,8 @@ function tick_launch(cfg, serverWide)
 		end)
 	end, serverWide)
 end
+
+do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
 
 function tick_spike(cfg, serverWide)
 	cfg = getAura(_Vzd({152,149,142,144,138}))
@@ -5173,14 +5173,10 @@ function tick_telekinesis(cfg, serverWide)
 	end, serverWide)
 end
 
-do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
-
 function tick_blackhole(cfg, serverWide)
 	S.tkShape = "Blackhole"
 	tick_telekinesis(cfg, serverWide)
 end
-
-do local _z797=(5*11); if _z797<0 and _Vj() then _z797=_z797+1 end end
 
 function tick_tornado(cfg, serverWide)
 	S.tkShape = "Tornado"
@@ -5288,6 +5284,8 @@ function setAura(id, on)
 	end
 end
 
+do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
+
 function setServerFx(id, on)
 	stopLoop("srv_" .. id)
 	S.toggles["srv_" .. id] = on == true
@@ -5303,6 +5301,8 @@ local antiGrabTick
 local doAntiGrabHard
 local antiGrabInstalled = false
 local extinguishPart
+
+do local _z797=(5*11); if _z797<0 and _Vj() then _z797=_z797+1 end end
 
 function getExtinguishPart()
 	if extinguishPart and extinguishPart.Parent then return extinguishPart end
@@ -5389,8 +5389,6 @@ function antiPaintTick()
 	end
 end
 
-do local _z257=(8*6); if _z257<0 and _Vj() then _z257=_z257+1 end end
-
 function antiBananaTick()
 	local c = char()
 	if not c then return end
@@ -5434,8 +5432,6 @@ function antiVoidTick()
 	end
 end
 
-do local _z109=(5*6); if _z109<0 and _Vj() then _z109=_z109+1 end end
-
 function antiFlingTick()
 	local r = hrp()
 	if not r then return end
@@ -5457,6 +5453,8 @@ function antiFlingTick()
 		r.Anchored = false
 	end
 end
+
+do local _z257=(8*6); if _z257<0 and _Vj() then _z257=_z257+1 end end
 
 function antiStickyTick()
 	if not S.toggles.antiSticky then return end
@@ -5504,8 +5502,6 @@ function antiStickyTick()
 	end)
 end
 
-do local _z472=(6*3); if _z472<0 and _Vj() then _z472=_z472+1 end end
-
 function antiBlobmanTick()
 	if not S.toggles.antiBlobman then return end
 	if S.trainDriving then return end -- never kick us off while driving blue train
@@ -5524,6 +5520,8 @@ function antiBlobmanTick()
 		end)
 	end
 end
+
+do local _z109=(5*6); if _z109<0 and _Vj() then _z109=_z109+1 end end
 
 function setAntiLag(on)
 	S.toggles.antiLag = on == true
@@ -5784,7 +5782,7 @@ function grabPartsIsAttackingUs(grabModel, ourChar)
 	return false
 end
 
-do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
+do local _z472=(6*3); if _z472<0 and _Vj() then _z472=_z472+1 end end
 
 function isLocalBeingHeldFlag()
 	local held = LP:FindFirstChild("IsHeld")
@@ -5845,6 +5843,8 @@ function plotHasOwner(plot)
 	end
 	return false
 end
+
+do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
 
 function getPlotInteriorCF(plot)
 	if not plot then return nil end
@@ -5976,8 +5976,6 @@ function tpToRandomHouse(reason)
 	return true
 end
 
-do local _z887=(5*7); if _z887<0 and _Vj() then _z887=_z887+1 end end
-
 function isLocalPlayerGrabbed()
 	local held = LP:FindFirstChild("IsHeld")
 	if held and held.Value == true then return true end
@@ -6067,6 +6065,8 @@ function startAntiKillLoop()
 	end
 end
 
+do local _z887=(5*7); if _z887<0 and _Vj() then _z887=_z887+1 end end
+
 function stopAntiKillLoop()
 	S.toggles.antiKill = false
 	stopLoop("antiKill")
@@ -6079,8 +6079,6 @@ function stopAntiKillLoop()
 		S.conns.antiKillHeld = nil
 	end
 end
-
-do local _z999=(9*11); if _z999<0 and _Vj() then _z999=_z999+1 end end
 
 function restoreGroundPhysics()
 	local r = hrp()
@@ -6205,7 +6203,7 @@ function gucciStripForeignConstraints(c)
 	end
 end
 
-do local _z839=(3*3); if _z839<0 and _Vj() then _z839=_z839+1 end end
+do local _z999=(9*11); if _z999<0 and _Vj() then _z999=_z999+1 end end
 
 function gucciDestroyAttackingGrabs(c)
 	c = c or char()
@@ -6251,6 +6249,8 @@ S._gucciWasHeld = false
 function gucciThrowGuardActive()
 	return (S._gucciThrowGuardUntil or 0) > os.clock()
 end
+
+do local _z839=(3*3); if _z839<0 and _Vj() then _z839=_z839+1 end end
 
 function gucciArmThrowGuard(sec)
 	sec = sec or 2.25
@@ -6679,8 +6679,12 @@ function installAntis()
 	LP.CharacterAdded:Connect(function(c) task.spawn(bindCharacter, c) end)
 
 	local gucciAcc = 0
+	local gucciIdleSkip = 0
 	bind(_Vzd({140,154,136,136,142,102,147,153,142,109,103}), RunService.Heartbeat:Connect(function(dt)
 		if not (S.toggles.antiGucci or S.toggles.antiGrab) then
+			gucciIdleSkip += 1
+			if gucciIdleSkip < 15 then return end
+			gucciIdleSkip = 0
 			local rr = hrp()
 			if rr then
 				local bv = rr:FindFirstChild("VOIDZ_GucciBV")
@@ -6689,6 +6693,7 @@ function installAntis()
 			S._gucciThrowGuardUntil = 0
 			return
 		end
+		gucciIdleSkip = 0
 		-- Leave our own grabs alone
 		if isLocalActivelyGrabbing() and not isLocalBeingHeldFlag() then
 			return
@@ -6705,19 +6710,19 @@ function installAntis()
 			if guarding then gucciCancelThrowVelocity() end
 		end
 		gucciAcc += dt
-		local need = S.toggles.antiGucci and 0.04 or 0.08
+		local need = S.toggles.antiGucci and 0.06 or 0.1
 		if gucciAcc < need then return end
 		gucciAcc = 0
 		gucciAntiTick()
 	end))
 
+	-- Only when actually grabbed / throw-guard (RenderStepped every frame was heavy)
 	bind("gucciAntiRS", RunService.RenderStepped:Connect(function()
 		if not (S.toggles.antiGucci or S.toggles.antiGrab) then return end
+		if not (isGucciVictim() or gucciThrowGuardActive()) then return end
 		if isLocalActivelyGrabbing() and not isLocalBeingHeldFlag() then return end
-		if isGucciVictim() or gucciThrowGuardActive() then
-			gucciForceFreeMove()
-			gucciCancelThrowVelocity()
-		end
+		gucciForceFreeMove()
+		gucciCancelThrowVelocity()
 	end))
 
 	task.spawn(function()
@@ -6875,8 +6880,6 @@ function invisSetNoclip(enabled)
 	end)
 end
 
-do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
-
 function setCharacterInvis(on, quiet)
 	S.toggles.charInvis = on == true
 	local r = hrp()
@@ -6965,6 +6968,8 @@ LP.CharacterAdded:Connect(function()
 	end
 end)
 
+
+do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
 
 function findSlotsFolder()
 	local s = workspace:FindFirstChild("Slots")
@@ -7242,23 +7247,33 @@ function setFly(on)
 end
 
 bind("moveHB", RunService.Heartbeat:Connect(function()
+	local t = S.toggles
+	if not (t.speed or t.jump or t.noclip or t.speedCFrame) then return end
 	local h = hum()
 	local r = hrp()
-	if S.toggles.speed and h and r and h.MoveDirection.Magnitude > 0 then
+	if t.speed and h and r and h.MoveDirection.Magnitude > 0 then
 		local targetSpeed = S.walkSpeed or 50
 		local mult = targetSpeed / 16
 		r.CFrame = r.CFrame + h.MoveDirection * (0.3 * mult)
 	end
-	if S.toggles.jump and h then
+	if t.jump and h then
 		h.UseJumpPower = true
 		h.JumpPower = S.jumpPower or 80
 	end
-	if S.toggles.noclip and char() then
-		for _, p in ipairs(char():GetDescendants()) do
-			if p:IsA("BasePart") then p.CanCollide = false end
+	-- noclip: only re-apply every ~0.2s (not every physics frame)
+	if t.noclip then
+		local now = os.clock()
+		if now - (S._noclipLast or 0) > 0.2 then
+			S._noclipLast = now
+			local c = char()
+			if c then
+				for _, p in ipairs(c:GetChildren()) do
+					if p:IsA("BasePart") then p.CanCollide = false end
+				end
+			end
 		end
 	end
-	if S.toggles.speedCFrame and r and h and h.MoveDirection.Magnitude > 0 then
+	if t.speedCFrame and r and h and h.MoveDirection.Magnitude > 0 then
 		r.CFrame = r.CFrame + h.MoveDirection * (S.speedMult or 1.5)
 	end
 end))
@@ -7392,8 +7407,6 @@ function resolveSpawnCF(name, opts)
 	return cp.CFrame * CFrame.new(0, opts.y or 0, -dist)
 end
 
-do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
-
 function spawnToyNow(name, opts)
 	opts = opts or {}
 	name = name or S.selectedToy or "PalletLightBrown"
@@ -7488,6 +7501,8 @@ function spawnToy(name, opts)
 	return true
 end
 
+do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
+
 function spawnToyBurst(name, count)
 	count = math.clamp(tonumber(count) or 1, 1, 80)
 	name = name or "PalletLightBrown"
@@ -7522,8 +7537,6 @@ function destroyAllMyToys(filterName)
 	return n
 end
 
-do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
-
 function countMyToys(filterName)
 	local folder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
 	if not folder then return 0 end
@@ -7534,15 +7547,17 @@ function countMyToys(filterName)
 	return n
 end
 
-S.trainSpeed = S.trainSpeed or 120
+S.trainSpeed = S.trainSpeed or 140
 S._trainDriveConn = nil
 S._trainHornConn = nil
-S._trainSnoConn = nil
 S._trainSeat = nil
 S._trainRoot = nil
 S._trainModel = nil
+S._trainParts = nil
 S.trainDriving = false
 S._trainSnoBudget = 0
+S._trainCached = nil
+S._trainCacheT = 0
 
 local TRAIN_CAVE_POS = Vector3.new(500, 62, -307)
 
@@ -7550,13 +7565,12 @@ function stopTrainDrive(quiet)
 	S.trainDriving = false
 	if S._trainDriveConn then pcall(function() S._trainDriveConn:Disconnect() end); S._trainDriveConn = nil end
 	if S._trainHornConn then pcall(function() S._trainHornConn:Disconnect() end); S._trainHornConn = nil end
-	if S._trainSnoConn then pcall(function() S._trainSnoConn:Disconnect() end); S._trainSnoConn = nil end
 	local seat = S._trainSeat
 	local root = S._trainRoot
 	for _, part in ipairs({ seat, root }) do
 		if part and part.Parent then
 			for _, ch in ipairs(part:GetChildren()) do
-				if ch.Name == "TrainDriveBV" or ch.Name == "TrainDriveBG" then
+				if ch.Name == "TrainDriveBV" or ch.Name == "TrainDriveBG" or ch.Name == "TrainDriveBP" then
 					pcall(function() ch:Destroy() end)
 				end
 			end
@@ -7565,6 +7579,7 @@ function stopTrainDrive(quiet)
 	S._trainSeat = nil
 	S._trainRoot = nil
 	S._trainModel = nil
+	S._trainParts = nil
 	if not quiet then notify(HUB_NAME, "Train stopped", 1) end
 end
 
@@ -7572,6 +7587,8 @@ function getTweenedFolder()
 	local map = workspace:FindFirstChild("Map")
 	return map and map:FindFirstChild("AlwaysHereTweenedObjects")
 end
+
+do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
 
 function trainPickSeat(container)
 	if not container then return nil end
@@ -7587,81 +7604,129 @@ function trainPickRoot(model, seat)
 	if model and model:IsA("Model") and model.PrimaryPart then return model.PrimaryPart end
 	if seat and seat:IsA("BasePart") then return seat end
 	if model then
+		local best, bestVol = nil, -1
+		for _, d in ipairs(model:GetDescendants()) do
+			if d:IsA("BasePart") and d.Transparency < 0.9 then
+				local vol = d.Size.X * d.Size.Y * d.Size.Z
+				if vol > bestVol then best, bestVol = d, vol end
+			end
+		end
+		if best then return best end
 		return model:FindFirstChildWhichIsA("BasePart", true)
 	end
 	return seat
 end
 
--- Bloody-style: locate the blue flying map train (AlwaysHereTweenedObjects.Train etc.)
+function trainCollectParts(model, seat, root, maxN)
+	maxN = maxN or 14
+	local out, seen = {}, {}
+	local function add(p)
+		if p and p:IsA("BasePart") and p.Parent and not seen[p] then
+			seen[p] = true
+			out[#out + 1] = p
+		end
+	end
+	add(root)
+	if seat and seat:IsA("BasePart") then add(seat) end
+	if model then
+		local scored = {}
+		for _, d in ipairs(model:GetDescendants()) do
+			if d:IsA("BasePart") and d.Transparency < 0.85 then
+				local vol = d.Size.X * d.Size.Y * d.Size.Z
+				if vol > 1.5 then
+					scored[#scored + 1] = { p = d, v = vol }
+				end
+			end
+		end
+		table.sort(scored, function(a, b) return a.v > b.v end)
+		for i = 1, math.min(#scored, maxN) do
+			add(scored[i].p)
+		end
+	end
+	return out
+end
+
+function trainScoreContainer(ch)
+	if not ch then return -1, nil, nil end
+	local n = tostring(ch.Name):lower()
+	if n:find("ufo", 1, true) or n:find("blob", 1, true) or n:find("cave", 1, true) then
+		return -1, nil, nil
+	end
+	local seat = trainPickSeat(ch)
+	local model = ch:IsA("Model") and ch or (seat and seat:FindFirstAncestorOfClass("Model")) or ch
+	local root = trainPickRoot(model, seat)
+	if not root then return -1, nil, nil end
+	local blue, total, maxY = 0, 0, root.Position.Y
+	for _, d in ipairs((model:IsA("Model") and model or ch):GetDescendants()) do
+		if d:IsA("BasePart") and d.Transparency < 0.85 and d.Size.Magnitude > 1.5 then
+			total += 1
+			local c = d.Color
+			if c.B > 0.32 and c.B >= c.R * 0.85 and c.B >= c.G * 0.75 then blue += 1 end
+			if d.Position.Y > maxY then maxY = d.Position.Y end
+		end
+	end
+	local sc = 0
+	if n == "train" or n:find("train", 1, true) then sc += 40 end
+	if n:find("mono", 1, true) or n:find("loco", 1, true) then sc += 20 end
+	if total > 0 then sc += (blue / total) * 35 end
+	if maxY > 40 then sc += 12 elseif maxY > 20 then sc += 6 end
+	if seat then sc += 10 end
+	if total >= 6 then sc += 5 end
+	return sc, seat or root, model
+end
+
+-- Blue flying map train (Map.AlwaysHereTweenedObjects) — no full workspace scan
 function findFlyingBlueTrain()
+	local now = os.clock()
+	if S._trainCached and (now - (S._trainCacheT or 0)) < 2.5 then
+		local seat, model = S._trainCached.seat, S._trainCached.model
+		local root = S._trainCached.root
+		if root and root.Parent and (not model or model.Parent) then
+			return seat or root, model, S._trainCached.score or 50
+		end
+	end
+
+	local bestSeat, bestModel, bestRoot, bestScore = nil, nil, nil, -1
+	local function consider(ch)
+		local sc, seatOrRoot, model = trainScoreContainer(ch)
+		if sc > bestScore then
+			bestScore = sc
+			bestSeat = seatOrRoot
+			bestModel = model
+			bestRoot = trainPickRoot(model, seatOrRoot:IsA(_Vzd({103,134,152,138,117,134,151,153})) and seatOrRoot or nil)
+		end
+	end
+
 	local always = getTweenedFolder()
-	local names = { "Train", "BlueTrain", "SkyTrain", "TheTrain", "Monorail", "FlyingTrain" }
 	if always then
+		local names = { "Train", "BlueTrain", "SkyTrain", "TheTrain", "Monorail", "FlyingTrain", "Locomotive" }
 		for _, name in ipairs(names) do
 			local obj = always:FindFirstChild(name)
-			if not obj then
-				for _, ch in ipairs(always:GetChildren()) do
-					if tostring(ch.Name):lower() == name:lower() then obj = ch; break end
-				end
-			end
-			if obj then
-				local seat = trainPickSeat(obj)
-				local model = obj:IsA("Model") and obj or (seat and seat:FindFirstAncestorOfClass("Model")) or obj
-				local root = trainPickRoot(model, seat)
-				if seat or root then
-					return seat or root, model, 100
-				end
-			end
+			if obj then consider(obj) end
 		end
-		-- any child with "train" in name (not UFO)
 		for _, ch in ipairs(always:GetChildren()) do
-			local n = tostring(ch.Name):lower()
-			if n:find("train", 1, true) and not n:find("ufo", 1, true) then
-				local seat = trainPickSeat(ch)
-				local model = ch:IsA("Model") and ch or (seat and seat:FindFirstAncestorOfClass(_Vzd({114,148,137,138,145})))
-				local root = trainPickRoot(model, seat)
-				if seat or root then return seat or root, model, 90 end
-			end
-		end
-		-- blue-ish high object with a seat
-		local bestSeat, bestModel, bestScore = nil, nil, -1
-		for _, ch in ipairs(always:GetChildren()) do
-			local n = tostring(ch.Name):lower()
-			if not n:find("ufo", 1, true) then
-				local seat = trainPickSeat(ch)
-				if seat then
-					local blue, total = 0, 0
-					for _, d in ipairs(ch:GetDescendants()) do
-						if d:IsA("BasePart") and d.Transparency < 0.85 and d.Size.Magnitude > 2 then
-							total += 1
-							local c = d.Color
-							if c.B > 0.35 and c.B >= c.R * 0.9 then blue += 1 end
-						end
-					end
-					local sc = (total > 0 and (blue / total) * 20 or 0) + (seat.Position.Y > 25 and 5 or 0)
-					if sc > bestScore then
-						bestScore = sc
-						bestSeat = seat
-						bestModel = ch:IsA("Model") and ch or seat:FindFirstAncestorOfClass("Model")
-					end
-				end
-			end
-		end
-		if bestSeat and bestScore >= 6 then
-			return bestSeat, bestModel, bestScore
+			consider(ch)
 		end
 	end
-	-- workspace fallback: Model named Train
-	for _, d in ipairs(workspace:GetDescendants()) do
-		if d:IsA("Model") then
-			local n = d.Name:lower()
-			if n == "train" or (n:find("train", 1, true) and not n:find("blob", 1, true) and not n:find("cave", 1, true)) then
-				local seat = trainPickSeat(d)
-				if seat then return seat, d, 50 end
+
+	-- Map folder only (not entire workspace)
+	local map = workspace:FindFirstChild("Map")
+	if map then
+		for _, ch in ipairs(map:GetChildren()) do
+			local n = tostring(ch.Name):lower()
+			if n:find("train", 1, true) or n:find("mono", 1, true) then
+				consider(ch)
 			end
 		end
 	end
-	return nil, nil, 0
+
+	if bestScore < 8 or not bestSeat then
+		return nil, nil, 0
+	end
+	local root = bestRoot or _vB2(bestSeat) or (bestSeat:IsA("BasePart") and bestSeat)
+	S._trainCached = { seat = bestSeat, model = bestModel, root = root, score = bestScore }
+	S._trainCacheT = now
+	return bestSeat, bestModel, bestScore
 end
 
 function findAnyTrainSeat()
@@ -7675,24 +7740,35 @@ function _vB2(seatOrModel)
 		if model and model.PrimaryPart then return model.PrimaryPart end
 		return seatOrModel
 	end
-	if seatOrModel:IsA("Model") then
-		return seatOrModel.PrimaryPart or seatOrModel:FindFirstChildWhichIsA("BasePart", true)
+	if seatOrModel:IsA(_Vzd({114,148,137,138,145})) then
+		return trainPickRoot(seatOrModel, nil)
 	end
 	return nil
 end
 
--- Rate-limited SNO (mass FireServer kicks)
-function trainSnoLight(parts, origin)
+function trainSnoParts(parts, origin, maxN, force)
 	if not FTAP.SetNetworkOwner then return end
 	local now = os.clock()
-	if now < (S._trainSnoBudget or 0) then return end
-	S._trainSnoBudget = now + 0.12
+	if not force and now < (S._trainSnoBudget or 0) then return end
+	S._trainSnoBudget = now + (force and 0.05 or 0.1)
 	local n = 0
-	for _, p in ipairs(parts) do
+	maxN = maxN or 6
+	for _, p in ipairs(parts or {}) do
 		if p and p.Parent and p:IsA("BasePart") then
 			sno(p, origin)
 			n += 1
-			if n >= 3 then break end
+			if n >= maxN then break end
+		end
+	end
+end
+
+function trainPrepParts(parts)
+	for _, p in ipairs(parts or {}) do
+		if p and p.Parent and p:IsA("BasePart") then
+			pcall(function()
+				p.Anchored = false
+				p.CanCollide = true
+			end)
 		end
 	end
 end
@@ -7703,51 +7779,71 @@ function startTrainDrive()
 	local me = hrp()
 	local h = hum()
 	if not me or not h then
-		notify(HUB_NAME, _Vzd({115,148,69,136,141,134,151,134,136,153,138,151}), 1.5)
+		notify(HUB_NAME, "No character", 1.5)
 		return false
 	end
 
-	-- Soft: do not spam unsit systems / other TPs
 	S.toggles.antiBlobman = false
 	S.toggles.antiTrain = false
 	stopLoop("antiBlob")
 	S.trainDriving = true
+	S._trainCached = nil
 
 	notify(HUB_NAME, "Finding blue train...", 1.2)
 	local seat, model, score = nil, nil, 0
-	for _ = 1, 8 do
+	for _ = 1, 12 do
 		seat, model, score = findFlyingBlueTrain()
 		if seat then break end
-		task.wait(0.3)
+		task.wait(0.25)
 	end
 	if not seat then
 		S.trainDriving = false
-		notify(HUB_NAME, "Blue train not found | wait for it in the sky", 2.5)
+		notify(HUB_NAME, "Blue train not found | wait for it on the map path", 2.5)
 		return false
 	end
 
 	local drivePart = _vB2(seat) or (seat:IsA("BasePart") and seat)
 	if not drivePart then
 		S.trainDriving = false
-		notify(HUB_NAME, "Train has no root part", 2)
+		notify(HUB_NAME, _Vzd({121,151,134,142,147,69,141,134,152,69,147,148,69,151,148,148,153,69,149,134,151,153}), 2)
 		return false
 	end
 	model = model or seat:FindFirstAncestorOfClass("Model")
+	local parts = trainCollectParts(model, seat, drivePart, 14)
 	S._trainSeat = seat
 	S._trainRoot = drivePart
 	S._trainModel = model
+	S._trainParts = parts
 
-	-- ONE clean mount (no sticky spam = no kick)
+	-- Mount near train
 	pcall(function()
-		me.CFrame = (seat:IsA("BasePart") and seat.CFrame or drivePart.CFrame) * CFrame.new(0, 3, 0)
+		local cf = (seat:IsA("BasePart") and seat.CFrame) or drivePart.CFrame
+		me.CFrame = cf * CFrame.new(0, 4, 0)
 	end)
-	task.wait(0.15)
+	task.wait(0.12)
 	me = hrp()
 	h = hum()
-	if me and drivePart.Parent then
+
+	-- Ownership burst + grab hook (helps SNO stick)
+	for i = 1, 10 do
+		me = hrp()
+		if not me or not drivePart.Parent then break end
 		local origin = me.Position
-		trainSnoLight({ seat:IsA(_Vzd({103,134,152,138,117,134,151,153})) and seat or nil, drivePart }, origin)
-		if seat:IsA("VehicleSeat") or seat:IsA("Seat") then
+		if (me.Position - drivePart.Position).Magnitude > 35 then
+			pcall(function() me.CFrame = drivePart.CFrame * CFrame.new(0, 4, 0) end)
+			me = hrp()
+			origin = me and me.Position or origin
+		end
+		trainSnoParts(parts, origin, 8, true)
+		if FTAP.CreateGrabLine and drivePart then
+			pcall(function()
+				FTAP.CreateGrabLine:FireServer(drivePart, drivePart.CFrame)
+			end)
+		end
+		if i == 2 or i == 5 then
+			trainPrepParts(parts)
+		end
+		if h and seat and (seat:IsA("VehicleSeat") or seat:IsA("Seat")) then
 			pcall(function() seat:Sit(h) end)
 			local prompt = seat:FindFirstChildOfClass("ProximityPrompt")
 				or seat:FindFirstChild("ProximityPrompt", true)
@@ -7755,86 +7851,90 @@ function startTrainDrive()
 				pcall(function() fireproximityprompt(prompt) end)
 			end
 		end
+		task.wait(0.06)
 	end
-	task.wait(0.2)
 
-	-- Light ownership only (seat + root) — NOT whole model every frame
-	for _ = 1, 6 do
-		me = hrp()
-		if me and drivePart.Parent then
-			trainSnoLight({
-				(seat and seat:IsA("BasePart")) and seat or nil,
-				drivePart,
-			}, me.Position)
+	if FTAP.DestroyGrabLine then
+		pcall(function() FTAP.DestroyGrabLine:FireServer() end)
+	end
+
+	me = hrp()
+	if me and drivePart.Parent then
+		pcall(function() me.CFrame = drivePart.CFrame * CFrame.new(0, 3.5, 0) end)
+	end
+	trainPrepParts(parts)
+
+	-- Movers on root (stronger — soft MaxForce was not enough vs map tween)
+	local function ensureMover(part)
+		if not part or not part.Parent then return nil, nil end
+		local bv = part:FindFirstChild("TrainDriveBV")
+		if not bv then
+			bv = Instance.new("BodyVelocity")
+			bv.Name = "TrainDriveBV"
+			bv.MaxForce = Vector3.new(1e6, 1e6, 1e6)
+			bv.P = 12500
+			bv.Velocity = Vector3.zero
+			bv.Parent = part
 		end
-		task.wait(0.08)
+		local bg = part:FindFirstChild("TrainDriveBG")
+		if not bg then
+			bg = Instance.new("BodyGyro")
+			bg.Name = "TrainDriveBG"
+			bg.MaxTorque = Vector3.new(1e6, 1e6, 1e6)
+			bg.P = 25000
+			bg.D = 800
+			bg.CFrame = part.CFrame
+			bg.Parent = part
+		end
+		return bv, bg
 	end
-
-	-- BodyVelocity only on drive root (Bloody-style), no mass unanchor
-	local bv = drivePart:FindFirstChild("TrainDriveBV")
-	if not bv then
-		bv = Instance.new("BodyVelocity")
-		bv.Name = "TrainDriveBV"
-		bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
-		bv.Velocity = Vector3.zero
-		bv.P = 3000
-		bv.Parent = drivePart
-	end
-	local bg = drivePart:FindFirstChild("TrainDriveBG")
-	if not bg then
-		bg = Instance.new("BodyGyro")
-		bg.Name = "TrainDriveBG"
-		bg.MaxTorque = Vector3.new(4e5, 4e5, 4e5)
-		bg.P = 12000
-		bg.D = 500
-		bg.CFrame = drivePart.CFrame
-		bg.Parent = drivePart
-	end
+	local bv, bg = ensureMover(drivePart)
 
 	local hornSound = model and (
 		model:FindFirstChild("HornSound", true)
 		or model:FindFirstChild("Horn", true)
-		or model:FindFirstChildWhichIsA("Sound", true)
 	)
 
-	S._trainSnoConn = RunService.Heartbeat:Connect(function()
+	local lastSno = 0
+	local lastSit = 0
+	local lastGrab = 0
+	local stickCF = drivePart.CFrame
+	S._trainDriveConn = RunService.Heartbeat:Connect(function(dt)
 		if not S.trainDriving then return end
 		if not drivePart or not drivePart.Parent then
 			stopTrainDrive(true)
-			return
-		end
-		local r = hrp()
-		if not r then return end
-		-- only SNO when close enough (ownership range)
-		if (r.Position - drivePart.Position).Magnitude < 40 then
-			trainSnoLight({
-				(seat and seat.Parent and seat:IsA("BasePart")) and seat or nil,
-				drivePart,
-			}, r.Position)
-		end
-	end)
-
-	S._trainDriveConn = RunService.Heartbeat:Connect(function()
-		if not S.trainDriving then return end
-		if not drivePart or not drivePart.Parent then
-			stopTrainDrive(true)
+			notify(HUB_NAME, "Train despawned", 1.5)
 			return
 		end
 		local r = hrp()
 		local hum2 = hum()
 		if not r then return end
+		dt = math.clamp(dt or 0.016, 0.008, 0.05)
 
-		-- If far from train, soft re-mount ONCE style (rare), not every frame
 		local dist = (r.Position - drivePart.Position).Magnitude
-		if dist > 80 then
-			-- lost train / kicked off — stop cleanly instead of TP spam (anti-kick)
-			stopTrainDrive(true)
-			notify(HUB_NAME, "Left train range | Drive again", 1.5)
-			return
+		-- Stay on train: pull player back (no hard stop at 80 that killed control)
+		if dist > 25 then
+			pcall(function()
+				r.CFrame = drivePart.CFrame * CFrame.new(0, 3.2, 0)
+			end)
+			r = hrp() or r
+			dist = (r.Position - drivePart.Position).Magnitude
+		end
+
+		local now = os.clock()
+		if now - lastSno > 0.12 then
+			lastSno = now
+			trainSnoParts(parts, r.Position, 5, false)
+		end
+		if FTAP.CreateGrabLine and now - lastGrab > 0.45 then
+			lastGrab = now
+			pcall(function()
+				FTAP.CreateGrabLine:FireServer(drivePart, drivePart.CFrame)
+			end)
 		end
 
 		if not bv or not bv.Parent then
-			bv = drivePart:FindFirstChild("TrainDriveBV")
+			bv, bg = ensureMover(drivePart)
 		end
 		if not bv then return end
 
@@ -7850,32 +7950,52 @@ function startTrainDrive()
 			dir = dir - Vector3.yAxis
 		end
 
-		local speed = S.trainSpeed or 120
-		if dir.Magnitude > 0.05 then
+		local speed = math.clamp(tonumber(S.trainSpeed) or 140, 20, 400)
+		local moving = dir.Magnitude > 0.05
+		if moving then
 			dir = dir.Unit * speed
-			-- light force — huge MaxForce on whole assembly is kicky
-			bv.MaxForce = Vector3.new(8e4, 8e4, 8e4)
+			bv.MaxForce = Vector3.new(1e6, 1e6, 1e6)
 			bv.Velocity = dir
-			if bg and bg.Parent then
-				local flat = Vector3.new(dir.X, 0, dir.Z)
-				if flat.Magnitude > 0.1 then
-					bg.CFrame = CFrame.new(drivePart.Position, drivePart.Position + flat)
+			local flat = Vector3.new(dir.X, 0, dir.Z)
+			local look = stickCF
+			if flat.Magnitude > 0.1 then
+				look = CFrame.new(drivePart.Position, drivePart.Position + flat)
+			else
+				look = CFrame.new(drivePart.Position) * (drivePart.CFrame - drivePart.CFrame.Position)
+			end
+			-- CFrame step fights the map path tween once we own the assembly
+			local step = dir * dt
+			local newPos = drivePart.Position + step
+			stickCF = CFrame.new(newPos) * (look - look.Position)
+			pcall(function()
+				drivePart.Anchored = false
+				drivePart.AssemblyLinearVelocity = dir
+				drivePart.AssemblyAngularVelocity = Vector3.zero
+				drivePart.CFrame = stickCF
+			end)
+			if bg and bg.Parent then bg.CFrame = stickCF end
+			-- Push a few big parts so the whole train follows
+			for i = 1, math.min(4, #parts) do
+				local p = parts[i]
+				if p and p.Parent and p ~= drivePart then
+					pcall(function()
+						p.Anchored = false
+						p.AssemblyLinearVelocity = dir
+					end)
 				end
 			end
-			pcall(function()
-				drivePart.AssemblyLinearVelocity = dir
-				if seat and seat:IsA("BasePart") then
-					seat.AssemblyLinearVelocity = dir
-				end
-			end)
 			if seat and seat:IsA("VehicleSeat") then
 				pcall(function()
 					seat.Throttle = 1
 					seat.ThrottleFloat = 1
+					seat.AssemblyLinearVelocity = dir
 				end)
 			end
 		else
 			bv.Velocity = Vector3.zero
+			pcall(function()
+				drivePart.AssemblyLinearVelocity = Vector3.zero
+			end)
 			if seat and seat:IsA("VehicleSeat") then
 				pcall(function()
 					seat.Throttle = 0
@@ -7884,23 +8004,29 @@ function startTrainDrive()
 			end
 		end
 
-		-- gentle re-sit if we slipped off (no CFrame spam)
 		if hum2 and seat and (seat:IsA("VehicleSeat") or seat:IsA("Seat")) then
-			if hum2.SeatPart ~= seat and dist < 18 then
+			if hum2.SeatPart ~= seat and now - lastSit > 0.35 then
+				lastSit = now
 				pcall(function() seat:Sit(hum2) end)
+			end
+		elseif hum2 and now - lastSit > 0.5 then
+			-- no seat: keep player on train roof
+			lastSit = now
+			if dist > 6 then
+				pcall(function() r.CFrame = drivePart.CFrame * CFrame.new(0, 3.2, 0) end)
 			end
 		end
 	end)
 
 	S._trainHornConn = UserInputService.InputBegan:Connect(function(input, gp)
 		if gp or not S.trainDriving then return end
-		if input.KeyCode == Enum.KeyCode.H and hornSound then
+		if input.KeyCode == Enum.KeyCode.H and hornSound and hornSound:IsA("Sound") then
 			pcall(function() hornSound:Play() end)
 		end
 	end)
 
 	local where = (model and model.Name) or "Train"
-	notify(HUB_NAME, "Train control | " .. where .. " | WASD + Space/Ctrl | H horn | Stop Train to exit", 3)
+	notify(HUB_NAME, "Driving " .. where .. " (score " .. math.floor(score) .. ") | WASD Space/Ctrl | Stop Train to exit", 3)
 	return true
 end
 
@@ -17602,7 +17728,7 @@ trainNote.TextColor3 = C.muted
 trainNote.TextXAlignment = Enum.TextXAlignment.Left
 trainNote.TextYAlignment = Enum.TextYAlignment.Top
 trainNote.TextWrapped = true
-trainNote.Text = " Blue flying train (map) | sit + light SNO | WASD fly | Space/Ctrl | H horn | Stop Train to exit | no TP spam (anti-kick)"
+trainNote.Text = " Blue map train | SNO + CFrame drive | WASD fly | Space/Ctrl up-down | H horn | Stop Train to exit"
 trainNote.Parent = sc
 corner(trainNote, 8)
 pad(trainNote, 6, 6, 6, 6)
@@ -18195,9 +18321,12 @@ local function switchTab(id)
 			if bg then tween(bg, { Color = C.accent, Transparency = 0.5, Thickness = 0.8 }, 0.2) end
 		end
 	end
-	-- Re-free mouse on every tab switch (game often re-locks after UI focus changes)
-	if S.hubOpen and S.toggles.unlockMouse ~= false and S.setMouseUnlocked then
-		pcall(S.setMouseUnlocked, true)
+	-- Light re-free (no reconnect thrash — that was laggy)
+	if S.hubOpen and S.toggles.unlockMouse ~= false then
+		pcall(function()
+			UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+			UserInputService.MouseIconEnabled = true
+		end)
 	end
 end
 
@@ -18248,11 +18377,6 @@ local function applyFreeMouse()
 		UserInputService.MouseBehavior = Enum.MouseBehavior.Default
 		UserInputService.MouseIconEnabled = true
 	end)
-	pcall(function()
-		if UserInputService.MouseIconEnabled ~= true then
-			UserInputService.MouseIconEnabled = true
-		end
-	end)
 end
 
 local function setMouseUnlocked(unlocked)
@@ -18276,22 +18400,28 @@ local function setMouseUnlocked(unlocked)
 			end
 			ensureMouseModal(true)
 			applyFreeMouse()
-			-- FTAP re-locks mouse after open; force free every frame at LAST priority
+			-- Single cheap loop: only writes when game re-locks (was 3x/frame = lag)
+			local frame = 0
 			local function tickFree()
-				if not S.hubOpen then return end
-				if S.toggles.unlockMouse == false then return end
+				if not S.hubOpen or S.toggles.unlockMouse == false then return end
 				if not S.root or not S.root.Parent then return end
-				ensureMouseModal(true)
-				applyFreeMouse()
+				frame += 1
+				if frame % 3 ~= 0 then return end
+				if UserInputService.MouseBehavior ~= Enum.MouseBehavior.Default
+					or UserInputService.MouseIconEnabled ~= true then
+					applyFreeMouse()
+				end
+				local m = S.mouseModal
+				if m and (not m.Modal or not m.Visible) then
+					m.Visible = true
+					m.Modal = true
+				end
 			end
 			pcall(function()
 				RunService:BindToRenderStep(MOUSE_FORCE_NAME, Enum.RenderPriority.Last.Value + 50, tickFree)
 			end)
-			S.mouseForceConn = RunService.Heartbeat:Connect(tickFree)
-			S.mouseForceConn2 = RunService.RenderStepped:Connect(tickFree)
-			-- Delayed re-applies: game often wins the first few frames after hub open
 			task.spawn(function()
-				for _, waitT in ipairs({ 0.05, 0.15, 0.35, 0.7, 1.2 }) do
+				for _, waitT in ipairs({ 0.08, 0.25, 0.6 }) do
 					task.wait(waitT)
 					if not S.hubOpen or S.toggles.unlockMouse == false then break end
 					ensureMouseModal(true)
@@ -18307,8 +18437,8 @@ local function setMouseUnlocked(unlocked)
 			end
 			UserInputService.MouseBehavior = target
 			UserInputService.MouseIconEnabled = false
-			local untilT = os.clock() + 1.5
-			S.mouseForceConn = RunService.RenderStepped:Connect(function()
+			local untilT = os.clock() + 0.8
+			S.mouseForceConn = RunService.Heartbeat:Connect(function()
 				if S.hubOpen and S.toggles.unlockMouse ~= false and S.root and S.root.Parent then
 					stopMouseForce()
 					setMouseUnlocked(true)
@@ -18801,12 +18931,12 @@ function buildMain()
 		local glow = rootStroke
 		while root.Parent do
 			if S.hubOpen then
-				tween(glow, { Transparency = 0.05 }, 1.5, Enum.EasingStyle.Sine)
-				task.wait(1.5)
-				tween(glow, { Transparency = 0.3 }, 1.5, Enum.EasingStyle.Sine)
-				task.wait(1.5)
+				tween(glow, { Transparency = 0.08 }, 2.2, Enum.EasingStyle.Sine)
+				task.wait(2.2)
+				tween(glow, { Transparency = 0.35 }, 2.2, Enum.EasingStyle.Sine)
+				task.wait(2.2)
 			else
-				task.wait(0.5)
+				task.wait(1.2)
 			end
 		end
 	end)
@@ -18837,9 +18967,11 @@ function buildMain()
 	task.spawn(function()
 		local rot = 0
 		while top.Parent do
-			rot = (rot + 1.2) % 360
-			topGrad.Rotation = rot
-			task.wait(0.03)
+			if S.hubOpen then
+				rot = (rot + 2) % 360
+				topGrad.Rotation = rot
+			end
+			task.wait(0.08)
 		end
 	end)
 	local glowLine = Instance.new("Frame")
@@ -20014,6 +20146,6 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.36 | 2026-07-28
+-- VOIDZ HUB | v1.2.37 | 2026-07-28
 
 -- hi im voidz

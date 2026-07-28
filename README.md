@@ -1,6 +1,11 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.36` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.37` · Access Key: `VOIDZHUB`
+
+## Recent (1.2.37)
+
+- **Blue train** — Stronger drive (SNO burst, CFrame + BV, stay-on-train, better find/cache). No more soft stop at 80 studs that killed control.
+- **Perf** — Less lag: mouse force 1 light loop, moveHB early-out, gucci idle skip, no workspace full scan for train, slower UI glow.
 
 ## Recent (1.2.36)
 

@@ -18308,11 +18308,9 @@ local function buildMain()
 
 	S.hubOpen = true
 
-	-- re-enable wanted antis after death/respawn
 	LP.CharacterAdded:Connect(function()
 		task.wait(0.8)
 		local w = S.antiWanted or {}
-		-- Only re-arm if user explicitly set antiWanted.antiGrab = true via UI
 		if w.antiGrab == true and S.toggles.antiGrab then
 			stopLoop("antiGrab")
 			startLoop("antiGrab", 0.1, antiGrabTick)
@@ -18330,7 +18328,6 @@ local function buildMain()
 				S.toggles[key] = true
 			end
 		end
-		-- fix orphaned freezePart after death — reset camera
 		local fp = workspace:FindFirstChild("VOIDZ_FreezePart")
 		if fp then
 			unfreezeCam()
@@ -18342,7 +18339,6 @@ local function buildMain()
 		end
 	end)
 
-	-- auto-update everything every 20s
 	task.spawn(function()
 		while S.gui and S.gui.Parent do
 			task.wait(20)
@@ -18373,8 +18369,6 @@ local function buildMain()
 	print("[VOIDZ HUB]", BUILD, "FTAP", FTAP.ok)
 end
 
-------------------------------------------------------------------------
--- Key gate
 local function buildKey()
 	local parent = getUiParent()
 	local old = parent:FindFirstChild("VOIDZ_KEY"); if old then old:Destroy() end
@@ -18477,7 +18471,6 @@ local function buildKey()
 	corner(unlock, 10); stroke(unlock, C.accent, 1.2)
 
 	local function showDeviceSplash(device, onDone)
-		-- Full-screen themed splash (PC vs Mobile layouts differ)
 		local parent = getUiParent()
 		local old = parent:FindFirstChild("VOIDZ_SPLASH")
 		if old then old:Destroy() end
@@ -18514,7 +18507,6 @@ local function buildKey()
 		grad.Parent = gradientBg
 		tween(gradientBg, { BackgroundTransparency = 0.15 }, 0.8)
 
-		-- Floating particles
 		local particles = Instance.new("Frame")
 		particles.Size = UDim2.fromScale(1, 1)
 		particles.BackgroundTransparency = 1
@@ -18809,7 +18801,6 @@ end
 
 	_voidzInitUI()
 
-	-- export boot-critical entry points to outer scope
 	Late.installAntiKickOnLoad = installAntiKickOnLoad
 	Late.installGrabWatch = installGrabWatch
 	Late.installAntis = installAntis

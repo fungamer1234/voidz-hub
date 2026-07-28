@@ -23,9 +23,9 @@ local LP = Players.LocalPlayer
 while not LP do task.wait() LP = Players.LocalPlayer end
 local Mouse = LP:GetMouse()
 
-local ACCESS_KEY = "kingvoidz"
+local ACCESS_KEY = "TESTRUN"
 local HUB_NAME = "VOIDZ HUB"
-local BUILD = "2026-07-27-1.1.7"
+local BUILD = "2026-07-27-1.2.0"
 local GuiService = game:GetService("GuiService")
 
 -- 6 themes (Purple = classic VOIDZ)
@@ -112,7 +112,6 @@ local S = {
 	loopGen = {}, -- prevents an old task from coming back alive after a quick off/on toggle
 	auraCfg = {},
 	whitelist = {},
-	antiGrabWhitelist = {}, -- players allowed to grab you even with anti-grab on
 	selected = nil,
 	loopTarget = nil,
 	loopTargets = {}, -- multi-select: {Player = true}
@@ -150,8 +149,6 @@ local S = {
 	grabFollowSpeed = 50,
 	superStrength = false,
 	superStrengthPower = 4000,
-	superStrengthHold = false,
-	superStrengthHoldPower = 5000,
 	masslessGrab = false,
 	noclipGrab = false,
 	killGrab = false,
@@ -161,6 +158,7 @@ local S = {
 	revengeGrab = false,
 	revengeForce = 12000,
 	anchorGrab = false,
+	radioactiveGrab = false,
 	strengthMult = 1,
 	counterMode = "Repulsion",
 	autoCounter = false,
@@ -170,15 +168,6 @@ local S = {
 	theme = "Purple",
 	device = "PC",
 	escapeSpace = false,
-	-- Blitzbr-style anchor objects
-	anchorMode = false,
-	anchorOwnership = true,
-	-- Anti-spectate
-	antiSpectate = false,
-	antiSpectateMode = "hide",
-	-- Dev join effects
-	devJoinEffects = false,
-	devJoinSound = false,
 }
 
 -- default aura config factory
@@ -629,21 +618,6 @@ Players.PlayerAdded:Connect(function(p)
 	if S._loopSearchRefresh then pcall(S._loopSearchRefresh) end
 	notify(HUB_NAME, playerLabel(fresh) .. " rejoined — loop re-acquired!", 2)
 end)
-
--- Creator join notification
-Players.PlayerAdded:Connect(function(p)
-	if p.Name == "Super_remy12" then
-		task.wait(0.5)
-		notify(HUB_NAME, "Welcome Super_remy12 creator of voidz!", 3)
-		voidzChat("✦ VOIDZ ✦ Super_remy12 CREATOR JOINED ✦")
-	end
-end)
-
--- Check if local player is creator on load
-if LP.Name == "Super_remy12" then
-	task.wait(0.5)
-	notify(HUB_NAME, "Owner mode active ✦", 3)
-end
 
 -- House / plot detection (FTAP: Player.InPlot + PlotItems.PlayersInPlots)
 S.toggles.plotAmbush = S.toggles.plotAmbush ~= false
@@ -1132,7 +1106,7 @@ function destroyGrabOn(part)
 	end
 end
 
--- CreateBringBody: keep BodyPosition for a few seconds then auto-cleanup
+-- CreateBringBody: keep BodyPosition forever (Debris was why people vanished after ~4s)
 function createBringBody(part, targetCF)
 	if not part then return end
 	local pos = typeof(targetCF) == "CFrame" and targetCF.Position or targetCF
@@ -1153,7 +1127,7 @@ function createBringBody(part, targetCF)
 		bp.D = 5000
 		bp.P = 1500000
 		bp.Parent = part
-		Debris:AddItem(bp, 3) -- auto-cleanup after 3 seconds
+		-- DO NOT Debris:AddItem — keeps BringBody until ownership is lost
 	end)
 end
 
@@ -3320,11 +3294,18 @@ function balloonTroll(targetPlayer)
 							if balloon then
 								sno(balloon)
 								balloon.CFrame = r.CFrame * CFrame.new(0, 6, 0)
+								balloon.AssemblyLinearVelocity = Vector3.zero
+								balloon.AssemblyAngularVelocity = Vector3.zero
+								-- try firetouchinterest (some executors support it)
 								if firetouchinterest then
-									firetouchinterest(balloon, r, 0)
-									task.wait(0.05)
-									firetouchinterest(balloon, r, 1)
+									pcall(function()
+										firetouchinterest(balloon, r, 0)
+										task.wait(0.05)
+										firetouchinterest(balloon, r, 1)
+									end)
 								end
+								-- fallback: let physics handle touch by keeping it overlapping for a moment
+								task.wait(0.1)
 							end
 						end)
 					end
@@ -3763,11 +3744,26 @@ function moveBlobNear(kit, targetRoot)
 		else
 			pivot.CFrame = dest
 		end
+		-- Anchor blobman parts during teleport to prevent flying
+		for _, part in ipairs(kit.blob:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.Anchored = true
+				part.AssemblyLinearVelocity = Vector3.zero
+				part.AssemblyAngularVelocity = Vector3.zero
+			end
+		end
 		local me = hrp()
 		if me then me.CFrame = dest * CFrame.new(0, 2, 0) end
 		local h = hum()
 		if h and kit.seat then
 			pcall(function() kit.seat:Sit(h) end)
+		end
+		-- Unanchor after a brief moment
+		task.wait(0.05)
+		for _, part in ipairs(kit.blob:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.Anchored = false
+			end
 		end
 	end)
 end
@@ -3786,11 +3782,6 @@ end
 -- Force sit blobman every cycle (re-mount if knocked off)
 function forceBlobmanMount()
 	if isOnBlobman() then return getBlobmanGrabKit() end
-	-- Don't force sit if already sitting on something that's not blobman
-	local h = hum()
-	if h and h.Sit and not isOnBlobman() then
-		return nil -- already sitting on something else, don't force
-	end
 	pcall(function() ensureBlobman(true) end)
 	if isOnBlobman() then return getBlobmanGrabKit() end
 	-- last resort: find any blob seat and sit
@@ -5190,164 +5181,6 @@ function setAntiLag(on)
 	end)
 end
 
-------------------------------------------------------------------------
--- Blitzbr-style Anchor Objects system (ownership tracking + auto-release)
-local AnchoredObjects = {}
-local _AnchorDebris = game:GetService("Debris")
-
-function anchorobjecteffectFX(part)
-	pcall(function()
-		local att = Instance.new("Attachment")
-		att.Parent = part
-		local snd = Instance.new("Sound", att)
-		snd.SoundId = "rbxassetid://1091083826"
-		snd:Play()
-		_AnchorDebris:AddItem(att, 2)
-	end)
-end
-
-function setAnchorObject(part)
-	if not S.toggles.anchorMode then return false end
-	if not part or not part.Parent then return false end
-	if not part:IsA("BasePart") then return false end
-	if AnchoredObjects[part] then return true end
-	pcall(function()
-		part.Anchored = true
-		part:SetAttribute("AnchorOwnership", S.toggles.anchorOwnership)
-		part:SetAttribute("IsAnchored", true)
-		AnchoredObjects[part] = {
-			PartAnchored = part,
-			Model = part.Parent,
-			Connections = {},
-			Ownership = S.toggles.anchorOwnership,
-		}
-		anchorobjecteffectFX(part)
-	end)
-	return true
-end
-
-function unAnchorObject(part)
-	if not part or not part.Parent then return end
-	pcall(function()
-		part.Anchored = false
-		part:SetAttribute("AnchorOwnership", false)
-		part:SetAttribute("IsAnchored", false)
-		AnchoredObjects[part] = nil
-	end)
-end
-
-function disconnectAnchorObject(part)
-	if not part or not AnchoredObjects[part] then return end
-	local data = AnchoredObjects[part]
-	pcall(function()
-		for _, conn in pairs(data.Connections) do
-			pcall(function() conn:Disconnect() end)
-		end
-		data.PartAnchored = nil
-		part:SetAttribute("IsAnchored", nil)
-		part:SetAttribute("AnchorOwnership", nil)
-		AnchoredObjects[part] = nil
-	end)
-end
-
-function anchorAllNearby(duration)
-	local me = hrp()
-	if not me then return end
-	local count = 0
-	for _, p in ipairs(workspace:GetChildren()) do
-		if p:IsA("Model") or p:IsA("Folder") then
-			for _, part in ipairs(p:GetDescendants()) do
-				if part:IsA("BasePart") and not part.Anchored and (part.Position - me.Position).Magnitude < (S.auraRange or 50) then
-					if setAnchorObject(part) then count += 1 end
-				end
-			end
-		end
-	end
-	notify(HUB_NAME, "Anchored " .. count .. " nearby parts", 2)
-	if duration and duration > 0 then
-		task.delay(duration, function()
-			for part, _ in pairs(AnchoredObjects) do
-				pcall(function() unAnchorObject(part) end)
-			end
-		end)
-	end
-end
-
-function autoAnchorLoop()
-	if not S.toggles.anchorMode then return end
-	local me = hrp()
-	if not me then return end
-	for _, p in ipairs(Players:GetPlayers()) do
-		if validP(p) and p ~= _LocalPlayer then
-			local r = rootOf(p)
-			if r then
-				for _, part in ipairs(r:GetChildren()) do
-					if part:IsA("BasePart") and not part.Anchored then
-						setAnchorObject(part)
-					end
-				end
-			end
-		end
-	end
-end
-
--- Anti-Spectate: prevent others from spectating you via camera hacks
-function setAntiSpectate(on)
-	S.toggles.antiSpectate = on == true
-	S.toggles.antiSpectateMode = on and "hide" or "off"
-	if on then
-		pcall(function()
-			local cam = workspace.CurrentCamera
-			if cam then
-				cam.CameraSubject = LP.Character or LP
-				cam.FieldOfView = 70
-			end
-		end)
-		notify(HUB_NAME, "Anti-Spectate ON · camera protected", 2)
-	else
-		notify(HUB_NAME, "Anti-Spectate OFF", 1.5)
-	end
-end
-
--- Dev Join Effects: troll visual when devs join
-local devJoinConn = nil
-function setDevJoinEffects(on)
-	S.toggles.devJoinEffects = on == true
-	S.toggles.devJoinSound = on == true
-	if on then
-		if devJoinConn then pcall(function() devJoinConn:Disconnect() end) end
-		devJoinConn = game:GetService("PlayerAdded"):Connect(function(p)
-			pcall(function()
-				if p and p.DisplayName and (p.DisplayName:lower():find("dev") or p.DisplayName:lower():find("admin") or p.DisplayName:lower():find("mod") or p.DisplayName:lower():find("owner") or p.DisplayName:lower():find("owner") or p.DisplayName ~= _LocalPlayer.DisplayName) then
-					local c = LP.Character
-					if c then
-						for _, d in ipairs(c:GetDescendants()) do
-							if d:IsA("Part") or d:IsA("MeshPart") or d:IsA("UnionOperation") then
-								pcall(function() d.Material = Enum.Material.Neon end)
-								pcall(function() d.Color = Color3.fromRGB(math.random(150,255), math.random(0,255), math.random(200,255)) end)
-							end
-						end
-						notify(HUB_NAME, "Dev Join Effect · " .. p.Name .. " joined", 2)
-						task.delay(3, function()
-							for _, d in ipairs(c:GetDescendants()) do
-								if d:IsA("BasePart") then
-									pcall(function() d.Material = Enum.Material.SmoothPlastic end)
-									pcall(function() d.Color = Color3.fromRGB(200, 200, 200) end)
-								end
-							end
-						end)
-					end
-				end
-			end)
-		end)
-		notify(HUB_NAME, "Dev Join Effects ON", 2)
-	else
-		if devJoinConn then pcall(function() devJoinConn:Disconnect() end) end
-		devJoinConn = nil
-		notify(HUB_NAME, "Dev Join Effects OFF", 1.5)
-	end
-end
-
 -- Water walk (nested — register budget)
 local setWaterWalk
 (function()
@@ -5935,61 +5768,6 @@ function isGucciVictim(c)
 	return false
 end
 
--- Get the player who is grabbing us (if any)
-function getGrabber(c)
-	c = c or char()
-	if not c then return nil end
-	-- Check PartOwner on head/HRP
-	for _, partName in ipairs({ "Head", "HumanoidRootPart", "Torso", "UpperTorso" }) do
-		local part = c:FindFirstChild(partName)
-		if part then
-			local po = part:FindFirstChild("PartOwner")
-			if po then
-				local val = nil
-				pcall(function() val = po.Value end)
-				if typeof(val) == "Instance" and val:IsA("Player") and val ~= LP then
-					return val
-				end
-				if type(val) == "string" and val ~= "" and val ~= LP.Name then
-					return Players:FindFirstChild(val)
-				end
-			end
-		end
-	end
-	-- Check GrabParts welds
-	for _, child in ipairs(workspace:GetChildren()) do
-		if child.Name == "GrabParts" then
-			for _, d in ipairs(child:GetDescendants()) do
-				if d:IsA("WeldConstraint") or d:IsA("Weld") then
-					local p0, p1 = d.Part0, d.Part1
-					local other = nil
-					if p0 and p0:IsDescendantOf(c) and p1 and not p1:IsDescendantOf(c) then
-						other = p1
-					elseif p1 and p1:IsDescendantOf(c) and p0 and not p0:IsDescendantOf(c) then
-						other = p0
-					end
-					if other then
-						local model = other:FindFirstAncestorOfClass("Model")
-						if model then
-							local plr = Players:GetPlayerFromCharacter(model)
-							if plr and plr ~= LP then return plr end
-						end
-					end
-				end
-			end
-		end
-	end
-	return nil
-end
-
--- Check if grabber is whitelisted for anti-grab bypass
-function isAntiGrabWhitelisted(grabber)
-	if not grabber then return false end
-	if S.antiGrabWhitelist[grabber.UserId] == true then return true end
-	if S.antiGrabWhitelist[grabber.Name] == true then return true end
-	return false
-end
-
 function gucciBreakGrabNow()
 	local c = char()
 	local r = hrp()
@@ -6117,18 +5895,8 @@ function gucciAntiTick()
 				r.Anchored = false
 			end
 		end
-		stopBlitzbrAntiGrab()
 		return -- DO NOT DestroyGrabLine while we grab others
 	end
-
-	-- Check if grabber is in anti-grab whitelist
-	local grabber = getGrabberPlayer()
-	if grabber and isAntiGrabWhitelisted(grabber) then
-		return -- whitelisted player allowed to grab you
-	end
-
-	-- Start blitzbr-style continuous anti-grab on heartbeat
-	startBlitzbrAntiGrab()
 
 	-- Anti-kill house escape while grabbed (if enabled)
 	if S.toggles.antiKill then
@@ -6157,38 +5925,6 @@ function gucciAntiTick()
 			end
 		end
 	end
-
-	-- Blitzbr-style continuous anti-grab: run on Heartbeat while held
-	-- Anchors HRP + zero velocity + Struggle + RagdollRemote until released
-	if not S._blitzbrAntiGrabConn then
-		S._blitzbrAntiGrabConn = RunService.Heartbeat:Connect(function()
-			if not (S.toggles.antiGucci or S.toggles.antiGrab) then return end
-			local held = LP:FindFirstChild("IsHeld")
-			if not (held and held.Value) then return end
-			local c2 = char()
-			local r2 = hrp()
-			if not c2 or not r2 then return end
-			pcall(function()
-				r2.Anchored = true
-				r2.AssemblyLinearVelocity = Vector3.zero
-				r2.AssemblyAngularVelocity = Vector3.zero
-				if FTAP.Struggle then pcall(function() FTAP.Struggle:FireServer(LP) end) end
-				if FTAP.RagdollRemote then pcall(function() FTAP.RagdollRemote:FireServer(r2, 0) end) end
-			end)
-		end)
-	end
-end
-
-function stopBlitzbrAntiGrab()
-	if S._blitzbrAntiGrabConn then
-		S._blitzbrAntiGrabConn:Disconnect()
-		S._blitzbrAntiGrabConn = nil
-	end
-	-- Unanchor on stop
-	pcall(function()
-		local r = hrp()
-		if r then r.Anchored = false end
-	end)
 end
 
 function installAntis()
@@ -7939,10 +7675,10 @@ function startMissileStrike()
 					end)
 				end
 				notify(HUB_NAME, "Boom ×" .. #batch .. " → @" .. (p and p.Name or "?"), 1.2)
-				task.wait(0.15)
+				task.wait(0.05)
 			end
 
-			task.wait(0.1)
+			task.wait(0.03)
 		end
 	end)
 end
@@ -9247,6 +8983,7 @@ function onGrabPartsAdded(child)
 		local model = grabbed:FindFirstAncestorOfClass("Model") or grabbed.Parent
 		local targetHum = model and model:FindFirstChildOfClass("Humanoid")
 		local targetPlr = model and Players:GetPlayerFromCharacter(model)
+		local targetRoot = targetPlr and rootOf(targetPlr) or grabbed
 		local releaseRoot = resolveReleaseRoot(grabbed)
 		local collideRestore = {}
 		local released = false
@@ -9274,6 +9011,12 @@ function onGrabPartsAdded(child)
 					end
 				end)
 			end
+		end
+
+		-- Store target player info in grabMap for access by other functions
+		if targetPlr then
+			grabMap[child .. "_targetPlr"] = targetPlr
+			grabMap[child .. "_targetRoot"] = targetRoot
 		end
 
 		-- pallet stick while holding (Part0/Part1 + late weld settle)
@@ -9385,18 +9128,26 @@ function onGrabPartsAdded(child)
 			end)
 		end
 
-		-- Anchored grabbed object while held
+		-- Anchored grabbed object while held (server-sided via SNO + BodyPosition)
 		if S.anchorGrab or S.toggles.anchorGrab then
 			task.spawn(function()
-				local was = grabbed.Anchored
+				local bp = Instance.new("BodyPosition")
+				bp.Name = "VOIDZ_AnchorLock"
+				bp.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+				bp.P = 100000
+				bp.D = 5000
+				bp.Position = grabbed.Position
+				bp.Parent = grabbed
 				while child.Parent and (S.anchorGrab or S.toggles.anchorGrab) do
 					pcall(function()
-						grabbed.Anchored = true
+						sno(grabbed, grabbed.Position)
+						bp.Position = grabbed.Position
 						grabbed.AssemblyLinearVelocity = Vector3.zero
+						grabbed.AssemblyAngularVelocity = Vector3.zero
 					end)
 					task.wait()
 				end
-				pcall(function() grabbed.Anchored = was end)
+				pcall(function() bp:Destroy() end)
 			end)
 		end
 
@@ -9406,6 +9157,16 @@ function onGrabPartsAdded(child)
 				while child.Parent and (S.masslessGrab or S.toggles.masslessGrab) do
 					boostGrabAlign(child, true)
 					task.wait(0.2)
+				end
+			end)
+		end
+
+		-- Radioactive Grab: use UFO PaintPlayerPart to "radioactive" the target
+		if (S.radioactiveGrab or S.toggles.radioactiveGrab) and targetRoot then
+			task.spawn(function()
+				while child.Parent and (S.radioactiveGrab or S.toggles.radioactiveGrab) do
+					applyMapPaint(targetRoot)
+					task.wait(0.15)
 				end
 			end)
 		end
@@ -9428,48 +9189,6 @@ function onGrabPartsAdded(child)
 				for d, v in pairs(collideRestore) do
 					if d.Parent then pcall(function() d.CanCollide = v end) end
 				end
-			end)
-		end
-
-		-- Super Strength While Holding: apply constant force toward camera direction
-		if S.superStrengthHold or S.toggles.superStrHold then
-			task.spawn(function()
-				while child.Parent and (S.superStrengthHold or S.toggles.superStrHold) do
-					pcall(function()
-						local cam = workspace.CurrentCamera
-						local dir = cam and cam.CFrame.LookVector or Vector3.new(0, 0, -1)
-						local power = tonumber(S.superStrengthHoldPower) or 5000
-						local force = dir * power + Vector3.new(0, power * 0.3, 0)
-						-- Apply to grabbed part and root
-						local targets = {grabbed}
-						if releaseRoot and releaseRoot ~= grabbed then
-							table.insert(targets, releaseRoot)
-						end
-						for _, part in ipairs(targets) do
-							if part and part.Parent then
-								part.AssemblyLinearVelocity = force
-								local bv = part:FindFirstChild("SuperStrengthHold")
-								if not bv then
-									bv = Instance.new("BodyVelocity")
-									bv.Name = "SuperStrengthHold"
-									bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-									bv.Parent = part
-								end
-								bv.Velocity = force
-							end
-						end
-					end)
-					task.wait()
-				end
-				-- cleanup
-				pcall(function()
-					local bv1 = grabbed:FindFirstChild("SuperStrengthHold")
-					if bv1 then bv1:Destroy() end
-					if releaseRoot then
-						local bv2 = releaseRoot:FindFirstChild("SuperStrengthHold")
-						if bv2 then bv2:Destroy() end
-					end
-				end)
 			end)
 		end
 
@@ -9512,12 +9231,11 @@ function onGrabPartsAdded(child)
 		end
 
 		-- Poison Grab (uses canonical getPoisonHurtParts + applyMapPoison)
-		if (S.poisonGrab or S.toggles.poisonGrab) and grabbed then
+		if (S.poisonGrab or S.toggles.poisonGrab) and targetRoot then
 			task.spawn(function()
 				while child.Parent and (S.poisonGrab or S.toggles.poisonGrab) do
-					local r = targetPlr and rootOf(targetPlr) or grabbed
-					if r then
-						applyMapPoison(r)
+					if targetRoot then
+						applyMapPoison(targetRoot)
 					end
 					task.wait(0.1)
 				end
@@ -9641,8 +9359,6 @@ end
 -- Auto Attacker: instant grabber fling — no long loops, just SNO + fling + break
 function counterAttackPlayer(plr, part)
 	if not plr or not validP(plr) then return end
-	-- Don't attack anti-grab whitelisted players
-	if isAntiGrabWhitelisted(plr) then return end
 	local mode = S.counterMode or "Repulsion"
 	local force = (tonumber(S.revengeForce) or 12000) * (tonumber(S.strengthMult) or 1)
 	local r = rootOf(plr) or part
@@ -9848,84 +9564,6 @@ function isLocalVictimGrabbed()
 		end
 	end
 	return false
-end
-
--- Get the player who is grabbing us (if any)
-function getGrabberPlayer()
-	local c = char()
-	if not c then return nil end
-	-- Check via IsHeld
-	local held = LP:FindFirstChild("IsHeld")
-	if held and held.Value then
-		-- Try to find grabber from PartOwner
-		for _, part in ipairs(c:GetDescendants()) do
-			if part:IsA("BasePart") then
-				local po = part:FindFirstChild("PartOwner")
-				if po and po.Value then
-					local plr = po.Value
-					if typeof(plr) == "Instance" and plr:IsA("Player") and plr ~= LP then
-						return plr
-					end
-				end
-			end
-		end
-	end
-	-- Check via GrabParts welds
-	if grabPartsIsAttackingUs then
-		for _, ch in ipairs(workspace:GetChildren()) do
-			if ch.Name == "GrabParts" and grabPartsIsAttackingUs(ch, c) then
-				-- Find the player who owns this GrabParts
-				for _, d in ipairs(ch:GetDescendants()) do
-					if d:IsA("WeldConstraint") or d:IsA("Weld") then
-						local other = nil
-						if d.Part0 and d.Part0:IsDescendantOf(c) and d.Part1 and not d.Part1:IsDescendantOf(c) then other = d.Part1 end
-						if d.Part1 and d.Part1:IsDescendantOf(c) and d.Part0 and not d.Part0:IsDescendantOf(c) then other = d.Part0 end
-						if other then
-							local model = other:FindFirstAncestorOfClass("Model")
-							if model then
-								local plr = Players:GetPlayerFromCharacter(model)
-								if plr and plr ~= LP then return plr end
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-	-- Check via welds on our character
-	for _, d in ipairs(c:GetDescendants()) do
-		if d:IsA("WeldConstraint") or d:IsA("Weld") then
-			local other = nil
-			if d.Part0 and d.Part0:IsDescendantOf(c) and d.Part1 and not d.Part1:IsDescendantOf(c) then other = d.Part1 end
-			if d.Part1 and d.Part1:IsDescendantOf(c) and d.Part0 and not d.Part0:IsDescendantOf(c) then other = d.Part0 end
-			if other then
-				local gp = nil
-				local cur = other
-				for _ = 1, 10 do
-					if not cur then break end
-					if cur.Name == "GrabParts" then gp = cur break end
-					cur = cur.Parent
-				end
-				if gp then
-					for _, d2 in ipairs(gp:GetDescendants()) do
-						if d2:IsA("WeldConstraint") or d2:IsA("Weld") then
-							local other2 = nil
-							if d2.Part0 and not d2.Part0:IsDescendantOf(c) and d2.Part1 and d2.Part1:IsDescendantOf(c) then other2 = d2.Part0 end
-							if d2.Part1 and not d2.Part1:IsDescendantOf(c) and d2.Part0 and d2.Part0:IsDescendantOf(c) then other2 = d2.Part1 end
-							if other2 then
-								local model = other2:FindFirstAncestorOfClass("Model")
-								if model then
-									local plr = Players:GetPlayerFromCharacter(model)
-									if plr and plr ~= LP then return plr end
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-	end
-	return nil
 end
 
 -- Full free: Struggle + DestroyGrabLine + break GrabParts on us (no sky/float boost)
@@ -10310,37 +9948,32 @@ end
 function installScrollDistanceWheel()
 	if S.conns.scrollDistWheel then return end
 	S.conns.scrollDistWheel = UserInputService.InputChanged:Connect(function(input)
-		if input.UserInputType ~= Enum.UserInputType.MouseWheel then return end
+		if not S.toggles.lineExtend then return end
+		-- Support multiple mouse wheel input types for better executor compatibility
+		local z = 0
+		if input.UserInputType == Enum.UserInputType.MouseWheel then
+			z = input.Position.Z
+		elseif input.UserInputType == Enum.UserInputType.MouseWheelForward then
+			z = 1
+		elseif input.UserInputType == Enum.UserInputType.MouseWheelBackward then
+			z = -1
+		else
+			return
+		end
+		if z == 0 and input.Delta then z = input.Delta.Y end
+		local holding = false
+		for _, ch in ipairs(workspace:GetChildren()) do
+			if ch.Name == "GrabParts" then holding = true break end
+		end
+		if not holding then return end
 		local step = tonumber(S.scrollStep) or 2
-		local z = input.Position.Z
 		if z > 0 then
 			pcDistance = pcDistance + step
-		else
+		elseif z < 0 then
 			pcDistance = pcDistance - step
 		end
 		pcDistance = math.clamp(pcDistance, 11, 120)
-		local amt = pcDistance
-		if FTAP.ExtendGrabLine then
-			pcall(function()
-				if FTAP.ExtendGrabLine:IsA("RemoteEvent") then
-					FTAP.ExtendGrabLine:FireServer(amt)
-				elseif FTAP.ExtendGrabLine:IsA("RemoteFunction") then
-					FTAP.ExtendGrabLine:InvokeServer(amt)
-				end
-			end)
-		end
-		for _, ch in ipairs(workspace:GetChildren()) do
-			if ch.Name == "GrabParts" then
-				local drag = ch:FindFirstChild("DragPart")
-				if drag then
-					local me = hrp()
-					if me then
-						drag.Position = me.Position + (me.CFrame.LookVector * amt)
-					end
-				end
-				ch:GetAttribute("VOIDZ_ReachSetup")
-			end
-		end
+		notify(HUB_NAME, "Scroll distance: " .. math.floor(pcDistance), 0.5)
 	end)
 end
 
@@ -10606,54 +10239,6 @@ local function antiKickReady()
 	return AK.enabled == true and os.clock() >= (AK.readyAt or math.huge)
 end
 
--- Detect FTAP kick blackhole (appears in CoreGui/PlayerGui before kick)
-local function detectKickBlackhole()
-	if not antiKickReady() then return false end
-	-- Check CoreGui for kick blackhole (FTAP shows blackhole before kick)
-	pcall(function()
-		local cg = game:GetService("CoreGui")
-		for _, child in ipairs(cg:GetChildren()) do
-			local name = child.Name:lower()
-			if name:find("blackhole", 1, true) or name:find("black_hole", 1, true) or name:find("kickblack", 1, true) or name:find("disconnectblack", 1, true) then
-				for _, desc in ipairs(child:GetDescendants()) do
-					if desc:IsA("Frame") or desc:IsA("ImageLabel") then
-						local bg = desc.BackgroundColor3
-						if bg.R < 0.1 and bg.G < 0.1 and bg.B < 0.1 and desc.BackgroundTransparency < 0.5 then
-							if desc.AbsoluteSize.X > 100 or desc.AbsoluteSize.Y > 100 then
-								onKickSignal("Kick BlackHole detected: " .. child.Name, "BlackHole")
-								return
-							end
-						end
-					end
-				end
-			end
-		end
-	end)
-	-- Check PlayerGui too
-	pcall(function()
-		local pg = LP:FindFirstChild("PlayerGui")
-		if pg then
-			for _, child in ipairs(pg:GetChildren()) do
-				local name = child.Name:lower()
-				if name:find("blackhole", 1, true) or name:find("black_hole", 1, true) then
-					for _, desc in ipairs(child:GetDescendants()) do
-						if desc:IsA("Frame") or desc:IsA("ImageLabel") then
-							local bg = desc.BackgroundColor3
-							if bg.R < 0.1 and bg.G < 0.1 and bg.B < 0.1 and desc.BackgroundTransparency < 0.5 then
-								if desc.AbsoluteSize.X > 100 or desc.AbsoluteSize.Y > 100 then
-									onKickSignal("Kick BlackHole detected (PlayerGui): " .. child.Name, "BlackHole")
-									return
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-	end)
-	return false
-end
-
 -- True only for REAL kick / disconnect language aimed at YOU
 local function isRealKickSignal(text, source)
 	source = tostring(source or "")
@@ -10744,7 +10329,7 @@ local function doVoidzRejoin(reason)
 	AK.rejoining = true
 	AK.weInitiatedTeleport = true
 
-	local fancy = "✦ VOIDZ · anti-kick triggered · rejoining ✦"
+	local fancy = "✦ VOIDZ · anti-kick checked… rejoining ✦"
 	pcall(function() voidzChat(fancy) end)
 	pcall(function()
 		notify(HUB_NAME, "Anti-kick · leaving before AC · rejoining…", 3)
@@ -10940,7 +10525,6 @@ local function bindKickScanners()
 				pcall(function()
 					scanPromptGuiText(CoreGui:FindFirstChild("RobloxPromptGui"))
 				end)
-				pcall(detectKickBlackhole)
 			end
 		end
 	end)
@@ -11755,6 +11339,45 @@ local function makePlayerSearchList(sc, opts, orderFn)
 		searchInput = box
 	end
 
+	-- Multi-select indicator bar
+	local multiBar = Instance.new("Frame")
+	multiBar.LayoutOrder = nn()
+	multiBar.Size = UDim2.new(1, -6, 0, 24)
+	multiBar.BackgroundColor3 = C.card
+	multiBar.BorderSizePixel = 0
+	multiBar.Visible = false
+	multiBar.Parent = sc
+	corner(multiBar, 6)
+	stroke(multiBar, C.strokeSoft, 1)
+	pad(multiBar, 6, 6, 6, 6)
+	local multiLabel = Instance.new("TextLabel")
+	multiLabel.BackgroundTransparency = 1
+	multiLabel.Size = UDim2.fromScale(1, 1)
+	multiLabel.Font = Enum.Font.GothamMedium
+	multiLabel.TextSize = 11
+	multiLabel.TextColor3 = C.accent2
+	multiLabel.TextXAlignment = Enum.TextXAlignment.Left
+	multiLabel.Text = ""
+	multiLabel.Parent = multiBar
+	local multiClearBtn = Instance.new("TextButton")
+	multiClearBtn.Size = UDim2.fromOffset(50, 20)
+	multiClearBtn.Position = UDim2.new(1, -54, 0.5, -10)
+	multiClearBtn.BackgroundColor3 = C.danger
+	multiClearBtn.Text = "Clear"
+	multiClearBtn.Font = Enum.Font.GothamBold
+	multiClearBtn.TextSize = 9
+	multiClearBtn.TextColor3 = C.dangerText
+	multiClearBtn.ZIndex = 10
+	multiClearBtn.Parent = multiBar
+	corner(multiClearBtn, 4)
+	multiClearBtn.MouseButton1Click:Connect(function()
+		S.loopTargets = {}
+		S.loopNames = {}
+		S.loopTarget = nil
+		S.loopName = nil
+		refresh()
+	end)
+
 	local listBox = Instance.new("Frame")
 	listBox.LayoutOrder = nn()
 	listBox.Size = UDim2.new(1, -6, 0, height)
@@ -11776,6 +11399,17 @@ local function makePlayerSearchList(sc, opts, orderFn)
 	listLay.Parent = listSc
 	pad(listSc, 4, 4, 4, 4)
 
+	local function updateMultiBar()
+		local count = 0
+		for _ in pairs(S.loopTargets) do count = count + 1 end
+		if count > 0 then
+			multiBar.Visible = true
+			multiLabel.Text = "  " .. count .. " player" .. (count > 1 and "s" or "") .. " selected for loops"
+		else
+			multiBar.Visible = false
+		end
+	end
+
 	local function refresh()
 		for _, ch in ipairs(listSc:GetChildren()) do
 			if ch:IsA("TextButton") then ch:Destroy() end
@@ -11787,30 +11421,33 @@ local function makePlayerSearchList(sc, opts, orderFn)
 			local isLoop = S.loopTargets[p]
 			local b = Instance.new("TextButton")
 			b.Size = UDim2.new(1, -4, 0, 28)
-			b.BackgroundColor3 = isSel and C.accentDim or C.card
+			if isLoop then
+				b.BackgroundColor3 = C.accentDim
+			elseif isSel then
+				b.BackgroundColor3 = C.accentSoft
+			else
+				b.BackgroundColor3 = C.card
+			end
 			b.BorderSizePixel = 0
 			b.Font = Enum.Font.Gotham
 			b.TextSize = 11
 			b.TextColor3 = C.text
 			b.TextXAlignment = Enum.TextXAlignment.Left
-			b.Text = " " .. lab .. (isLoop and "  ★" or "") .. (isSel and "  ●" or "")
+			local prefix = isLoop and "  ★ " or (isSel and "  ● " or "  ")
+			b.Text = prefix .. lab
 			b.AutoButtonColor = false
 			b.Parent = listSc
 			corner(b, 6)
-			if isLoop then stroke(b, C.accent, 1) end
+			if isLoop then stroke(b, C.accent, 1.5) end
 			b.MouseButton1Click:Connect(function()
 				S.selected = p
 				pcall(function() clickFn(p, lab) end)
 				refresh()
+				updateMultiBar()
 			end)
 		end
+		updateMultiBar()
 	end
-	refresh()
-	if searchInput then
-		searchInput:GetPropertyChangedSignal("Text"):Connect(refresh)
-	end
-	return refresh
-end
 
 local function makeAuraBlock(parent, order, meta)
 	local id = meta.id
@@ -12068,13 +11705,12 @@ local TAB_DEFS = {
 	{ id = "anti", icon = "08", label = "Protect" },
 	{ id = "move", icon = "09", label = "Movement" },
 	{ id = "visuals", icon = "10", label = "Visuals" },
--- world / toys
+	-- world / toys
 	{ id = "toys", icon = "11", label = "Toys" },
 	{ id = "explosions", icon = "12", label = "Explosions" },
 	{ id = "world", icon = "13", label = "World" },
-	{ id = "blobman", icon = "14", label = "Blobman" },
-	{ id = "auto", icon = "15", label = "Auto" },
-	{ id = "console", icon = "16", label = "Misc" },
+	{ id = "auto", icon = "14", label = "Auto" },
+	{ id = "console", icon = "15", label = "Misc" },
 	{ id = "trans", icon = "16", label = "Trans" },
 	{ id = "sounds", icon = "17", label = "Sounds" },
 	{ id = "fun", icon = "18", label = "Fun" },
@@ -12150,7 +11786,7 @@ _TAB_BUILDERS["home"] = function(sc, n)
 		st.TextXAlignment = Enum.TextXAlignment.Left
 		st.TextYAlignment = Enum.TextYAlignment.Top
 		st.TextWrapped = true
-		st.Text = " Build: " .. BUILD .. "\n Place: " .. tostring(game.PlaceId) .. "\n Key: kingvoidz"
+		st.Text = " Build: " .. BUILD .. "\n Place: " .. tostring(game.PlaceId) .. "\n Key: TESTRUN"
 		st.Parent = sc
 		corner(st, 8)
 		pad(st, 8, 8, 8, 8)
@@ -12158,7 +11794,6 @@ _TAB_BUILDERS["home"] = function(sc, n)
 end
 _TAB_BUILDERS["combat"] = function(sc, n)
 		section(sc, "HIT ONE PERSON", n())
-		makeSlider(sc, { order = n(), title = "Throw Strength", min = 400, max = 20000, default = 8000, step = 100, stateKey = "flingPower" })
 		makeDropdown(sc, {
 			order = n(),
 			title = "How To Kick",
@@ -12186,10 +11821,10 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 				end
 			end)
 		end
-section(sc, "HOUSE / PLOT", n())
-	if S.toggles.plotAmbush == nil then S.toggles.plotAmbush = true end
-	if S.toggles.plotPullTry == nil then S.toggles.plotPullTry = true end
-	makeToggle(sc, {
+		section(sc, "HOUSE / PLOT", n())
+		if S.toggles.plotAmbush == nil then S.toggles.plotAmbush = true end
+		if S.toggles.plotPullTry == nil then S.toggles.plotPullTry = true end
+		makeToggle(sc, {
 			order = n(), id = "plotAmbush", title = "Ambush On Plot Exit",
 			tip = "If they are in a house: alert you, wait, then auto-grab + attack when they walk out",
 			desc = "Default ON · kills, flings, loops, auras",
@@ -12209,19 +11844,45 @@ section(sc, "HOUSE / PLOT", n())
 		})
 		makeButton(sc, {
 			order = n(), title = "Grab Selected On Exit",
-			tip = "Queue selected · auto-grab the frame they leave their house (uses blobman if in plot)",
+			tip = "Queue selected · auto-grab the frame they leave their house",
 			callback = function()
 				local p = combatTarget()
 				if not p then notify(HUB_NAME, "Select a player", 1.5); return end
 				if isInSafePlot(p) then
 					plotWatch[p.UserId] = { kind = "grab", quiet = false }
-					notify(HUB_NAME, playerLabel(p) .. " in house · blob grab on exit", 2)
+					notify(HUB_NAME, playerLabel(p) .. " in house · will grab on exit", 2)
 					if S.toggles.plotPullTry then task.spawn(tryPullFromPlot, p) end
-					task.delay(3, function() if plotWatch[p.UserId] then blobGrabSingle(p) end end)
 				else
 					task.spawn(function() forceGrabOnExit(p) end)
 					notify(HUB_NAME, "Grabbed " .. playerLabel(p) .. " (not in house)", 1.5)
 				end
+			end,
+		})
+		makeButton(sc, {
+			order = n(), title = "Blobman Extract From Plot",
+			danger = true,
+			tip = "Spawns blobman → mounts → CreatureGrab target in their plot (bypasses house protection)",
+			callback = function()
+				local p = combatTarget()
+				if not p then notify(HUB_NAME, "Select a player", 1.5); return end
+				notify(HUB_NAME, "Blobman extract → " .. playerLabel(p), 1.2)
+				task.spawn(function() blobGrabSingle(p) end)
+			end,
+		})
+		makeButton(sc, {
+			order = n(), title = "Blobman Extract All From Plots",
+			danger = true,
+			tip = "Spawns blobman → CreatureGrab every player in plots",
+			callback = function()
+				notify(HUB_NAME, "Blobman extract ALL from plots", 1.5)
+				task.spawn(function()
+					for _, p in ipairs(Players:GetPlayers()) do
+						if p ~= LP and validP(p) and isInSafePlot(p) then
+							blobGrabSingle(p)
+							task.wait(0.3)
+						end
+					end
+				end)
 			end,
 		})
 		section(sc, "ACTIONS (selected player)", n())
@@ -12288,151 +11949,52 @@ section(sc, "HOUSE / PLOT", n())
 				if h then h.WalkSpeed = 16; h.JumpPower = 50; h.JumpHeight = 7.2 end
 			end)
 		end })
-makeButton(sc, { order = n(), title = "Massless Grab", tip = "Make grabbed part massless for easier flinging", callback = function()
+		makeButton(sc, { order = n(), title = "Massless Grab", tip = "Make grabbed part massless for easier flinging", callback = function()
 			runOnTarget("Massless", function(p)
 				local r = rootOf(p)
 				if r then pcall(function() r.Massless = true end) end
 			end)
 		end })
 
-		section(sc, "GRAB EFFECTS", n())
-		makeToggle(sc, { order = n(), id = "grabRadiation", title = "Radiation Grab",
-			tip = "OuterUFO follows target · radiation damage over time",
-			callback = function(on)
-				S.toggles.grabRadiation = on
-				stopLoop("grabRadiation")
-				if on then startLoop("grabRadiation", 0.1, function()
-					local p = S.selected or combatTarget()
-					if not p then return end
-					local r = rootOf(p)
-					if not r then return end
-					local outer = workspace:FindFirstChild("OuterUFO")
-					if outer then
-						outer.Position = r.Position
-						outer.Anchored = true
-					end
-				end) end
+		section(sc, "BLOB MAIN GRAB", n())
+		local blobNote = Instance.new("TextLabel")
+		blobNote.LayoutOrder = n()
+		blobNote.Size = UDim2.new(1, -6, 0, 32)
+		blobNote.BackgroundColor3 = C.card
+		blobNote.BorderSizePixel = 0
+		blobNote.Font = Enum.Font.Gotham
+		blobNote.TextSize = 9
+		blobNote.TextColor3 = C.muted
+		blobNote.TextXAlignment = Enum.TextXAlignment.Left
+		blobNote.TextWrapped = true
+		blobNote.Text = "Spawns blobman + CreatureGrab. Works inside plots — bypasses house protection."
+		blobNote.Parent = sc
+		corner(blobNote, 8)
+		pad(blobNote, 6, 6, 6, 6)
+		makeButton(sc, { order = n(), title = "Blob Grab Selected", danger = true,
+			tip = "Spawn blobman → TP to target → CreatureGrab (works in plots)",
+			callback = function()
+				local p = combatTarget()
+				if not p then notify(HUB_NAME, "Select a player", 1.5); return end
+				notify(HUB_NAME, "Blob Grab → " .. playerLabel(p), 1.2)
+				task.spawn(function() blobGrabSingle(p) end)
 			end,
 		})
-		makeToggle(sc, { order = n(), id = "grabBurn", title = "Burn Grab",
-			tip = "Fire trail on grabbed target · continuous burn damage",
-			callback = function(on)
-				S.toggles.grabBurn = on
-				stopLoop("grabBurn")
-				if on then startLoop("grabBurn", 0.2, function()
-					local p = S.selected or combatTarget()
-					if not p then return end
-					local body = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
-					if not body then return end
-					pcall(function()
-						local fire = Instance.new("Fire")
-						fire.Size = 8
-						fire.Heat = 25
-						fire.Color = Color3.fromRGB(255, 100, 0)
-						fire.SecondaryColor = Color3.fromRGB(255, 0, 0)
-						fire.Parent = body
-					end)
-				end) end
+		makeButton(sc, { order = n(), title = "Blob Grab All", danger = true,
+			tip = "Spawn blobman → TP to every player → CreatureGrab all",
+			callback = function()
+				task.spawn(blobGrabAll)
 			end,
 		})
-		makeToggle(sc, { order = n(), id = "grabPoison", title = "Poison Grab",
-			tip = "PoisonHurtPart follows target head · poison damage over time",
-			callback = function(on)
-				S.toggles.grabPoison = on
-				stopLoop("grabPoison")
-				if on then startLoop("grabPoison", 0.15, function()
-					local p = S.selected or combatTarget()
-					if not p then return end
-					local head = p.Character and p.Character:FindFirstChild("Head")
-					if not head then return end
-					local list = workspace:GetDescendants()
-					local hurts = {}
-					for _, d in ipairs(list) do
-						if d.Name == "PoisonHurtPart" and d:IsA("BasePart") then
-							hurts[#hurts + 1] = d
-						end
-					end
-					for _, hurt in ipairs(hurts) do
-						hurt.CFrame = head.CFrame
-					end
-				end) end
-			end,
-		})
-		makeToggle(sc, { order = n(), id = "grabDeath", title = "Death Grab",
-			tip = "Force-kill grabbed target on cycle break",
-			callback = function(on)
-				S.toggles.grabDeath = on
-				stopLoop("grabDeath")
-				if on then startLoop("grabDeath", 0.5, function()
-					local p = S.selected or combatTarget()
-					if not p then return end
-					local h = p.Character and p.Character:FindFirstChildOfClass("Humanoid")
-					if h and h.Health > 0 then
-						h:ChangeState(Enum.HumanoidStateType.Dead)
-					end
-				end) end
-			end,
-		})
-		makeToggle(sc, { order = n(), id = "grabNoclip", title = "Noclip Grab",
-			tip = "Disable collisions on grabbed target",
-			callback = function(on)
-				S.toggles.grabNoclip = on
-				stopLoop("grabNoclip")
-				if on then startLoop("grabNoclip", 0.3, function()
-					local p = S.selected or combatTarget()
-					if not p then return end
-					pcall(function()
-						for _, part in ipairs(p.Character:GetDescendants()) do
-							if part:IsA("BasePart") then
-								part.CanCollide = false
-							end
-						end
-					end)
-				end) end
-			end,
-		})
-		makeToggle(sc, { order = n(), id = "grabPerspective", title = "Perspective Grab",
-			tip = "Shift grabbed target camera · disorientation effect",
-			callback = function(on)
-				S.toggles.grabPerspective = on
-				stopLoop("grabPerspective")
-				if on then startLoop("grabPerspective", 0.2, function()
-					local p = S.selected or combatTarget()
-					if not p then return end
-					local r = rootOf(p)
-					if r then r.CFrame = r.CFrame * CFrame.Angles(0, math.rad(180), 0) end
-				end) end
+		makeButton(sc, { order = n(), title = "Blob Grab Loop", danger = true,
+			tip = "Loop blob grab selected until toggled off · persists through rejoin",
+			callback = function()
+				local p = combatTarget()
+				if not p then notify(HUB_NAME, "Select a player", 1.5); return end
+				startBlobGrabLoop(p)
 			end,
 		})
 
-		section(sc, "PLOT EXTRACTION", n())
-		makeToggle(sc, { order = n(), id = "plotExtract", title = "Extract from Plot",
-			tip = "Knock players out of safe plots with high force",
-			callback = function(on)
-				S.toggles.plotExtract = on
-				stopLoop("plotExtract")
-				if on then startLoop("plotExtract", 0.8, function()
-					for _, p in ipairs(Players:GetPlayers()) do
-						if validP(p) then
-							local flag = p:FindFirstChild("InPlot")
-							if flag and flag:IsA("BoolValue") and flag.Value then
-								flingPlayer(p, 15000, true)
-							end
-						end
-					end
-				end) end
-			end,
-		})
-
-		section(sc, "FREEZE CAM", n())
-		makeToggle(sc, { order = n(), id = "freezeCam", title = "Freeze Camera",
-			tip = "Freeze game camera at current position · unfreeze toggles off",
-			callback = function(on)
-				S.toggles.freezeCam = on
-				if on then freezeCam(workspace.CurrentCamera.CFrame)
-				else unfreezeCam() end
-			end,
-		})
 
 		section(sc, "AIM", n())
 		makeToggle(sc, {
@@ -12957,34 +12519,21 @@ _TAB_BUILDERS["grab"] = function(sc, n)
 			end,
 		})
 
-section(sc, "WHILE YOU HOLD", n())
-	makeToggle(sc, {
-		order = n(), id = "superStr", title = "Super Throw On Release",
-		tip = "Launch grabbed object on release along camera",
-		callback = function(on)
-			S.superStrength = on
-			S.toggles.superStr = on
-			if on then installGrabWatch() end
-		end,
-	})
-	makeSlider(sc, {
-		order = n(), title = "Super Throw Strength", min = 400, max = 20000, default = 4000, step = 100,
-		stateKey = "superStrengthPower",
-	})
-	makeToggle(sc, {
-		order = n(), id = "superStrHold", title = "Super Strength While Holding",
-		tip = "Applies constant force to held target while you hold (like blitzbr) · great for dragging players",
-		callback = function(on)
-			S.superStrengthHold = on
-			S.toggles.superStrHold = on
-			if on then installGrabWatch() end
-		end,
-	})
-	makeSlider(sc, {
-		order = n(), title = "Hold Force", min = 500, max = 20000, default = 5000, step = 100,
-		stateKey = "superStrengthHoldPower",
-	})
-	makeToggle(sc, {
+		section(sc, "WHILE YOU HOLD", n())
+		makeToggle(sc, {
+			order = n(), id = "superStr", title = "Super Throw On Release",
+			tip = "Launch grabbed object on release along camera",
+			callback = function(on)
+				S.superStrength = on
+				S.toggles.superStr = on
+				if on then installGrabWatch() end
+			end,
+		})
+		makeSlider(sc, {
+			order = n(), title = "Super Throw Strength", min = 400, max = 20000, default = 4000, step = 100,
+			stateKey = "superStrengthPower",
+		})
+		makeToggle(sc, {
 			order = n(), id = "masslessGrab", title = "Massless Grab",
 			tip = "Massless Grab: max AlignPosition / AlignOrientation force while holding (not scroll distance)",
 			desc = "Hold feels glued · does not change how far you can grab",
@@ -13028,6 +12577,11 @@ section(sc, "WHILE YOU HOLD", n())
 			order = n(), id = "anchorGrab", title = "Freeze What You Hold",
 			tip = "keep held part Anchored while you hold",
 			callback = function(on) S.anchorGrab = on; S.toggles.anchorGrab = on; if on then installGrabWatch() end end,
+		})
+		makeToggle(sc, {
+			order = n(), id = "radioactiveGrab", title = "Radioactive Grab",
+			tip = "UFO PaintPlayerPart - paints target while holding (map-wide)",
+			callback = function(on) S.radioactiveGrab = on; S.toggles.radioactiveGrab = on; if on then installGrabWatch() end end,
 		})
 		makeToggle(sc, {
 			order = n(), id = "uncollisionGrab", title = "No Collision Hold",
@@ -13097,25 +12651,6 @@ section(sc, "WHILE YOU HOLD", n())
 				end
 			end) end
 		end })
-		makeButton(sc, {
-			order = n(), title = "Anchor All Nearby",
-			tip = "Anchor all physics parts within range for 15 seconds (Blitzbr-style)",
-			callback = function() anchorAllNearby(15) end,
-		})
-		makeToggle(sc, {
-			order = n(), id = "anchorMode", title = "Anchor Loop",
-			tip = "Auto-anchor nearby parts + players' parts when they respawn",
-			callback = function(on)
-				S.toggles.anchorMode = on
-				if on then
-					startLoop("anchorLoop", 2, autoAnchorLoop)
-					notify(HUB_NAME, "Anchor Loop ON · anchoring nearby parts", 2)
-				else
-					stopLoop("anchorLoop")
-					notify(HUB_NAME, "Anchor Loop OFF", 1.5)
-				end
-			end,
-		})
 end
 _TAB_BUILDERS["anti"] = function(sc, n)
 		section(sc, "PROTECT ME", n())
@@ -13149,7 +12684,6 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 				else
 					local r = hrp()
 					if r then r.Anchored = false end
-					stopBlitzbrAntiGrab()
 					notify(HUB_NAME, "Gucci Anti OFF", 1.2)
 				end
 			end,
@@ -13164,6 +12698,35 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 				if doAntiGrabHard then doAntiGrabHard() end
 				gucciAntiTick()
 				notify(HUB_NAME, "Gucci break fired", 1.2)
+			end,
+		})
+		makeToggle(sc, {
+			order = n(), id = "antiTrain", title = "Anti Train / Blobman Seat",
+			tip = "Force unsit if someone sticks you on a train or blob seat",
+			callback = function(on)
+				S.toggles.antiBlobman = on
+				stopLoop("antiBlob")
+				if on then startLoop("antiBlob", 0.15, antiBlobmanTick) end
+			end,
+		})
+		makeToggle(sc, {
+			order = n(), id = "antiGrab", title = "Stop Being Grabbed",
+			tip = "Struggle + destroy GrabParts + IsHeld break",
+			callback = function(on)
+				S.antiWanted = S.antiWanted or {}
+				S.antiWanted.antiGrab = on
+				S.toggles.antiGrab = on
+				stopLoop("antiGrab")
+				installAntis()
+				notify(HUB_NAME, "Anti-grab " .. (on and "ON" or "OFF"), 1.5)
+				if on then
+					if FTAP.Struggle then pcall(function() FTAP.Struggle:FireServer(LP) end) end
+					startLoop("antiGrab", 0.1, antiGrabTick)
+					doAntiGrabHard()
+				else
+					local r = hrp()
+					if r then r.Anchored = false end
+				end
 			end,
 		})
 		makeToggle(sc, {
@@ -13328,9 +12891,9 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 			stopLoop("god")
 			if on then startLoop("god", 0.15, function() local h=hum(); if h then h.Health=h.MaxHealth end end) end
 		end })
-section(sc, "HOUSE BYPASS", n())
-	if S.toggles.plotBypass == nil then S.toggles.plotBypass = false end
-	makeToggle(sc, {
+		section(sc, "HOUSE BYPASS", n())
+		if S.toggles.plotBypass == nil then S.toggles.plotBypass = false end
+		makeToggle(sc, {
 			order = n(), id = "plotBypass", title = "Bypass House Protection",
 			tip = "Actions work on players even inside houses",
 			callback = function(on)
@@ -13339,75 +12902,6 @@ section(sc, "HOUSE BYPASS", n())
 				notify(HUB_NAME, "House bypass " .. (on and "ON" or "OFF"), 1.2)
 			end,
 		})
-
-	section(sc, "ANTI-GRAB WHITELIST", n())
-	local agwlLabel = Instance.new("TextLabel")
-	agwlLabel.LayoutOrder = n()
-	agwlLabel.Size = UDim2.new(1, -6, 0, 16)
-	agwlLabel.BackgroundTransparency = 1
-	agwlLabel.Font = Enum.Font.GothamBold
-	agwlLabel.TextSize = 12
-	agwlLabel.TextColor3 = C.muted
-	agwlLabel.TextXAlignment = Enum.TextXAlignment.Left
-	agwlLabel.Text = "Anti-Grab Whitelisted: (none)"
-	agwlLabel.Parent = sc
-
-	local function refreshAntiGrabWL()
-		local names = {}
-		for name in pairs(S.antiGrabWhitelist) do
-			if tonumber(name) == nil then -- only names, not UserIds
-				names[#names + 1] = name
-			end
-		end
-		table.sort(names)
-		agwlLabel.Text = #names > 0 and ("Anti-Grab Whitelisted: " .. table.concat(names, ", ")) or "Anti-Grab Whitelisted: (none)"
-	end
-
-	-- Searchable player dropdown for whitelist
-	local agwlPlayerDropdown = nil
-	makePlayerSearchList(sc, {
-		label = "Select Player for Whitelist",
-		clickFn = function(p)
-			if not p then return end
-			S.antiGrabWhitelist[p.UserId] = true
-			S.antiGrabWhitelist[p.Name] = true
-			notify(HUB_NAME, "Anti-grab WL: " .. playerLabel(p), 1.5)
-			refreshAntiGrabWL()
-		end,
-	}, n)
-
-	makeButton(sc, {
-		order = n(), title = "Whitelist Selected (Allow Grab)",
-		tip = "Add selected player to anti-grab whitelist · they can grab you even with anti-grab ON",
-		callback = function()
-			local p = S.selected or combatTarget()
-			if not p then notify(HUB_NAME, "Select a player", 1.5); return end
-			S.antiGrabWhitelist[p.UserId] = true
-			S.antiGrabWhitelist[p.Name] = true
-			notify(HUB_NAME, "Anti-grab WL: " .. playerLabel(p), 1.5)
-			refreshAntiGrabWL()
-		end,
-	})
-	makeButton(sc, {
-		order = n(), title = "Unwhitelist Selected",
-		callback = function()
-			local p = S.selected or combatTarget()
-			if not p then notify(HUB_NAME, "Select a player", 1.5); return end
-			S.antiGrabWhitelist[p.UserId] = nil
-			S.antiGrabWhitelist[p.Name] = nil
-			notify(HUB_NAME, "Removed anti-grab WL: " .. playerLabel(p), 1.5)
-			refreshAntiGrabWL()
-		end,
-	})
-	makeButton(sc, {
-		order = n(), title = "Clear Anti-Grab Whitelist",
-		callback = function()
-			S.antiGrabWhitelist = {}
-			notify(HUB_NAME, "Anti-grab whitelist cleared", 1.5)
-			refreshAntiGrabWL()
-		end,
-	})
-	refreshAntiGrabWL()
 end
 _TAB_BUILDERS["player"] = function(sc, n)
 		section(sc, "CHARACTER MODS", n())
@@ -13971,20 +13465,10 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 						end)
 					end
 					end -- for targets
-					end)
-				end
+				end)
+				end,
 			})
 		end
-		makeToggle(sc, {
-			order = n(), id = "antiSpectate", title = "Anti-Spectate",
-			tip = "Hide your character from spectators · protect camera",
-			callback = function(on) setAntiSpectate(on) end,
-		})
-		makeToggle(sc, {
-			order = n(), id = "devJoinEffects", title = "Dev Join Effects",
-			tip = "Flash neon + color when any player joins (troll)",
-			callback = function(on) setDevJoinEffects(on) end,
-		})
 end
 _TAB_BUILDERS["move"] = function(sc, n)
 		section(sc, "MY MOVEMENT", n())
@@ -14451,133 +13935,6 @@ _TAB_BUILDERS["explosions"] = function(sc, n)
 			end,
 		})
 end
-
-_TAB_BUILDERS["blobman"] = function(sc, n)
-	section(sc, "BLOBMAN SPAWN", n())
-	makeButton(sc, {
-		order = n(), title = "Spawn Blobman",
-		tip = "Buy + spawn CreatureBlobman and auto-sit",
-		callback = function()
-			notify(HUB_NAME, "Spawning blobman...", 1.5)
-			task.spawn(function()
-				local ok = ensureBlobman()
-				if ok then notify(HUB_NAME, "Blobman ready", 1.5) else notify(HUB_NAME, "Spawn failed", 2) end
-			end)
-		end,
-	})
-	makeToggle(sc, {
-		order = n(), id = "autoRemountBlobman",
-		title = "Auto Re-mount",
-		tip = "Re-sits blobman if knocked off",
-		callback = function(on)
-			S.toggles.autoRemountBlobman = on
-			if on then
-				startLoop("autoRemountBlobman", 1, function()
-					if not isOnBlobman() then
-						forceBlobmanMount()
-					end
-				end)
-			else
-				stopLoop("autoRemountBlobman")
-			end
-		end,
-	})
-
-	section(sc, "CREATURE GRAB (works in plots)", n())
-	S.playerDropdowns = S.playerDropdowns or {}
-	makePlayerSearchList(sc, {
-		label = "Target",
-		clickFn = function(p) S.blobmanTarget = p; S.selected = p end,
-	}, n)
-	makeButton(sc, {
-		order = n(), title = "Blob Grab Selected",
-		danger = true,
-		tip = "Spawn blobman → TP to target → CreatureGrab (works in plots)",
-		callback = function()
-			local p = S.blobmanTarget or combatTarget()
-			if not p then notify(HUB_NAME, "Select a player", 1.5); return end
-			notify(HUB_NAME, "Blob Grab → " .. playerLabel(p), 1.2)
-			task.spawn(function() blobGrabSingle(p) end)
-		end,
-	})
-	makeButton(sc, {
-		order = n(), title = "Blob Grab All",
-		danger = true,
-		tip = "Spawn blobman → TP to every player → CreatureGrab all",
-		callback = function()
-			task.spawn(blobGrabAll)
-		end,
-	})
-	makeButton(sc, {
-		order = n(), title = "Blob Grab Loop",
-		danger = true,
-		tip = "Loop blob grab selected until toggled off · persists through rejoin",
-		callback = function()
-			local p = combatTarget()
-			if not p then notify(HUB_NAME, "Select a player", 1.5); return end
-			startBlobGrabLoop(p)
-		end,
-	})
-	makeToggle(sc, { order = n(), id = "blobLockLight", title = "Blobman Lock Light",
-		tip = "Light persistent grab · re-holds target on creature",
-		callback = function(on)
-			S.toggles.blobLockLight = on
-			stopLoop("blobLockLight")
-			if on then startLoop("blobLockLight", 0.25, function()
-				local p = S.selected or combatTarget()
-				if p then blobGrabSingle(p) end
-			end) end
-		end,
-	})
-	makeToggle(sc, { order = n(), id = "blobLockStrong", title = "Blobman Lock Strong",
-		tip = "Persistent grab + SNO · target cannot stand to escape",
-		callback = function(on)
-			S.toggles.blobLockStrong = on
-			stopLoop("blobLockStrong")
-			if on then startLoop("blobLockStrong", 0.2, function()
-				local p = S.selected or combatTarget()
-				if not p then return end
-				blobGrabSingle(p)
-				if rootOf(p) then snoPlayer(p) end
-			end) end
-		end,
-	})
-	makeToggle(sc, { order = n(), id = "blobLockBest", title = "Blobman Lock Best",
-		tip = "Max persistent lock · re-grab at highest rate · works in plots",
-		callback = function(on)
-			S.toggles.blobLockBest = on
-			stopLoop("blobLockBest")
-			if on then startLoop("blobLockBest", 0.1, function()
-				local p = S.selected or combatTarget()
-				if not p then return end
-				blobGrabSingle(p)
-				if rootOf(p) then snoPlayer(p) end
-			end) end
-		end,
-	})
-
-	section(sc, "BLOBMAN ARMY", n())
-	makeButton(sc, { order = n(), title = "Blobman Army (3)", danger = true,
-		tip = "Spawn 3 blobmen",
-		callback = function()
-			spawnToyBurst("CreatureBlobman", 3)
-		end,
-	})
-	makeButton(sc, { order = n(), title = "Blobman Army (5)", danger = true,
-		tip = "Spawn 5 blobmen",
-		callback = function()
-			spawnToyBurst("CreatureBlobman", 5)
-		end,
-	})
-	makeButton(sc, { order = n(), title = "Clear All Blobmen",
-		tip = "Destroy all spawned blobmen",
-		callback = function()
-			local n = destroyAllMyToys("CreatureBlobman")
-			notify(HUB_NAME, "Cleared " .. n .. " blobmen", 1.5)
-		end,
-	})
-end
-
 _TAB_BUILDERS["world"] = function(sc, n)
 		section(sc, "WORLD / OBJECTS", n())
 		makeToggle(sc, { order = n(), id = "aura_netown", title = "Network Ownership Aura", tip = "OP continuous SNO", callback = function(on) setAura("netown", on) end })
@@ -17011,6 +16368,310 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 				notify(HUB_NAME, "Everyone's limbs ripped off", 1)
 			end,
 		})
+
+-- ════════════════════════════════════════════════════════════════
+-- BLOODyv2 TRAIN CONTROL
+-- ═══════════════════════════════════════════════════════════════
+section(sc, "TRAIN CONTROL (BLOODYv2 STYLE)", n())
+local trainNote = Instance.new("TextLabel")
+trainNote.LayoutOrder = n()
+trainNote.Size = UDim2.new(1, -6, 0, 40)
+trainNote.BackgroundColor3 = C.card
+trainNote.BorderSizePixel = 0
+trainNote.Font = Enum.Font.Gotham
+trainNote.TextSize = 10
+trainNote.TextColor3 = C.muted
+trainNote.TextXAlignment = Enum.TextXAlignment.Left
+trainNote.TextYAlignment = Enum.TextYAlignment.Top
+trainNote.TextWrapped = true
+trainNote.Text = " Spawns train, seats you, WASD drives · Horn on H · Speed slider · Auto-repair"
+trainNote.Parent = sc
+corner(trainNote, 8)
+pad(trainNote, 6, 6, 6, 6)
+
+S.trainSpeed = S.trainSpeed or 120
+makeSlider(sc, {
+	order = n(),
+	title = "Train Speed",
+	min = 20,
+	max = 300,
+	default = 120,
+	step = 5,
+	stateKey = "trainSpeed",
+	tip = "BodyVelocity speed for train driving",
+})
+
+makeButton(sc, {
+	order = n(),
+	title = "Spawn & Drive Train",
+	tip = "Spawns Train model, seats you in driver seat, WASD to drive, H for horn",
+	callback = function()
+		local me = hrp()
+		if not me then notify(HUB_NAME, "No character", 1.5); return end
+		
+		-- Spawn train
+		if FTAP.BuyToy then pcall(function() FTAP.BuyToy:InvokeServer("Train") end) end
+		task.wait(0.3)
+		if FTAP.SpawnToy then
+			pcall(function()
+				FTAP.SpawnToy:InvokeServer("Train", me.CFrame * CFrame.new(0, 0, -10), Vector3.zero)
+			end)
+		end
+		task.wait(0.5)
+		
+		-- Find train and seat
+		local train = nil
+		for _, obj in ipairs(workspace:GetDescendants()) do
+			if obj.Name == "Train" and obj:IsA("Model") then
+				train = obj
+				break
+			end
+		end
+		if not train then notify(HUB_NAME, "Train not found", 1.5); return end
+		
+		-- Find driver seat
+		local seat = nil
+		for _, d in ipairs(train:GetDescendants()) do
+			if d:IsA("VehicleSeat") and (d.Name:lower():find("drive") or d.Name:lower():find("driver")) then
+				seat = d
+				break
+			elseif d:IsA("VehicleSeat") then
+				seat = d
+			end
+		end
+		if not seat then notify(HUB_NAME, "No driver seat found", 1.5); return end
+		
+		-- Sit
+		local h = hum()
+		if h then pcall(function() seat:Sit(h) end) end
+		task.wait(0.2)
+		
+		-- Setup driving
+		local bv = Instance.new("BodyVelocity")
+		bv.Name = "TrainDriveBV"
+		bv.MaxForce = Vector3.new(math.huge, 0, math.huge)
+		bv.Velocity = Vector3.zero
+		bv.Parent = seat
+		
+		local bg = Instance.new("BodyGyro")
+		bg.Name = "TrainDriveBG"
+		bg.MaxTorque = Vector3.new(0, math.huge, 0)
+		bg.P = 50000
+		bg.D = 5000
+		bg.CFrame = seat.CFrame
+		bg.Parent = seat
+		
+		-- Horn sound
+		local hornSound = train:FindFirstChild("HornSound", true) or train:FindFirstChild("Horn", true)
+		
+		-- Driving loop
+		local driving = true
+		S._trainDriveConn = RunService.Heartbeat:Connect(function()
+			if not driving or not seat or not seat.Parent then driving = false; return end
+			if h and h.Sit == false then driving = false; return end
+			
+			local cam = workspace.CurrentCamera
+			local dir = Vector3.zero
+			if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + cam.CFrame.LookVector end
+			if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - cam.CFrame.LookVector end
+			if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir = dir - cam.CFrame.RightVector end
+			if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + cam.CFrame.RightVector end
+			
+			if dir.Magnitude > 0 then
+				dir = dir.Unit * (S.trainSpeed or 120)
+				bv.Velocity = Vector3.new(dir.X, 0, dir.Z)
+				bg.CFrame = CFrame.new(seat.Position, seat.Position + Vector3.new(dir.X, 0, dir.Z))
+			else
+				bv.Velocity = Vector3.zero
+			end
+		end)
+		
+		-- Horn on H
+		S._trainHornConn = UserInputService.InputBegan:Connect(function(input, gp)
+			if gp then return end
+			if input.KeyCode == Enum.KeyCode.H and hornSound then
+				pcall(function() hornSound:Play() end)
+			end
+		end)
+		
+		notify(HUB_NAME, "Train spawned · WASD to drive · H = Horn", 3)
+	end,
+})
+
+makeButton(sc, {
+	order = n(),
+	title = "Stop Train",
+	danger = true,
+	callback = function()
+		if S._trainDriveConn then S._trainDriveConn:Disconnect(); S._trainDriveConn = nil end
+		if S._trainHornConn then S._trainHornConn:Disconnect(); S._trainHornConn = nil end
+		-- Clean up train parts
+		for _, obj in ipairs(workspace:GetDescendants()) do
+			if obj.Name == "TrainDriveBV" or obj.Name == "TrainDriveBG" then
+				pcall(function() obj:Destroy() end)
+			end
+		end
+		notify(HUB_NAME, "Train stopped", 1)
+	end,
+})
+
+-- ════════════════════════════════════════════════════════════════
+-- AUTO SNOWBALL / SANDBALL MAKER (blitzbr style)
+-- ═══════════════════════════════════════════════════════════════
+section(sc, "AUTO SNOWBALL / SANDBALL MAKER", n())
+local ballNote = Instance.new("TextLabel")
+ballNote.LayoutOrder = n()
+ballNote.Size = UDim2.new(1, -6, 0, 40)
+ballNote.BackgroundColor3 = C.card
+ballNote.BorderSizePixel = 0
+ballNote.Font = Enum.Font.Gotham
+ballNote.TextSize = 10
+ballNote.TextColor3 = C.muted
+ballNote.TextXAlignment = Enum.TextXAlignment.Left
+ballNote.TextYAlignment = Enum.TextYAlignment.Top
+ballNote.TextWrapped = true
+ballNote.Text = " Blitzbr-style: Spawns balls, resizes them, flings at target · Size = scale · Count = how many"
+ballNote.Parent = sc
+corner(ballNote, 8)
+pad(ballNote, 6, 6, 6, 6)
+
+S.ballType = S.ballType or "Snowball"
+S.ballSize = S.ballSize or 3
+S.ballCount = S.ballCount or 10
+S.ballFlingPower = S.ballFlingPower or 5000
+
+makeDropdown(sc, {
+	order = n(),
+	title = "Ball Type",
+	options = { "Snowball", "Sandball" },
+	default = S.ballType,
+	callback = function(v) S.ballType = v end,
+})
+
+makeSlider(sc, {
+	order = n(),
+	title = "Ball Size (scale)",
+	min = 1,
+	max = 20,
+	default = 3,
+	step = 1,
+	stateKey = "ballSize",
+	tip = "Scale multiplier for ball model",
+})
+
+makeSlider(sc, {
+	order = n(),
+	title = "Ball Count",
+	min = 1,
+	max = 50,
+	default = 10,
+	step = 1,
+	stateKey = "ballCount",
+	tip = "How many balls to spawn and fling",
+})
+
+makeSlider(sc, {
+	order = n(),
+	title = "Fling Power",
+	min = 500,
+	max = 50000,
+	default = 5000,
+	step = 500,
+	stateKey = "ballFlingPower",
+	tip = "Velocity applied to each ball",
+})
+
+makeButton(sc, {
+	order = n(),
+	title = "Make & Fling Balls at Target",
+	danger = true,
+	tip = "Spawns balls, resizes them, flings at selected player",
+	callback = function()
+		local p = S.selected
+		if not p or not validP(p) or not p.Character then
+			notify(HUB_NAME, "Select a target", 1.5); return
+		end
+		local r = rootOf(p)
+		if not r then notify(HUB_NAME, "No target root", 1.5); return end
+		
+		local me = hrp()
+		if not me then notify(HUB_NAME, "No character", 1.5); return end
+		
+		local ballName = S.ballType == "Sandball" and "BallSand" or "Snowball"
+		local size = S.ballSize or 3
+		local count = S.ballCount or 10
+		local power = S.ballFlingPower or 5000
+		
+		notify(HUB_NAME, "Spawning " .. count .. " " .. ballName .. "s (size " .. size .. "x)...", 2)
+		
+		-- Buy and spawn all balls
+		for i = 1, count do
+			if FTAP.BuyToy then pcall(function() FTAP.BuyToy:InvokeServer(ballName) end) end
+			task.wait(0.05)
+			if FTAP.SpawnToy then
+				pcall(function()
+					FTAP.SpawnToy:InvokeServer(ballName, me.CFrame * CFrame.new(0, 2 + i * 0.5, -4), Vector3.zero)
+				end)
+			end
+			task.wait(0.03)
+		end
+		
+		task.wait(0.5)
+		
+		-- Find and resize all balls, then fling
+		local myFolder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
+		local balls = {}
+		if myFolder then
+			for _, obj in ipairs(myFolder:GetChildren()) do
+				if obj.Name == ballName then
+					table.insert(balls, obj)
+				end
+			end
+		end
+		
+		for _, ball in ipairs(balls) do
+			-- Resize ball
+			local scale = size
+			for _, d in ipairs(ball:GetDescendants()) do
+				if d:IsA("BasePart") then
+					d.Size = d.Size * scale
+				elseif d:IsA("SpecialMesh") then
+					d.Scale = d.Scale * scale
+				end
+			end
+			
+			-- Fling at target
+			task.spawn(function()
+				local bp = ball:FindFirstChild("BallBodyPosition") or ball:FindFirstChild("BodyPosition")
+				local bv = ball:FindFirstChild("BallBodyVelocity") or ball:FindFirstChild("BodyVelocity")
+				
+				-- Own it first
+				for _, d in ipairs(ball:GetDescendants()) do
+					if d:IsA("BasePart") then pcall(function() sno(d, r.Position) end) end
+				end
+				task.wait(0.1)
+				
+				-- Apply velocity toward target
+				local dir = (r.Position - ball:GetPivot().Position).Unit
+				if dir.Magnitude < 0.1 then dir = Vector3.new(0, 0, -1) end
+				
+				pcall(function()
+					for _, d in ipairs(ball:GetDescendants()) do
+						if d:IsA("BasePart") then
+							d.AssemblyLinearVelocity = dir * power
+						end
+					end
+				end)
+				
+				-- Clean up after
+				task.delay(5, function() pcall(function() ball:Destroy() end) end)
+			end)
+		end
+		
+		notify(HUB_NAME, "Flung " .. #balls .. " " .. ballName .. "s at " .. p.Name, 1.5)
+	end,
+})
+
 end
 _TAB_BUILDERS["settings"] = function(sc, n)
 		section(sc, "THEMES", n())
@@ -18308,9 +17969,11 @@ local function buildMain()
 
 	S.hubOpen = true
 
+	-- re-enable wanted antis after death/respawn
 	LP.CharacterAdded:Connect(function()
 		task.wait(0.8)
 		local w = S.antiWanted or {}
+		-- Only re-arm if user explicitly set antiWanted.antiGrab = true via UI
 		if w.antiGrab == true and S.toggles.antiGrab then
 			stopLoop("antiGrab")
 			startLoop("antiGrab", 0.1, antiGrabTick)
@@ -18328,6 +17991,7 @@ local function buildMain()
 				S.toggles[key] = true
 			end
 		end
+		-- fix orphaned freezePart after death — reset camera
 		local fp = workspace:FindFirstChild("VOIDZ_FreezePart")
 		if fp then
 			unfreezeCam()
@@ -18339,6 +18003,7 @@ local function buildMain()
 		end
 	end)
 
+	-- auto-update everything every 20s
 	task.spawn(function()
 		while S.gui and S.gui.Parent do
 			task.wait(20)
@@ -18369,6 +18034,8 @@ local function buildMain()
 	print("[VOIDZ HUB]", BUILD, "FTAP", FTAP.ok)
 end
 
+------------------------------------------------------------------------
+-- Key gate
 local function buildKey()
 	local parent = getUiParent()
 	local old = parent:FindFirstChild("VOIDZ_KEY"); if old then old:Destroy() end
@@ -18454,7 +18121,7 @@ local function buildKey()
 	status.Font = Enum.Font.Gotham
 	status.TextSize = 11
 	status.TextColor3 = C.muted
-	status.Text = "Key: kingvoidz"
+	status.Text = "Key: TESTRUN"
 	status.Parent = card
 
 	local unlock = Instance.new("TextButton")
@@ -18471,6 +18138,7 @@ local function buildKey()
 	corner(unlock, 10); stroke(unlock, C.accent, 1.2)
 
 	local function showDeviceSplash(device, onDone)
+		-- Full-screen themed splash (PC vs Mobile layouts differ)
 		local parent = getUiParent()
 		local old = parent:FindFirstChild("VOIDZ_SPLASH")
 		if old then old:Destroy() end
@@ -18484,73 +18152,47 @@ local function buildKey()
 		local isMobile = device == "Mobile"
 		local bg = Instance.new("Frame")
 		bg.Size = UDim2.fromScale(1, 1)
-		bg.BackgroundColor3 = Color3.fromRGB(4, 2, 10)
+		bg.BackgroundColor3 = C.bg
 		bg.BorderSizePixel = 0
 		bg.BackgroundTransparency = 1
 		bg.Parent = splash
+		tween(bg, { BackgroundTransparency = 0 }, 0.35)
 
-		-- Animated gradient background
-		local gradientBg = Instance.new("Frame")
-		gradientBg.Size = UDim2.fromScale(1, 1)
-		gradientBg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-		gradientBg.BackgroundTransparency = 1
-		gradientBg.BorderSizePixel = 0
-		gradientBg.Parent = bg
-		local grad = Instance.new("UIGradient")
-		grad.Color = ColorSequence.new{
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(18, 8, 30)),
-			ColorSequenceKeypoint.new(0.3, Color3.fromRGB(30, 12, 50)),
-			ColorSequenceKeypoint.new(0.6, Color3.fromRGB(50, 18, 60)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 6, 28))
-		}
-		grad.Rotation = 45
-		grad.Parent = gradientBg
-		tween(gradientBg, { BackgroundTransparency = 0.15 }, 0.8)
+		-- accent wash
+		local wash = Instance.new("Frame")
+		wash.Size = UDim2.fromScale(1, 1)
+		wash.BackgroundColor3 = C.accent
+		wash.BackgroundTransparency = 0.88
+		wash.BorderSizePixel = 0
+		wash.Parent = bg
+		grad(wash, C.accentDim, C.bg, isMobile and 180 or 35)
 
-		local particles = Instance.new("Frame")
-		particles.Size = UDim2.fromScale(1, 1)
-		particles.BackgroundTransparency = 1
-		particles.Parent = bg
-		for i = 1, 12 do
-			local p = Instance.new("Frame")
-			p.Size = UDim2.fromOffset(math.random(4, 10), math.random(4, 10))
-			p.Position = UDim2.fromScale(math.random(), math.random())
-			p.BackgroundColor3 = Color3.fromRGB(180, 100, 255)
-			p.BackgroundTransparency = math.random(40, 70) / 100
-			p.BorderSizePixel = 0
-			p.Parent = particles
-			corner(p, p.Size.X.Offset / 2)
-			task.spawn(function()
-				while particles.Parent do
-					local start = p.Position
-					local target = UDim2.fromScale(math.clamp(start.X.Scale + (math.random() - 0.5) * 0.15, 0.05, 0.95), math.clamp(start.Y.Scale + (math.random() - 0.5) * 0.15, 0.05, 0.95))
-					tween(p, { Position = target }, math.random(3, 6), Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
-					task.wait(math.random(2, 5))
-				end
-			end)
-		end
-
-		-- Outer glow rings
+		-- cinematic bars (PC) or soft vignette ring (Mobile)
 		if not isMobile then
-			for i = 1, 3 do
-				local ring = Instance.new("Frame")
-				ring.AnchorPoint = Vector2.new(0.5, 0.5)
-				ring.Position = UDim2.fromScale(0.5, 0.5)
-				ring.Size = UDim2.fromOffset(180 + i * 80, 180 + i * 80)
-				ring.BackgroundTransparency = 1
-				ring.Parent = bg
-				local rs = Instance.new("UIStroke")
-				rs.Color = Color3.fromRGB(120 + i * 40, 60, 220)
-				rs.Thickness = 3 - i
-				rs.Transparency = 0.3 + i * 0.15
-				rs.Parent = ring
-				corner(ring, 200 + i * 60)
-				task.spawn(function()
-					while ring.Parent do
-						tween(ring, { Rotation = ring.Rotation + 360 }, 8 + i * 3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-						task.wait(8 + i * 3)
-					end
-				end)
+			for _, side in ipairs({ "top", "bot" }) do
+				local bar = Instance.new("Frame")
+				bar.Size = UDim2.new(1, 0, 0, 52)
+				bar.Position = side == "top" and UDim2.new(0, 0, 0, 0) or UDim2.new(0, 0, 1, -52)
+				bar.BackgroundColor3 = C.black
+				bar.BorderSizePixel = 0
+				bar.BackgroundTransparency = 0.15
+				bar.Parent = bg
+				local line = Instance.new("Frame")
+				line.Size = UDim2.new(1, 0, 0, 2)
+				line.Position = side == "top" and UDim2.new(0, 0, 1, -2) or UDim2.new(0, 0, 0, 0)
+				line.BackgroundColor3 = C.accent
+				line.BorderSizePixel = 0
+				line.Parent = bar
+			end
+			for _, x in ipairs({ 0, 1 }) do
+				local rail = Instance.new("Frame")
+				rail.AnchorPoint = Vector2.new(x, 0.5)
+				rail.Position = UDim2.fromScale(x, 0.5)
+				rail.Size = UDim2.new(0, 3, 0.42, 0)
+				rail.BackgroundColor3 = C.accent
+				rail.BackgroundTransparency = 0.25
+				rail.BorderSizePixel = 0
+				rail.Parent = bg
 			end
 		else
 			local ring = Instance.new("Frame")
@@ -18565,117 +18207,88 @@ local function buildKey()
 			rs.Transparency = 0.35
 			rs.Parent = ring
 			corner(ring, 140)
-			task.spawn(function()
-				while ring.Parent do
-					tween(ring, { Rotation = ring.Rotation + 360 }, 6, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-					task.wait(6)
-				end
-			end)
+			local ring2 = ring:Clone()
+			ring2.Size = UDim2.fromOffset(220, 220)
+			ring2.Parent = bg
+			local rs2 = ring2:FindFirstChildOfClass("UIStroke")
+			if rs2 then
+				rs2.Thickness = 1.5
+				rs2.Transparency = 0.55
+			end
 		end
 
 		local brand = Instance.new("TextLabel")
 		brand.BackgroundTransparency = 1
 		brand.AnchorPoint = Vector2.new(0.5, 0.5)
-		brand.Position = UDim2.fromScale(0.5, isMobile and 0.38 or 0.40)
-		brand.Size = UDim2.new(0.9, 0, 0, isMobile and 60 or 72)
+		brand.Position = UDim2.fromScale(0.5, isMobile and 0.40 or 0.42)
+		brand.Size = UDim2.new(0.9, 0, 0, isMobile and 56 or 64)
 		brand.Font = Enum.Font.GothamBlack
-		brand.TextSize = isMobile and 48 or 60
+		brand.TextSize = isMobile and 42 or 52
 		brand.TextColor3 = C.accent2
 		brand.Text = "VOIDZ"
 		brand.TextTransparency = 1
 		brand.Parent = bg
-		tween(brand, { TextTransparency = 0 }, 0.6, Enum.EasingStyle.Back)
-
-		-- Glow effect on brand
-		local brandGlow = Instance.new("UIStroke")
-		brandGlow.Color = C.accent
-		brandGlow.Thickness = 3
-		brandGlow.Transparency = 0.2
-		brandGlow.Parent = brand
-		task.spawn(function()
-			while brandGlow.Parent do
-				tween(brandGlow, { Transparency = 0.6 }, 1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
-				task.wait(1.2)
-				tween(brandGlow, { Transparency = 0.2 }, 1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
-				task.wait(1.2)
-			end
-		end)
+		tween(brand, { TextTransparency = 0 }, 0.45)
 
 		local sub = Instance.new("TextLabel")
 		sub.BackgroundTransparency = 1
 		sub.AnchorPoint = Vector2.new(0.5, 0)
-		sub.Position = UDim2.new(0.5, 0, isMobile and 0.48 or 0.52, 0)
-		sub.Size = UDim2.new(0.85, 0, 0, 32)
+		sub.Position = UDim2.new(0.5, 0, isMobile and 0.48 or 0.50, 0)
+		sub.Size = UDim2.new(0.85, 0, 0, 28)
 		sub.Font = Enum.Font.GothamBold
-		sub.TextSize = isMobile and 16 or 18
+		sub.TextSize = isMobile and 14 or 16
 		sub.TextColor3 = C.text
-		sub.Text = isMobile and "✦ MOBILE · TOUCH OPS ✦" or "✦ PC · FULL CONTROL ✦"
+		sub.Text = isMobile and "MOBILE · TOUCH OPS" or "PC · FULL CONTROL"
 		sub.TextTransparency = 1
 		sub.Parent = bg
-		tween(sub, { TextTransparency = 0 }, 0.6)
+		tween(sub, { TextTransparency = 0 }, 0.5)
 
 		local tag = Instance.new("TextLabel")
 		tag.BackgroundTransparency = 1
 		tag.AnchorPoint = Vector2.new(0.5, 0)
-		tag.Position = UDim2.new(0.5, 0, isMobile and 0.56 or 0.58, 0)
-		tag.Size = UDim2.new(0.8, 0, 0, 22)
+		tag.Position = UDim2.new(0.5, 0, isMobile and 0.54 or 0.56, 0)
+		tag.Size = UDim2.new(0.8, 0, 0, 20)
 		tag.Font = Enum.Font.Gotham
-		tag.TextSize = 13
+		tag.TextSize = 12
 		tag.TextColor3 = C.muted
-		tag.Text = "✦ " .. (S.theme or "Purple") .. " theme · FTAP suite · " .. BUILD .. " ✦"
+		tag.Text = (S.theme or "Purple") .. " theme · FTAP suite · " .. BUILD
 		tag.TextTransparency = 1
 		tag.Parent = bg
-		tween(tag, { TextTransparency = 0 }, 0.7)
+		tween(tag, { TextTransparency = 0 }, 0.55)
 
-		-- Animated center line
 		local slash = Instance.new("Frame")
 		slash.AnchorPoint = Vector2.new(0.5, 0.5)
-		slash.Position = UDim2.fromScale(0.5, isMobile and 0.47 or 0.50)
-		slash.Size = UDim2.fromOffset(0, 4)
+		slash.Position = UDim2.fromScale(0.5, isMobile and 0.47 or 0.49)
+		slash.Size = UDim2.fromOffset(0, 3)
 		slash.BackgroundColor3 = C.accent
 		slash.BorderSizePixel = 0
 		slash.Parent = bg
-		local slashGrad = Instance.new("UIGradient")
-		slashGrad.Color = ColorSequence.new{
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(0,0,0)),
-			ColorSequenceKeypoint.new(0.5, C.accent),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(0,0,0))
-		}
-		slashGrad.Parent = slash
-		tween(slash, { Size = UDim2.fromOffset(isMobile and 140 or 220, 4) }, 0.7, Enum.EasingStyle.Quint)
+		tween(slash, { Size = UDim2.fromOffset(isMobile and 120 or 180, 3) }, 0.55, Enum.EasingStyle.Quint)
 
 		if isMobile then
 			local chip = Instance.new("TextLabel")
 			chip.AnchorPoint = Vector2.new(0.5, 1)
 			chip.Position = UDim2.new(0.5, 0, 1, -48)
-			chip.Size = UDim2.fromOffset(220, 36)
+			chip.Size = UDim2.fromOffset(200, 32)
 			chip.BackgroundColor3 = C.accentDim
 			chip.BorderSizePixel = 0
 			chip.Font = Enum.Font.GothamBold
-			chip.TextSize = 13
+			chip.TextSize = 12
 			chip.TextColor3 = C.text
-			chip.Text = "✦ TAP TO BEGIN ✦"
+			chip.Text = "TAP READY"
 			chip.Parent = bg
-			corner(chip, 18)
-			stroke(chip, C.accent, 2)
-			task.spawn(function()
-				while chip.Parent do
-					tween(chip, { TextColor3 = C.accent2 }, 1, Enum.EasingStyle.Sine)
-					task.wait(1)
-					tween(chip, { TextColor3 = C.text }, 1, Enum.EasingStyle.Sine)
-					task.wait(1)
-				end
-			end)
+			corner(chip, 16)
+			stroke(chip, C.accent, 1.5)
 		else
 			local keys = Instance.new("TextLabel")
 			keys.BackgroundTransparency = 1
 			keys.AnchorPoint = Vector2.new(0.5, 1)
 			keys.Position = UDim2.new(0.5, 0, 1, -64)
-			keys.Size = UDim2.new(0.7, 0, 0, 20)
+			keys.Size = UDim2.new(0.7, 0, 0, 18)
 			keys.Font = Enum.Font.Code
-			keys.TextSize = 13
+			keys.TextSize = 12
 			keys.TextColor3 = C.accent2
-			keys.Text = "WASD · Q PALLET · TAB TOY · SPACE ESCAPE · = CONTROL"
+			keys.Text = "WASD · Q PALLET · TAB TOY · SPACE ESCAPE"
 			keys.Parent = bg
 		end
 
@@ -18683,14 +18296,14 @@ local function buildKey()
 		local function finish()
 			if done then return end
 			done = true
-			tween(bg, { BackgroundTransparency = 1 }, 0.45)
+			tween(bg, { BackgroundTransparency = 1 }, 0.35)
 			tween(brand, { TextTransparency = 1 }, 0.3)
-			task.delay(0.45, function()
+			task.delay(0.38, function()
 				pcall(function() splash:Destroy() end)
 				if onDone then onDone() end
 			end)
 		end
-		task.delay(isMobile and 2.5 or 3.0, finish)
+		task.delay(isMobile and 2.1 or 2.4, finish)
 		local skip = Instance.new("TextButton")
 		skip.Size = UDim2.fromScale(1, 1)
 		skip.BackgroundTransparency = 1
@@ -18779,12 +18392,6 @@ local function buildKey()
 			unlock.Visible = false
 			status.Visible = false
 			sub.Text = "Almost ready"
-			if LP.Name == "Super_remy12" then
-				voidzChat("✦ VOIDZ HUB ✦ LOADED ✦ OWNER MODE")
-				notify(HUB_NAME, "Owner mode enabled ✦", 3)
-			else
-				voidzChat("✦ VOIDZ HUB ✦ LOADED ✦")
-			end
 			pickDeviceThenMain()
 		else
 			status.TextColor3 = C.danger
@@ -18801,6 +18408,7 @@ end
 
 	_voidzInitUI()
 
+	-- export boot-critical entry points to outer scope
 	Late.installAntiKickOnLoad = installAntiKickOnLoad
 	Late.installGrabWatch = installGrabWatch
 	Late.installAntis = installAntis
@@ -18818,4 +18426,4 @@ task.spawn(Late.installGrabWatch)
 task.spawn(Late.installAntis)
 Late.buildKey()
 
--- hello everyone this is voidz enjoy the script v1.1.7
+-- hello everyone this is voidz enjoy the script v1.2.0

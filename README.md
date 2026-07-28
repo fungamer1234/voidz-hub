@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-28-1.2.59` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.60` · Access Key: `VOIDZHUB`
 
 1. Join **Fling Things and People** (PlaceId `6961824067`).
 2. Execute the loadstring above in your executor.
@@ -18,6 +18,10 @@ GitHub: https://github.com/fungamer1234/voidz-hub
 ---
 
 A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more.
+
+## Recent (1.2.60)
+
+- **Anti-Explosion + Gucci** — No longer anchors you while grabbing or while Gucci free-move (that combo was freezing you / killing the grab line). Restores beam after unpin.
 
 ## Recent (1.2.59)
 

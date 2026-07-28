@@ -1,6 +1,6 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.20` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.21` · Access Key: `VOIDZHUB`
 
 A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more. Press **RightShift** to toggle the hub.
 
@@ -17,7 +17,11 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hu
 
 ---
 
-## Recent (1.2.20)
+## Recent (1.2.21)
+
+- **Gucci anti-toss** — Cancels right-click throw on release (~2.7s velocity/mover guard).
+
+## Prior (1.2.20)
 
 - **UI text** — Removed fancy symbols (middle-dot/arrows/ellipsis) that showed as `?` on key screen and hub.
 

@@ -3,11 +3,11 @@
 ## Loadstring (always at top)
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua?v=1.2.72", true))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua?v=1.2.73", true))()
 ```
 
-Build: `2026-07-28-1.2.72` · Access Key: `VOIDZHUB`  
-**Must use `?v=1.2.72`** or you will still get the old □□□ unicode chat.
+Build: `2026-07-28-1.2.73` · Access Key: `VOIDZHUB`  
+**Must use `?v=1.2.73`** or you may still get an old cached script.
 
 1. Join **Fling Things and People** (PlaceId `6961824067`).
 2. Execute the loadstring above in your executor.
@@ -20,9 +20,13 @@ GitHub: https://github.com/fungamer1234/voidz-hub
 
 A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more.
 
+## Recent (1.2.73)
+
+- **Load chat** — `💀 VoIdZ HuB LoAdEd 💀` (skulls on both sides; text stays ASCII so no □ boxes).
+
 ## Recent (1.2.72)
 
-- **Load chat** — Hardcoded pure ASCII only: `VoIdZ HuB LoAdEd`. Removed all unicode/fullwidth/math fonts (those were the □□□ boxes). CDN was also serving old 1.2.69 — use `?v=1.2.72`.
+- **Load chat** — Hardcoded pure ASCII only: `VoIdZ HuB LoAdEd`. Removed math fonts that caused □□□.
 
 ## Recent (1.2.71)
 

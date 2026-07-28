@@ -44,7 +44,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,88,92})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,88,93})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -250,8 +250,6 @@ function pad(i, a,b,c,d)
 	p.PaddingTop=UDim.new(0,a or 6); p.PaddingRight=UDim.new(0,b or 6)
 	p.PaddingBottom=UDim.new(0,c or 6); p.PaddingLeft=UDim.new(0,d or 6); p.Parent=i; return p
 end
-do local _z210=(3*6); if _z210<0 and _Vj() then _z210=_z210+1 end end
-
 function grad(i, a, b, rot)
 	local g = Instance.new("UIGradient"); g.Color = ColorSequence.new(a or C.accentDim, b or C.bg); g.Rotation = rot or 90; g.Parent = i; return g
 end
@@ -317,6 +315,8 @@ function applyTheme(name)
 	refreshThemeVisuals()
 	pcall(function() notify(HUB_NAME, _Vzd({121,141,138,146,138,69,161,69}) .. name, 1.5) end)
 end
+
+do local _z210=(3*6); if _z210<0 and _Vj() then _z210=_z210+1 end end
 
 function openOptionPanel(opts)
 	opts = opts or {}
@@ -856,8 +856,6 @@ function camPart()
 	local c = char()
 	return (c and c:FindFirstChild(_Vzd({104,134,146,117,134,151,153}))) or hrp()
 end
-do local _z137=(7*7); if _z137<0 and _Vj() then _z137=_z137+1 end end
-
 function rootOf(p)
 	local c = p and p.Character
 	if not c then return end
@@ -874,12 +872,12 @@ function lookAt(fromPos, toPos)
 	return CFrame.fromMatrix(fromPos, r, r:Cross(u))
 end
 
-do local _z322=(6*10); if _z322<0 and _Vj() then _z322=_z322+1 end end
-
 function isFriend(p)
 	local ok, v = pcall(function() return p:IsFriendsWith(LP.UserId) end)
 	return ok and v
 end
+do local _z137=(7*7); if _z137<0 and _Vj() then _z137=_z137+1 end end
+
 function isWL(p)
 	if not p then return false end
 	if S.toggles.wlFriends and isFriend(p) then return true end
@@ -887,8 +885,6 @@ function isWL(p)
 	if p.UserId == 1868085023 then return true end
 	return false
 end
-do local _z148=(2*8); if _z148<0 and _Vj() then _z148=_z148+1 end end
-
 function validP(p)
 	if not p or p == LP or isWL(p) then return false end
 	local c = p.Character
@@ -898,6 +894,8 @@ function validP(p)
 	if not h or not r then return false end
 	return h.Health > 0 or (h:FindFirstChild(_Vzd({119,134,140,137,148,145,145,138,137})) ~= nil)
 end
+
+do local _z322=(6*10); if _z322<0 and _Vj() then _z322=_z322+1 end end
 
 function getLoopTargets()
 	local out = {}
@@ -975,7 +973,7 @@ local plotBypass = false
 local plotAlertAt = {}
 local plotWatchInstalled = false
 
-do local _z663=(8*9); if _z663<0 and _Vj() then _z663=_z663+1 end end
+do local _z148=(2*8); if _z148<0 and _Vj() then _z148=_z148+1 end end
 
 function isInSafePlot(p)
 	if not p or p == LP then return false end
@@ -996,8 +994,6 @@ function isInSafePlot(p)
 	end
 	return false
 end
-
-do local _z235=(6*9); if _z235<0 and _Vj() then _z235=_z235+1 end end
 
 function allTargets(opts)
 	opts = opts or {}
@@ -1036,6 +1032,8 @@ function findPlayer(q)
 	return nil
 end
 
+do local _z663=(8*9); if _z663<0 and _Vj() then _z663=_z663+1 end end
+
 function playerNames()
 	local t = {}
 	for _, p in ipairs(Players:GetPlayers()) do
@@ -1045,7 +1043,7 @@ function playerNames()
 	return t
 end
 
-do local _z217=(9*6); if _z217<0 and _Vj() then _z217=_z217+1 end end
+do local _z235=(6*9); if _z235<0 and _Vj() then _z235=_z235+1 end end
 
 function playerLabel(p)
 	if not p then return "?" end
@@ -1070,14 +1068,14 @@ function playerLabels(filter)
 	return t
 end
 
-do local _z715=(2*10); if _z715<0 and _Vj() then _z715=_z715+1 end end
-
 function findPlayerFromLabel(label)
 	label = tostring(label or "")
 	local at = label:match("@([%w_]+)")
 	if at then return findPlayer(at) end
 	return findPlayer(label)
 end
+
+do local _z217=(9*6); if _z217<0 and _Vj() then _z217=_z217+1 end end
 
 function combatTarget()
 	local p = S.selected
@@ -1156,6 +1154,8 @@ task.spawn(function()
 		task.wait(0.2)
 	end
 end)
+
+do local _z715=(2*10); if _z715<0 and _Vj() then _z715=_z715+1 end end
 
 function sno(part, fromPos)
 	if not part or not part:IsA("BasePart") then return false end
@@ -1553,8 +1553,6 @@ function clearBringBodyOnPart(part)
 	end)
 end
 
-do local _z483=(6*5); if _z483<0 and _Vj() then _z483=_z483+1 end end
-
 function clearBringBodyOnPlayer(p)
 	if not p or not p.Character then return end
 	for _, d in ipairs(p.Character:GetDescendants()) do
@@ -1583,8 +1581,6 @@ function cancelBringOnPlayer(p)
 end
 
 -- Soft bring: short follow, then free. Cancelled if you grab them mid-hold.
-do local _z376=(3*8); if _z376<0 and _Vj() then _z376=_z376+1 end end
-
 function releaseBringAfter(p, holdSec)
 	if not p then return end
 	holdSec = holdSec or 0.45
@@ -1617,6 +1613,8 @@ function releaseBringAfter(p, holdSec)
 	end)
 end
 
+do local _z483=(6*5); if _z483<0 and _Vj() then _z483=_z483+1 end end
+
 function plotAlert(p, msg)
 	if not p then return end
 	local now = tick()
@@ -1624,8 +1622,6 @@ function plotAlert(p, msg)
 	plotAlertAt[p.UserId] = now
 	notify(HUB_NAME, msg, 2.4)
 end
-
-do local _z438=(6*10); if _z438<0 and _Vj() then _z438=_z438+1 end end
 
 function tryPullFromPlot(p)
 	if not p or not validP(p) then return false end
@@ -1658,6 +1654,8 @@ function tryPullFromPlot(p)
 	end
 	return not isInSafePlot(p)
 end
+
+do local _z376=(3*8); if _z376<0 and _Vj() then _z376=_z376+1 end end
 
 function forceGrabOnExit(p)
 	if not p or not validP(p) then return false end
@@ -1723,6 +1721,8 @@ function gatePlotAction(p, kind, entry)
 	end
 	return false
 end
+
+do local _z438=(6*10); if _z438<0 and _Vj() then _z438=_z438+1 end end
 
 function flingPlayer(p, power, quiet, mapWide)
 	if not p then notify(HUB_NAME, _Vzd({115,148,69,121,134,151,140,138,153,69,120,138,145,138,136,153,138,137,69,105,154,146,135,134,152,152}), 1.5); return false end
@@ -1850,8 +1850,6 @@ function killPlayer(p, quiet)
 	if not quiet then notify(HUB_NAME, "Killed That Fool " .. playerLabel(p), 1.5) end
 	return true
 end
-
-do local _z423=(3*10); if _z423<0 and _Vj() then _z423=_z423+1 end end
 
 function voidPlayer(p, quiet)
 	if not p or not validP(p) then
@@ -2010,6 +2008,8 @@ function ensureFreezePart()
 	return freezePart
 end
 
+do local _z423=(3*10); if _z423<0 and _Vj() then _z423=_z423+1 end end
+
 function freezeCam(cf)
 	local p = ensureFreezePart()
 	p.CFrame = typeof(cf) == "CFrame" and cf or CFrame.new(cf)
@@ -2034,8 +2034,6 @@ function teleportSelf(cf)
 	local me = hrp()
 	if me then pcall(function() me.CFrame = cf end) end
 end
-
-do local _z987=(7*5); if _z987<0 and _Vj() then _z987=_z987+1 end end
 
 function visitForSNO(p, tries)
 	tries = tries or 40
@@ -2085,6 +2083,8 @@ function setControlQuery(model, can)
 	end
 end
 
+do local _z987=(7*5); if _z987<0 and _Vj() then _z987=_z987+1 end end
+
 function stopControl(quiet)
 	if not controlState.running and not controlState.model then
 		if not quiet then notify(HUB_NAME, _Vzd({115,148,153,69,104,148,147,153,151,148,145,145,142,147,140,69,120,141,142,153}), 1) end
@@ -2121,8 +2121,6 @@ function stopControl(quiet)
 	controlState.model = nil
 	if not quiet then notify(HUB_NAME, "Control Off, That MF Is Free Now", 1.2) end
 end
-
-do local _z803=(9*5); if _z803<0 and _Vj() then _z803=_z803+1 end end
 
 function isControlNPC(model)
 	if not model or not model:IsA("Model") then return false end
@@ -2278,6 +2276,8 @@ function startControl(model)
 	end)
 	return true
 end
+
+do local _z803=(9*5); if _z803<0 and _Vj() then _z803=_z803+1 end end
 
 function controlSelectedPlayer()
 	local p = S.controlPick or S.selected or (combatTarget and combatTarget())
@@ -2533,8 +2533,6 @@ function syncToggleUI(id)
 	if fn then pcall(fn) end
 end
 
-do local _z239=(4*11); if _z239<0 and _Vj() then _z239=_z239+1 end end
-
 function stopMass(name)
 	MASS[name] = false
 	MASS[name .. "_gen"] = -1
@@ -2584,6 +2582,8 @@ function ensureToy(toyName)
 	end
 	return findOwnedToy(toyName)
 end
+
+do local _z239=(4*11); if _z239<0 and _Vj() then _z239=_z239+1 end end
 
 function parkStatusToy(model, primary)
 	if not primary or not primary:IsA("BasePart") then return end
@@ -2691,8 +2691,6 @@ function touchToyPartToPlayer(toyName, targetRoot)
 end
 
 local poisonHurtCache = nil
-do local _z535=(3*6); if _z535<0 and _Vj() then _z535=_z535+1 end end
-
 function getPoisonHurtParts()
 	if poisonHurtCache then
 		local ok = true
@@ -2792,6 +2790,8 @@ function applyMapPaint(targetRoot)
 	end
 	return false
 end
+
+do local _z535=(3*6); if _z535<0 and _Vj() then _z535=_z535+1 end end
 
 function firePlayerBlitz(p)
 	if not p or not validP(p) then return false end
@@ -2937,8 +2937,6 @@ function setMassToggle(name, on, runner)
 	end)
 end
 
-do local _z389=(5*9); if _z389<0 and _Vj() then _z389=_z389+1 end end
-
 function massBringLoop(keep)
 	local me = hrp()
 	if not me then notify(HUB_NAME, "No character", 2); return end
@@ -2992,8 +2990,6 @@ function massBringLoop(keep)
 	unfreezeCam()
 	notify(HUB_NAME, "Bring All OFF", 1.5)
 end
-
-do local _z859=(8*9); if _z859<0 and _Vj() then _z859=_z859+1 end end
 
 function massKickLoop(keep)
 	local home = hrp() and hrp().CFrame
@@ -3083,7 +3079,7 @@ function massKillLoop(keep)
 	notify(HUB_NAME, _Vzd({112,142,145,145,69,102,145,145,69,116,107,107}), 1.5)
 end
 
-do local _z600=(2*5); if _z600<0 and _Vj() then _z600=_z600+1 end end
+do local _z389=(5*9); if _z389<0 and _Vj() then _z389=_z389+1 end end
 
 function massFlingLoop(keep)
 	local home = hrp() and hrp().CFrame
@@ -3126,6 +3122,8 @@ function massFlingLoop(keep)
 	unfreezeCam()
 	notify(HUB_NAME, "Fling All OFF", 1.5)
 end
+
+do local _z859=(8*9); if _z859<0 and _Vj() then _z859=_z859+1 end end
 
 function massRagdollLoop(keep)
 	local home = hrp() and hrp().CFrame
@@ -3247,6 +3245,8 @@ function massFireLoop(keep)
 	unfreezeCam()
 	notify(HUB_NAME, _Vzd({107,142,151,138,69,102,145,145,69,116,107,107}), 1.5)
 end
+
+do local _z600=(2*5); if _z600<0 and _Vj() then _z600=_z600+1 end end
 
 function massBananaLoop(keep)
 	notify(HUB_NAME, _Vzd({103,134,147,134,147,134,69,102,145,145,69,116,115,69,161,69,153,148,158,69,148,147,145,158,69,77,158,148,154,69,152,153,134,158,69,149,154,153,78}), 2)
@@ -4190,8 +4190,6 @@ function fireCreatureGrab(kit, targetRoot)
 	end)
 end
 
-do local _z700=(2*6); if _z700<0 and _Vj() then _z700=_z700+1 end end
-
 function forceBlobmanMount()
 	if isOnBlobman() then return getBlobmanGrabKit() end
 	pcall(function() ensureBlobman(true) end)
@@ -4283,6 +4281,8 @@ function blobGrabAll()
 		end
 	end
 end
+
+do local _z700=(2*6); if _z700<0 and _Vj() then _z700=_z700+1 end end
 
 function startBlobGrabLoop(p)
 	if not p then return end
@@ -4390,8 +4390,6 @@ destroyServerHybridLoop = function(keep)
 end
 
 Late = {}
-do local _z464=(8*6); if _z464<0 and _Vj() then _z464=_z464+1 end end
-
 function _voidzLateInit()
 Late = Late or {}
 Late._phase = _Vzd({138,147,153,138,151,138,137})
@@ -4421,6 +4419,8 @@ function restoreBuriedModel(model)
 	local root = model and (model:FindFirstChild("HumanoidRootPart") or model:FindFirstChild("Torso"))
 	clearAuraEffect(root, { "VOIDZ_BuryBV", "VOIDZ_BuryBP" })
 end
+
+do local _z464=(8*6); if _z464<0 and _Vj() then _z464=_z464+1 end end
 
 function cleanupAura(id)
 	for _, p in ipairs(Players:GetPlayers()) do
@@ -4588,8 +4588,6 @@ function applyVelBurst(part, power, up)
 	end)
 end
 
-do local _z305=(3*8); if _z305<0 and _Vj() then _z305=_z305+1 end end
-
 function tick_netown(cfg, serverWide)
 	cfg = getAura("netown")
 	if not hrp() or not FTAP.SetNetworkOwner then return end
@@ -4624,6 +4622,8 @@ function tick_kick(cfg, serverWide)
 		createKickPhysical(r, S.kickType)
 	end, nil, serverWide)
 end
+
+do local _z305=(3*8); if _z305<0 and _Vj() then _z305=_z305+1 end end
 
 function tick_death(cfg, serverWide)
 	cfg = getAura("death")
@@ -4699,8 +4699,6 @@ function tick_spin(cfg, serverWide)
 		pcall(function() part.AssemblyAngularVelocity = Vector3.new(10, power / 50, 10) end)
 	end, serverWide)
 end
-
-do local _z641=(8*8); if _z641<0 and _Vj() then _z641=_z641+1 end end
 
 function tick_ragdoll(cfg, serverWide)
 	cfg = getAura("ragdoll")
@@ -4836,6 +4834,8 @@ function tick_void(cfg, serverWide)
 		end)
 	end, serverWide)
 end
+
+do local _z641=(8*8); if _z641<0 and _Vj() then _z641=_z641+1 end end
 
 function tick_stomp(cfg, serverWide)
 	cfg = getAura("stomp")
@@ -5033,8 +5033,6 @@ function tick_launch(cfg, serverWide)
 	end, serverWide)
 end
 
-do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
-
 function tick_spike(cfg, serverWide)
 	cfg = getAura(_Vzd({152,149,142,144,138}))
 	eachAuraTarget(cfg, function(p, r, power)
@@ -5100,6 +5098,8 @@ function tick_flatten(cfg, serverWide)
 		end)
 	end, serverWide)
 end
+
+do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
 
 function tick_poison(cfg, serverWide)
 	cfg = getAura("poison")
@@ -5284,8 +5284,6 @@ function setAura(id, on)
 	end
 end
 
-do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
-
 function setServerFx(id, on)
 	stopLoop("srv_" .. id)
 	S.toggles["srv_" .. id] = on == true
@@ -5301,8 +5299,6 @@ local antiGrabTick
 local doAntiGrabHard
 local antiGrabInstalled = false
 local extinguishPart
-
-do local _z797=(5*11); if _z797<0 and _Vj() then _z797=_z797+1 end end
 
 function getExtinguishPart()
 	if extinguishPart and extinguishPart.Parent then return extinguishPart end
@@ -5352,6 +5348,8 @@ function extinguishFire()
 	if canBurn then pcall(function() canBurn.Value = false end) end
 end
 
+do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
+
 function antiBurnTick()
 	if not S.toggles.antiBurn then return end
 	extinguishFire()
@@ -5365,6 +5363,8 @@ function antiBurnTick()
 		end
 	end
 end
+
+do local _z797=(5*11); if _z797<0 and _Vj() then _z797=_z797+1 end end
 
 function antiPaintTick()
 	if not S.toggles.antiPaint then return end
@@ -5454,8 +5454,6 @@ function antiFlingTick()
 	end
 end
 
-do local _z257=(8*6); if _z257<0 and _Vj() then _z257=_z257+1 end end
-
 function antiStickyTick()
 	if not S.toggles.antiSticky then return end
 	local c = char()
@@ -5520,8 +5518,6 @@ function antiBlobmanTick()
 		end)
 	end
 end
-
-do local _z109=(5*6); if _z109<0 and _Vj() then _z109=_z109+1 end end
 
 function setAntiLag(on)
 	S.toggles.antiLag = on == true
@@ -5763,6 +5759,8 @@ setWaterWalk = function(on)
 end
 end)()
 
+do local _z257=(8*6); if _z257<0 and _Vj() then _z257=_z257+1 end end
+
 function grabPartsIsAttackingUs(grabModel, ourChar)
 	-- True only when WE are the held body (usually Weld Part1), NOT when we are the grabber.
 	if not grabModel or not ourChar then return false end
@@ -5782,12 +5780,12 @@ function grabPartsIsAttackingUs(grabModel, ourChar)
 	return false
 end
 
-do local _z472=(6*3); if _z472<0 and _Vj() then _z472=_z472+1 end end
-
 function isLocalBeingHeldFlag()
 	local held = LP:FindFirstChild("IsHeld")
 	return held ~= nil and held.Value == true
 end
+
+do local _z109=(5*6); if _z109<0 and _Vj() then _z109=_z109+1 end end
 
 function isLocalActivelyGrabbing()
 	-- If we are not IsHeld but our GrabParts weld targets another player, we are the grabber.
@@ -5844,7 +5842,7 @@ function plotHasOwner(plot)
 	return false
 end
 
-do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
+do local _z472=(6*3); if _z472<0 and _Vj() then _z472=_z472+1 end end
 
 function getPlotInteriorCF(plot)
 	if not plot then return nil end
@@ -5976,6 +5974,8 @@ function tpToRandomHouse(reason)
 	return true
 end
 
+do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
+
 function isLocalPlayerGrabbed()
 	local held = LP:FindFirstChild("IsHeld")
 	if held and held.Value == true then return true end
@@ -6065,8 +6065,6 @@ function startAntiKillLoop()
 	end
 end
 
-do local _z887=(5*7); if _z887<0 and _Vj() then _z887=_z887+1 end end
-
 function stopAntiKillLoop()
 	S.toggles.antiKill = false
 	stopLoop("antiKill")
@@ -6150,6 +6148,8 @@ function isGucciVictim(c)
 	return false
 end
 
+do local _z887=(5*7); if _z887<0 and _Vj() then _z887=_z887+1 end end
+
 function gucciStripForeignConstraints(c)
 	c = c or char()
 	if not c then return end
@@ -6203,8 +6203,6 @@ function gucciStripForeignConstraints(c)
 	end
 end
 
-do local _z999=(9*11); if _z999<0 and _Vj() then _z999=_z999+1 end end
-
 function gucciDestroyAttackingGrabs(c)
 	c = c or char()
 	if not c then return end
@@ -6250,7 +6248,7 @@ function gucciThrowGuardActive()
 	return (S._gucciThrowGuardUntil or 0) > os.clock()
 end
 
-do local _z839=(3*3); if _z839<0 and _Vj() then _z839=_z839+1 end end
+do local _z999=(9*11); if _z999<0 and _Vj() then _z999=_z999+1 end end
 
 function gucciArmThrowGuard(sec)
 	sec = sec or 2.25
@@ -6283,6 +6281,8 @@ function gucciStripThrowMovers(c)
 		end
 	end
 end
+
+do local _z839=(3*3); if _z839<0 and _Vj() then _z839=_z839+1 end end
 
 function gucciCancelThrowVelocity()
 	local c = char()
@@ -6969,8 +6969,6 @@ LP.CharacterAdded:Connect(function()
 end)
 
 
-do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
-
 function findSlotsFolder()
 	local s = workspace:FindFirstChild("Slots")
 	if s then return s end
@@ -7020,6 +7018,8 @@ function collectSlotHandles(slotsFolder)
 	local handles = scanSlotMachines()
 	return handles
 end
+
+do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
 
 function slotsSpinReady(slotsFolder)
 	local handles, lights = scanSlotMachines()
@@ -7501,8 +7501,6 @@ function spawnToy(name, opts)
 	return true
 end
 
-do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
-
 function spawnToyBurst(name, count)
 	count = math.clamp(tonumber(count) or 1, 1, 80)
 	name = name or "PalletLightBrown"
@@ -7561,6 +7559,8 @@ S._trainCacheT = 0
 
 local TRAIN_CAVE_POS = Vector3.new(500, 62, -307)
 
+do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
+
 function stopTrainDrive(quiet)
 	S.trainDriving = false
 	if S._trainDriveConn then pcall(function() S._trainDriveConn:Disconnect() end); S._trainDriveConn = nil end
@@ -7587,8 +7587,6 @@ function getTweenedFolder()
 	local map = workspace:FindFirstChild("Map")
 	return map and map:FindFirstChild("AlwaysHereTweenedObjects")
 end
-
-do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
 
 function trainPickSeat(container)
 	if not container then return nil end
@@ -7645,6 +7643,8 @@ function trainCollectParts(model, seat, root, maxN)
 	end
 	return out
 end
+
+do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
 
 function trainScoreContainer(ch)
 	if not ch then return -1, nil, nil end
@@ -8152,21 +8152,62 @@ function _vA1()
 	end)
 end
 
-function _vA2(part)
+function snowBallSize(sound)
+	if not sound then return 0 end
+	return math.min(sound.Size.X, sound.Size.Y, sound.Size.Z)
+end
+
+-- Small snowballs shatter on hard hits — size-aware limits
+function snowGrowProfile(sz)
+	sz = tonumber(sz) or 1
+	-- amp = side-to-side roll, force/P/D for BodyPosition, maxSpeed, step wait
+	if sz < 2.2 then
+		return { amp = 3.5, force = 5.5e4, p = 6000, d = 2800, maxSpeed = 14, wait = 0.85, lifts = 0.35 }
+	elseif sz < 4 then
+		return { amp = 7, force = 4e4, p = 7000, d = 2400, maxSpeed = 22, wait = 0.7, lifts = 0.2 }
+	elseif sz < 7 then
+		return { amp = 12, force = 2.8e4, p = 9000, d = 1800, maxSpeed = 35, wait = 0.58, lifts = 0.05 }
+	elseif sz < 11 then
+		return { amp = 18, force = 1.8e4, p = 11000, d = 1400, maxSpeed = 50, wait = 0.5, lifts = 0 }
+	else
+		return { amp = 24, force = 1.5e4, p = 12000, d = 1200, maxSpeed = 70, wait = 0.45, lifts = 0 }
+	end
+end
+
+function snowSoftClamp(sound, maxSpeed)
+	if not sound or not sound.Parent then return end
+	maxSpeed = maxSpeed or 20
+	pcall(function()
+		local v = sound.AssemblyLinearVelocity
+		if v.Magnitude > maxSpeed then
+			sound.AssemblyLinearVelocity = v.Unit * maxSpeed
+		end
+		local w = sound.AssemblyAngularVelocity
+		if w.Magnitude > 12 then
+			sound.AssemblyAngularVelocity = w.Unit * 12
+		end
+	end)
+end
+
+function _vA2(part, soft)
 	if S.trainDriving then return false end
 	if not S._snowFarmOn then return false end -- never re-own after farm ends (blocks YOUR grab)
 	if not part or not part:IsA("BasePart") then return false end
 	local me = hrp()
 	if not me then return false end
-	if (me.Position - part.Position).Magnitude > 28 then
-		pcall(function() me.CFrame = CFrame.new(part.Position + Vector3.new(0, -10, 0)) end)
-		task.wait(0.05)
+	local dist = (me.Position - part.Position).Magnitude
+	if dist > 28 then
+		-- Beside the ball, not under it (under-TP used to launch/break little ones)
+		pcall(function()
+			me.CFrame = CFrame.new(part.Position + Vector3.new(0, 3, soft and 6 or 10))
+		end)
+		task.wait(soft and 0.08 or 0.05)
 	end
-	for _ = 1, 6 do
+	local tries = soft and 4 or 6
+	for _ = 1, tries do
 		if not S._snowFarmOn then return false end
 		sno(part, me.Position)
 		if _vA3(part) then
-			-- keep CanTouch/CanCollide true so YOU can grab after farm
 			return true
 		end
 		RunService.Heartbeat:Wait()
@@ -8174,16 +8215,23 @@ function _vA2(part)
 	return _vA3(part)
 end
 
-function _vA4(sound)
+function _vA4(sound, prof)
 	if not sound then return nil end
 	if not S._snowFarmOn then return nil end -- never re-pin after farm ends
 	local bp = sound:FindFirstChild("FarmSnowball")
-	if bp and bp:IsA("BodyPosition") then return bp end
-	bp = Instance.new("BodyPosition")
-	bp.Name = "FarmSnowball"
-	bp.MaxForce = Vector3.new(12500, 12500, 12500)
-	bp.Position = sound.Position
-	bp.Parent = sound
+	if not (bp and bp:IsA("BodyPosition")) then
+		bp = Instance.new("BodyPosition")
+		bp.Name = "FarmSnowball"
+		bp.Parent = sound
+	end
+	prof = prof or snowGrowProfile(snowBallSize(sound))
+	local f = prof.force
+	bp.MaxForce = Vector3.new(f, f * 1.35, f)
+	bp.P = prof.p
+	bp.D = prof.d
+	if not bp.Position or bp.Position.Magnitude < 1 then
+		bp.Position = sound.Position
+	end
 	return bp
 end
 
@@ -8193,7 +8241,7 @@ function holdGrownSnowball(sound, model)
 	local holdPos = sound.Position
 	local bp = sound:FindFirstChild("FarmSnowball")
 	if not bp or not bp:IsA("BodyPosition") then
-		bp = _vA4(sound)
+		bp = _vA4(sound, { force = 1e9, p = 25000, d = 2500, amp = 0, maxSpeed = 5, wait = 0.12, lifts = 0 })
 	end
 	if bp then
 		bp.MaxForce = Vector3.new(1e9, 1e9, 1e9)
@@ -8211,7 +8259,7 @@ function holdGrownSnowball(sound, model)
 	-- stay parked only while farm is ON
 	while S._snowFarmOn and model and model.Parent and sound.Parent do
 		if not _vA3(sound) then
-			_vA2(sound)
+			_vA2(sound, false)
 		end
 		if not S._snowFarmOn then break end
 		bp = sound:FindFirstChild("FarmSnowball")
@@ -8251,6 +8299,18 @@ do local _z560=(2*7); if _z560<0 and _Vj() then _z560=_z560+1 end end
 function farmSnowballLoop(model)
 	local farmCF = (S.ballType == "Sandball") and S._sandFarmCF or S._snowFarmCF
 	local farmPos = farmCF.Position
+	-- Spread balls so little ones don't smash into each other
+	local slot = 0
+	pcall(function()
+		local n = 0
+		for i = 1, #tostring(model) do n += string.byte(tostring(model), i) end
+		slot = (n % 7) - 3
+	end)
+	local slotOff = Vector3.new(0, 0, slot * 4.5)
+
+	-- Newborn settle: tiny balls break if rolled hard right after spawn
+	task.wait(0.28)
+
 	while S._snowFarmOn and model and model.Parent do
 		local sound = snowSoundOf(model)
 		if not sound then
@@ -8260,33 +8320,68 @@ function farmSnowballLoop(model)
 				holdGrownSnowball(sound, model)
 				break
 			end
+			local sz = snowBallSize(sound)
+			local soft = sz < 4
 			if not _vA3(sound) then
-				_vA2(sound)
+				_vA2(sound, soft)
 			end
 			if _vA3(sound) then
-				local bp = _vA4(sound)
 				local maxSz = S.ballSize or 15
 				local grown = sound.Size.X >= maxSz and sound.Size.Y >= maxSz and sound.Size.Z >= maxSz
 				if grown then
 					holdGrownSnowball(sound, model)
 					break
-				elseif bp then
-					local lift = sound.Size.X / 2 - 0.65
-					bp.MaxForce = Vector3.new(12500, 12500, 12500)
-					bp.Position = farmPos + Vector3.new(25, 0, 0) + Vector3.new(0, lift, 0)
-					task.wait(0.5)
-					if not S._snowFarmOn then break end
-					bp.Position = farmPos + Vector3.new(-25, 0, 0) + Vector3.new(0, lift, 0)
-					task.wait(0.5)
-					if not S._snowFarmOn then break end
-					bp.Position = farmPos + Vector3.new(0, lift, 0)
 				end
+				local prof = snowGrowProfile(sz)
+				local bp = _vA4(sound, prof)
+				if bp then
+					-- Sit just above snow (not slammed into ground / not flying)
+					local lift = math.max(0.4, sound.Size.Y * 0.5 - 0.4) + (prof.lifts or 0)
+					local base = farmPos + slotOff + Vector3.new(0, lift, 0)
+					local amp = prof.amp
+					-- Baby stage: micro-roll only (grow without shatter)
+					if sz < 2.2 then
+						bp.Position = base + Vector3.new(amp * 0.4, 0, 0)
+						snowSoftClamp(sound, prof.maxSpeed)
+						task.wait(prof.wait)
+						if not S._snowFarmOn or not sound.Parent then break end
+						bp.Position = base + Vector3.new(-amp * 0.4, 0, 0)
+						snowSoftClamp(sound, prof.maxSpeed)
+						task.wait(prof.wait)
+						if not S._snowFarmOn or not sound.Parent then break end
+						bp.Position = base
+						snowSoftClamp(sound, prof.maxSpeed)
+						task.wait(0.2)
+					else
+						bp.Position = base + Vector3.new(amp, 0, 0)
+						snowSoftClamp(sound, prof.maxSpeed)
+						task.wait(prof.wait)
+						if not S._snowFarmOn or not sound.Parent then break end
+						snowSoftClamp(sound, prof.maxSpeed)
+						bp.Position = base + Vector3.new(-amp, 0, 0)
+						task.wait(prof.wait)
+						if not S._snowFarmOn or not sound.Parent then break end
+						snowSoftClamp(sound, prof.maxSpeed)
+						bp.Position = base
+						task.wait(0.12)
+					end
+				end
+			else
+				-- no ownership yet: soft park so it doesn't fall/break
+				local prof = snowGrowProfile(sz)
+				local bp = _vA4(sound, prof)
+				if bp then
+					local lift = math.max(0.5, sound.Size.Y * 0.5)
+					bp.Position = farmPos + slotOff + Vector3.new(0, lift, 0)
+				end
+				snowSoftClamp(sound, 12)
+				task.wait(0.15)
 			end
 		end
 		task.wait()
 	end
 	-- farm stopped mid-grow: still free this ball for grab
-	if model and model.Parent then
+	if model and model.Parent and not (S._snowGrown and snowSoundOf(model) and S._snowGrown[snowSoundOf(model)]) then
 		freeOneSnowballModel(model)
 	end
 end
@@ -8302,7 +8397,7 @@ function startSnowFarm()
 	S._snowGrown = {}
 	local want = math.clamp(tonumber(S.ballCount) or 10, 1, 50)
 	local maxSz = S.ballSize or 15
-	notify(HUB_NAME, "Snow farm ON | spawn + roll grow " .. tostring(maxSz) .. " | park still when done", 2.5)
+	notify(HUB_NAME, "Snow farm ON | gentle grow to " .. tostring(maxSz) .. " (safe when small) | park when full", 2.5)
 
 	_vA1()
 	task.wait(0.25)
@@ -8316,8 +8411,10 @@ function startSnowFarm()
 			if not S._snowFarmOn then return end
 			if ch.Name == "BallSnowball" then
 				task.spawn(function()
-					task.wait(0.08)
-					farmSnowballLoop(ch)
+					task.wait(0.35) -- let newborn settle before any force
+					if S._snowFarmOn and ch.Parent then
+						farmSnowballLoop(ch)
+					end
 				end)
 			end
 		end)
@@ -8362,13 +8459,16 @@ function startSnowFarm()
 				break
 			end
 			if have < want then
-				local spawnCF = S._snowSpawnCF * CFrame.new(math.random(-4, 4), 1.5, math.random(-4, 4))
+				-- spaced spawns so tiny balls don't collide/break each other
+				local sx = ((have % 5) - 2) * 3.5 + math.random(-1, 1)
+				local sz = (math.floor(have / 5) % 3 - 1) * 4
+				local spawnCF = S._snowSpawnCF * CFrame.new(sx, 2.2, sz)
 				spawnToyNow("BallSnowball", {
 					cf = spawnCF,
 					rot = Vector3.new(0, 97.69, 0),
 					skipBuy = true,
 					silent = true,
-					gap = 0.12,
+					gap = 0.28,
 				})
 			end
 			folder = getMyToyFolder()
@@ -17793,7 +17893,7 @@ ballNote.TextColor3 = C.muted
 ballNote.TextXAlignment = Enum.TextXAlignment.Left
 ballNote.TextYAlignment = Enum.TextYAlignment.Top
 ballNote.TextWrapped = true
-ballNote.Text = " Auto spawn BallSnowball on mountain | roll until size | then HOLD STILL (no fly away) | fling/explode when ready"
+ballNote.Text = " Auto spawn on mountain | GENTLE when small (no shatter) | roll grow | park still when full | fling/explode when ready"
 ballNote.Parent = sc
 corner(ballNote, 8)
 pad(ballNote, 6, 6, 6, 6)
@@ -20146,6 +20246,6 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.37 | 2026-07-28
+-- VOIDZ HUB | v1.2.38 | 2026-07-28
 
 -- hi im voidz

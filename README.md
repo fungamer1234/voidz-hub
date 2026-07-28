@@ -1,6 +1,10 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.37` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.38` · Access Key: `VOIDZHUB`
+
+## Recent (1.2.38)
+
+- **Snowballs** — Little balls grow gently (small roll amp, speed clamp, settle delay, spaced spawns) so they stop breaking when tiny.
 
 ## Recent (1.2.37)
 

@@ -1,6 +1,10 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.41` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.42` · Access Key: `VOIDZHUB`
+
+## Recent (1.2.42)
+
+- **Grab** — Safer DragPart lookup (no WaitForChild spam). Console "DragPart is not a valid member" should stop; grabs still work.
 
 ## Recent (1.2.41)
 

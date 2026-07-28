@@ -3,11 +3,11 @@
 ## Loadstring (always at top)
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua?v=1.2.80", true))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua?v=1.2.81", true))()
 ```
 
-Build: `2026-07-28-1.2.80` · Access Key: `VOIDZHUB`  
-**Must use `?v=1.2.80`** or you may still get an old cached script.
+Build: `2026-07-28-1.2.81` · Access Key: `VOIDZHUB`  
+**Must use `?v=1.2.81`** or you may still get an old cached script.
 
 1. Join **Fling Things and People** (PlaceId `6961824067`).
 2. Execute the loadstring above in your executor.
@@ -20,9 +20,13 @@ GitHub: https://github.com/fungamer1234/voidz-hub
 
 A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more.
 
+## Recent (1.2.81)
+
+- **WAR MODE (FE)** — Chat `/war-mode` (or `/war` / `/war-burst`). Remote-heavy: Struggle spam, DestroyGrabLine on body, StopAllVelocity, Ragdoll clear, SetNetworkOwner self, multi house escape. Client god disabled for war.
+
 ## Recent (1.2.80)
 
-- **WAR MODE** — One toggle arms max anti stack (Gucci/Kill/Fling/Explode/Burn/Sticky/Void/God) + `voidzWarProtectBurst` loop (20x Struggle, multi StopAllVelocity, full heal, house TP). Antis cranked hard for hub wars.
+- **WAR MODE** — Earlier max stack (superseded by FE-focused 1.2.81).
 
 ## Recent (1.2.79)
 

@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-28-1.2.49` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.50` · Access Key: `VOIDZHUB`
 
 1. Join **Fling Things and People** (PlaceId `6961824067`).
 2. Execute the loadstring above in your executor.
@@ -18,6 +18,10 @@ GitHub: https://github.com/fungamer1234/voidz-hub
 ---
 
 A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more.
+
+## Recent (1.2.50)
+
+- **NPC / Blobman control (Blitz-style)** — Hard SNO + grab-line claim, Humanoid:Move + BodyVelocity/Gyro, stick under creature, WASD/Space/Ctrl, works on Blobman/decoy/Robloxians/creatures.
 
 ## Recent (1.2.49)
 

@@ -1,6 +1,10 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.43` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.44` · Access Key: `VOIDZHUB`
+
+## Recent (1.2.44)
+
+- **Snow grab** — After farm, balls stay grabbable: strip farm pins without killing hold, SNO assist while holding so server does not force-drop.
 
 ## Recent (1.2.43)
 

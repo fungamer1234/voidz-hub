@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-28-1.2.64` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.65` · Access Key: `VOIDZHUB`
 
 1. Join **Fling Things and People** (PlaceId `6961824067`).
 2. Execute the loadstring above in your executor.
@@ -18,6 +18,10 @@ GitHub: https://github.com/fungamer1234/voidz-hub
 ---
 
 A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more.
+
+## Recent (1.2.65)
+
+- **Load chat (fixed)** — After key unlock, forces a chat system line via `DisplaySystemMessage` + fullwidth/emoji letter variants + retries (old send was silent/no-op).
 
 ## Recent (1.2.64)
 

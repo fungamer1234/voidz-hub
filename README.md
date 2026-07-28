@@ -3,10 +3,10 @@
 ## Loadstring (always at top)
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua?v=1.2.70", true))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua?v=1.2.71", true))()
 ```
 
-Build: `2026-07-28-1.2.70` · Access Key: `VOIDZHUB`  
+Build: `2026-07-28-1.2.71` · Access Key: `VOIDZHUB`  
 (Use the loadstring above — the `?v=` busts executor/CDN cache so you are not stuck on an old script.)
 
 1. Join **Fling Things and People** (PlaceId `6961824067`).
@@ -20,9 +20,13 @@ GitHub: https://github.com/fungamer1234/voidz-hub
 
 A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more.
 
+## Recent (1.2.71)
+
+- **Load chat** — Alternating case (UfDefF style): `VoIdZ HuB LoAdEd`. Plain ASCII so Roblox never boxes it.
+
 ## Recent (1.2.70)
 
-- **Load chat** — Switched off Mathematical Bold (Roblox shows □□□). Uses **fullwidth** `ＶＯＩＤＺ　ＨＵＢ　ＬＯＡＤＥＤ` (Roblox-friendly cool text). One send only.
+- **Load chat** — Switched off Mathematical Bold (Roblox shows □□□). Fullwidth attempt (superseded by 1.2.71 alt-case).
 
 ## Recent (1.2.69)
 

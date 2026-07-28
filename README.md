@@ -1,6 +1,11 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.23` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.24` · Access Key: `VOIDZHUB`
+
+## Recent (1.2.24)
+
+- **Snow farm** — Grown snowballs hold still in place (no sky fly-away).
+
 
 A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more. Press **RightShift** to toggle the hub.
 
@@ -17,7 +22,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hu
 
 ---
 
-## Recent (1.2.23)
+## Recent (1.2.24)
 
 - **Gucci** — No longer breaks YOUR grabs (only when you are IsHeld).
 

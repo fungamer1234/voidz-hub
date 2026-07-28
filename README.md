@@ -3,11 +3,11 @@
 ## Loadstring (always at top)
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua?v=1.2.78", true))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua?v=1.2.79", true))()
 ```
 
-Build: `2026-07-28-1.2.78` · Access Key: `VOIDZHUB`  
-**Must use `?v=1.2.78`** or you may still get an old cached script.
+Build: `2026-07-28-1.2.79` · Access Key: `VOIDZHUB`  
+**Must use `?v=1.2.79`** or you may still get an old cached script.
 
 1. Join **Fling Things and People** (PlaceId `6961824067`).
 2. Execute the loadstring above in your executor.
@@ -20,9 +20,13 @@ GitHub: https://github.com/fungamer1234/voidz-hub
 
 A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more.
 
+## Recent (1.2.79)
+
+- **Harder antis vs Phoenix-style kill** — Gucci: 16x Struggle, full DestroyGrabLine, limb zero, heal, auto house if Anti-Kill on. Anti-Kill: faster multi-pass house TP, full heal, death flags off, fling detect. Anti-Fling tighter. Gucci auto-arms Anti-Fling.
+
 ## Recent (1.2.78)
 
-- **Perf** — Major lag cut: anti-fling uses collision groups (not every-player scans), grab-line keep-alive slowed + no RenderStepped spam, Gucci lighter, mouse unlock single throttled bind.
+- **Perf** — Lag cut: collision-group anti-fling, slower grab keep-alive, lighter Gucci/mouse.
 
 ## Recent (1.2.77)
 

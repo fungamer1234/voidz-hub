@@ -1,23 +1,28 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.28` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.29` · Access Key: `VOIDZHUB`
 
-## Recent (1.2.28)
+## Recent (1.2.29)
+
+- **Snowballs** — After farm ends, strip client FarmSnowball pins so YOU can grab (not only others).
+
+
+## Recent (1.2.29)
 
 - **Train control** — Bloody-style light mount (sit + rate-limited SNO, no sticky TP spam that kicks).
 
 
-## Recent (1.2.28)
+## Recent (1.2.29)
 
 - **Bring** — No permanent pin; releases so you can grab. **Snow farm off** frees balls for grab.
 
 
-## Recent (1.2.28)
+## Recent (1.2.29)
 
 - **Blue train** — Sticky mount (no snap-back TP), snow farm will not TP you while driving.
 
 
-## Recent (1.2.28)
+## Recent (1.2.29)
 
 - **Snow farm** — Grown snowballs hold still in place (no sky fly-away).
 
@@ -37,7 +42,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hu
 
 ---
 
-## Recent (1.2.28)
+## Recent (1.2.29)
 
 - **Gucci** — No longer breaks YOUR grabs (only when you are IsHeld).
 

@@ -1,6 +1,10 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.38` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.39` · Access Key: `VOIDZHUB`
+
+## Recent (1.2.39)
+
+- **Grab line** — After snow farm ends, beam/line is forced visible again. Invisible Line OFF also restores beams (was leaving them hidden).
 
 ## Recent (1.2.38)
 

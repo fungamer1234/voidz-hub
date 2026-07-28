@@ -44,7 +44,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,88,87})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,88,88})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -19608,19 +19608,20 @@ local function showImmediateKeyUI()
 	bc.CornerRadius = UDim.new(0, 6)
 	bc.Parent = box
 	local boxStroke = Instance.new(_Vzd({122,110,120,153,151,148,144,138}))
-	boxStroke.Color = Color3.fromRGB(70, 40, 120)
-	boxStroke.Thickness = 1.1
-	boxStroke.Transparency = 0.25
+	boxStroke.Color = colViolet
+	boxStroke.Thickness = 2
+	boxStroke.Transparency = 0.05
+	boxStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	boxStroke.Parent = box
 	local boxPad = Instance.new("UIPadding")
 	boxPad.PaddingLeft = UDim.new(0, 14)
 	boxPad.PaddingRight = UDim.new(0, 14)
 	boxPad.Parent = box
 	box.Focused:Connect(function()
-		tween(boxStroke, { Color = colViolet, Transparency = 0.05, Thickness = 1.5 }, 0.15)
+		tween(boxStroke, { Color = colViolet, Transparency = 0, Thickness = 2.6 }, 0.15)
 	end)
 	box.FocusLost:Connect(function()
-		tween(boxStroke, { Color = Color3.fromRGB(70, 40, 120), Transparency = 0.25, Thickness = 1.1 }, 0.2)
+		tween(boxStroke, { Color = colViolet, Transparency = 0.05, Thickness = 2 }, 0.2)
 	end)
 
 	local status = Instance.new("TextLabel")
@@ -19637,7 +19638,7 @@ local function showImmediateKeyUI()
 	local unlock = Instance.new("TextButton")
 	unlock.Size = UDim2.new(1, -44, 0, 46)
 	unlock.Position = UDim2.fromOffset(22, 198)
-	unlock.BackgroundColor3 = colDeep
+	unlock.BackgroundColor3 = Color3.fromRGB(18, 10, 34)
 	unlock.BorderSizePixel = 0
 	unlock.Font = Enum.Font.GothamBlack
 	unlock.TextSize = 14
@@ -19650,16 +19651,17 @@ local function showImmediateKeyUI()
 	uc.Parent = unlock
 	local unlockStroke = Instance.new("UIStroke")
 	unlockStroke.Color = colViolet
-	unlockStroke.Thickness = 1.4
-	unlockStroke.Transparency = 0.15
+	unlockStroke.Thickness = 2.2
+	unlockStroke.Transparency = 0
+	unlockStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	unlockStroke.Parent = unlock
 	unlock.MouseEnter:Connect(function()
 		tween(unlock, { BackgroundColor3 = colDarkV }, 0.12)
-		tween(unlockStroke, { Transparency = 0 }, 0.12)
+		tween(unlockStroke, { Color = colViolet, Thickness = 2.6, Transparency = 0 }, 0.12)
 	end)
 	unlock.MouseLeave:Connect(function()
-		tween(unlock, { BackgroundColor3 = colDeep }, 0.12)
-		tween(unlockStroke, { Transparency = 0.15 }, 0.12)
+		tween(unlock, { BackgroundColor3 = Color3.fromRGB(18, 10, 34) }, 0.12)
+		tween(unlockStroke, { Color = colViolet, Thickness = 2.2, Transparency = 0 }, 0.12)
 	end)
 
 	local foot = Instance.new("TextLabel")
@@ -19865,6 +19867,6 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.32 | 2026-07-28
+-- VOIDZ HUB | v1.2.33 | 2026-07-28
 
 -- hi im voidz

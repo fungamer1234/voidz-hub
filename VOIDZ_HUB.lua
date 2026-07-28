@@ -44,7 +44,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,88,86})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,88,87})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -517,15 +517,16 @@ function showVoidzSplash(device, onDone)
 	local old = parent:FindFirstChild("VOIDZ_SPLASH")
 	if old then pcall(function() old:Destroy() end) end
 
-	-- Opium / cold: black, ash, blood red, white. No candy colors.
-	local colDeep = Color3.fromRGB(0, 0, 0)
-	local colMid = Color3.fromRGB(18, 18, 18)
-	local colAsh = Color3.fromRGB(40, 40, 40)
-	local colRed = Color3.fromRGB(160, 20, 30)
-	local colBlood = Color3.fromRGB(110, 8, 14)
-	local colWhite = Color3.fromRGB(245, 245, 245)
-	local colDim = Color3.fromRGB(120, 120, 120)
-	local colSoft = Color3.fromRGB(70, 70, 70)
+	-- Serious purple: black + deep violet. No candy pink/cyan.
+	local colDeep = Color3.fromRGB(4, 2, 10)
+	local colMid = Color3.fromRGB(14, 8, 28)
+	local colAsh = Color3.fromRGB(28, 16, 48)
+	local colPurple = Color3.fromRGB(120, 40, 220)
+	local colViolet = Color3.fromRGB(155, 70, 255)
+	local colDarkV = Color3.fromRGB(70, 25, 140)
+	local colWhite = Color3.fromRGB(245, 240, 255)
+	local colDim = Color3.fromRGB(140, 120, 170)
+	local colSoft = Color3.fromRGB(50, 30, 80)
 
 	local splash = Instance.new("ScreenGui")
 	splash.Name = "VOIDZ_SPLASH"
@@ -557,7 +558,7 @@ function showVoidzSplash(device, onDone)
 	washG.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, colDeep),
 		ColorSequenceKeypoint.new(0.35, colMid),
-		ColorSequenceKeypoint.new(0.55, colBlood),
+		ColorSequenceKeypoint.new(0.55, colDarkV),
 		ColorSequenceKeypoint.new(0.78, colAsh),
 		ColorSequenceKeypoint.new(1, colDeep),
 	})
@@ -576,11 +577,11 @@ function showVoidzSplash(device, onDone)
 		orb.Size = UDim2.fromScale(scale, scale)
 		orb.BackgroundColor3 = Color3.new(1, 1, 1)
 		orb.BorderSizePixel = 0
-		orb.BackgroundTransparency = 0.55
+		orb.BackgroundTransparency = 0.5
 		orb.ZIndex = 2
 		orb.Parent = root
 		local c = Instance.new("UICorner")
-		c.CornerRadius = UDim.new(0, 4) -- hard, not soft blob
+		c.CornerRadius = UDim.new(0, 4)
 		c.Parent = orb
 		local g = Instance.new(_Vzd({122,110,108,151,134,137,142,138,147,153}))
 		g.Color = ColorSequence.new(c1, c2)
@@ -593,15 +594,15 @@ function showVoidzSplash(device, onDone)
 				local ox = math.sin(t * drift) * 0.03
 				local oy = math.cos(t * drift * 0.85) * 0.025
 				orb.Position = UDim2.new(pos.X.Scale + ox, 0, pos.Y.Scale + oy, 0)
-				orb.BackgroundTransparency = 0.5 + math.sin(t * 1.1) * 0.1
+				orb.BackgroundTransparency = 0.48 + math.sin(t * 1.1) * 0.1
 				task.wait()
 			end
 		end)
 		return orb
 	end
-	makeOrb(isMobile and 0.5 or 0.38, colBlood, colDeep, UDim2.fromScale(0.18, 0.3), 0.4)
-	makeOrb(isMobile and 0.42 or 0.32, colAsh, colRed, UDim2.fromScale(0.82, 0.65), 0.32)
-	makeOrb(isMobile and 0.3 or 0.24, colMid, colBlood, UDim2.fromScale(0.55, 0.15), 0.5)
+	makeOrb(isMobile and 0.5 or 0.38, colDarkV, colDeep, UDim2.fromScale(0.18, 0.3), 0.4)
+	makeOrb(isMobile and 0.42 or 0.32, colAsh, colPurple, UDim2.fromScale(0.82, 0.65), 0.32)
+	makeOrb(isMobile and 0.3 or 0.24, colMid, colViolet, UDim2.fromScale(0.55, 0.15), 0.5)
 
 	local grid = Instance.new("Frame")
 	grid.Size = UDim2.fromScale(1, 1)
@@ -643,12 +644,12 @@ function showVoidzSplash(device, onDone)
 	local beamG = Instance.new(_Vzd({122,110,108,151,134,137,142,138,147,153}))
 	beamG.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, colDeep),
-		ColorSequenceKeypoint.new(0.5, colRed),
+		ColorSequenceKeypoint.new(0.5, colViolet),
 		ColorSequenceKeypoint.new(1, colDeep),
 	})
 	beamG.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
-		NumberSequenceKeypoint.new(0.5, 0.55),
+		NumberSequenceKeypoint.new(0.5, 0.5),
 		NumberSequenceKeypoint.new(1, 1),
 	})
 	beamG.Rotation = 90
@@ -668,7 +669,7 @@ function showVoidzSplash(device, onDone)
 	glow.Size = UDim2.fromOffset(isMobile and 240 or 300, isMobile and 70 or 88)
 	glow.BackgroundColor3 = Color3.new(1, 1, 1)
 	glow.BorderSizePixel = 0
-	glow.BackgroundTransparency = 0.82
+	glow.BackgroundTransparency = 0.8
 	glow.ZIndex = 10
 	glow.Parent = center
 	local glowC = Instance.new("UICorner")
@@ -677,7 +678,7 @@ function showVoidzSplash(device, onDone)
 	local glowGrad = Instance.new("UIGradient")
 	glowGrad.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, colDeep),
-		ColorSequenceKeypoint.new(0.5, colRed),
+		ColorSequenceKeypoint.new(0.5, colPurple),
 		ColorSequenceKeypoint.new(1, colDeep),
 	})
 	glowGrad.Parent = glow
@@ -697,9 +698,9 @@ function showVoidzSplash(device, onDone)
 	local brandGrad = Instance.new("UIGradient")
 	brandGrad.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, colWhite),
-		ColorSequenceKeypoint.new(0.55, colWhite),
-		ColorSequenceKeypoint.new(0.85, Color3.fromRGB(200, 200, 200)),
-		ColorSequenceKeypoint.new(1, colRed),
+		ColorSequenceKeypoint.new(0.5, colWhite),
+		ColorSequenceKeypoint.new(0.85, colViolet),
+		ColorSequenceKeypoint.new(1, colPurple),
 	})
 	brandGrad.Rotation = 0
 	brandGrad.Parent = brand
@@ -741,8 +742,8 @@ function showVoidzSplash(device, onDone)
 	local barGrad = Instance.new("UIGradient")
 	barGrad.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, colWhite),
-		ColorSequenceKeypoint.new(0.7, colWhite),
-		ColorSequenceKeypoint.new(1, colRed),
+		ColorSequenceKeypoint.new(0.55, colViolet),
+		ColorSequenceKeypoint.new(1, colPurple),
 	})
 	barGrad.Parent = barFill
 
@@ -777,9 +778,9 @@ function showVoidzSplash(device, onDone)
 		local b = Instance.new("Frame")
 		b.Size = UDim2.new(0, 2, 1, 0)
 		b.Position = UDim2.new(flipX and 1 or 0, flipX and -2 or 0, 0, 0)
-		b.BackgroundColor3 = colRed
+		b.BackgroundColor3 = colViolet
 		b.BorderSizePixel = 0
-		b.BackgroundTransparency = 0.2
+		b.BackgroundTransparency = 0.15
 		b.Parent = m
 	end
 	cornerMark(0, 0, false, false)
@@ -794,7 +795,7 @@ function showVoidzSplash(device, onDone)
 			s.AnchorPoint = Vector2.new(0.5, 0.5)
 			s.Size = UDim2.fromOffset(math.random(1, 3), math.random(1, 3))
 			s.Position = UDim2.fromScale(math.random(), math.random())
-			s.BackgroundColor3 = ({ colWhite, colRed, colDim, colAsh })[math.random(1, 4)]
+			s.BackgroundColor3 = ({ colWhite, colViolet, colDim, colPurple })[math.random(1, 4)]
 			s.BorderSizePixel = 0
 			s.BackgroundTransparency = 0.25
 			s.ZIndex = 6
@@ -19435,16 +19436,17 @@ local function showImmediateKeyUI()
 	local old = parent:FindFirstChild("VOIDZ_KEY")
 	if old then pcall(function() old:Destroy() end) end
 
-	-- Opium key card: black / ash / blood / white
-	local colDeep = Color3.fromRGB(0, 0, 0)
-	local colCard = Color3.fromRGB(12, 12, 12)
-	local colCard2 = Color3.fromRGB(22, 22, 22)
-	local colRed = Color3.fromRGB(160, 20, 30)
-	local colBlood = Color3.fromRGB(100, 10, 16)
-	local colText = Color3.fromRGB(245, 245, 245)
-	local colMuted = Color3.fromRGB(120, 120, 120)
-	local colOk = Color3.fromRGB(200, 200, 200)
-	local colBad = Color3.fromRGB(200, 50, 60)
+	-- Purple key card: black + deep violet (fav color, still serious)
+	local colDeep = Color3.fromRGB(4, 2, 10)
+	local colCard = Color3.fromRGB(12, 8, 22)
+	local colCard2 = Color3.fromRGB(20, 12, 36)
+	local colPurple = Color3.fromRGB(120, 40, 220)
+	local colViolet = Color3.fromRGB(155, 70, 255)
+	local colDarkV = Color3.fromRGB(70, 25, 140)
+	local colText = Color3.fromRGB(245, 240, 255)
+	local colMuted = Color3.fromRGB(140, 120, 170)
+	local colOk = Color3.fromRGB(160, 255, 190)
+	local colBad = Color3.fromRGB(255, 120, 150)
 
 	local sg = Instance.new("ScreenGui")
 	sg.Name = "VOIDZ_KEY"
@@ -19461,21 +19463,21 @@ local function showImmediateKeyUI()
 	dim.BackgroundTransparency = 1
 	dim.BorderSizePixel = 0
 	dim.Parent = sg
-	tween(dim, { BackgroundTransparency = 0.28 }, 0.35)
+	tween(dim, { BackgroundTransparency = 0.3 }, 0.35)
 
 	local wash = Instance.new("Frame")
 	wash.Size = UDim2.fromScale(1.2, 1.2)
 	wash.AnchorPoint = Vector2.new(0.5, 0.5)
 	wash.Position = UDim2.fromScale(0.5, 0.5)
 	wash.BackgroundColor3 = Color3.new(1, 1, 1)
-	wash.BackgroundTransparency = 0.7
+	wash.BackgroundTransparency = 0.65
 	wash.BorderSizePixel = 0
 	wash.Parent = dim
 	local washG = Instance.new("UIGradient")
 	washG.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, colDeep),
-		ColorSequenceKeypoint.new(0.45, colBlood),
-		ColorSequenceKeypoint.new(0.75, colCard2),
+		ColorSequenceKeypoint.new(0.4, colDarkV),
+		ColorSequenceKeypoint.new(0.7, colPurple),
 		ColorSequenceKeypoint.new(1, colDeep),
 	})
 	washG.Transparency = NumberSequence.new({
@@ -19504,9 +19506,9 @@ local function showImmediateKeyUI()
 	cc.CornerRadius = UDim.new(0, 10)
 	cc.Parent = card
 	local cardStroke = Instance.new("UIStroke")
-	cardStroke.Color = Color3.fromRGB(55, 55, 55)
+	cardStroke.Color = colPurple
 	cardStroke.Thickness = 1.4
-	cardStroke.Transparency = 0.1
+	cardStroke.Transparency = 0.25
 	cardStroke.Parent = card
 	local cardGrad = Instance.new("UIGradient")
 	cardGrad.Color = ColorSequence.new(colCard2, colDeep)
@@ -19520,9 +19522,9 @@ local function showImmediateKeyUI()
 	topBar.Parent = card
 	local topG = Instance.new("UIGradient")
 	topG.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, colText),
-		ColorSequenceKeypoint.new(0.65, colText),
-		ColorSequenceKeypoint.new(1, colRed),
+		ColorSequenceKeypoint.new(0, colViolet),
+		ColorSequenceKeypoint.new(0.5, colPurple),
+		ColorSequenceKeypoint.new(1, colDarkV),
 	})
 	topG.Parent = topBar
 
@@ -19536,7 +19538,7 @@ local function showImmediateKeyUI()
 	badgeC.CornerRadius = UDim.new(0, 6)
 	badgeC.Parent = badge
 	local badgeStroke = Instance.new("UIStroke")
-	badgeStroke.Color = colRed
+	badgeStroke.Color = colViolet
 	badgeStroke.Thickness = 1.2
 	badgeStroke.Parent = badge
 	local badgeTx = Instance.new("TextLabel")
@@ -19573,8 +19575,8 @@ local function showImmediateKeyUI()
 	local divider = Instance.new("Frame")
 	divider.Size = UDim2.new(1, -44, 0, 1)
 	divider.Position = UDim2.fromOffset(22, 78)
-	divider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-	divider.BackgroundTransparency = 0.2
+	divider.BackgroundColor3 = colPurple
+	divider.BackgroundTransparency = 0.55
 	divider.BorderSizePixel = 0
 	divider.Parent = card
 
@@ -19592,12 +19594,12 @@ local function showImmediateKeyUI()
 	local box = Instance.new("TextBox")
 	box.Size = UDim2.new(1, -44, 0, 44)
 	box.Position = UDim2.fromOffset(22, 114)
-	box.BackgroundColor3 = Color3.fromRGB(6, 6, 6)
+	box.BackgroundColor3 = Color3.fromRGB(8, 5, 16)
 	box.BorderSizePixel = 0
 	box.Font = Enum.Font.GothamMedium
 	box.TextSize = 15
 	box.TextColor3 = colText
-	box.PlaceholderColor3 = Color3.fromRGB(70, 70, 70)
+	box.PlaceholderColor3 = Color3.fromRGB(80, 65, 110)
 	box.PlaceholderText = "enter key..."
 	box.Text = ""
 	box.ClearTextOnFocus = false
@@ -19606,19 +19608,19 @@ local function showImmediateKeyUI()
 	bc.CornerRadius = UDim.new(0, 6)
 	bc.Parent = box
 	local boxStroke = Instance.new(_Vzd({122,110,120,153,151,148,144,138}))
-	boxStroke.Color = Color3.fromRGB(55, 55, 55)
+	boxStroke.Color = Color3.fromRGB(70, 40, 120)
 	boxStroke.Thickness = 1.1
-	boxStroke.Transparency = 0.2
+	boxStroke.Transparency = 0.25
 	boxStroke.Parent = box
 	local boxPad = Instance.new("UIPadding")
 	boxPad.PaddingLeft = UDim.new(0, 14)
 	boxPad.PaddingRight = UDim.new(0, 14)
 	boxPad.Parent = box
 	box.Focused:Connect(function()
-		tween(boxStroke, { Color = colRed, Transparency = 0.05, Thickness = 1.5 }, 0.15)
+		tween(boxStroke, { Color = colViolet, Transparency = 0.05, Thickness = 1.5 }, 0.15)
 	end)
 	box.FocusLost:Connect(function()
-		tween(boxStroke, { Color = Color3.fromRGB(55, 55, 55), Transparency = 0.2, Thickness = 1.1 }, 0.2)
+		tween(boxStroke, { Color = Color3.fromRGB(70, 40, 120), Transparency = 0.25, Thickness = 1.1 }, 0.2)
 	end)
 
 	local status = Instance.new("TextLabel")
@@ -19647,12 +19649,12 @@ local function showImmediateKeyUI()
 	uc.CornerRadius = UDim.new(0, 6)
 	uc.Parent = unlock
 	local unlockStroke = Instance.new("UIStroke")
-	unlockStroke.Color = colRed
+	unlockStroke.Color = colViolet
 	unlockStroke.Thickness = 1.4
 	unlockStroke.Transparency = 0.15
 	unlockStroke.Parent = unlock
 	unlock.MouseEnter:Connect(function()
-		tween(unlock, { BackgroundColor3 = colBlood }, 0.12)
+		tween(unlock, { BackgroundColor3 = colDarkV }, 0.12)
 		tween(unlockStroke, { Transparency = 0 }, 0.12)
 	end)
 	unlock.MouseLeave:Connect(function()
@@ -19666,7 +19668,7 @@ local function showImmediateKeyUI()
 	foot.Position = UDim2.fromOffset(22, 256)
 	foot.Font = Enum.Font.Code
 	foot.TextSize = 10
-	foot.TextColor3 = Color3.fromRGB(60, 60, 60)
+	foot.TextColor3 = Color3.fromRGB(70, 55, 100)
 	foot.TextXAlignment = Enum.TextXAlignment.Left
 	foot.Text = "build " .. tostring(BUILD)
 	foot.Parent = card
@@ -19863,6 +19865,6 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.31 | 2026-07-28
+-- VOIDZ HUB | v1.2.32 | 2026-07-28
 
 -- hi im voidz

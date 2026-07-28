@@ -49,7 +49,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,93,86})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,93,87})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -7243,7 +7243,7 @@ do local _z485=(8*6); if _z485<0 and _Vj() then _z485=_z485+1 end end
 function stopWarMode()
 	S.toggles.warMode = false
 	stopLoop("warProtect")
-	notify(HUB_NAME, _Vzd({124,102,119,69,114,116,105,106,69,116,107,107,69,161,69,153,158,149,138,69,84,156,134,151,82,146,148,137,138,69,153,148,69,151,138,82,134,151,146}), 1.5)
+	notify(HUB_NAME, _Vzd({124,102,119,69,114,116,105,106,69,116,107,107,69,161,69,84,156,134,151,82,146,148,137,138,69,153,148,69,151,138,82,134,151,146}), 1.5)
 	print("[VOIDZ] WAR MODE off")
 end
 
@@ -17471,7 +17471,7 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 		section(sc, "WAR", n())
 		makeToggle(sc, {
 			order = n(), id = "warMode", title = _Vzd({124,102,119,69,114,116,105,106,69,77,107,106,69,114,102,125,78}),
-			tip = "Chat: /war-mode | FE remotes only: Struggle spam, DestroyGrabLine, StopAllVelocity, Ragdoll clear, SNO self, house escape. Not client god.",
+			tip = "Chat: /war-mode ON | /unwar-mode OFF | FE remotes: Struggle, DestroyGrabLine, StopAllVelocity, SNO, house escape.",
 			danger = true,
 			callback = function(on)
 				if on then startWarMode() else stopWarMode() end
@@ -23504,6 +23504,6 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.81 | 2026-07-28
+-- VOIDZ HUB | v1.2.82 | 2026-07-28
 
 -- hi im voidz

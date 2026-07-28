@@ -1,5 +1,11 @@
 
 
+-- Safety wrapper for executor compatibility (MacSploit, Opiumware, Synapse, Fluxus, etc.)
+local safeGetGen = function() return getgenv and getgenv() or _G end
+local queue_teleport = (queue_on_teleport or (syn and syn.queue_on_teleport) or (fluxus and fluxus.queue_on_teleport) or (macsploit and macsploit.queue_on_teleport) or function() end)
+local protect_gui_fn = (protect_gui or (syn and syn.protect_gui) or (macsploit and macsploit.protect_gui) or function() end)
+local get_hui = (gethui or function() end)
+
 if getgenv and getgenv().VOIDZ_LOADED then
 	pcall(function() if getgenv().VOIDZ_UNLOAD then getgenv().VOIDZ_UNLOAD() end end)
 end
@@ -10348,12 +10354,7 @@ local function doVoidzRejoin(reason)
 		local jobId = game.JobId
 		-- Queue rejoin FIRST so even if we self-kick, teleport is pending
 		pcall(function()
-			if queue_on_teleport then
-				queue_on_teleport("print('[VOIDZ] anti-kick rejoin')")
-			end
-			if syn and syn.queue_on_teleport then
-				syn.queue_on_teleport("print('[VOIDZ] anti-kick rejoin')")
-			end
+			queue_teleport("print('[VOIDZ] anti-kick rejoin')")
 		end)
 		-- Teleport same server ASAP (beat game AC kick)
 		local tries = {

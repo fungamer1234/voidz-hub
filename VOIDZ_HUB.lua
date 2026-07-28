@@ -6,10 +6,10 @@ local queue_teleport = (queue_on_teleport or (syn and syn.queue_on_teleport) or 
 local protect_gui_fn = (protect_gui or (syn and syn.protect_gui) or (macsploit and macsploit.protect_gui) or function() end)
 local get_hui = (gethui or function() end)
 
-if getgenv and getgenv().VOIDZ_LOADED then
+if getgenv and type(getgenv) == "function" and getgenv().VOIDZ_LOADED then
 	pcall(function() if getgenv().VOIDZ_UNLOAD then getgenv().VOIDZ_UNLOAD() end end)
 end
-if getgenv then getgenv().VOIDZ_LOADED = true end
+if getgenv and type(getgenv) == "function" then getgenv().VOIDZ_LOADED = true end
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -31,7 +31,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = "TESTRUN"
 local HUB_NAME = "VOIDZ HUB"
-local BUILD = "2026-07-27-1.2.0"
+local BUILD = "2026-07-28-1.2.1"
 local GuiService = game:GetService("GuiService")
 
 -- 6 themes (Purple = classic VOIDZ)
@@ -491,7 +491,7 @@ function voidzChatSpam(msg)
 end
 
 function getUiParent()
-	local ok, h = pcall(function() if gethui then return gethui() end end)
+	local ok, h = pcall(function() if gethui and type(gethui) == "function" then return gethui() end end)
 	if ok and h then return h end
 	local ok2 = pcall(function() local t=Instance.new("Folder"); t.Parent=CoreGui; t:Destroy() end)
 	if ok2 then return CoreGui end
@@ -10227,7 +10227,7 @@ end
 -- Strict phrases only — ignores hub buttons / other players' kicks
 ------------------------------------------------------------------------
 local LogService = game:GetService("LogService")
-local AK = (getgenv and getgenv().VOIDZ_ANTIKICK) or {}
+local AK = (getgenv and type(getgenv) == "function" and getgenv().VOIDZ_ANTIKICK) or {}
 if getgenv then getgenv().VOIDZ_ANTIKICK = AK end
 -- reset on every inject so old hooks cannot instant-rejoin
 AK.enabled = false
@@ -10403,7 +10403,7 @@ end
 
 local function installNamecallKickHook()
 	if not hookmetamethod or not getnamecallmethod then return false end
-	if getgenv and getgenv().VOIDZ_AK_HOOKED then return true end
+	if getgenv and type(getgenv) == "function" and getgenv().VOIDZ_AK_HOOKED then return true end
 	local ok = pcall(function()
 		local old
 		old = hookmetamethod(game, "__namecall", function(self, ...)
@@ -10428,7 +10428,7 @@ local function installNamecallKickHook()
 			end
 			return old(self, ...)
 		end)
-		if getgenv then getgenv().VOIDZ_AK_HOOKED = true end
+		if getgenv and type(getgenv) == "function" then getgenv().VOIDZ_AK_HOOKED = true end
 	end)
 	return ok
 end
@@ -10593,7 +10593,7 @@ end)()
 local function unload()
 	-- hard-disable anti-kick so stacked hooks from prior injects never rejoin
 	pcall(function()
-		local ak = getgenv and getgenv().VOIDZ_ANTIKICK
+		local ak = getgenv and type(getgenv) == "function" and getgenv().VOIDZ_ANTIKICK
 		if ak then
 			ak.enabled = false
 			ak.readyAt = math.huge
@@ -10639,10 +10639,10 @@ local function unload()
 			RunService.RenderStepped:Wait()
 		end
 	end)
-	if getgenv then getgenv().VOIDZ_LOADED = nil; getgenv().VOIDZ_UNLOAD = nil end
+	if getgenv and type(getgenv) == "function" then getgenv().VOIDZ_LOADED = nil; getgenv().VOIDZ_UNLOAD = nil end
 	print("[VOIDZ] unloaded")
 end
-if getgenv then getgenv().VOIDZ_UNLOAD = unload end
+if getgenv and type(getgenv) == "function" then getgenv().VOIDZ_UNLOAD = unload end
 
 ------------------------------------------------------------------------
 -- UI nested scope (Luau max 200 locals per function — UI was pushing past limit)
@@ -12655,7 +12655,7 @@ _TAB_BUILDERS["grab"] = function(sc, n)
 end
 _TAB_BUILDERS["anti"] = function(sc, n)
 		section(sc, "PROTECT ME", n())
-		S.toggles.antiKick = (getgenv and getgenv().VOIDZ_ANTIKICK and getgenv().VOIDZ_ANTIKICK.enabled) == true
+		S.toggles.antiKick = (getgenv and type(getgenv) == "function" and getgenv().VOIDZ_ANTIKICK and getgenv().VOIDZ_ANTIKICK.enabled) == true
 		makeToggle(sc, {
 			order = n(), id = "antiKick", title = "Rejoin If Kicked",
 			tip = "Detect kick early → self-kick + rejoin BEFORE game AC finishes",
@@ -14149,7 +14149,7 @@ _TAB_BUILDERS["auto"] = function(sc, n)
 				task.wait(1); spawnToy("PalletLightBrown")
 			end) end
 		end })
-		S.toggles.autoRejoin = (getgenv and getgenv().VOIDZ_ANTIKICK and getgenv().VOIDZ_ANTIKICK.enabled) == true
+		S.toggles.autoRejoin = (getgenv and type(getgenv) == "function" and getgenv().VOIDZ_ANTIKICK and getgenv().VOIDZ_ANTIKICK.enabled) == true
 		makeToggle(sc, {
 			order = n(), id = "autoRejoin", title = "Auto Rejoin if Kicked",
 			tip = "Same as Anti → Anti-Kick (console + Roblox kick UI scan)",
@@ -18428,4 +18428,4 @@ task.spawn(Late.installGrabWatch)
 task.spawn(Late.installAntis)
 Late.buildKey()
 
--- hello everyone this is voidz enjoy the script v1.2.0
+-- hello everyone this is voidz enjoy the script v1.2.1

@@ -1,6 +1,5 @@
 
 
--- Safety wrapper for executor compatibility (MacSploit, Opiumware, Synapse, Fluxus, etc.)
 local safeGetGen = function() return getgenv and getgenv() or _G end
 local queue_teleport = (queue_on_teleport or (syn and syn.queue_on_teleport) or (fluxus and fluxus.queue_on_teleport) or (macsploit and macsploit.queue_on_teleport) or function() end)
 local protect_gui_fn = (protect_gui or (syn and syn.protect_gui) or (macsploit and macsploit.protect_gui) or function() end)
@@ -31,10 +30,9 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = "TESTRUN"
 local HUB_NAME = "VOIDZ HUB"
-local BUILD = "2026-07-28-1.2.15"
+local BUILD = "2026-07-28-1.2.16"
 local GuiService = game:GetService("GuiService")
 
--- 6 themes (Purple = classic VOIDZ)
 local THEMES = {
 	Purple = {
 		bg = Color3.fromRGB(7, 5, 12), bg2 = Color3.fromRGB(12, 8, 20),
@@ -115,13 +113,13 @@ local S = {
 	toggles = {},
 	conns = {},
 	loops = {},
-	loopGen = {}, -- prevents an old task from coming back alive after a quick off/on toggle
+	loopGen = {},
 	auraCfg = {},
 	whitelist = {},
 	selected = nil,
 	loopTarget = nil,
-	loopTargets = {}, -- multi-select: {Player = true}
-	loopNames = {}, -- track target names for rejoin re-acquire
+	loopTargets = {},
+	loopNames = {},
 	_toggleRenderers = {},
 	flingPower = 8000,
 	auraRange = 50,
@@ -176,7 +174,6 @@ local S = {
 	escapeSpace = false,
 }
 
--- default aura config factory
 function auraDefaults()
 	return { target = "Players", range = 50, power = 2500 }
 end
@@ -184,7 +181,6 @@ function getAura(id)
 	if not S.auraCfg[id] then S.auraCfg[id] = auraDefaults() end
 	local cfg = S.auraCfg[id]
 	cfg._id = id
-	-- live global sliders unless per-aura ⚙ customized
 	if not cfg._customRange then
 		cfg.range = tonumber(S.auraRange) or cfg.range or 50
 	end
@@ -194,8 +190,6 @@ function getAura(id)
 	return cfg
 end
 
-------------------------------------------------------------------------
--- Tiny utils
 function bind(id, conn)
 	if S.conns[id] then pcall(function() S.conns[id]:Disconnect() end) end
 	S.conns[id] = conn
@@ -209,7 +203,6 @@ function startLoop(id, waitTime, fn)
 	local generation = (S.loopGen[id] or 0) + 1
 	S.loopGen[id] = generation
 	S.loops[id] = true
-	-- never run hotter than ~30fps for background loops (lag fix)
 	local waitSec = math.max(tonumber(waitTime) or 0.1, 0.05)
 	task.spawn(function()
 		while S.loops[id] and S.loopGen[id] == generation do
@@ -253,7 +246,6 @@ function refreshThemeVisuals()
 	local newName = S.theme or "Purple"
 	local oldT = THEMES[oldName] or THEMES.Purple
 	local newT = THEMES[newName] or THEMES.Purple
-	-- build old→new pairs by RGB component comparison (Color3 can't be table keys in Luau)
 	local rgbPairs = {}
 	for k, oldC in pairs(oldT) do
 		if typeof(oldC) == "Color3" and typeof(newT[k]) == "Color3" then
@@ -310,7 +302,6 @@ function applyTheme(name)
 	pcall(function() notify(HUB_NAME, "Theme · " .. name, 1.5) end)
 end
 
--- Fancy option detail panel (description + optional sliders)
 function openOptionPanel(opts)
 	opts = opts or {}
 	if not S.gui then return end
@@ -452,7 +443,6 @@ function notify(title, text, dur)
 	end
 end
 
--- Public chat only for anti-kick rejoin notice (user-requested)
 function voidzChat(msg)
 	msg = tostring(msg or "")
 	if msg == "" then return end
@@ -474,19 +464,15 @@ function voidzChat(msg)
 	end)
 	pcall(function()
 		if LP.Character then
-			-- legacy fallback some games still use
 			game:GetService("Players"):Chat(msg)
 		end
 	end)
 end
 
--- Spam version: wraps trigger word in invisible chars so chat appears blank
--- but game still detects the trigger word and plays the sound
-local INV = "\u{3164}" -- Hangul Filler (invisible, works on Roblox)
+local INV = "\u{3164}"
 function voidzChatSpam(msg)
 	msg = tostring(msg or "")
 	if msg == "" then return end
-	-- wrap: invisible + trigger + invisible = blank chat, sound still fires
 	voidzChat(INV .. msg .. INV)
 end
 
@@ -498,9 +484,6 @@ function getUiParent()
 	return LP:WaitForChild("PlayerGui")
 end
 
-------------------------------------------------------------------------
--- Animated gradient splash (boot + post-key). Not a flat purple box.
-------------------------------------------------------------------------
 function showVoidzSplash(device, onDone)
 	device = device or S.device or "PC"
 	local isMobile = device == "Mobile"
@@ -533,7 +516,6 @@ function showVoidzSplash(device, onDone)
 	root.Parent = splash
 	tween(root, { BackgroundTransparency = 0 }, 0.28)
 
-	-- animated multi-stop gradient wash
 	local wash = Instance.new("Frame")
 	wash.Size = UDim2.fromScale(1.4, 1.4)
 	wash.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -558,7 +540,6 @@ function showVoidzSplash(device, onDone)
 	washG.Rotation = 25
 	washG.Parent = wash
 
-	-- soft floating orbs
 	local function makeOrb(scale, c1, c2, pos, drift)
 		local orb = Instance.new("Frame")
 		orb.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -593,7 +574,6 @@ function showVoidzSplash(device, onDone)
 	makeOrb(isMobile and 0.48 or 0.38, colCyan, colViolet, UDim2.fromScale(0.78, 0.62), 0.42)
 	makeOrb(isMobile and 0.35 or 0.28, colPink, colCyan, UDim2.fromScale(0.55, 0.18), 0.7)
 
-	-- perspective grid (diagonal lines)
 	local grid = Instance.new("Frame")
 	grid.Size = UDim2.fromScale(1, 1)
 	grid.BackgroundTransparency = 1
@@ -622,7 +602,6 @@ function showVoidzSplash(device, onDone)
 		h.Parent = grid
 	end
 
-	-- scan beam
 	local beam = Instance.new("Frame")
 	beam.Size = UDim2.new(0.35, 0, 1.4, 0)
 	beam.Position = UDim2.new(-0.4, 0, -0.2, 0)
@@ -646,7 +625,6 @@ function showVoidzSplash(device, onDone)
 	beamG.Rotation = 90
 	beamG.Parent = beam
 
-	-- center stack
 	local center = Instance.new("Frame")
 	center.AnchorPoint = Vector2.new(0.5, 0.5)
 	center.Position = UDim2.fromScale(0.5, 0.46)
@@ -655,7 +633,6 @@ function showVoidzSplash(device, onDone)
 	center.ZIndex = 10
 	center.Parent = root
 
-	-- glow plate behind title
 	local glow = Instance.new("Frame")
 	glow.AnchorPoint = Vector2.new(0.5, 0.5)
 	glow.Position = UDim2.fromScale(0.5, 0.38)
@@ -753,7 +730,6 @@ function showVoidzSplash(device, onDone)
 	tag.ZIndex = 12
 	tag.Parent = center
 
-	-- corner accents
 	local function cornerMark(ax, ay, flipX, flipY)
 		local m = Instance.new("Frame")
 		m.AnchorPoint = Vector2.new(ax, ay)
@@ -782,7 +758,6 @@ function showVoidzSplash(device, onDone)
 	cornerMark(0, 1, false, true)
 	cornerMark(1, 1, true, true)
 
-	-- spark particles
 	task.spawn(function()
 		for _ = 1, (isMobile and 10 or 16) do
 			if not splash.Parent then break end
@@ -807,7 +782,6 @@ function showVoidzSplash(device, onDone)
 		end
 	end)
 
-	-- animate in
 	tween(brand, { TextTransparency = 0 }, 0.5)
 	tween(sub, { TextTransparency = 0 }, 0.55)
 	tween(tag, { TextTransparency = 0 }, 0.6)
@@ -889,10 +863,9 @@ function isWL(p)
 	if not p then return false end
 	if S.toggles.wlFriends and isFriend(p) then return true end
 	if S.whitelist[p.Name] == true then return true end
-	if p.UserId == 1868085023 then return true end -- VOIDZ creator protection
+	if p.UserId == 1868085023 then return true end
 	return false
 end
--- Works on plot players too (still valid targets; combat gates handle houses)
 function validP(p)
 	if not p or p == LP or isWL(p) then return false end
 	local c = p.Character
@@ -900,20 +873,16 @@ function validP(p)
 	local h = c:FindFirstChildOfClass("Humanoid")
 	local r = rootOf(p)
 	if not h or not r then return false end
-	-- allow low health / ragdolled / InPlot — still valid targets
 	return h.Health > 0 or (h:FindFirstChild("Ragdolled") ~= nil)
 end
 
--- Returns a list of all active loop targets (multi-select or single)
 function getLoopTargets()
 	local out = {}
-	-- clean stale entries and re-acquire by name if player rejoined
 	if next(S.loopTargets) then
 		for p in pairs(S.loopTargets) do
 			if p and p.Parent then
 				out[#out + 1] = p
 			elseif S.loopNames[p.Name] then
-				-- player left — try re-acquire by name immediately
 				local fresh = Players:FindFirstChild(p.Name)
 				if fresh and fresh.Parent then
 					S.loopTargets[fresh] = true
@@ -927,7 +896,6 @@ function getLoopTargets()
 	elseif S.loopTarget and S.loopTarget.Parent then
 		out[1] = S.loopTarget
 	elseif S.loopName then
-		-- single target left — try re-acquire
 		local fresh = Players:FindFirstChild(S.loopName)
 		if fresh and fresh.Parent then
 			S.loopTarget = fresh
@@ -938,10 +906,8 @@ function getLoopTargets()
 	return out
 end
 
--- Toggle a player in/out of multi-loop selection
 function toggleLoopTarget(p)
 	if not p then return end
-	-- resolve by name so stale Player objects from prior sessions are handled
 	local fresh = Players:FindFirstChild(p.Name) or p
 	if S.loopTargets[fresh] then
 		S.loopTargets[fresh] = nil
@@ -951,7 +917,6 @@ function toggleLoopTarget(p)
 			S.loopName = nil
 		end
 	else
-		-- remove any stale entry with same name first
 		for old in pairs(S.loopTargets) do
 			if old.Name == fresh.Name then S.loopTargets[old] = nil end
 		end
@@ -962,13 +927,11 @@ function toggleLoopTarget(p)
 	end
 end
 
--- Auto re-acquire loop targets when they rejoin the server
 Players.PlayerAdded:Connect(function(p)
 	if not S.loopNames or not S.loopNames[p.Name] then return end
-	task.wait(0.5) -- wait for character to load
+	task.wait(0.5)
 	local fresh = Players:FindFirstChild(p.Name)
 	if not fresh or not fresh.Parent then return end
-	-- replace stale refs in loopTargets
 	for old, v in pairs(S.loopTargets) do
 		if v and old.Name == fresh.Name and old ~= fresh then
 			S.loopTargets[old] = nil
@@ -981,7 +944,6 @@ Players.PlayerAdded:Connect(function(p)
 	notify(HUB_NAME, playerLabel(fresh) .. " rejoined — loop re-acquired!", 2)
 end)
 
--- House / plot detection (FTAP: Player.InPlot + PlotItems.PlayersInPlots)
 S.toggles.plotAmbush = S.toggles.plotAmbush ~= false
 S.toggles.plotPullTry = S.toggles.plotPullTry ~= false
 S.toggles.auraMapWide = S.toggles.auraMapWide == true
@@ -1010,8 +972,6 @@ function isInSafePlot(p)
 	return false
 end
 
--- Default: skip players currently in a house (mass loops won't waste SNO)
--- includePlot / plotBypass still hit them when needed
 function allTargets(opts)
 	opts = opts or {}
 	local t = {}
@@ -1021,7 +981,6 @@ function allTargets(opts)
 			if opts.includePlot or plotBypass or not isInSafePlot(p) then
 				t[#t + 1] = p
 			elseif S.toggles.plotAmbush ~= false then
-				-- queue ambush for house campers (auto-grab + action on exit)
 				local prev = plotWatch[p.UserId]
 				if not prev or prev.kind == "grab" then
 					plotWatch[p.UserId] = {
@@ -1089,11 +1048,9 @@ function findPlayerFromLabel(label)
 	return findPlayer(label)
 end
 
--- Combat selected player (always resolve a real Player)
 function combatTarget()
 	local p = S.selected
 	if p and p.Parent and p:IsA("Player") and p ~= LP then return p end
-	-- nearest living player as last resort
 	local me = hrp()
 	if me then
 		local best, bd = nil, 1e9
@@ -1114,8 +1071,6 @@ function combatTarget()
 	return nil
 end
 
-------------------------------------------------------------------------
--- FTAP remotes
 local FTAP = {
 	ok = false,
 	CreateGrabLine = nil, DestroyGrabLine = nil, SetNetworkOwner = nil, ExtendGrabLine = nil,
@@ -1141,7 +1096,6 @@ function resolveFTAP()
 		end
 		local mt = ReplicatedStorage:FindFirstChild("MenuToys")
 		if not mt then
-			-- wait briefly once for toys (don't yield on every spawn)
 			pcall(function()
 				mt = ReplicatedStorage:WaitForChild("MenuToys", 0.5)
 			end)
@@ -1165,7 +1119,6 @@ function resolveFTAP()
 	return FTAP.ok
 end
 
--- Pre-warm remotes so first pallet clutch isn't delayed
 task.spawn(function()
 	for _ = 1, 30 do
 		if resolveFTAP() and FTAP.SpawnToy then break end
@@ -1173,8 +1126,6 @@ task.spawn(function()
 	end
 end)
 
-------------------------------------------------------------------------
--- Network ownership ( SNO) — the OP core
 function sno(part, fromPos)
 	if not part or not part:IsA("BasePart") then return false end
 	if not FTAP.SetNetworkOwner then return false end
@@ -1191,7 +1142,6 @@ function snoPlayer(p, fromPos)
 	local ok = false
 	local r = rootOf(p)
 	local origin = fromPos or (hrp() and hrp().Position) or (r and r.Position)
-	-- priority parts first (faster ownership on HRP/torso)
 	if r then
 		ok = sno(r, origin) or ok
 	end
@@ -1204,7 +1154,6 @@ function snoPlayer(p, fromPos)
 			ok = sno(part, origin) or ok
 		end
 	end
-	-- -style: grab line + SNO pairs stronger than SNO alone
 	if FTAP.CreateGrabLine and r then
 		pcall(function()
 			local t = p.Character:FindFirstChild("Torso") or p.Character:FindFirstChild("UpperTorso") or r
@@ -1214,7 +1163,6 @@ function snoPlayer(p, fromPos)
 	return ok
 end
 
--- Hard SNO without sitting/freezing: rapid ownership from current pos + optional freecam TP
 function snoPlayerHard(p, opts)
 	opts = opts or {}
 	if not p or not p.Character then return false end
@@ -1237,7 +1185,6 @@ function snoPlayerHard(p, opts)
 end
 
 function hasNetOwner(part)
-	-- best-effort: PartOwner value or attribute
 	local m = part:FindFirstAncestorOfClass("Model") or part.Parent
 	if not m then return false end
 	local po = m:FindFirstChild("PartOwner", true) or part:FindFirstChild("PartOwner")
@@ -1254,7 +1201,6 @@ function applyVel(part, power, up)
 	if not part then return end
 	power = power or S.flingPower or 5000
 	up = up == nil and 0.5 or up
-	-- fling: camera look * strength (Y bias 0.5)
 	local cam = workspace.CurrentCamera
 	local look = cam and cam.CFrame.LookVector or Vector3.new(0, 0, -1)
 	local dir = Vector3.new(look.X, up, look.Z)
@@ -1280,7 +1226,6 @@ function skyVel(part)
 	pcall(function()
 		local old = part:FindFirstChild("SkyVelocity")
 		if old then
-			-- CreateSkyVelocity: Y = 1e14, permanent
 			old.Velocity = Vector3.new(0, 1e14, 0)
 			old.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
 			return
@@ -1290,15 +1235,12 @@ function skyVel(part)
 		bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
 		bv.Velocity = Vector3.new(0, 1e14, 0)
 		bv.Parent = part
-		-- permanent — do NOT Debris
 	end)
 	pcall(function()
 		part.AssemblyLinearVelocity = Vector3.new(0, 1e5, 0)
 	end)
 end
 
--- CreateKickPhysical: KickAuraP (BodyPosition) + KickAuraP1 (BodyVelocity)
--- modes: Silent | Float | Sky Anchor (OP kick hold after ownership)
 function createKickPhysical(part, mode)
 	if not part or not part.Parent then return end
 	mode = mode or "Sky Anchor"
@@ -1319,7 +1261,6 @@ function createKickPhysical(part, mode)
 			bv.Velocity = Vector3.new(0, 400, 0)
 			bv.Parent = part
 		end
-		-- apply mode once (loop in refreshes; one-shot is enough with SkyVelocity)
 		local zero = Vector3.zero
 		local skyForce = Vector3.new(0, 12500, 0)
 		local floatForce = Vector3.new(4000, 4000, 4000)
@@ -1340,7 +1281,7 @@ function createKickPhysical(part, mode)
 			bv.MaxForce = floatForce
 			bv.Velocity = Vector3.new(0, 400, 0)
 			bp.MaxForce = zero
-		else -- Sky Anchor ( OP / "Go to the heaven")
+		else
 			bp.MaxForce = floatForce
 			bp.Position = skyPos
 			bv.MaxForce = zero
@@ -1348,8 +1289,6 @@ function createKickPhysical(part, mode)
 	end)
 end
 
--- Strip BringBody / old fling so kill/void loops don't fight pull-back
--- NEVER remove SkyVelocity (that's the actual launch)
 function clearTargetMovers(partOrModel)
 	local roots = {}
 	if typeof(partOrModel) == "Instance" then
@@ -1374,7 +1313,6 @@ function clearTargetMovers(partOrModel)
 					or ch:IsA("BodyAngularVelocity") then
 					local n = ch.Name
 					if n == "SkyVelocity" then
-						-- keep launch
 					elseif n == "BringBody" or n == "VOIDZ_BV" or n == "FlingAuraVelocity"
 						or n == "KickAuraP" or n == "KickAuraP1" or n == "KickAuraVelocity"
 						or n == "FollowBP" or n == "FreezeBP" or n == "VOIDZ_ControlBV"
@@ -1400,7 +1338,6 @@ function isAliveP(p)
 	return true
 end
 
--- Stop "just sits down and drops" — force out of seats / sit pose before launch
 function forceUnsit(p)
 	local c = p and p.Character
 	if not c then return end
@@ -1411,12 +1348,10 @@ function forceUnsit(p)
 		h.PlatformStand = false
 		h.AutoRotate = true
 		if h.SeatPart then
-			-- leave vehicle/seat
 			h.Sit = false
 			h:ChangeState(Enum.HumanoidStateType.Jumping)
 			h.Jump = true
 		end
-		-- break sit-looking states
 		local st = h:GetState()
 		if st == Enum.HumanoidStateType.Seated
 			or st == Enum.HumanoidStateType.GettingUp
@@ -1427,9 +1362,7 @@ function forceUnsit(p)
 	end)
 end
 
--- Apply sky launch + optional fling; always unsit first
 function launchTarget(p, mode)
-	-- mode: "sky" | "fling" | "void"
 	forceUnsit(p)
 	local r = rootOf(p)
 	if not r then return end
@@ -1468,7 +1401,6 @@ function destroyGrabOn(part)
 	end
 end
 
--- CreateBringBody: keep BodyPosition forever (Debris was why people vanished after ~4s)
 function createBringBody(part, targetCF)
 	if not part then return end
 	local pos = typeof(targetCF) == "CFrame" and targetCF.Position or targetCF
@@ -1489,13 +1421,9 @@ function createBringBody(part, targetCF)
 		bp.D = 5000
 		bp.P = 1500000
 		bp.Parent = part
-		-- DO NOT Debris:AddItem — keeps BringBody until ownership is lost
 	end)
 end
 
-------------------------------------------------------------------------
--- Plot ambush engine (after SNO / BringBody exist)
--- Inside house: alert + try grab-line pull · on exit: auto-grab + queued action
 function plotAlert(p, msg)
 	if not p then return end
 	local now = tick()
@@ -1562,7 +1490,6 @@ function forceGrabOnExit(p)
 	return true
 end
 
--- true = run combat now · false = blocked / queued for exit
 function gatePlotAction(p, kind, entry)
 	if plotBypass or not p then return true end
 	if not isInSafePlot(p) then return true end
@@ -1580,7 +1507,6 @@ function gatePlotAction(p, kind, entry)
 		end
 	end
 	if S.toggles.plotAmbush ~= false then
-		-- queue (runPlotExitAmbush assigned below after combat fns)
 		if not entry.quiet then
 			plotAlert(p, playerLabel(p) .. " is in a house · waiting to grab on exit")
 		end
@@ -1646,12 +1572,10 @@ function ragdoll(p, hard)
 	if hard then visitForSNO(p, 20) else snoPlayer(p) end
 	r = rootOf(p)
 	if FTAP.RagdollRemote and r then
-		-- fire ragdoll instantly — 3 rapid bursts, no delay between
 		for _ = 1, 3 do
 			pcall(function() FTAP.RagdollRemote:FireServer(r, 0) end)
 		end
 		task.wait()
-		-- second burst after 1 frame
 		for _ = 1, 3 do
 			pcall(function() FTAP.RagdollRemote:FireServer(r, 0) end)
 		end
@@ -1665,7 +1589,6 @@ function ragdoll(p, hard)
 	end
 end
 
--- Instant ragdoll for grab — no visitForSNO, just fire immediately
 function ragdollInstant(p)
 	if not p or not validP(p) then return end
 	local r = rootOf(p)
@@ -1684,7 +1607,6 @@ function ragdollInstant(p)
 	end
 end
 
--- kill: blitzbr Death Aura style — SNO + DestroyGrabLine + SkyVelocity + state Dead
 function killPlayer(p, quiet)
 	if not p or not validP(p) then
 		if not quiet then notify(HUB_NAME, "No Kill Target Damn", 1.5) end
@@ -1734,7 +1656,6 @@ function killPlayer(p, quiet)
 	return true
 end
 
--- Void slam: own then hard down — never leave sitting
 function voidPlayer(p, quiet)
 	if not p or not validP(p) then
 		if not quiet then 		notify(HUB_NAME, "No Void Target LMAO", 1.5) end
@@ -1747,7 +1668,6 @@ function voidPlayer(p, quiet)
 	local home = hrp() and hrp().CFrame
 	forceUnsit(p)
 	surfaceForGrab()
-	-- visit to get ownership
 	for _ = 1, 3 do
 		visitForSNO(p, 15)
 		local r = rootOf(p)
@@ -1757,14 +1677,12 @@ function voidPlayer(p, quiet)
 	local r = rootOf(p)
 	if not r then return false end
 	clearTargetMovers(p.Character)
-	-- slam them down hard
 	for _ = 1, 20 do
 		r = rootOf(p)
 		if not r or not validP(p) then break end
 		forceUnsit(p)
 		snoPlayer(p, r.Position)
 		destroyGrabOn(r)
-		-- noclip all parts so they go through the floor
 		pcall(function()
 			local model = r:FindFirstAncestorOfClass("Model")
 			if model then
@@ -1775,13 +1693,11 @@ function voidPlayer(p, quiet)
 				end
 			end
 		end)
-		-- hard downward velocity
 		pcall(function()
 			r.AssemblyLinearVelocity = Vector3.new(0, -5000, 0)
 			r.AssemblyAngularVelocity = Vector3.zero
 			r.CFrame = CFrame.new(r.Position.X, math.min(r.Position.Y - 15, -30), r.Position.Z)
 		end)
-		-- BodyVelocity slam
 		local bv = r:FindFirstChild("VOIDZ_VoidBV")
 		if not bv then
 			bv = Instance.new("BodyVelocity")
@@ -1791,7 +1707,6 @@ function voidPlayer(p, quiet)
 		end
 		bv.Velocity = Vector3.new(0, -8000, 0)
 		Debris:AddItem(bv, 0.3)
-		-- kill state
 		pcall(function()
 			local h = p.Character and p.Character:FindFirstChildOfClass("Humanoid")
 			if h then
@@ -1801,7 +1716,6 @@ function voidPlayer(p, quiet)
 			end
 		end)
 		skyVel(r)
-		-- fix: skyVel pushes UP, we want DOWN — override immediately
 		pcall(function()
 			r.AssemblyLinearVelocity = Vector3.new(0, -5000, 0)
 			local sv = r:FindFirstChild("SkyVelocity")
@@ -1866,7 +1780,6 @@ function bringPlayer(p, destCF, quiet)
 	return true
 end
 
--- FreezeCam (CameraType.Follow + invisible part) — stays until mass toggle OFF
 local freezePart
 function ensureFreezePart()
 	if freezePart and freezePart.Parent then return freezePart end
@@ -1886,7 +1799,6 @@ function freezeCam(cf)
 	p.CFrame = typeof(cf) == "CFrame" and cf or CFrame.new(cf)
 	local cam = workspace.CurrentCamera
 	if cam then
-		-- uses Follow + subject = freezecampart (not Scriptable)
 		cam.CameraType = Enum.CameraType.Follow
 		cam.CameraSubject = p
 		pcall(function() cam.CFrame = p.CFrame end)
@@ -1907,7 +1819,6 @@ function teleportSelf(cf)
 	if me then pcall(function() me.CFrame = cf end) end
 end
 
--- Visit player for SNO (: TP near, FireServer within ~30 studs)
 function visitForSNO(p, tries)
 	tries = tries or 40
 	local r = rootOf(p)
@@ -1931,8 +1842,6 @@ function visitForSNO(p, tries)
 	return hasNetOwner(rootOf(p) or r)
 end
 
-------------------------------------------------------------------------
--- Control (SNO head + BodyVelocity + cam subject). = = look-at take / release.
 local controlState = {
 	model = nil,
 	conns = {},
@@ -1966,7 +1875,6 @@ function stopControl(quiet)
 	controlState.running = false
 	local model = controlState.model
 	clearControlConns()
-	-- Destroy BodyVelocity instances
 	if controlState.bv then
 		pcall(function() controlState.bv:Destroy() end)
 		controlState.bv = nil
@@ -2063,12 +1971,10 @@ function startControl(model)
 	end)
 	setControlQuery(model, false)
 
-	-- Try to set network ownership (blitzbr method)
 	if plr and SetNetworkOwner then
 		pcall(function() SetNetworkOwner:FireServer(tr, LP) end)
 	end
 
-	-- BodyVelocity on target: horizontal only (blitzbr-style)
 	local bv = Instance.new("BodyVelocity")
 	bv.MaxForce = Vector3.new(math.huge, 0, math.huge)
 	bv.Velocity = Vector3.new()
@@ -2076,7 +1982,6 @@ function startControl(model)
 	bv.Parent = tr
 	controlState.bv = bv
 
-	-- BodyVelocity on local player: vertical pin only
 	local bvMe = Instance.new("BodyVelocity")
 	bvMe.MaxForce = Vector3.new(0, math.huge, 0)
 	bvMe.Velocity = Vector3.new()
@@ -2084,7 +1989,6 @@ function startControl(model)
 	bvMe.Parent = me
 	controlState.bvMe = bvMe
 
-	-- Noclip local character
 	local noclipConn
 	noclipConn = RunService.Stepped:Connect(function()
 		if not controlState.running then return end
@@ -2099,7 +2003,6 @@ function startControl(model)
 	end)
 	controlState.conns.noclip = noclipConn
 
-	-- Camera follows target
 	local cam = workspace.CurrentCamera
 	if cam then
 		cam.CameraType = Enum.CameraType.Custom
@@ -2144,7 +2047,6 @@ function startControl(model)
 			end)
 			pcall(function()
 				th.AutoRotate = true
-				-- Pin local player below target
 				if bvMe and bvMe.Parent then
 					bvMe.Velocity = Vector3.new(0, 0, 0)
 					my.CFrame = CFrame.new(tr.Position + Vector3.new(0, -10, 0))
@@ -2187,7 +2089,6 @@ function nearestControlPlayer(maxDist)
 	return best
 end
 
--- head → camera look ray, then mouse, then aim cone
 function lookAtControlModel(maxDist)
 	maxDist = maxDist or 50
 	local c = char()
@@ -2220,7 +2121,6 @@ function lookAtControlModel(maxDist)
 		if m then return m, pl end
 	end
 
-	-- mouse.Target fallback (works when ray clips scenery first)
 	local mt = Mouse.Target
 	if mt then
 		local m, pl = accept(charModelFromPart(mt))
@@ -2232,7 +2132,6 @@ function lookAtControlModel(maxDist)
 		end
 	end
 
-	-- cone: whoever is most under the crosshair
 	local bestM, bestPl, bestScore = nil, nil, 0.88
 	for _, pl in ipairs(Players:GetPlayers()) do
 		if pl ~= LP and validP(pl) and not isWL(pl) and pl.Character then
@@ -2335,7 +2234,6 @@ function toggleControlBind()
 		stopControl()
 		return
 	end
-	-- look first, then dropdown pick
 	if controlBindLook(true) then return end
 	local p = S.controlPick or S.selected
 	if p and validP(p) and p.Character then
@@ -2386,7 +2284,6 @@ function installControlKeyC(on, quiet)
 			Enum.KeyCode.Equals
 		)
 	end)
-	-- backup if CAS is eaten by another script
 	S.conns.controlKeyC = UserInputService.InputBegan:Connect(function(input, gp)
 		if gp then return end
 		if input.KeyCode ~= Enum.KeyCode.Equals then return end
@@ -2404,9 +2301,7 @@ function installControlKeyK(on, quiet)
 	installControlKeyC(on, quiet)
 end
 
-------------------------------------------------------------------------
--- mass toggles: LOOP until OFF (not one-shot buttons)
-local MASS = {} -- name -> true while active
+local MASS = {}
 local massGen = 0
 
 function massActive(name)
@@ -2427,7 +2322,6 @@ function stopMass(name)
 	if not anyCam then unfreezeCam() end
 end
 
--- Campfire / banana / paint toy helpers ( Fire All / annoy toys)
 function findOwnedToy(nameSub)
 	nameSub = tostring(nameSub or ""):lower()
 	local folder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
@@ -2452,7 +2346,6 @@ function ensureToy(toyName)
 		if FTAP.BuyToy then FTAP.BuyToy:InvokeServer(toyName) end
 	end)
 	pcall(function()
-		-- spawn FAR from you so it never lands on your character
 		local me = hrp()
 		local cf = me and (me.CFrame * CFrame.new(0, 80, -20)) or CFrame.new(0, 200, 0)
 		if FTAP.SpawnToy then
@@ -2470,7 +2363,6 @@ function ensureToy(toyName)
 	return findOwnedToy(toyName)
 end
 
--- Park status toys in the sky so they never collide with / fling YOU
 function parkStatusToy(model, primary)
 	if not primary or not primary:IsA("BasePart") then return end
 	local park = Vector3.new(math.random(-40, 40), 420 + math.random(0, 40), math.random(-40, 40))
@@ -2498,7 +2390,7 @@ function parkStatusToy(model, primary)
 	end)
 end
 
-local statusToyCache = {} -- toyName -> { model, primary, tip }
+local statusToyCache = {}
 
 function getStatusToy(toyName)
 	local cached = statusToyCache[toyName]
@@ -2518,20 +2410,17 @@ function getStatusToy(toyName)
 	return model, primary, tip
 end
 
--- Touch a hurt-part onto TARGET only (never teleports / flings local player)
 function touchPartOnTarget(part, targetRoot, hold)
 	if not part or not targetRoot then return end
 	hold = hold or 0.08
 	pcall(function()
 		part.CanCollide = false
 		part.Size = Vector3.new(math.max(part.Size.X, 2), math.max(part.Size.Y, 2), math.max(part.Size.Z, 2))
-		-- SNO the hurt part only (not you)
 		sno(part, targetRoot.Position)
 		local dest = targetRoot.CFrame
 		part.CFrame = dest
 		part.AssemblyLinearVelocity = Vector3.zero
 		if firetouchinterest then
-			-- touch every basepart on the victim character if possible
 			local model = targetRoot:FindFirstAncestorOfClass("Model")
 			if model then
 				for _, limb in ipairs(model:GetChildren()) do
@@ -2566,7 +2455,6 @@ function touchToyPartToPlayer(toyName, targetRoot)
 	if not model or not primary then return end
 	tip = tip or primary
 	pcall(function()
-		-- keep body parked in sky; only flick the tip part onto them
 		if tip ~= primary then
 			local home = primary.Position
 			touchPartOnTarget(tip, targetRoot, 0.1)
@@ -2580,8 +2468,7 @@ function touchToyPartToPlayer(toyName, targetRoot)
 	end)
 end
 
--- poison: ONLY the three PoisonHurtPart tips — never the whole poison hole model
-local poisonHurtCache = nil -- { p1, p2, p3 }
+local poisonHurtCache = nil
 function getPoisonHurtParts()
 	if poisonHurtCache then
 		local ok = true
@@ -2608,7 +2495,6 @@ function getPoisonHurtParts()
 				list[#list + 1] = n
 			end
 		end
-		-- fallback: exact name only (never parent containers)
 		if #list == 0 then
 			for _, d in ipairs(map:GetDescendants()) do
 				if d.Name == "PoisonHurtPart" and d:IsA("BasePart") then
@@ -2618,7 +2504,6 @@ function getPoisonHurtParts()
 			end
 		end
 	end)
-	-- setup: small size, park under map
 	for _, hurt in ipairs(list) do
 		pcall(function()
 			hurt.Size = Vector3.new(2, 2, 2)
@@ -2630,7 +2515,6 @@ function getPoisonHurtParts()
 	return list
 end
 
--- Flick hurt tips onto head for one frame, then park at Y=-50 (exact )
 function applyMapPoison(targetRoot)
 	if not targetRoot then return end
 	local head = targetRoot
@@ -2654,7 +2538,6 @@ function applyMapPoison(targetRoot)
 	end
 end
 
--- Map paint (OuterUFO PaintPlayerPart)
 function applyMapPaint(targetRoot)
 	if not targetRoot then return end
 	local paint = nil
@@ -2686,33 +2569,22 @@ function applyMapPaint(targetRoot)
 	return false
 end
 
---[[
- Status loops: force fire / slip / poison / paint on TARGET only.
- NEVER visitForSNO / teleport local player (that was slamming you into the ground).
-]]
--- Blitzbr-style fire: SNO the FirePlayerPart, flick it to the target, snap back
 function firePlayerBlitz(p)
 	if not p or not validP(p) then return false end
 	local r = rootOf(p)
 	if not r then return false end
 	local me = hrp()
 	if not me then return false end
-	-- ensure campfire exists and is owned
 	local model, primary, tip = getStatusToy("Campfire")
 	if not model or not primary then return false end
 	tip = model:FindFirstChild("FirePlayerPart") or tip
 	if not tip or not tip:IsA("BasePart") then return false end
-	-- SNO the FirePlayerPart
 	sno(tip, r.Position)
 	sno(tip, me.Position)
-	-- make it big enough to touch
 	pcall(function() tip.Size = Vector3.new(3, 3, 3) end)
-	-- flick FirePlayerPart to target then back
 	pcall(function()
 		local homePos = primary.Position
-		-- park campfire high above you
 		primary.CFrame = CFrame.new(me.Position + Vector3.new(0, 500, 0))
-		-- move tip to target
 		tip.CFrame = r.CFrame
 		tip.AssemblyLinearVelocity = Vector3.zero
 		if firetouchinterest then
@@ -2737,7 +2609,6 @@ function firePlayerBlitz(p)
 		else
 			task.wait(0.08)
 		end
-		-- snap back
 		tip.CFrame = CFrame.new(homePos)
 		parkStatusToy(model, primary)
 	end)
@@ -2757,7 +2628,6 @@ function applyStatusToPlayer(kind, p)
 	local head = p.Character and (p.Character:FindFirstChild("Head") or r) or r
 
 	if kind == "fire" then
-		-- burn: only FirePlayerPart tip, not whole campfire model on them
 		local model, primary, tip = getStatusToy("Campfire")
 		if tip and tip:IsA("BasePart") then
 			pcall(function()
@@ -2783,7 +2653,6 @@ function applyStatusToPlayer(kind, p)
 		touchToyPartToPlayer("FoodBanana", r)
 		return true
 	elseif kind == "poison" then
-		-- map PoisonHurtPart only — never FoodPoison toy / whole hole
 		applyMapPoison(head)
 		return true
 	elseif kind == "paint" then
@@ -2806,14 +2675,12 @@ function setMassToggle(name, on, runner)
 		if not anyCam then unfreezeCam() end
 		return
 	end
-	-- bump gen so any previous loop for this name exits
 	massGen += 1
 	local gen = massGen
 	MASS[name] = true
 	MASS[name .. "_gen"] = gen
 	S.toggles["mass_" .. name] = true
 	syncToggleUI("mass_" .. name)
-	-- house campers get this action queued for plot-exit ambush
 	S._activeMassKind = (name == "fling" and "fling")
 		or (name == "kill" and "kill")
 		or (name == "kick" and "kick")
@@ -2837,7 +2704,6 @@ function setMassToggle(name, on, runner)
 			syncToggleUI("mass_" .. name)
 		end
 		if S._activeMassKind == name or S._activeMassKind == "fling" or S._activeMassKind == "kill" then
-			-- clear only if this gen still owns the kind
 			if not (MASS.fling or MASS.kill or MASS.kick or MASS.bring or MASS.ragdoll or MASS.fire or MASS.vomit) then
 				S._activeMassKind = nil
 			end
@@ -2847,11 +2713,9 @@ function setMassToggle(name, on, runner)
 	end)
 end
 
--- Bring All: freeze cam above home, loop ALL players forever until toggle OFF
 function massBringLoop(keep)
 	local me = hrp()
 	if not me then notify(HUB_NAME, "No character", 2); return end
-	-- save home ONCE at start (never re-read from hrp — teleporting invalidates it)
 	local home = me.CFrame
 	local homePos = home.Position
 	local overview = CFrame.lookAt(homePos + Vector3.new(-15, 22, 8), homePos)
@@ -2866,7 +2730,6 @@ function massBringLoop(keep)
 				local h = p.Character:FindFirstChildOfClass("Humanoid")
 				local ragdolled = h and h:FindFirstChild("Ragdolled")
 				if r and h then
-					-- blitzbr 50-iter ownership pattern
 					for _ = 0, 50 do
 						if not keep() then break end
 						if r.Position.Y <= -12 then
@@ -2883,7 +2746,6 @@ function massBringLoop(keep)
 							end)
 						end
 						if hasNetOwner(r) then
-							-- only teleport if not ragdolled and far away (blitzbr pattern)
 							local isRagdolled = ragdolled and ragdolled.Value
 							if not isRagdolled and (r.Position - homePos).Magnitude > 10 then
 								r.CFrame = home
@@ -2896,7 +2758,6 @@ function massBringLoop(keep)
 				end
 			end
 		end
-		-- return to saved home (not hrp re-read)
 		teleportSelf(home)
 		freezeCam(overview)
 		task.wait()
@@ -2917,7 +2778,6 @@ function massKickLoop(keep)
 			if not keep() then break end
 			local r = rootOf(p)
 			if r then
-				-- blitzbr 50-iter ownership pattern: wait for SNO before applying
 				for _ = 0, 50 do
 					if not keep() then break end
 					if r.Position.Y <= -12 then
@@ -2957,12 +2817,10 @@ function massKillLoop(keep)
 			local r = rootOf(p)
 			local h = p.Character and p.Character:FindFirstChildOfClass("Humanoid")
 			if r and h then
-				-- blitzbr pattern: inner loop up to 50 attempts per player
 				for _ = 0, 50 do
 					if not keep() then break end
 					sno(r, r.Position)
 					if not keep() then break end
-					-- if we own them or they're flying fast, finish them
 					if hasNetOwner(r) or r.AssemblyLinearVelocity.Magnitude > 500 then
 						skyVel(r)
 						destroyGrabOn(r)
@@ -2975,7 +2833,6 @@ function massKillLoop(keep)
 						break
 					end
 					task.wait()
-					-- TP near target (blitzbr offset pattern)
 					if r.Position.Y <= -12 then
 						teleportSelf(CFrame.new(r.Position + Vector3.new(0, 5, -15)))
 					else
@@ -3009,7 +2866,6 @@ function massFlingLoop(keep)
 			if not keep() then break end
 			local r = rootOf(p)
 			if r then
-				-- blitzbr 50-iter ownership pattern: wait for SNO before applying
 				for _ = 0, 50 do
 					if not keep() then break end
 					if r.Position.Y <= -12 then
@@ -3191,7 +3047,6 @@ function massPaintLoop(keep)
 	notify(HUB_NAME, "Paint All OFF", 1.5)
 end
 
--- Legacy one-shot wrappers (still used if called)
 function flingAllMap()
 	setMassToggle("fling", true, massFlingLoop)
 end
@@ -3205,9 +3060,6 @@ function ragdollAllMap()
 	setMassToggle("ragdoll", true, massRagdollLoop)
 end
 
-------------------------------------------------------------------------
--- One-shot mass actions (bloodyv2 style: do once across all players, done)
-------------------------------------------------------------------------
 function massKillOnce()
 	local home = hrp() and hrp().CFrame
 	if not home then notify(HUB_NAME, "No character", 2); return end
@@ -3418,10 +3270,6 @@ function massFireOnce()
 	notify(HUB_NAME, "Burn All · done", 1.5)
 end
 
--- Lag Server + Destroy Server
--- Lag = CreateGrabLine spam (can kick YOU or others — intensity matters)
--- Destroy = Blobman CreatureGrab on everyone (must be seated on Blobman)
-------------------------------------------------------------------------
 local CRAZY_LINE_CF = CFrame.new(
 	-0.12640380859375, 0.9606337547302246, -0.5000009536743164,
 	0.9985212683677673, 0, -0.05436277016997337,
@@ -3437,7 +3285,6 @@ function torsoOf(p)
 		or p.Character:FindFirstChild("HumanoidRootPart")
 end
 
--- Lag Server: intensity = remote spam rate (CreateGrabLine + SNO + DestroyGrabLine)
 function lagServerLoop(keep)
 	if not FTAP.CreateGrabLine and not FTAP.SetNetworkOwner then
 		notify(HUB_NAME, "Remotes missing — open Home → Link Remotes", 3)
@@ -3447,7 +3294,6 @@ function lagServerLoop(keep)
 	notify(HUB_NAME, "Lag Server ON This Some Bullshit " .. intensity, 2)
 	while keep() do
 		intensity = math.clamp(tonumber(S.lagIntensity) or 150, 1, 500)
-		-- higher intensity = more fires per frame batch, shorter wait
 		local waves = math.max(1, math.floor(intensity / 3))
 		for _ = 1, waves do
 			if not keep() then break end
@@ -3475,13 +3321,11 @@ function lagServerLoop(keep)
 				end
 			end
 		end
-		-- intensity 1 ≈ slow, 500 ≈ almost no wait
 		task.wait(math.clamp(0.55 - (intensity / 1000), 0.02, 0.55))
 	end
 	notify(HUB_NAME, "Lag Server OFF Thank God", 1.5)
 end
 
--- Crazy Line (soft lag): continuous CreateGrabLine with fixed CFrame
 function softLagLoop(keep)
 	if not FTAP.CreateGrabLine then
 		notify(HUB_NAME, "CreateGrabLine missing", 2)
@@ -3505,7 +3349,6 @@ function softLagLoop(keep)
 	notify(HUB_NAME, "Soft Lag OFF", 1.5)
 end
 
--- Extra hard lag: CreateGrabLine + SNO + DestroyGrabLine thrash (still -style remote spam)
 function hardLagLoop(keep)
 	if not FTAP.CreateGrabLine then
 		notify(HUB_NAME, "CreateGrabLine missing", 2)
@@ -3539,10 +3382,8 @@ function hardLagLoop(keep)
 	notify(HUB_NAME, "Hard Lag OFF", 2)
 end
 
--- Destroy Server functions defined after ensureBlobman/kickPlayer (see below)
 local blobmanGrabAllOnce, destroyServerLoop, destroyServerHybridLoop
 
--- fling nearby objects (not players)
 function massFlingObjectsLoop(keep)
 	notify(HUB_NAME, "Fling Nearby Objects ON Hell Yeah", 2)
 	local me = hrp()
@@ -3557,7 +3398,6 @@ function massFlingObjectsLoop(keep)
 				if n >= 40 then break end
 				if inst:IsA("BasePart") and not inst.Anchored then
 					if myChar and inst:IsDescendantOf(myChar) then
-						-- skip self
 					else
 						local model = inst:FindFirstAncestorOfClass("Model")
 						local plr = model and Players:GetPlayerFromCharacter(model)
@@ -3577,7 +3417,6 @@ function massFlingObjectsLoop(keep)
 	notify(HUB_NAME, "Fling objects OFF", 1.5)
 end
 
--- zero gravity nearby objects for ~30s
 function zeroGNearbyObjects(seconds)
 	seconds = tonumber(seconds) or 30
 	local me = hrp()
@@ -3588,7 +3427,6 @@ function zeroGNearbyObjects(seconds)
 	local myModel = myChar
 	local applied = {}
 	notify(HUB_NAME, "Zero-G objects " .. seconds .. "s", 2)
-	-- scan workspace children (fast) then shallow descend into models
 	local function tryPart(inst)
 		if #applied >= 50 then return end
 		if not inst:IsA("BasePart") or inst.Anchored then return end
@@ -3597,7 +3435,7 @@ function zeroGNearbyObjects(seconds)
 		if model and Players:GetPlayerFromCharacter(model) then return end
 		local ok, dist = pcall(function() return (inst.Position - me.Position).Magnitude end)
 		if not ok then return end
-		if dist > range + 15 then return end  -- extra tolerance after SNO shift
+		if dist > range + 15 then return end
 		pcall(function()
 			sno(inst, me.Position)
 			local old = inst:FindFirstChild("VOIDZ_ZeroG")
@@ -3629,7 +3467,6 @@ function zeroGNearbyObjects(seconds)
 	notify(HUB_NAME, "Zero-G on " .. #applied .. " objects", 2)
 end
 
--- throw BombBalloon over player heads (troll) — fresh spawn per target
 function balloonTroll(targetPlayer)
 	local list = {}
 	if targetPlayer and validP(targetPlayer) then
@@ -3638,7 +3475,6 @@ function balloonTroll(targetPlayer)
 		list = allTargets()
 	end
 	task.spawn(function()
-		-- make sure we own at least one BombBalloon first
 		local okModel, okPrimary = ensureToy("BombBalloon")
 		if not okModel and not okPrimary then
 			notify(HUB_NAME, "Balloon failed — buy BombBalloon first", 3)
@@ -3648,7 +3484,6 @@ function balloonTroll(targetPlayer)
 			if validP(p) then
 				local r = rootOf(p)
 				if r then
-					-- fresh bomb for each target (bombs are consumed on explosion)
 					local model, primary = ensureToy("BombBalloon")
 					if model or primary then
 						pcall(function()
@@ -3658,7 +3493,6 @@ function balloonTroll(targetPlayer)
 								balloon.CFrame = r.CFrame * CFrame.new(0, 6, 0)
 								balloon.AssemblyLinearVelocity = Vector3.zero
 								balloon.AssemblyAngularVelocity = Vector3.zero
-								-- try firetouchinterest (some executors support it)
 								if firetouchinterest then
 									pcall(function()
 										firetouchinterest(balloon, r, 0)
@@ -3666,21 +3500,18 @@ function balloonTroll(targetPlayer)
 										firetouchinterest(balloon, r, 1)
 									end)
 								end
-								-- fallback: let physics handle touch by keeping it overlapping for a moment
 								task.wait(0.1)
 							end
 						end)
 					end
 				end
-				task.wait(0.3)  -- give bomb time to explode before spawning next
+				task.wait(0.3)
 			end
 		end
 		notify(HUB_NAME, "Balloon troll · " .. #list, 2)
 	end)
 end
 
-------------------------------------------------------------------------
--- Kick types (incl. blobman-style)
 local KICK_TYPES = {
 	"Sky Anchor", "Float Pin",
 	"Velocity", "Hard", "Void", "Sky", "Ragdoll",
@@ -3700,7 +3531,6 @@ function ensureBlobman(quiet)
 	if isOnBlobman() then return true end
 	local me = hrp()
 	if not me then return false end
-	-- ensure remotes are resolved
 	if not FTAP.BuyToy or not FTAP.SpawnToy then pcall(resolveFTAP) end
 	pcall(function()
 		if FTAP.BuyToy then FTAP.BuyToy:InvokeServer("CreatureBlobman") end
@@ -3740,7 +3570,6 @@ function ensureBlobman(quiet)
 		end
 		if isOnBlobman() then return true end
 	end
-	-- fallback: try any seat near blobman model
 	if not isOnBlobman() then
 		for _, d in ipairs(workspace:GetDescendants()) do
 			if (d:IsA("Seat") or d:IsA("VehicleSeat")) and d:GetFullName():lower():find("blob") then
@@ -3775,7 +3604,6 @@ function kickPlayer(p, ktype, quiet)
 	clearTargetMovers(p.Character)
 	surfaceForGrab()
 
-	-- Kick All / Loop Kick Ownership core
 	local function ownershipVisit(opts)
 		opts = opts or {}
 		local frames = opts.frames or 55
@@ -3838,7 +3666,6 @@ function kickPlayer(p, ktype, quiet)
 	end
 
 	if ktype == "Sky Anchor" then
-		-- ownership SNO + SkyVelocity + KickPhysical sky pin
 		ownershipVisit({
 			frames = 55,
 			onOwned = function(rr)
@@ -3848,7 +3675,6 @@ function kickPlayer(p, ktype, quiet)
 			end,
 		})
 	elseif ktype == "Float Pin" then
-		-- float self + sky pin BP/BG
 		ownershipVisit({
 			frames = 55,
 			floatSelf = true,
@@ -3910,7 +3736,6 @@ function kickPlayer(p, ktype, quiet)
 			RunService.Heartbeat:Wait()
 		end
 	elseif ktype == "StackKick" then
-		-- blitzbr 50-iter ownership pattern
 		for _ = 0, 50 do
 			r = rootOf(p)
 			if not r or not isAliveP(p) then break end
@@ -3956,7 +3781,6 @@ function kickPlayer(p, ktype, quiet)
 	end
 end
 
--- Plot exit: auto-grab + run whatever was queued (fling/kill/kick/bring)
 function runPlotExitAmbush(p)
 	if not p or not validP(p) then
 		if p then plotWatch[p.UserId] = nil end
@@ -4032,7 +3856,6 @@ function installPlotWatch()
 		while true do
 			task.wait(0.4)
 			if S.toggles.plotAmbush == false and next(plotWatch) == nil then
-				-- idle
 			else
 				for _, p in ipairs(Players:GetPlayers()) do
 					if p ~= LP then
@@ -4060,7 +3883,6 @@ function installPlotWatch()
 end
 task.spawn(installPlotWatch)
 
--- Resolve blobman model + CreatureGrab remote while seated
 function getBlobmanGrabKit()
 	local h = hum()
 	if not h or not h.SeatPart or not h.SeatPart.Parent then return nil end
@@ -4094,7 +3916,6 @@ function getBlobmanGrabKit()
 	}
 end
 
--- Move blob next to target so server accepts CreatureGrab (not radius-limited)
 function moveBlobNear(kit, targetRoot)
 	if not kit or not targetRoot then return end
 	local pivot = kit.blob.PrimaryPart or kit.seat
@@ -4106,7 +3927,6 @@ function moveBlobNear(kit, targetRoot)
 		else
 			pivot.CFrame = dest
 		end
-		-- Anchor blobman parts during teleport to prevent flying
 		for _, part in ipairs(kit.blob:GetDescendants()) do
 			if part:IsA("BasePart") then
 				part.Anchored = true
@@ -4120,7 +3940,6 @@ function moveBlobNear(kit, targetRoot)
 		if h and kit.seat then
 			pcall(function() kit.seat:Sit(h) end)
 		end
-		-- Unanchor after a brief moment
 		task.wait(0.05)
 		for _, part in ipairs(kit.blob:GetDescendants()) do
 			if part:IsA("BasePart") then
@@ -4141,12 +3960,10 @@ function fireCreatureGrab(kit, targetRoot)
 	end)
 end
 
--- Force sit blobman every cycle (re-mount if knocked off)
 function forceBlobmanMount()
 	if isOnBlobman() then return getBlobmanGrabKit() end
 	pcall(function() ensureBlobman(true) end)
 	if isOnBlobman() then return getBlobmanGrabKit() end
-	-- last resort: find any blob seat and sit
 	local me = hrp()
 	local h = hum()
 	if not me or not h then return nil end
@@ -4179,7 +3996,6 @@ blobmanGrabAllOnce = function()
 		if p ~= LP and validP(p) then
 			local r = rootOf(p)
 			if r then
-				-- visit each player so grab is not limited to local radius
 				moveBlobNear(kit, r)
 				kit = getBlobmanGrabKit() or kit
 				for _ = 1, 3 do
@@ -4192,12 +4008,6 @@ blobmanGrabAllOnce = function()
 	return true
 end
 
--- ═══════════════════════════════════════════════════════════════════════════════
--- BLOB MAIN GRAB — grab players from inside plots using blobman CreatureGrab
--- ═══════════════════════════════════════════════════════════════════════════════
--- Blobman's CreatureGrab bypasses normal plot protection because it's a
--- server-side seat + remote, not a local grab line.  This grabs them even
--- while they're hiding inside their house.
 
 function blobGrabSingle(p)
 	if not p or not validP(p) then return false end
@@ -4242,7 +4052,6 @@ function blobGrabAll()
 	end
 end
 
--- Persistent blob grab loop: keeps trying until toggled off, re-acquires by name
 function startBlobGrabLoop(p)
 	if not p then return end
 	local id = "blobGrabLoop"
@@ -4257,7 +4066,6 @@ function startBlobGrabLoop(p)
 	notify(HUB_NAME, "Blob Grab Loop ON → " .. playerLabel(p), 1.5)
 	local homeCF = hrp() and hrp().CFrame
 	startLoop(id, 0.25, function()
-		-- re-acquire by name if player object went stale (rejoin / respawn)
 		local target = Players:FindFirstChild(targetName)
 		if not target or not target.Parent then return end
 		local r = rootOf(target)
@@ -4267,7 +4075,6 @@ function startBlobGrabLoop(p)
 	end)
 end
 
--- Destroy Server: always remount blobman, grab EVERY player (TP blob to each)
 destroyServerLoop = function(keep)
 	notify(HUB_NAME, "Destroy Server ON This Shit Over", 2)
 	while keep() do
@@ -4280,7 +4087,6 @@ destroyServerLoop = function(keep)
 				if p ~= LP and validP(p) then
 					local r = rootOf(p)
 					if r then
-						-- re-force seat every target (stay on blobman)
 						if not isOnBlobman() then
 							kit = forceBlobmanMount() or kit
 						end
@@ -4293,7 +4099,6 @@ destroyServerLoop = function(keep)
 					end
 				end
 			end
-			-- if knocked off mid-loop, remount immediately
 			if not isOnBlobman() then
 				forceBlobmanMount()
 			end
@@ -4303,7 +4108,6 @@ destroyServerLoop = function(keep)
 	notify(HUB_NAME, "Destroy Server OFF", 1.5)
 end
 
--- Hybrid destroy (no blobman required): lag lines + visit SNO kill/fling + toy spam
 destroyServerHybridLoop = function(keep)
 	notify(HUB_NAME, "Destroy Server Hybrid ON (no blobman needed)", 3)
 	while keep() do
@@ -4353,16 +4157,12 @@ destroyServerHybridLoop = function(keep)
 	notify(HUB_NAME, "Destroy Hybrid OFF", 2)
 end
 
--- REGISTER LIMIT FIX: late systems live in nested function (Luau max 200 locals/scope)
--- Main chunk was exceeding 200 locals (setAntiKick allocation failed).
-------------------------------------------------------------------------
 Late = {}
 function _voidzLateInit()
 Late = Late or {}
 Late._phase = "entered"
 print("[VOIDZ] late init entered")
--- Aura engine (revamped): parallel targets, live range/power, unique effects
-local orbitAngles = {} -- player -> angle
+local orbitAngles = {}
 local buriedPartState = setmetatable({}, { __mode = "k" })
 
 function clearAuraEffect(part, names)
@@ -4411,10 +4211,7 @@ function inRange(pos, range)
 	return (pos - me.Position).Magnitude <= range
 end
 
--- Shared aura selector.  Every aura must come through here so the target and
--- range controls mean the same thing everywhere.
--- serverWide = true: teleport to each player (blitzbr Kill/Kick/Bring All pattern).
-local auraHomeCF = nil -- saved position during map-wide teleport sweep
+local auraHomeCF = nil
 function eachAuraTarget(cfg, fnPlayers, fnObjects, serverWide)
 	if type(cfg) ~= "table" then cfg = auraDefaults() end
 	if cfg._id then cfg = getAura(cfg._id) end
@@ -4426,7 +4223,6 @@ function eachAuraTarget(cfg, fnPlayers, fnObjects, serverWide)
 	local objRange = S.toggles.auraMapWide and configuredRange or math.min(configuredRange, 80)
 
 	if t == "Players" or t == "Players and Objects" then
-		-- Collect valid targets first
 		local targets = {}
 		for _, p in ipairs(Players:GetPlayers()) do
 			if validP(p) then
@@ -4443,8 +4239,6 @@ function eachAuraTarget(cfg, fnPlayers, fnObjects, serverWide)
 		end
 
 		if serverWide and #targets > 0 then
-			-- MAP-WIDE: blitzbr teleport-to-target pattern
-			-- Save home, teleport to each player, SNO + apply, teleport back
 			local me = hrp()
 			if not me then return end
 			auraHomeCF = me.CFrame
@@ -4454,25 +4248,21 @@ function eachAuraTarget(cfg, fnPlayers, fnObjects, serverWide)
 				local r = rootOf(p)
 				if not r then continue end
 				pcall(function()
-					-- Teleport near target (blitzbr pattern: offset below/behind)
 					if r.Position.Y <= -12 then
 						me.CFrame = CFrame.new(r.Position + Vector3.new(0, 5, -15))
 					else
 						me.CFrame = CFrame.new(r.Position + Vector3.new(0, -10, -10))
 					end
-					-- SNO from near target position (blitzbr: SNOWship fires within 30 studs)
 					snoPlayer(p, r.Position)
 					r = rootOf(p)
 					if r and fnPlayers then fnPlayers(p, r, power, playerRange) end
 				end)
 			end
-			-- Restore position
 			pcall(function()
 				if auraHomeCF and me.Parent then me.CFrame = auraHomeCF end
 			end)
 			auraHomeCF = nil
 		else
-			-- LOCAL PROXIMITY: no teleport, just check range and SNO from here
 			for _, p in ipairs(targets) do
 				local r = rootOf(p)
 				if r then
@@ -4489,7 +4279,6 @@ function eachAuraTarget(cfg, fnPlayers, fnObjects, serverWide)
 			end
 		end
 	end
-	-- Objects: query spatially — scan nearby parts
 	if (t == "Objects" or t == "Players and Objects") and fnObjects then
 		local me = hrp()
 		local myChar = LP.Character
@@ -4527,7 +4316,6 @@ function eachAuraTarget(cfg, fnPlayers, fnObjects, serverWide)
 end
 
 function snoQuick(p, r)
-	-- nearby: SNO from your position (must be close — ≤30)
 	if not p or not r then return end
 	local me = hrp()
 	local origin = me and me.Position or r.Position
@@ -4566,7 +4354,6 @@ function applyVelBurst(part, power, up)
 	end)
 end
 
--- Unique aura ticks (each does something different)
 function tick_netown(cfg, serverWide)
 	cfg = getAura("netown")
 	if not hrp() or not FTAP.SetNetworkOwner then return end
@@ -4583,7 +4370,6 @@ function tick_netown(cfg, serverWide)
 	end, serverWide)
 end
 
--- fling aura: blitzbr-pattern — SNO + BodyVelocity toward camera
 function tick_fling(cfg, serverWide)
 	cfg = getAura("fling")
 	eachAuraTarget(cfg, function(_, r, power)
@@ -4593,7 +4379,6 @@ function tick_fling(cfg, serverWide)
 	end, serverWide)
 end
 
--- kick aura: blitzbr-pattern — SNO + SkyVelocity + DestroyGrabLine
 function tick_kick(cfg, serverWide)
 	cfg = getAura("kick")
 	eachAuraTarget(cfg, function(p, r)
@@ -4604,7 +4389,6 @@ function tick_kick(cfg, serverWide)
 	end, nil, serverWide)
 end
 
--- death aura: blitzbr-pattern — SNO + DestroyGrabLine + SkyVelocity + Dead
 function tick_death(cfg, serverWide)
 	cfg = getAura("death")
 	eachAuraTarget(cfg, function(p, r)
@@ -4639,7 +4423,6 @@ end
 function tick_attract(cfg, serverWide)
 	cfg = getAura("attract")
 	eachAuraTarget(cfg, function(p, r, power)
-		-- Use home position for direction (auraHomeCF saved by eachAuraTarget)
 		local center = auraHomeCF and auraHomeCF.Position or (hrp() and hrp().Position) or Vector3.zero
 		local d = center - r.Position
 		if d.Magnitude > 1 then
@@ -4655,7 +4438,6 @@ function tick_attract(cfg, serverWide)
 	end, serverWide)
 end
 
--- Sky: pure straight UP impulse (fly up high and fall back, no outward scatter)
 function tick_sky(cfg, serverWide)
 	cfg = getAura("sky")
 	eachAuraTarget(cfg, function(p, r, power)
@@ -4745,13 +4527,11 @@ function tick_bring(cfg, serverWide)
 	local homeCF = me.CFrame
 
 	if serverWide then
-		-- MAP-WIDE: bring each player server-sided (bringPlayer pattern)
 		for _, p in ipairs(Players:GetPlayers()) do
 			if p ~= LP and isAliveP(p) and not isInSafePlot(p) and not isWL(p) then
 				local r = rootOf(p)
 				if r then
 					pcall(function()
-						-- Teleport near target
 						if r.Position.Y <= -12 then
 							me.CFrame = CFrame.new(r.Position + Vector3.new(0, 5, -15))
 						else
@@ -4759,18 +4539,15 @@ function tick_bring(cfg, serverWide)
 						end
 						sno(r, r.Position)
 						snoPlayer(p, r.Position)
-						-- Create grab line server-sided
 						if FTAP.CreateGrabLine then
 							local t = p.Character and (p.Character:FindFirstChild("Torso") or p.Character:FindFirstChild("UpperTorso") or r)
 							if t then pcall(function() FTAP.CreateGrabLine:FireServer(t, t.CFrame) end) end
 						end
 						forceUnsit(p)
-						-- Wait for net ownership (up to 8 ticks)
 						for _ = 1, 8 do
 							if hasNetOwner(r) then break end
 							task.wait()
 						end
-						-- Move them to your original position
 						pcall(function()
 							r.CFrame = homeCF * CFrame.new(0, 0, -5)
 							createBringBody(r, homeCF * CFrame.new(0, 0, -5))
@@ -4779,10 +4556,8 @@ function tick_bring(cfg, serverWide)
 				end
 			end
 		end
-		-- Restore home
 		pcall(function() me.CFrame = homeCF end)
 	else
-		-- PROXIMITY: bring nearby players only
 		eachAuraTarget(cfg, function(p, r)
 			local dest = homeCF * CFrame.new(0, 0, -5)
 			pcall(function()
@@ -4803,7 +4578,6 @@ function tick_bring(cfg, serverWide)
 	end
 end
 
--- Void: disable collision on character + downward velocity (phase through floor)
 function tick_void(cfg, serverWide)
 	cfg = getAura("void")
 	eachAuraTarget(cfg, function(p, r, power)
@@ -4825,7 +4599,6 @@ function tick_void(cfg, serverWide)
 	end, serverWide)
 end
 
--- Slam: noclip their whole character into the ground (CanCollide off + hard slam)
 function tick_stomp(cfg, serverWide)
 	cfg = getAura("stomp")
 	local power = tonumber(cfg.power) or S.flingPower or 8000
@@ -4854,11 +4627,9 @@ function tick_stomp(cfg, serverWide)
 			end
 			clearTargetMovers(model)
 			destroyGrabOn(root)
-			-- Slam underground hard
 			local pos = root.Position
 			local underY = pos.Y - depth
 			root.CFrame = CFrame.new(pos.X, underY, pos.Z)
-			-- BodyVelocity slam down
 			local bv = root:FindFirstChild("VOIDZ_BuryBV")
 			if not bv then
 				bv = Instance.new("BodyVelocity")
@@ -4868,7 +4639,6 @@ function tick_stomp(cfg, serverWide)
 			end
 			bv.Velocity = Vector3.new(0, -slam, 0)
 			root.AssemblyLinearVelocity = Vector3.new(0, -slam, 0)
-			-- BodyPosition holds them deep underground
 			local bp = root:FindFirstChild("VOIDZ_BuryBP")
 			if not bp then
 				bp = Instance.new("BodyPosition")
@@ -4887,14 +4657,12 @@ function tick_stomp(cfg, serverWide)
 	end, nil, serverWide)
 end
 
--- Orbit: float around local player's home position (unique)
 function tick_orbit(cfg, serverWide)
 	cfg = getAura("orbit")
 	local radius = math.clamp((cfg.range or 50) * 0.35, 8, 40)
 	local power = cfg.power or 2500
 	local speed = math.clamp(power / 800, 1.5, 8)
 	eachAuraTarget(cfg, function(p, r)
-		-- Orbit center = home position (we teleported to them)
 		local center = auraHomeCF and auraHomeCF.Position or (hrp() and hrp().Position) or r.Position
 		local key = p.UserId
 		orbitAngles[key] = (orbitAngles[key] or math.random() * math.pi * 2) + speed * 0.12
@@ -4923,7 +4691,6 @@ function tick_orbit(cfg, serverWide)
 	end, serverWide)
 end
 
--- Yeet: horizontal launch in direction FROM you TO target (like throwing a ball)
 function tick_yeet(cfg, serverWide)
 	cfg = getAura("yeet")
 	eachAuraTarget(cfg, function(p, r, power)
@@ -4947,7 +4714,6 @@ function tick_yeet(cfg, serverWide)
 	end, serverWide)
 end
 
--- Soft Push: gentle camera-direction nudge (light poke, no spin, no BodyVelocity)
 function tick_soft(cfg, serverWide)
 	cfg = getAura("soft")
 	local cam = workspace.CurrentCamera
@@ -5004,7 +4770,6 @@ function tick_freeze(cfg, serverWide)
 	end, serverWide)
 end
 
--- Launch: continuous upward force (keeps lifting them while aura is on — levitation)
 function tick_launch(cfg, serverWide)
 	cfg = getAura("launch")
 	eachAuraTarget(cfg, function(p, r, power)
@@ -5068,7 +4833,6 @@ function tick_repel(cfg, serverWide)
 	end, serverWide)
 end
 
--- Flatten: continuous downward pressure (press into ground without burying)
 function tick_flatten(cfg, serverWide)
 	cfg = getAura("flatten")
 	eachAuraTarget(cfg, function(p, r, power)
@@ -5097,7 +4861,6 @@ function tick_flatten(cfg, serverWide)
 	end, serverWide)
 end
 
--- poison aura: blitzbr-pattern — move PoisonHurtParts onto head for one frame, park at -50
 function tick_poison(cfg, serverWide)
 	cfg = getAura("poison")
 	eachAuraTarget(cfg, function(p)
@@ -5105,13 +4868,11 @@ function tick_poison(cfg, serverWide)
 		if not head then return end
 		local hurts = getPoisonHurtParts()
 		for _, hurt in ipairs(hurts) do pcall(function() hurt.CFrame = head.CFrame end) end
-		-- Poison parts are shared, so reset them before moving to the next target.
 		task.wait()
 		for _, hurt in ipairs(hurts) do pcall(function() hurt.Position = Vector3.new(0, -50, 0) end) end
 	end, nil, serverWide)
 end
 
--- burn aura: blitzbr-pattern — get campfire, touch FirePlayerPart to target HRP, park back
 function tick_burnaura(cfg, serverWide)
 	cfg = getAura("burnaura")
 	local model, primary, tip = getStatusToy("Campfire")
@@ -5129,7 +4890,6 @@ function tick_burnaura(cfg, serverWide)
 	if primary then parkStatusToy(model, primary) end
 end
 
--- Telekinesis: Tornado (orbit) or Blackhole (pull to mouse/look)
 local tkAngles = {}
 function tick_telekinesis(cfg, serverWide)
 	cfg = getAura("telekinesis")
@@ -5152,7 +4912,6 @@ function tick_telekinesis(cfg, serverWide)
 				end)
 			end
 		else
-			-- Tornado: rising spiral around center
 			local id = p.UserId
 			tkAngles[id] = (tkAngles[id] or 0) + 0.18
 			local ang = tkAngles[id]
@@ -5184,7 +4943,6 @@ function tick_tornado(cfg, serverWide)
 	tick_telekinesis(cfg, serverWide)
 end
 
--- Auras run map-wide (visit each player) — same engine as Server tab
 local AURA_TICKS = {
 	netown = function() tick_netown(nil, false) end,
 	fling = function() tick_fling(nil, false) end,
@@ -5270,7 +5028,6 @@ local AURA_META = {
 	{ id = "flatten", title = "Ground Press Nearby", tip = "Continuous downward pressure — press into ground without burying." },
 }
 
--- bind ids for getAura merge
 for _, m in ipairs(AURA_META) do
 	local c = getAura(m.id)
 	c._id = m.id
@@ -5279,7 +5036,6 @@ end
 function setAura(id, on)
 	stopLoop("aura_" .. id)
 	if on and AURA_TICKS[id] then
-		-- proximity-based auras: only affect players within range, no teleporting
 		local interval = 0.15
 		startLoop("aura_" .. id, interval, AURA_TICKS[id])
 		notify(HUB_NAME, "Aura " .. id .. " ON", 1.2)
@@ -5299,12 +5055,10 @@ function setServerFx(id, on)
 	end
 end
 
-------------------------------------------------------------------------
--- Anti systems — open-source methods (IsHeld / CanBurn / Extinguish)
 local antiGrabTick
 local doAntiGrabHard
 local antiGrabInstalled = false
-local extinguishPart -- Map Hole ExtinguishPart ( apagarfogo)
+local extinguishPart
 
 function getExtinguishPart()
 	if extinguishPart and extinguishPart.Parent then return extinguishPart end
@@ -5331,7 +5085,6 @@ function extinguishFire()
 	if canBurn and canBurn:IsA("BoolValue") and not canBurn.Value then return end
 	local ep = getExtinguishPart()
 	if not ep then
-		-- fallback: strip client fire visuals
 		for _, d in ipairs(char() and char():GetDescendants() or {}) do
 			if d:IsA("Fire") or d:IsA("Smoke") then pcall(function() d:Destroy() end) end
 		end
@@ -5385,11 +5138,9 @@ function antiPaintTick()
 			end
 		end
 	end
-	-- reset body colors if painted
 	local bc = c:FindFirstChildOfClass("BodyColors")
 	if bc then
 		pcall(function()
-			-- no hard reset if already default; strip paint attachments
 		end)
 	end
 end
@@ -5425,7 +5176,6 @@ function antiBananaTick()
 end
 
 function antiVoidTick()
-	-- FallenPartsDestroyHeight + rescue if Y < -800
 	pcall(function() workspace.FallenPartsDestroyHeight = -1000 end)
 	local r = hrp()
 	if r and r.Position.Y < -800 then
@@ -5441,7 +5191,6 @@ end
 function antiFlingTick()
 	local r = hrp()
 	if not r then return end
-	-- anti-explosion style: while ragdolled, anchor + zero vel
 	local h = hum()
 	local rag = h and h:FindFirstChild("Ragdolled")
 	if S.toggles.antiExplode and rag and rag.Value then
@@ -5461,7 +5210,6 @@ function antiFlingTick()
 	end
 end
 
--- / : Anti-Sticky (force Massless=false + break StickyWelds on you)
 function antiStickyTick()
 	if not S.toggles.antiSticky then return end
 	local c = char()
@@ -5477,7 +5225,6 @@ function antiStickyTick()
 			end
 		end
 	end
-	-- nearby sticky parts glued to us
 	for _, ch in ipairs(workspace:GetChildren()) do
 		if tostring(ch.Name):lower():find("sticky") or ch.Name == "SprayCanWD" then
 			for _, d in ipairs(ch:GetDescendants()) do
@@ -5490,7 +5237,6 @@ function antiStickyTick()
 			end
 		end
 	end
-	-- sticky remover toy touch if we own one
 	pcall(function()
 		local r = hrp()
 		if not r then return end
@@ -5510,7 +5256,6 @@ function antiStickyTick()
 	end)
 end
 
--- Optional only: force unsit from blob/train seats (NOT tied to Gucci — that fought intentional sits)
 function antiBlobmanTick()
 	if not S.toggles.antiBlobman then return end
 	local h = hum()
@@ -5529,7 +5274,6 @@ function antiBlobmanTick()
 	end
 end
 
--- Anti-Lag: disable CharacterAndBeamMove LocalScript (reduces grab lag)
 function setAntiLag(on)
 	S.toggles.antiLag = on == true
 	pcall(function()
@@ -5546,11 +5290,10 @@ function setAntiLag(on)
 	end)
 end
 
--- Water walk (nested — register budget)
 local setWaterWalk
 (function()
-local waterPartBackup = {} -- BasePart -> { CanCollide, CanTouch, CanQuery }
-local waterTerrainBackup = {} -- { region, materials, occupancies }
+local waterPartBackup = {}
+local waterTerrainBackup = {}
 local waterSolidConn = nil
 
 local function isWaterishPart(part)
@@ -5575,7 +5318,6 @@ end
 local function solidifyWaterPart(part)
 	if not isWaterishPart(part) then return end
 	if waterPartBackup[part] then
-		-- already tracked — keep solid while toggle on
 		pcall(function()
 			part.CanCollide = true
 		end)
@@ -5588,7 +5330,6 @@ local function solidifyWaterPart(part)
 	}
 	pcall(function()
 		part.CanCollide = true
-		-- keep touch/query so nothing else breaks
 	end)
 end
 
@@ -5606,7 +5347,6 @@ local function restoreWaterParts()
 end
 
 local function copyVoxelGrid(src)
-	-- deep-copy ReadVoxels materials/occupancies so we can restore later
 	local size = src.Size
 	local out = {}
 	for x = 1, size.X do
@@ -5618,7 +5358,6 @@ local function copyVoxelGrid(src)
 			end
 		end
 	end
-	-- Roblox WriteVoxels expects a table with .Size
 	out.Size = size
 	return out
 end
@@ -5640,20 +5379,18 @@ local function mapWaterBounds()
 			maxV = Vector3.new(cf.Position.X + half.X + 40, math.max(cf.Position.Y + half.Y, 80), cf.Position.Z + half.Z + 40)
 		end
 	end
-	-- clamp Y — water is near surface, don't scan whole sky/void
 	minV = Vector3.new(minV.X, math.clamp(minV.Y, -60, 0), minV.Z)
 	maxV = Vector3.new(maxV.X, math.clamp(maxV.Y, 20, 150), maxV.Z)
 	return minV, maxV
 end
 
 local function solidifyTerrainWater()
-	-- convert Terrain Water cells → Ice (solid, still water-looking) across the map
 	waterTerrainBackup = {}
 	local Terrain = workspace.Terrain
 	if not Terrain then return 0 end
 	local minV, maxV = mapWaterBounds()
 	local res = 4
-	local step = 96 -- stud chunks (grid-aligned-ish)
+	local step = 96
 	local cells = 0
 	for x = minV.X, maxV.X, step do
 		for z = minV.Z, maxV.Z, step do
@@ -5681,7 +5418,6 @@ local function solidifyTerrainWater()
 											origOccs = copyVoxelGrid(occupancies)
 											changed = true
 										end
-										-- Ice = solid collision, still reads as water-ish
 										materials[ix][iy][iz] = Enum.Material.Ice
 										if occupancies[ix][iy][iz] < 0.5 then
 											occupancies[ix][iy][iz] = 1
@@ -5705,7 +5441,6 @@ local function solidifyTerrainWater()
 				end
 			end
 		end
-		-- yield every row to avoid freezing the game
 		task.wait()
 	end
 	return cells
@@ -5751,7 +5486,6 @@ setWaterWalk = function(on)
 		return
 	end
 
-	-- destroy any old under-feet platform leftovers
 	for _, d in ipairs(workspace:GetChildren()) do
 		if d.Name == "VOIDZ_WaterWalk" then pcall(function() d:Destroy() end) end
 	end
@@ -5760,7 +5494,6 @@ setWaterWalk = function(on)
 	local cellCount = 0
 	pcall(function() cellCount = solidifyTerrainWater() end)
 
-	-- keep solid if the map streams new water parts in
 	waterSolidConn = workspace.DescendantAdded:Connect(function(d)
 		if not S.toggles.waterWalk then return end
 		if isWaterishPart(d) then
@@ -5768,7 +5501,6 @@ setWaterWalk = function(on)
 		end
 	end)
 
-	-- light re-assert: some maps reset CanCollide on water parts
 	startLoop("waterWalk", 1.0, function()
 		if not S.toggles.waterWalk then return end
 		for part, _ in pairs(waterPartBackup) do
@@ -5782,16 +5514,13 @@ setWaterWalk = function(on)
 end
 end)()
 
--- True only when YOU are the victim of someone else's GrabParts (not when YOU are grabbing)
 function grabPartsIsAttackingUs(grabModel, ourChar)
 	if not grabModel or not ourChar then return false end
 	for _, d in ipairs(grabModel:GetDescendants()) do
 		if d:IsA("WeldConstraint") or d:IsA("Weld") then
 			local p0, p1 = d.Part0, d.Part1
-			-- victim = our character is Part1 (held) or welded as victim
 			if p1 and p1:IsDescendantOf(ourChar) then return true end
 			if p0 and p0:IsDescendantOf(ourChar) then
-				-- if both ends on us, ignore; if other end is not our grab tool, we're grabbed
 				local other = p1
 				if other and not other:IsDescendantOf(ourChar) and not other:IsDescendantOf(grabModel) then
 					return true
@@ -5802,13 +5531,10 @@ function grabPartsIsAttackingUs(grabModel, ourChar)
 	return false
 end
 
-------------------------------------------------------------------------
--- Anti-kill house TP: random plot interior, prefer unowned houses
 function plotHasOwner(plot)
 	if not plot then return false end
 	local sign = plot:FindFirstChild("PlotSign") or plot:FindFirstChild("PlotSign", true)
 	if not sign then
-		-- fallback: any ThisPlotsOwners under plot
 		local owners = plot:FindFirstChild("ThisPlotsOwners", true)
 		if not owners then return false end
 		for _, v in ipairs(owners:GetChildren()) do
@@ -5832,10 +5558,8 @@ end
 
 function getPlotInteriorCF(plot)
 	if not plot then return nil end
-	-- PlotArea is the FTAP safe interior region ( uses PlotArea.Position)
 	local area = plot:FindFirstChild("PlotArea") or plot:FindFirstChild("PlotArea", true)
 	if area and area:IsA("BasePart") then
-		-- sit slightly above floor center so you land inside the house
 		return CFrame.new(area.Position + Vector3.new(0, 4, 0))
 	end
 	for _, name in ipairs({ "Spawn", "SpawnLocation", "HouseSpawn", "InteriorSpawn", "Floor", "Base" }) do
@@ -5844,7 +5568,6 @@ function getPlotInteriorCF(plot)
 			return p.CFrame * CFrame.new(0, 3, 0)
 		end
 	end
-	-- any large anchored floor-ish part near plot center
 	local best, bestVol = nil, 0
 	for _, d in ipairs(plot:GetDescendants()) do
 		if d:IsA("BasePart") and d.Anchored and d.Size.X * d.Size.Z > bestVol and d.Size.Y < 6 then
@@ -5880,7 +5603,6 @@ function collectHouseSpots()
 			end
 		end
 	end
-	-- fallback: any PlotArea under workspace if Plots folder empty/odd
 	if #free == 0 and #owned == 0 then
 		for _, d in ipairs(workspace:GetDescendants()) do
 			if d.Name == "PlotArea" and d:IsA("BasePart") then
@@ -5903,10 +5625,8 @@ function tpToRandomHouse(reason)
 	if not r then return false end
 
 	local free, owned = collectHouseSpots()
-	-- priority: unowned houses first
 	local pool = (#free > 0) and free or owned
 	if #pool == 0 then
-		-- last resort: last safe CF if we ever stored one
 		if S.lastSafeCF then
 			S.lastHouseTpAt = now
 			pcall(function()
@@ -5924,7 +5644,6 @@ function tpToRandomHouse(reason)
 	S.lastHouseTpAt = now
 	S.lastSafeCF = pick.cf
 
-	-- break grab forces briefly while we TP
 	pcall(function()
 		r.AssemblyLinearVelocity = Vector3.zero
 		r.AssemblyAngularVelocity = Vector3.zero
@@ -5946,7 +5665,6 @@ function tpToRandomHouse(reason)
 		pcall(function() FTAP.DestroyGrabLine:FireServer(r) end)
 	end
 
-	-- reassert TP a few frames (grab/align can yank you back)
 	local dest = pick.cf
 	task.spawn(function()
 		for _ = 1, 8 do
@@ -5986,7 +5704,6 @@ function antiKillTick()
 	local h, r = hum(), hrp()
 	if not h or not r then return end
 
-	-- water / drowning → house TP (both anti-kill and anti-drown share this)
 	local inWater = false
 	pcall(function()
 		if h:GetState() == Enum.HumanoidStateType.Swimming then inWater = true end
@@ -6005,12 +5722,10 @@ function antiKillTick()
 		return
 	end
 
-	-- anytime grabbed → random house (prefer empty)
 	if isLocalPlayerGrabbed() then
 		tpToRandomHouse("grab")
 	end
 
-	-- anytime damage → random house
 	local maxRef = S.lastSafeHP or h.MaxHealth
 	if h.Health >= maxRef - 0.5 then
 		S.lastSafeHP = h.Health
@@ -6029,7 +5744,6 @@ function startAntiKillLoop()
 	S.lastSafeCF = hrp() and hrp().CFrame
 	stopLoop("antiKill")
 	startLoop("antiKill", 0.12, antiKillTick)
-	-- instant damage hook
 	if S.conns.antiKillHealth then
 		pcall(function() S.conns.antiKillHealth:Disconnect() end)
 		S.conns.antiKillHealth = nil
@@ -6074,7 +5788,6 @@ function stopAntiKillLoop()
 	end
 end
 
--- Restore grounded movement after escape/anti-grab (no float / no leave Anchored)
 function restoreGroundPhysics()
 	local r = hrp()
 	local h = hum()
@@ -6107,13 +5820,11 @@ function restoreGroundPhysics()
 	end
 end
 
--- True when someone is holding / welding US (not when we grab others)
 function isGucciVictim(c)
 	c = c or char()
 	if not c then return false end
 	local held = LP:FindFirstChild("IsHeld")
 	if held and held.Value == true then return true end
-	-- Head.PartOwner while held = someone owns your head
 	local head = c:FindFirstChild("Head")
 	if head and head:FindFirstChild("PartOwner") then
 		local po = head.PartOwner
@@ -6122,7 +5833,6 @@ function isGucciVictim(c)
 		if val ~= nil and tostring(val) ~= "" and tostring(val) ~= LP.Name then
 			return true
 		end
-		-- PartOwner exists while grabbed even if value is delayed
 		if held and held.Value then return true end
 	end
 	for _, child in ipairs(workspace:GetChildren()) do
@@ -6139,7 +5849,6 @@ function gucciBreakGrabNow()
 	local h = hum()
 	if not c or not r then return end
 
-	-- zero velocity while breaking — do NOT leave Anchored (that causes float after free)
 	pcall(function()
 		r.AssemblyLinearVelocity = Vector3.zero
 		r.AssemblyAngularVelocity = Vector3.zero
@@ -6159,7 +5868,6 @@ function gucciBreakGrabNow()
 		pcall(function() FTAP.RagdollRemote:FireServer(r, 0) end)
 	end
 
-	-- DestroyGrabLine on all body parts (server often keys off specific part)
 	if FTAP.DestroyGrabLine then
 		for _, n in ipairs({ "HumanoidRootPart", "Torso", "UpperTorso", "LowerTorso", "Head", "Left Arm", "Right Arm", "Left Leg", "Right Leg", "LeftUpperArm", "RightUpperArm" }) do
 			local p = c:FindFirstChild(n)
@@ -6179,7 +5887,6 @@ function gucciBreakGrabNow()
 		end
 	end
 
-	-- strip foreign welds on our body that pin us to others
 	for _, d in ipairs(c:GetDescendants()) do
 		if d:IsA("WeldConstraint") or d:IsA("Weld") then
 			local p0, p1 = d.Part0, d.Part1
@@ -6208,7 +5915,6 @@ function gucciBreakGrabNow()
 		end)
 	end
 
-	-- land properly after break (no Y boost float)
 	task.defer(function()
 		if not r.Parent then return end
 		r.Anchored = false
@@ -6220,7 +5926,6 @@ function gucciBreakGrabNow()
 			local move = h and h.MoveDirection or Vector3.zero
 			if move.Magnitude > 0.1 then
 				local spd = (S.toggles.speed and S.walkSpeed) or (h and h.WalkSpeed) or 16
-				-- horizontal only — no +Y float
 				r.AssemblyLinearVelocity = Vector3.new(move.X * spd * 1.15, 0, move.Z * spd * 1.15)
 			else
 				r.AssemblyLinearVelocity = Vector3.zero
@@ -6235,7 +5940,6 @@ function gucciBreakGrabNow()
 	end)
 end
 
--- Gucci anti: hard break when WE are victim — never kills your own grab line
 function gucciAntiTick()
 	if not (S.toggles.antiGucci or S.toggles.antiGrab) then return end
 	local c = char()
@@ -6243,27 +5947,23 @@ function gucciAntiTick()
 	local h = hum()
 	if not c or not r then return end
 
-	-- Always safe: burn/sticky (don't touch grab remotes)
 	if S.toggles.antiBurn or S.toggles.antiGucci then
 		extinguishFire()
 	end
 	if S.toggles.antiSticky or S.toggles.antiGucci then
 		antiStickyTick()
 	end
-	-- Note: blob/train unsit is NOT part of Gucci (separate toggle only)
 
 	if not isGucciVictim(c) then
 		if r.Anchored and not S.toggles.antiExplode then
-			-- don't leave yourself stuck anchored if anti-explode isn't holding you
 			local held = LP:FindFirstChild("IsHeld")
 			if not (held and held.Value) then
 				r.Anchored = false
 			end
 		end
-		return -- DO NOT DestroyGrabLine while we grab others
+		return
 	end
 
-	-- Anti-kill house escape while grabbed (if enabled)
 	if S.toggles.antiKill then
 		tpToRandomHouse("grab")
 	end
@@ -6271,7 +5971,6 @@ function gucciAntiTick()
 	gucciBreakGrabNow()
 	if doAntiGrabHard then pcall(doAntiGrabHard) end
 
-	-- Auto attacker via Gucci: find grabber from PartOwner and counter-attack
 	if S.autoCounter or S.toggles.autoCounter then
 		for _, bp in ipairs({ c:FindFirstChild("Head"), c:FindFirstChild("HumanoidRootPart"), c:FindFirstChild("Torso"), c:FindFirstChild("UpperTorso") }) do
 			if bp then
@@ -6320,7 +6019,6 @@ function installAntis()
 			end
 		end)
 
-		-- PartOwner on ANY body part = grab ownership signal (anti-grab v2 + auto-counter)
 		task.spawn(function()
 			local head = c:WaitForChild("Head", 8)
 			local hrp2 = c:WaitForChild("HumanoidRootPart", 8)
@@ -6332,7 +6030,6 @@ function installAntis()
 			for _, part in ipairs(watchParts) do
 				part.ChildAdded:Connect(function(ch)
 					if ch.Name == "PartOwner" then
-						-- Auto-counter: blitzbr-style — attack grabber via PartOwner.Value
 						if S.autoCounter or S.toggles.autoCounter then
 							local grabberVal = ch.Value
 							local grabberName = nil
@@ -6344,12 +6041,10 @@ function installAntis()
 							if grabberName and grabberName ~= LP.Name then
 								local grabberPlr = Players:FindFirstChild(grabberName)
 								if grabberPlr and validP(grabberPlr) then
-									-- fire counter BEFORE breaking grab (like blitzbr)
 									task.spawn(counterAttackPlayer, grabberPlr, rootOf(grabberPlr))
 								end
 							end
 						end
-						-- Anti-grab: break the grab
 						if S.toggles.antiGucci or S.toggles.antiGrab then
 							task.defer(function()
 								gucciBreakGrabNow()
@@ -6361,16 +6056,13 @@ function installAntis()
 			end
 		end)
 
-		-- Sit-state backup detection (blitzbr-style): grab forces Sit = true
 		task.spawn(function()
 			local h2 = c:FindFirstChildOfClass("Humanoid")
 			if not h2 then return end
 			h2:GetPropertyChangedSignal("Sit"):Connect(function()
 				if not h2.Sit then return end
 				if h2.SeatPart and h2.SeatPart.Parent and h2.SeatPart.Parent.Name == "CreatureBlobman" then return end
-				-- Sit = true without a seat = grabbed
 				if S.autoCounter or S.toggles.autoCounter then
-					-- find grabber from PartOwner on any body part
 					for _, bp in ipairs({ c:FindFirstChild("Head"), c:FindFirstChild("HumanoidRootPart"), c:FindFirstChild("Torso"), c:FindFirstChild("UpperTorso") }) do
 						if bp then
 							local po = bp:FindFirstChild("PartOwner")
@@ -6388,7 +6080,6 @@ function installAntis()
 						end
 					end
 				end
-				-- Anti-grab: force unfreeze sit
 				if S.toggles.antiGucci or S.toggles.antiGrab then
 					task.defer(function()
 						h2:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
@@ -6426,7 +6117,6 @@ function installAntis()
 	if LP.Character then task.spawn(bindCharacter, LP.Character) end
 	LP.CharacterAdded:Connect(function(c) task.spawn(bindCharacter, c) end)
 
-	-- Fast when Gucci ON ( ~0.04), slightly slower for plain antiGrab
 	local gucciAcc = 0
 	bind("gucciAntiHB", RunService.Heartbeat:Connect(function(dt)
 		if not (S.toggles.antiGucci or S.toggles.antiGrab) then return end
@@ -6442,7 +6132,6 @@ function installAntis()
 		if not isHeld then return end
 		isHeld.Changed:Connect(function(held)
 			if held == true and (S.toggles.antiGrab or S.toggles.antiGucci) then
-				-- burst: same-frame + next frames
 				gucciBreakGrabNow()
 				if doAntiGrabHard then doAntiGrabHard() end
 				gucciAntiTick()
@@ -6455,8 +6144,6 @@ function installAntis()
 	end)
 end
 
-------------------------------------------------------------------------
--- line tricks + character invisibility
 function setCrazyLine(on)
 	S.toggles.crazyLine = on == true
 	stopLoop("crazyLine")
@@ -6465,13 +6152,11 @@ function setCrazyLine(on)
 		return
 	end
 	if S.toggles.invisLine then
-		-- note: Invisible Line won't work if Crazy Line is Enabled
 		S.toggles.invisLine = false
 		stopLoop("invisLine")
 	end
 	if not FTAP.CreateGrabLine then resolveFTAP() end
 	notify(HUB_NAME, "Crazy Line ON (soft lag lines)", 1.5)
-	-- CFrame used for soft-lag grab lines
 	local lagCF = CFrame.new(
 		0.12640380859375, 0.9606337547302246, -0.5000009536743164,
 		0.9985212683677673, 0, -0.05436277016997337,
@@ -6498,7 +6183,6 @@ function setInvisibleLine(on)
 		notify(HUB_NAME, "Turn Crazy Line OFF for Invisible Line", 2)
 	end
 	if on then
-		-- local visual hide + empty CreateGrabLine fires on grab (see onGrabPartsAdded)
 		startLoop("invisLine", 0.25, function()
 			for _, ch in ipairs(workspace:GetChildren()) do
 				if ch.Name == "GrabParts" then
@@ -6519,7 +6203,6 @@ function setInvisibleLine(on)
 	end
 end
 
--- Character invis ( underground FE method — body under map, camera on surface)
 local invisState = {
 	on = false,
 	origY = nil,
@@ -6609,7 +6292,6 @@ function setCharacterInvis(on, quiet)
 	if not quiet then notify(HUB_NAME, "Invisibility ON (body under map)", 1.5) end
 end
 
--- Temporarily surface character for grab actions while invisible
 function surfaceForGrab()
 	if not invisState.on or not S.toggles.charInvis then return false end
 	local r = hrp()
@@ -6629,7 +6311,6 @@ function hideAfterGrab()
 	r.Transparency = 1
 end
 
--- re-arm invis after respawn
 LP.CharacterAdded:Connect(function()
 	if S.toggles.charInvis then
 		task.delay(0.6, function()
@@ -6639,10 +6320,6 @@ LP.CharacterAdded:Connect(function()
 end)
 
 
-------------------------------------------------------------------------
--- Auto-Spin Coins (workspace.Slots → SlotHandle.Handle)
--- Ready when all LightBalls are Neon · then TP above each Handle + SNO ~1s
-------------------------------------------------------------------------
 function findSlotsFolder()
 	local s = workspace:FindFirstChild("Slots")
 	if s then return s end
@@ -6655,12 +6332,10 @@ function findSlotsFolder()
 	return nil
 end
 
--- Collect SlotHandle.Handle parts + LightBalls under workspace.Slots
 function scanSlotMachines()
 	local root = findSlotsFolder()
 	local handles, lights = {}, {}
 	if not root then return handles, lights, root end
-	-- Prefer direct children with SlotHandle (real machines)
 	for _, slot in ipairs(root:GetChildren()) do
 		local sh = slot:FindFirstChild("SlotHandle")
 		if sh then
@@ -6674,7 +6349,6 @@ function scanSlotMachines()
 			end
 		end
 	end
-	-- Fallback: deep scan (map variants)
 	if #handles == 0 then
 		for _, d in ipairs(root:GetDescendants()) do
 			if d.Name == "Handle" and d:IsA("BasePart") then
@@ -6696,12 +6370,11 @@ function collectSlotHandles(slotsFolder)
 	return handles
 end
 
--- All LightBalls Neon = spin window open (if no lights found, allow attempt)
 function slotsSpinReady(slotsFolder)
 	local handles, lights = scanSlotMachines()
 	if #handles == 0 then return false, 0, 0 end
 	if #lights == 0 then
-		return true, 0, 0 -- structure unknown — still try
+		return true, 0, 0
 	end
 	local neon = 0
 	for _, lb in ipairs(lights) do
@@ -6747,7 +6420,6 @@ function tpAboveHandle(handle)
 			hum.Sit = false
 			hum.PlatformStand = false
 		end
-		-- keep look rotation, only move position (FTAP-friendly)
 		local pos = handle.Position + Vector3.new(0, 5, 0)
 		me.CFrame = me.CFrame.Rotation + pos
 		me.AssemblyLinearVelocity = Vector3.zero
@@ -6755,7 +6427,6 @@ function tpAboveHandle(handle)
 	end)
 end
 
--- One full pass: every SlotHandle.Handle for ~1s with CanCollide off + TP + SNO
 function autoSpinCoinsOnce()
 	local handles, lights, root = scanSlotMachines()
 	if not root then
@@ -6772,7 +6443,6 @@ function autoSpinCoinsOnce()
 	if not me then return false, "no character" end
 	local saved = me.CFrame
 
-	-- live target handle for background TP/SNO loop
 	local current = handles[1]
 	local chase = true
 	local chaseThread = task.spawn(function()
@@ -6793,7 +6463,6 @@ function autoSpinCoinsOnce()
 		current = handle
 		local oldCollide = handle.CanCollide
 		pcall(function() handle.CanCollide = false end)
-		-- ~1s on this handle (5 × 0.2)
 		for _ = 1, 5 do
 			if not S.toggles.autoSpin or not handle.Parent then break end
 			tpAboveHandle(handle)
@@ -6810,7 +6479,6 @@ function autoSpinCoinsOnce()
 		end
 		pcall(function() handle.CanCollide = oldCollide end)
 		spun += 1
-		-- round ended mid-pass
 		local stillReady = slotsSpinReady()
 		if not stillReady then break end
 	end
@@ -6863,13 +6531,11 @@ function setAutoSpinCoins(on)
 					notify(HUB_NAME, "Auto-Spin · " .. tostring(info), 1.5)
 					lastMsg = os.clock()
 				end
-				-- ~5s between rounds
 				for _ = 1, 50 do
 					if not S.toggles.autoSpin then break end
 					task.wait(0.1)
 				end
 			else
-				-- only notify waiting every 30s to reduce spam
 				if os.clock() - lastWaitMsg > 30 then
 					notify(HUB_NAME, "Auto-Spin · " .. tostring(info or "waiting"), 1.2)
 					lastWaitMsg = os.clock()
@@ -6881,8 +6547,6 @@ function setAutoSpinCoins(on)
 	end)
 end
 
-------------------------------------------------------------------------
--- Movement (Heartbeat enforced — FTAP resets WalkSpeed)
 function setFly(on)
 	if S.flyBv then pcall(function() S.flyBv:Destroy() end) S.flyBv = nil end
 	if S.flyBg then pcall(function() S.flyBg:Destroy() end) S.flyBg = nil end
@@ -6931,11 +6595,9 @@ function setFly(on)
 	end)
 end
 
--- movement heartbeat
 bind("moveHB", RunService.Heartbeat:Connect(function()
 	local h = hum()
 	local r = hrp()
-	-- WalkSpeed override: use cFrame push (FTAP resets h.WalkSpeed)
 	if S.toggles.speed and h and r and h.MoveDirection.Magnitude > 0 then
 		local targetSpeed = S.walkSpeed or 50
 		local mult = targetSpeed / 16
@@ -6961,9 +6623,6 @@ bind("infJump", UserInputService.JumpRequest:Connect(function()
 	if h then h:ChangeState(Enum.HumanoidStateType.Jumping) end
 end))
 
-------------------------------------------------------------------------
--- Toys / inventory / unowned map
--- Internal toy names from working FTAP spawner scripts
 local KNOWN_TOYS = {
 	"Airhorn", "AnvilGray", "ArmChairBlue", "ArmChairBrownGray", "ArmChairPink",
 	"BallBasketball", "BallMagicLight", "BallSnowball", "BathroomShower", "BathroomSink",
@@ -6982,7 +6641,6 @@ local KNOWN_TOYS = {
 
 function getOwnedToyNames()
 	local owned = {}
-	-- backpack + character tools
 	local function scan(container)
 		if not container then return end
 		for _, t in ipairs(container:GetChildren()) do
@@ -6993,7 +6651,6 @@ function getOwnedToyNames()
 	end
 	scan(LP:FindFirstChild("Backpack"))
 	scan(char())
-	-- PlayerGui inventory labels/buttons
 	local pg = LP:FindFirstChild("PlayerGui")
 	if pg then
 		for _, d in ipairs(pg:GetDescendants()) do
@@ -7005,7 +6662,6 @@ function getOwnedToyNames()
 							owned[toy] = true
 						end
 					end
-					-- any non-generic inventory text
 					local low = tx:lower()
 					if not low:find("equip") and not low:find("spawn") and not low:find("buy") then
 						if d.Parent and (tostring(d.Parent.Name):lower():find("toy") or tostring(d.Parent.Name):lower():find("inv") or tostring(d.Parent.Name):lower():find("item")) then
@@ -7016,7 +6672,6 @@ function getOwnedToyNames()
 			end
 		end
 	end
-	-- models we already own on map (PartOwner)
 	for _, m in ipairs(workspace:GetDescendants()) do
 		if m:IsA("StringValue") and m.Name == "PartOwner" and m.Value == LP.Name then
 			local model = m.Parent
@@ -7030,7 +6685,6 @@ function getOwnedToyNames()
 end
 
 function getMapItems()
-	-- returns { name = {owned=bool, parts={...}, models={...}} }
 	local map = {}
 	local me = hrp()
 	local origin = me and me.Position or Vector3.zero
@@ -7057,16 +6711,9 @@ function getMapItems()
 	return map
 end
 
-------------------------------------------------------------------------
--- Toy spawn ( serial queue + CanSpawnToy gate like /)
--- FTAP SpawnToyRemoteFunction args: (name, CFrame, Vector3 rotation degrees)
--- Parallel InvokeServer = only 1 pallet lands. Forms MUST spawn one-by-one.
-------------------------------------------------------------------------
--- S.formSizeScale = S.formSizeScale or 1.2
--- S.formDistance = S.formDistance or 12
 S.formOrientation = S.formOrientation or 0
 S.formHeight = S.formHeight or 2
-S.formGap = S.formGap or 0.09 -- seconds between spawns
+S.formGap = S.formGap or 0.09
 S.formBuilding = false
 
 function getCanSpawnToy()
@@ -7085,7 +6732,6 @@ function waitForCanSpawn(timeout)
 end
 
 function rotFromCF(cf)
-	-- Vector3.new(0, CamPart.Orientation.Y, 0) — degrees
 	if typeof(cf) ~= "CFrame" then return Vector3.zero end
 	local _, y = cf:ToOrientation()
 	return Vector3.new(0, math.deg(y), 0)
@@ -7100,14 +6746,12 @@ function resolveSpawnCF(name, opts)
 	return cp.CFrame * CFrame.new(0, opts.y or 0, -dist)
 end
 
--- Synchronous spawn (used by queue + form builder). Returns true if invoke ran.
 function spawnToyNow(name, opts)
 	opts = opts or {}
 	name = name or S.selectedToy or "PalletLightBrown"
 	if name == "Pallet" then name = "PalletLightBrown" end
 	if not FTAP.SpawnToy then resolveFTAP() end
 	if not FTAP.SpawnToy then
-		-- one more attempt after a brief wait
 		task.wait(0.3)
 		resolveFTAP()
 	end
@@ -7140,7 +6784,6 @@ function spawnToyNow(name, opts)
 		end)
 	end
 
-	-- server flips CanSpawnToy false→true; give it a beat
 	local gap = opts.gap
 	if gap == nil then gap = S.formGap or 0.09 end
 	if gap > 0 then task.wait(gap) end
@@ -7148,7 +6791,6 @@ function spawnToyNow(name, opts)
 	return ok
 end
 
--- single-worker queue (never parallel InvokeServer spam)
 local toySpawnQueue = {}
 local toySpawnWorker = false
 
@@ -7157,11 +6799,9 @@ function pumpToyQueue()
 	toySpawnWorker = true
 	task.spawn(function()
 		while #toySpawnQueue > 0 do
-			-- never interleave with form builds (same remote, CanSpawnToy)
 			local formWaitStart = os.clock()
 			while S.formBuilding do
 				task.wait(0.1)
-				-- safety: if formBuilding stuck for >8s, force reset
 				if os.clock() - formWaitStart > 8 then
 					S.formBuilding = false
 					break
@@ -7169,7 +6809,6 @@ function pumpToyQueue()
 			end
 			local job = table.remove(toySpawnQueue, 1)
 			if job then
-				-- auto-resolve remotes if missing
 				if not FTAP.SpawnToy then pcall(resolveFTAP) end
 				local ok = spawnToyNow(job.name, job.opts)
 				if job.opts and job.opts.onDone then
@@ -7181,7 +6820,6 @@ function pumpToyQueue()
 	end)
 end
 
--- Public: clutch-friendly enqueue (Q key never stalls the input thread)
 function spawnToy(name, opts)
 	opts = opts or {}
 	name = name or S.selectedToy or "PalletLightBrown"
@@ -7194,7 +6832,6 @@ function spawnToy(name, opts)
 	if not opts.silent then
 		notify(HUB_NAME, "Spawn " .. name, 0.6)
 	end
-	-- copy opts so we can force silent for the worker
 	local jobOpts = {}
 	for k, v in pairs(opts) do jobOpts[k] = v end
 	jobOpts.silent = true
@@ -7207,7 +6844,6 @@ function spawnToyBurst(name, count)
 	count = math.clamp(tonumber(count) or 1, 1, 80)
 	name = name or "PalletLightBrown"
 	task.spawn(function()
-		-- buy once, then serial spawn with spacing so stack is visible
 		if FTAP.BuyToy then pcall(function() FTAP.BuyToy:InvokeServer(name) end) end
 		waitForCanSpawn(3)
 		local cp = camPart() or hrp()
@@ -7248,9 +6884,6 @@ function countMyToys(filterName)
 	return n
 end
 
-------------------------------------------------------------------------
--- Train control (map train cave + optional spawn + SNO + WASD drive)
-------------------------------------------------------------------------
 S.trainSpeed = S.trainSpeed or 120
 S._trainDriveConn = nil
 S._trainHornConn = nil
@@ -7303,10 +6936,8 @@ function findTrainSeatNear(pos, maxDist)
 end
 
 function findAnyTrainSeat()
-	-- 1) Secret train cave
 	local cave = findTrainSeatNear(TRAIN_CAVE_POS, 250)
 	if cave then return cave end
-	-- 2) My spawned toys named Train*
 	local folder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
 	if folder then
 		for _, ch in ipairs(folder:GetChildren()) do
@@ -7321,7 +6952,6 @@ function findAnyTrainSeat()
 			end
 		end
 	end
-	-- 3) Workspace models with "train" in name
 	for _, obj in ipairs(workspace:GetDescendants()) do
 		if obj:IsA("Model") and tostring(obj.Name):lower():find("train", 1, true) then
 			for _, d in ipairs(obj:GetDescendants()) do
@@ -7361,7 +6991,6 @@ function sitTrainSeat(seat)
 	local h = hum()
 	local me = hrp()
 	if not h or not me or not seat then return false end
-	-- get close first (SNO range ~30)
 	pcall(function()
 		me.CFrame = seat.CFrame * CFrame.new(0, 3.2, 0)
 	end)
@@ -7399,7 +7028,6 @@ function startTrainDrive()
 		notify(HUB_NAME, "No character", 1.5)
 		return false
 	end
-	-- soft-disable anti seat toggles so we can sit
 	local prevAntiBlob = S.toggles.antiBlobman
 	local prevAntiTrain = S.toggles.antiTrain
 	S.toggles.antiBlobman = false
@@ -7408,7 +7036,6 @@ function startTrainDrive()
 	notify(HUB_NAME, "Finding train…", 1.2)
 	local seat = findAnyTrainSeat()
 	if not seat then
-		-- try toy spawn names (map train is primary; spawn is best-effort)
 		for _, name in ipairs({ "Train", "ToyTrain", "SteamTrain" }) do
 			spawnToyNow(name, { silent = true, gap = 0.12, dist = 12, y = 0 })
 			task.wait(0.35)
@@ -7417,7 +7044,6 @@ function startTrainDrive()
 		end
 	end
 	if not seat then
-		-- teleport to cave and search again
 		pcall(function() me.CFrame = CFrame.new(TRAIN_CAVE_POS + Vector3.new(0, 6, 0)) end)
 		task.wait(0.4)
 		seat = findAnyTrainSeat()
@@ -7436,7 +7062,6 @@ function startTrainDrive()
 	end
 
 	if not sitTrainSeat(seat) then
-		-- one more force sit attempt
 		sitTrainSeat(seat)
 	end
 	task.wait(0.15)
@@ -7492,7 +7117,6 @@ function startTrainDrive()
 		end
 		local h = hum()
 		if h and h.Sit == false and h.SeatPart == nil then
-			-- try re-sit once every few frames is expensive; soft stop
 			stopTrainDrive(true)
 			notify(HUB_NAME, "Left train seat · drive stopped", 1.5)
 			return
@@ -7543,18 +7167,15 @@ function startTrainDrive()
 	return true
 end
 
-------------------------------------------------------------------------
--- Snowball farm (BallSnowball · serial spawn · SNO · roll-grow · fling/explode)
-------------------------------------------------------------------------
 S.ballType = S.ballType or "Snowball"
 S.ballSize = S.ballSize or 12
 S.ballCount = S.ballCount or 10
 S.ballFlingPower = S.ballFlingPower or 5000
 S._snowFarmOn = false
 S._snowFarmConn = nil
-S._snowGrown = S._snowGrown or {} -- [SoundPart] = true
+S._snowGrown = S._snowGrown or {}
 S._snowFarmCF = CFrame.new(-410, 228.394, 510)
-S._sandFarmCF = CFrame.new(-410, 228.394, 510) -- same peak; sand material patches nearby
+S._sandFarmCF = CFrame.new(-410, 228.394, 510)
 
 function getMyToyFolder()
 	return workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
@@ -7639,7 +7260,6 @@ function farmSnowballLoop(model)
 				local grown = sound.Size.X >= maxSz and sound.Size.Y >= maxSz and sound.Size.Z >= maxSz
 				if grown then
 					S._snowGrown[sound] = true
-					-- park grown balls high so they stop rolling
 					bp.Position = Vector3.new(math.random(-8000, 8000), 10000, math.random(-8000, 8000))
 				else
 					local half = sound.Size.X / 2 - 0.65
@@ -7707,7 +7327,6 @@ function startSnowFarm()
 					gap = 0.1,
 				})
 			end
-			-- ensure farm loops on existing
 			folder = getMyToyFolder()
 			if folder and not S._snowFarmConn then
 				S._snowFarmConn = folder.ChildAdded:Connect(function(ch)
@@ -7810,7 +7429,6 @@ function explodeGrownSnowballs()
 end
 
 function makeAndFlingSnowballsNow()
-	-- one-shot: farm to size quickly then fling at selected
 	local p = S.selected
 	if not p or not validP(p) or not p.Character then
 		notify(HUB_NAME, "Select a target", 1.5)
@@ -7826,13 +7444,11 @@ function makeAndFlingSnowballsNow()
 		while S._snowFarmOn and (os.clock() - t0) < 90 do
 			task.wait(0.4)
 		end
-		-- if still farming but some grown, fling what we have; else wait a bit more
 		if countGrownSnowballs() == 0 then
 			task.wait(2)
 		end
 		stopSnowFarm(true)
 		if countGrownSnowballs() == 0 then
-			-- fallback: fling whatever BallSnowballs we own even if not fully grown
 			local folder = getMyToyFolder()
 			if folder then
 				for _, ch in ipairs(folder:GetChildren()) do
@@ -7847,10 +7463,7 @@ function makeAndFlingSnowballsNow()
 	end)
 end
 
-------------------------------------------------------------------------
--- Toy limit (free = 100 · gamepass = 200) + form wear
-------------------------------------------------------------------------
-S.toyPassMode = S.toyPassMode or "auto" -- auto | free | pass
+S.toyPassMode = S.toyPassMode or "auto"
 S.formSizeScale = S.formSizeScale or 1.2
 S.formGap = S.formGap or 0.09
 S.formWearPieces = S.formWearPieces or {}
@@ -7895,9 +7508,6 @@ function clampOffsetList(offs, maxN)
 	return out
 end
 
-------------------------------------------------------------------------
--- Form builds (wearable): spawn serial → SNO → stick + animate
-------------------------------------------------------------------------
 local WEAR_PITCH = 1.15
 
 function formToyPart(inst)
@@ -8013,7 +7623,6 @@ function startFormWearLoop()
 					part.AssemblyLinearVelocity = Vector3.zero
 					part.AssemblyAngularVelocity = Vector3.zero
 				end)
-				-- re-SNO periodically so ownership sticks while you move
 				if (pe._snoT or 0) < t then
 					pe._snoT = t + 0.35
 					sno(part)
@@ -8088,7 +7697,6 @@ function registerFormPiece(model, off, pitch, defAnim, defAnchor)
 			end
 		end
 	end
-	-- short ownership pulse
 	if FTAP.CreateGrabLine then
 		pcall(function() FTAP.CreateGrabLine:FireServer(part, part.CFrame) end)
 		task.defer(function()
@@ -8124,7 +7732,6 @@ function spawnFormOffsets(toy, offsets, scaleMul, opts)
 	local defAnim = opts.anim
 	local defAnchor = opts.anchor or "hrp"
 	if not S.formWearPieces then S.formWearPieces = {} end
-	-- respect toy cap (free 100 / pass 200)
 	local room = toysRoom()
 	if room < 2 then
 		S.formBuilding = false
@@ -8136,7 +7743,6 @@ function spawnFormOffsets(toy, offsets, scaleMul, opts)
 	if #offsets < want then
 		notify(HUB_NAME, "Form clipped to " .. #offsets .. " (limit " .. getToyLimit() .. ")", 2)
 	end
-	-- replace previous worn form so shapes don't stack forever
 	if not opts.keep then
 		clearFormWear(true)
 	end
@@ -8154,7 +7760,6 @@ function spawnFormOffsets(toy, offsets, scaleMul, opts)
 		if S.formCancel then break end
 		me = hrp()
 		if not me then break end
-		-- spawn slightly behind/above so it doesn't slam into you, then wear loop snaps it on
 		local ox = (off.x or off[1] or 0) * pitch
 		local oy = (off.y or off[2] or 0) * pitch
 		local oz = (off.z or off[3] or 0) * pitch
@@ -8187,7 +7792,6 @@ function spawnFormOffsets(toy, offsets, scaleMul, opts)
 	return n > 0
 end
 
--- Grid-space shape generators (unit ≈ wear pitch after scale)
 function formHeartOffsets(steps)
 	steps = steps or 28
 	local pts = {}
@@ -8195,7 +7799,6 @@ function formHeartOffsets(steps)
 		local tt = (i / steps) * math.pi * 2
 		local x = 16 * (math.sin(tt) ^ 3)
 		local y = 13 * math.cos(tt) - 5 * math.cos(2 * tt) - 2 * math.cos(3 * tt) - math.cos(4 * tt)
-		-- sit above head; head anchor + small bob
 		pts[#pts + 1] = {
 			x = x * 0.07,
 			y = y * 0.07 + 1.35,
@@ -8265,7 +7868,6 @@ function formWingsOffsets()
 			}
 		end
 	end
-	-- spine / back plate
 	for i = -1, 2 do
 		pts[#pts + 1] = { x = 0, y = i * 0.55, z = 0.45 }
 	end
@@ -8273,7 +7875,6 @@ function formWingsOffsets()
 end
 
 function formSuitOffsets()
-	-- tight body shell (armor around HRP)
 	local pts = {}
 	local function ring(cy, r, n, zoff)
 		n = n or 8
@@ -8286,17 +7887,15 @@ function formSuitOffsets()
 			}
 		end
 	end
-	ring(1.55, 0.55, 6, 0) -- shoulders / neck
-	ring(0.85, 0.85, 8, 0) -- chest
-	ring(0.1, 0.9, 8, 0) -- mid
-	ring(-0.7, 0.75, 7, 0) -- hips
-	-- front plate
+	ring(1.55, 0.55, 6, 0)
+	ring(0.85, 0.85, 8, 0)
+	ring(0.1, 0.9, 8, 0)
+	ring(-0.7, 0.75, 7, 0)
 	for y = -0.5, 1.2, 0.45 do
 		pts[#pts + 1] = { x = 0, y = y, z = -0.85 }
 		pts[#pts + 1] = { x = -0.55, y = y, z = -0.7 }
 		pts[#pts + 1] = { x = 0.55, y = y, z = -0.7 }
 	end
-	-- back plate
 	for y = -0.4, 1.1, 0.45 do
 		pts[#pts + 1] = { x = 0, y = y, z = 0.75 }
 	end
@@ -8317,8 +7916,8 @@ function formRobotOffsets()
 			end
 		end
 	end
-	box(0, 2.4, 0, 0.55, 0.55, 0.45, 0.85) -- head
-	box(0, 0.85, 0, 0.85, 0.95, 0.5, 0.85) -- torso
+	box(0, 2.4, 0, 0.55, 0.55, 0.45, 0.85)
+	box(0, 0.85, 0, 0.85, 0.95, 0.5, 0.85)
 	box(-1.55, 0.95, 0, 0.4, 0.85, 0.35, 0.85)
 	box(1.55, 0.95, 0, 0.4, 0.85, 0.35, 0.85)
 	box(-0.5, -1.15, 0, 0.4, 0.85, 0.35, 0.85)
@@ -8456,9 +8055,6 @@ function cancelFormBuild()
 	notify(HUB_NAME, "Form cancel · use Remove Form to detach", 1.2)
 end
 
-------------------------------------------------------------------------
--- Missile strike: spawn → own → TP on target → BombExplode
-------------------------------------------------------------------------
 S.missileType = S.missileType or "BombMissile"
 S.missileCount = S.missileCount or 3
 S.missileTarget = S.missileTarget or nil
@@ -8721,8 +8317,6 @@ function fireMissilesOnce()
 	end)
 end
 
-------------------------------------------------------------------------
--- Console: commands + exploit sign scanner (replicated only)
 local SUSPICIOUS_NAMES = {
 	"voidz", "fe6", "rayfield", "orion", "dex", "infiniteyield", "iy_", "darkdex",
 	"flingaura", "skyvelocity", "bringbody", "kethhook", "hydroxide", "simple spy",
@@ -8771,14 +8365,12 @@ function scanPlayerExploits(p)
 				checkName(t.Name, "backpack")
 			end
 		end
-		-- PlayerGui rarely replicates; still try
 		local pg = p:FindFirstChild("PlayerGui")
 		if pg then
 			for _, g in ipairs(pg:GetChildren()) do
 				checkName(g.Name, "PlayerGui")
 			end
 		end
-		-- known NumberValues for reach exploit
 		for _, n in ipairs({ "FartherReach", "DefaultReach", "CurrentReach" }) do
 			if p:FindFirstChild(n) then mark("reach value: " .. n) end
 		end
@@ -8830,7 +8422,6 @@ function runConsoleCommand(raw)
 				if p ~= LP then list[#list + 1] = p end
 			end
 		end
-		-- names only — who might have something loaded (best-effort)
 		local suspects = {}
 		for _, p in ipairs(list) do
 			local hits = scanPlayerExploits(p)
@@ -8899,8 +8490,7 @@ function runConsoleCommand(raw)
 	end
 end
 
--- Real bring: SNO within range → keep ownership → hold in front of you until grab/release
-S.broughtItems = S.broughtItems or {} -- [model] = { part, untilT, lastSno, ox, oy, oz }
+S.broughtItems = S.broughtItems or {}
 S.bringHoldConn = S.bringHoldConn or nil
 
 function modelGrabbedLocally(model)
@@ -8992,7 +8582,6 @@ function claimPartOwnership(part, tries)
 	for _ = 1, tries do
 		me = hrp()
 		if not me or not part.Parent then return false end
-		-- SNO only sticks within ~30 studs
 		if (part.Position - me.Position).Magnitude > 28 then
 			pcall(function() me.CFrame = part.CFrame * CFrame.new(0, 3, 5) end)
 		end
@@ -9026,7 +8615,6 @@ function startBringHoldLoop()
 			elseif info.untilT and now > info.untilT then
 				releaseBroughtItem(model, true)
 			elseif modelGrabbedLocally(model) then
-				-- you grabbed it — drop our hold so you can move/drop freely
 				releaseBroughtItem(model, true)
 			else
 				local part = info.part
@@ -9063,7 +8651,6 @@ function startBringHoldLoop()
 				end
 			end
 		end
-		-- stop loop if empty
 		local any = false
 		for _ in pairs(S.broughtItems) do any = true; break end
 		if not any and S.bringHoldConn then
@@ -9084,7 +8671,6 @@ function bringModel(model, opts)
 
 	local home = me.CFrame
 	local went = false
-	-- get in SNO range of the item
 	if (primary.Position - me.Position).Magnitude > 26 then
 		went = true
 		pcall(function() me.CFrame = primary.CFrame * CFrame.new(0, 4, 6) end)
@@ -9097,7 +8683,6 @@ function bringModel(model, opts)
 			if claimPartOwnership(part, 8) then claimed = true end
 		end
 	end
-	-- one more hard pulse on primary
 	if claimPartOwnership(primary, 12) then claimed = true end
 
 	if went then
@@ -9106,7 +8691,6 @@ function bringModel(model, opts)
 		me = hrp() or me
 	end
 
-	-- register hold (keeps SNO + parks in front of you)
 	local slot = 0
 	for _ in pairs(S.broughtItems) do slot += 1 end
 	S.broughtItems[model] = {
@@ -9151,7 +8735,6 @@ function bringUnownedByName(name)
 	task.spawn(function()
 		local found = findMapModelsByName(name)
 		if #found == 0 then
-			-- fallback to cached scan samples
 			local map = getMapItems()
 			local entry = map[name]
 			if entry then
@@ -9170,7 +8753,6 @@ function bringUnownedByName(name)
 			notify(HUB_NAME, "None found: " .. tostring(name), 2)
 			return
 		end
-		-- bring closest first, then a few more of same name
 		local n, maxN = 0, math.min(5, #found)
 		notify(HUB_NAME, "Bringing " .. name .. "…", 1)
 		for i = 1, maxN do
@@ -9182,7 +8764,6 @@ function bringUnownedByName(name)
 	end)
 end
 
--- Q pallet toggle — InputBegan only, zero delay
 function setPalletQ(on)
 	pcall(function() ContextActionService:UnbindAction("VOIDZ_PalletQ") end)
 	if S.conns.palletQ then pcall(function() S.conns.palletQ:Disconnect() end) S.conns.palletQ = nil end
@@ -9190,17 +8771,14 @@ function setPalletQ(on)
 		notify(HUB_NAME, "Q pallet OFF", 1)
 		return
 	end
-	-- pre-resolve so first Q is instant
 	task.spawn(resolveFTAP)
 	S.conns.palletQ = UserInputService.InputBegan:Connect(function(input, gp)
 		if gp then return end
 		if input.KeyCode == Enum.KeyCode.Q and S.toggles.palletQ then
-			-- auto-resolve remotes if missing, then sync spawn for instant response
 			if not FTAP.SpawnToy then pcall(resolveFTAP) end
 			if FTAP.SpawnToy then
 				spawnToy("PalletLightBrown", { silent = false, dist = 2.5, sync = true })
 			else
-				-- queue fallback if remotes still loading
 				spawnToy("PalletLightBrown", { silent = false, dist = 2.5 })
 			end
 		end
@@ -9208,9 +8786,6 @@ function setPalletQ(on)
 	notify(HUB_NAME, "Q pallet ON (instant)", 1)
 end
 
-------------------------------------------------------------------------
--- ESP / visuals
-------------------------------------------------------------------------
 local espStore = {}
 function clearESP()
 	for p, objs in pairs(espStore) do
@@ -9299,10 +8874,7 @@ function setPurpleTint(on)
 	bloom.Threshold = 0.9
 end
 
-------------------------------------------------------------------------
--- Loops with death detect + quiet mode
 function watchUntilDead(p, actionName, attackerFn)
-	-- runs attackerFn repeatedly until dead, then one notify + chat
 	if not p then return end
 	local name = p.Name
 	startLoop("watch_" .. name .. actionName, 0.25, function()
@@ -9319,13 +8891,9 @@ function watchUntilDead(p, actionName, attackerFn)
 	end)
 end
 
-------------------------------------------------------------------------
--- Grab-release engine (working FTAP method — GrabParts ChildAdded)
--- Source: pastebin FLING IN PEOPLE complete script
-------------------------------------------------------------------------
-local grabMap = {} -- GrabParts model -> BasePart
+local grabMap = {}
 local heldParts = {}
-local effectParts = {} -- part -> true while forces applied
+local effectParts = {}
 local grabWatchInstalled = false
 
 function isValidGrabItem(part)
@@ -9345,7 +8913,6 @@ function clearPartForces(part)
 		for _, ch in ipairs(part:GetChildren()) do
 			if ch:IsA("BodyVelocity") or ch:IsA("BodyForce") or ch:IsA("BodyAngularVelocity")
 				or ch:IsA("BodyGyro") or ch:IsA("BodyPosition") then
-				-- never strip dormant throw arms while still MaxForce 0 (holding)
 				if ch.Name == "VOIDZ_ThrowArm" or ch.Name == "SuperStrength" then
 					if ch:IsA("BodyVelocity") and ch.MaxForce.Magnitude > 1 then
 						ch:Destroy()
@@ -9374,8 +8941,6 @@ function resolveReleaseRoot(part)
 	return part
 end
 
--- Pre-arm BodyVelocity WHILE holding ( SuperStrength method).
--- Ownership only lasts during grab — BV must already be parented before let-go.
 function ensureThrowArm(part)
 	if not part or not part:IsA("BasePart") then return nil end
 	local bv = part:FindFirstChild("VOIDZ_ThrowArm")
@@ -9400,7 +8965,6 @@ function launchThrowArm(part, power, dir)
 	dir = dir.Unit
 	local vel = dir * power + Vector3.new(0, power * 0.12, 0)
 	pcall(function()
-		-- keep ownership pulse while we still can
 		if FTAP.SetNetworkOwner then
 			local me = hrp()
 			local origin = me and me.Position or (part.Position - dir * 6)
@@ -9417,7 +8981,6 @@ function launchThrowArm(part, power, dir)
 		Debris:AddItem(bv, 0.9)
 		part.AssemblyLinearVelocity = vel
 		part.AssemblyAngularVelocity = Vector3.new(18, 36, 12)
-		-- spare FlingBV in case arm was stripped
 		local spare = part:FindFirstChild("FlingBV")
 		if not spare then
 			spare = Instance.new("BodyVelocity")
@@ -9440,7 +9003,6 @@ function applyReleaseEffects(part)
 	if dir.Magnitude < 1e-3 then dir = Vector3.new(0, 0, -1) end
 	dir = dir.Unit
 
-	-- Silent aim override: pallet / shuriken aimed at nearest target
 	if S._aimAtTarget then
 		local target = S._aimAtTarget
 		if target and target.Parent then
@@ -9464,10 +9026,8 @@ function applyReleaseEffects(part)
 	local wantGrav = S.grabGravity == true or (S.toggles and S.toggles.grabGravOn == true)
 	local wantSpin = S.grabSpin == true or (S.toggles and S.toggles.grabSpinOn == true)
 
-	-- Super throw wins if both on
 	if S.superStrength or (S.toggles and S.toggles.superStr) then
 		local power = (tonumber(S.superStrengthPower) or 4000) * (tonumber(S.strengthMult) or 1)
-		-- activate pre-armed SuperStrength BV () + our throw arm
 		pcall(function()
 			local ss = root:FindFirstChild("SuperStrength") or part:FindFirstChild("SuperStrength")
 			if ss and ss:IsA("BodyVelocity") then
@@ -9487,14 +9047,12 @@ function applyReleaseEffects(part)
 	end
 
 	if wantThrow then
-		-- slider 0–500 → ~0–20000 (default 80 → 3200)
 		local power = math.clamp((tonumber(S.grabFlingPower) or 80) * 40, 400, 25000)
 		power = power * (tonumber(S.strengthMult) or 1)
 		launchThrowArm(root, power, dir)
 		if part ~= root and part.Parent then
 			launchThrowArm(part, power * 0.95, dir)
 		end
-		-- if player: SNO whole character + fling limbs
 		local model = root:FindFirstAncestorOfClass("Model")
 		local plr = model and Players:GetPlayerFromCharacter(model)
 		if plr then
@@ -9558,7 +9116,6 @@ function applyReleaseEffects(part)
 	end
 end
 
--- boost AlignPosition/AlignOrientation on GrabParts DragPart (Massless Grab)
 function boostGrabAlign(grabModel, on)
 	local drag = grabModel:FindFirstChild("DragPart", true)
 		or grabModel:FindFirstChild("GrabPart", true)
@@ -9583,15 +9140,10 @@ function boostGrabAlign(grabModel, on)
 	end
 end
 
-------------------------------------------------------------------------
--- Stick To Pallet Center — MUST be above onGrabPartsAdded (Luau locals)
--- While YOU hold a pallet: hard-SNO anyone near it + pin their HRP to top center.
--- No client-only welds (those never stick FE). Ownership + BP/CFrame every frame.
-------------------------------------------------------------------------
 local destroyPalletCage, isPalletPart, buildPalletCage, resolveGrabbedFromWeld, setPalletCage
 do
-local palletLocks = {} -- GrabParts model -> true
-local palletPinned = {} -- root -> true (for cleanup)
+local palletLocks = {}
+local palletPinned = {}
 local palletCageNotified = false
 
 function _destroyPalletCage(key)
@@ -9605,18 +9157,15 @@ function _isPalletPart(part)
 		if not p then break end
 		local n = tostring(p.Name):lower()
 		if n:find("pallet", 1, true) or n == "palletlightbrown" then return true end
-		-- your spawned toys folder often parents models as PalletLightBrown
 		if p:IsA("Model") and n:find("pallet", 1, true) then return true end
 		p = p.Parent
 	end
-	-- flat wood-ish platform from SpawnedInToys (fallback)
 	local model = part:FindFirstAncestorOfClass("Model")
 	if model and model.Parent and tostring(model.Parent.Name):find("SpawnedInToys", 1, true) then
 		local n = tostring(model.Name):lower()
 		if n:find("pallet", 1, true) or n:find("crate", 1, true) or n:find("platform", 1, true) then
 			return true
 		end
-		-- large flat part you're holding from toys folder
 		if part:IsA("BasePart") and part.Size.Y <= 2.5 and part.Size.X >= 4 and part.Size.Z >= 4 then
 			return true
 		end
@@ -9643,7 +9192,6 @@ function resolvePalletBase(palletPart)
 				local area = d.Size.X * d.Size.Z
 				local score = area
 				if n:find("pallet", 1, true) then score = area * 10 end
-				-- prefer flat wide parts
 				if d.Size.Y < 3 then score = score * 1.5 end
 				if score > best then base, best = d, score end
 			end
@@ -9672,18 +9220,15 @@ end
 
 function palletTopCFrame(base)
 	local halfY = base.Size.Y * 0.5
-	-- stand slightly above top face center
 	return base.CFrame * CFrame.new(0, halfY + 2.15, 0)
 end
 
 function rootOnPallet(root, base)
 	if not root or not base then return false end
 	local off = base.CFrame:PointToObjectSpace(root.Position)
-	-- generous pad — people slide around while you swing the pallet
 	local hx = math.max(base.Size.X, base.Size.Z) * 0.5 + 6
 	local hz = hx
 	local hy = base.Size.Y * 0.5
-	-- also accept sphere check (tilted pallet)
 	local top = palletTopCFrame(base).Position
 	local flat = Vector3.new(root.Position.X - top.X, 0, root.Position.Z - top.Z).Magnitude
 	local yDiff = root.Position.Y - top.Y
@@ -9699,7 +9244,6 @@ end
 function pinRootToPalletCenter(root, base, plr)
 	if not root or not base or not root.Parent or not base.Parent then return end
 	local top = palletTopCFrame(base)
-	-- ownership first — without it BP/CFrame is local spoof only
 	if plr then
 		pcall(function() snoPlayer(plr, base.Position) end)
 	end
@@ -9718,7 +9262,6 @@ function pinRootToPalletCenter(root, base, plr)
 		root.AssemblyAngularVelocity = Vector3.zero
 		local owned = hasNetOwner(root)
 		if owned then
-			-- hard stick when we own them
 			root.CFrame = top
 		end
 		local bp = root:FindFirstChild("VOIDZ_PalletLock")
@@ -9757,14 +9300,12 @@ function pinEveryoneOnPallet(base)
 	if not base or not base.Parent then return end
 	local still = {}
 
-	-- Pin LOCAL PLAYER (you) to pallet top — no PlatformStand so you can still move
 	local myR = hrp()
 	if myR and rootOnPallet(myR, base) then
 		local top = palletTopCFrame(base)
 		pcall(function()
 			myR.AssemblyLinearVelocity = Vector3.zero
 			myR.AssemblyAngularVelocity = Vector3.zero
-			-- BodyPosition locks you to top center
 			local bp = myR:FindFirstChild("VOIDZ_PalletLock")
 			if not bp then
 				bp = Instance.new("BodyPosition")
@@ -9775,7 +9316,6 @@ function pinEveryoneOnPallet(base)
 				bp.Parent = myR
 			end
 			bp.Position = top.Position
-			-- BodyVelocity kills any slide
 			local bv = myR:FindFirstChild("VOIDZ_PalletBV")
 			if not bv then
 				bv = Instance.new("BodyVelocity")
@@ -9788,7 +9328,6 @@ function pinEveryoneOnPallet(base)
 		still[myR] = true
 	end
 
-	-- Pin OTHER players
 	for _, plr in ipairs(Players:GetPlayers()) do
 		if plr ~= LP and not isWL(plr) then
 			local r = rootOf(plr)
@@ -9798,7 +9337,6 @@ function pinEveryoneOnPallet(base)
 			end
 		end
 	end
-	-- NPCs
 	pcall(function()
 		for _, m in ipairs(workspace:GetChildren()) do
 			if m:IsA("Model") and not Players:GetPlayerFromCharacter(m) then
@@ -9811,7 +9349,6 @@ function pinEveryoneOnPallet(base)
 			end
 		end
 	end)
-	-- free anyone who left
 	for root in pairs(palletPinned) do
 		if not still[root] then
 			local hum = root.Parent and root.Parent:FindFirstChildOfClass("Humanoid")
@@ -9821,7 +9358,6 @@ function pinEveryoneOnPallet(base)
 	end
 end
 
--- resolve which side of the weld is the world object (not GrabPart)
 function _resolveGrabbedFromWeld(weld, grabPart)
 	if not weld then return nil end
 	local p0, p1 = weld.Part0, weld.Part1
@@ -9841,7 +9377,6 @@ function getHeldPalletBase()
 			if base then return base, grabModel, part end
 		end
 	end
-	-- live scan GrabParts (in case grabMap missed Part0)
 	for _, ch in ipairs(workspace:GetChildren()) do
 		if ch.Name == "GrabParts" then
 			local gp = ch:FindFirstChild("GrabPart")
@@ -9870,7 +9405,6 @@ function _buildPalletCage(palletPart, grabModel)
 	end
 end
 
--- always-on enforcer while toggle is active (more reliable than one while-loop)
 function tickPalletCage()
 	if not S.toggles.palletCage then
 		if next(palletPinned) then clearAllPalletPins() end
@@ -9881,7 +9415,6 @@ function tickPalletCage()
 		if next(palletPinned) then clearAllPalletPins() end
 		return
 	end
-	-- keep SNO on the pallet itself so physics stays with you
 	pcall(function()
 		sno(base)
 		for _, d in ipairs(base:GetDescendants()) do
@@ -9924,7 +9457,6 @@ function onGrabPartsAdded(child)
 		local ok = pcall(function()
 			gp = child:WaitForChild("GrabPart", 3)
 			if not gp then return end
-			-- weld can be delayed a frame
 			for _ = 1, 30 do
 				weld = gp:FindFirstChildOfClass("WeldConstraint") or gp:FindFirstChild("WeldConstraint")
 				if weld and (weld.Part0 or weld.Part1) then break end
@@ -9933,11 +9465,9 @@ function onGrabPartsAdded(child)
 			if not weld then
 				weld = gp:WaitForChild("WeldConstraint", 2)
 			end
-			-- Part0 OR Part1 can be the world object (FTAP varies)
 			grabbed = resolveGrabbedFromWeld(weld, gp)
 		end)
 		if not ok or not grabbed then return end
-		-- allow most parts (old isValidGrabItem blocked too much)
 		if not grabbed:IsA("BasePart") then return end
 		local myChar = char()
 		if myChar and grabbed:IsDescendantOf(myChar) then return end
@@ -9963,11 +9493,9 @@ function onGrabPartsAdded(child)
 			for d, v in pairs(collideRestore) do
 				if d.Parent then pcall(function() d.CanCollide = v end) end
 			end
-			-- fire immediately ( Parent-changed style) + one Heartbeat later as backup
 			if part then
 				pcall(function() applyReleaseEffects(part) end)
 				task.defer(function()
-					-- re-fire if arm still dormant (edge race with network)
 					local r = resolveReleaseRoot(part) or part
 					local arm = r and r:FindFirstChild("VOIDZ_ThrowArm")
 					if arm and arm:IsA("BodyVelocity") and arm.MaxForce.Magnitude < 1 then
@@ -9977,13 +9505,11 @@ function onGrabPartsAdded(child)
 			end
 		end
 
-		-- Store target player info in grabMap for access by other functions
 		if targetPlr then
 			grabMap[child .. "_targetPlr"] = targetPlr
 			grabMap[child .. "_targetRoot"] = targetRoot
 		end
 
-		-- pallet stick while holding (Part0/Part1 + late weld settle)
 		task.spawn(function()
 			while child.Parent and not released do
 				if S.toggles.palletCage then
@@ -10002,7 +9528,6 @@ function onGrabPartsAdded(child)
 						buildPalletCage(part, child)
 					end
 				end
-				-- Silent aim: pallet / shuriken — lock target while holding
 				if (S.toggles.palletSilentAim or S.toggles.shurikenSilentAim) and not released then
 					local part = grabMap[child] or grabbed
 					local isPallet = part and isPalletPart(part)
@@ -10035,8 +9560,6 @@ function onGrabPartsAdded(child)
 			end
 		end)
 
-		-- ALWAYS pre-arm throw BVs while holding if throw / super throw might fire
-		-- (must exist before GrabParts dies or ownership is gone)
 		local function armIfNeeded()
 			local want = S.grabFling or (S.toggles and S.toggles.grabFlingOn)
 				or S.superStrength or (S.toggles and S.toggles.superStr)
@@ -10052,7 +9575,6 @@ function onGrabPartsAdded(child)
 			end
 		end)
 
-		-- Invisible Line: empty CreateGrabLine so others don't see the beam
 		if S.toggles.invisLine and FTAP.CreateGrabLine and not S.toggles.crazyLine then
 			pcall(function() FTAP.CreateGrabLine:FireServer() end)
 			task.defer(function()
@@ -10061,7 +9583,6 @@ function onGrabPartsAdded(child)
 				end
 			end)
 		end
-		-- local beam hide backup
 		if S.toggles.invisLine then
 			task.spawn(function()
 				while child.Parent and not released and S.toggles.invisLine do
@@ -10078,7 +9599,6 @@ function onGrabPartsAdded(child)
 			end)
 		end
 
-		-- Super Strength placeholder BV (: MaxForce 0 → launch on release)
 		if S.superStrength or (S.toggles and S.toggles.superStr) then
 			pcall(function()
 				local target = releaseRoot or grabbed
@@ -10092,7 +9612,6 @@ function onGrabPartsAdded(child)
 			end)
 		end
 
-		-- Anchored grabbed object while held (server-sided via SNO + BodyPosition)
 		if S.anchorGrab or S.toggles.anchorGrab then
 			task.spawn(function()
 				local bp = Instance.new("BodyPosition")
@@ -10115,7 +9634,6 @@ function onGrabPartsAdded(child)
 			end)
 		end
 
-		-- Massless Grab: crank Align forces while held
 		if S.masslessGrab or S.toggles.masslessGrab then
 			task.spawn(function()
 				while child.Parent and (S.masslessGrab or S.toggles.masslessGrab) do
@@ -10125,7 +9643,6 @@ function onGrabPartsAdded(child)
 			end)
 		end
 
-		-- Radioactive Grab: use UFO PaintPlayerPart to "radioactive" the target
 		if (S.radioactiveGrab or S.toggles.radioactiveGrab) and targetRoot then
 			task.spawn(function()
 				while child.Parent and (S.radioactiveGrab or S.toggles.radioactiveGrab) do
@@ -10135,7 +9652,6 @@ function onGrabPartsAdded(child)
 			end)
 		end
 
-		-- Noclip Grab: disable collision on held model while held
 		if (S.noclipGrab or S.toggles.noclipGrab) and model then
 			task.spawn(function()
 				for _, d in ipairs(model:GetDescendants()) do
@@ -10156,7 +9672,6 @@ function onGrabPartsAdded(child)
 			end)
 		end
 
-		-- Death / Kill Grab — blitzbr pattern: SNO + DestroyGrabLine + Dead state
 		if (S.killGrab or S.toggles.killGrab) and targetHum then
 			task.spawn(function()
 				while child.Parent and (S.killGrab or S.toggles.killGrab) do
@@ -10167,7 +9682,6 @@ function onGrabPartsAdded(child)
 						targetHum.Jump = true
 						targetHum.Sit = false
 					end)
-					-- destroy grab line like blitzbr so the death state actually kills them
 					if targetPlr then
 						pcall(function()
 							if hasNetOwner(grabbed) and targetHum:GetStateEnabled(Enum.HumanoidStateType.Dead) then
@@ -10182,10 +9696,8 @@ function onGrabPartsAdded(child)
 			end)
 		end
 
-		-- Ragdoll Grab (instant)
 		if (S.ragdollGrab or S.toggles.ragdollGrab) and targetPlr then
 			task.spawn(function()
-				-- fire immediately on grab
 				ragdollInstant(targetPlr)
 				while child.Parent and (S.ragdollGrab or S.toggles.ragdollGrab) do
 					ragdollInstant(targetPlr)
@@ -10194,7 +9706,6 @@ function onGrabPartsAdded(child)
 			end)
 		end
 
-		-- Poison Grab (uses canonical getPoisonHurtParts + applyMapPoison)
 		if (S.poisonGrab or S.toggles.poisonGrab) and targetRoot then
 			task.spawn(function()
 				while child.Parent and (S.poisonGrab or S.toggles.poisonGrab) do
@@ -10206,7 +9717,6 @@ function onGrabPartsAdded(child)
 			end)
 		end
 
-		-- Burn Grab (ensure campfire exists first)
 		if (S.burnGrab or S.toggles.burnGrab) and grabbed then
 			task.spawn(function()
 				getStatusToy("Campfire")
@@ -10221,7 +9731,6 @@ function onGrabPartsAdded(child)
 			end)
 		end
 
-		-- zero-g while holding
 		if S.grabZeroG then
 			clearPartForces(grabbed)
 			local bf = Instance.new("BodyForce")
@@ -10230,7 +9739,6 @@ function onGrabPartsAdded(child)
 			bf.Parent = grabbed
 		end
 
-		-- while held: optional spin drag
 		if S.grabSpin and S.toggles.spinWhileHold then
 			local av = Instance.new("BodyAngularVelocity")
 			av.Name = "SpinAV"
@@ -10239,7 +9747,6 @@ function onGrabPartsAdded(child)
 			av.Parent = grabbed
 		end
 
-		-- Release detection ( uses Parent changed; also Ancestry + Destroying + weld break)
 		pcall(function()
 			child:GetPropertyChangedSignal("Parent"):Connect(function()
 				if not child.Parent then doRelease() end
@@ -10255,7 +9762,6 @@ function onGrabPartsAdded(child)
 				doRelease()
 			end)
 		end)
-		-- weld broke / Part1 cleared while GrabParts still exists
 		if weld then
 			pcall(function()
 				weld:GetPropertyChangedSignal("Part1"):Connect(function()
@@ -10268,7 +9774,6 @@ function onGrabPartsAdded(child)
 				end)
 			end)
 		end
-		-- safety: poll until GrabParts gone
 		task.spawn(function()
 			while child.Parent and not released do
 				task.wait(0.05)
@@ -10284,7 +9789,6 @@ function installGrabWatch()
 	workspace.ChildAdded:Connect(onGrabPartsAdded)
 	workspace.ChildRemoved:Connect(function(ch)
 		if ch.Name == "GrabParts" and grabMap[ch] then
-			-- onGrabPartsAdded poll/Parent should handle; this is a hard backup
 			local part = grabMap[ch]
 			grabMap[ch] = nil
 			if part then
@@ -10295,11 +9799,9 @@ function installGrabWatch()
 			end
 		end
 	end)
-	-- catch already-existing
 	for _, ch in ipairs(workspace:GetChildren()) do
 		if ch.Name == "GrabParts" then onGrabPartsAdded(ch) end
 	end
-	-- keep follow BP updated
 	bind("grabFollowHB", RunService.Heartbeat:Connect(function()
 		if not S.grabFollow then return end
 		local me = hrp()
@@ -10320,7 +9822,6 @@ function installGrabWatch()
 	print("[VOIDZ] grab-release watch installed")
 end
 
--- Auto Attacker: instant grabber fling — no long loops, just SNO + fling + break
 function counterAttackPlayer(plr, part)
 	if not plr or not validP(plr) then return end
 	local mode = S.counterMode or "Repulsion"
@@ -10330,7 +9831,6 @@ function counterAttackPlayer(plr, part)
 	local me = hrp()
 	if not me then return end
 
-	-- quick SNO (you're already next to them while grabbed)
 	sno(r, r.Position)
 	snoPlayer(plr, r.Position)
 
@@ -10359,7 +9859,6 @@ function counterAttackPlayer(plr, part)
 			destroyGrabOn(r)
 			applyVel(r, force, 0.1)
 		else
-			-- Repulsion: launch grabber away from you
 			local look = lookAt(me.Position, r.Position)
 			local vel = Vector3.new(look.LookVector.X, 0.5, look.LookVector.Z) * math.clamp(force / 100, 80, 300)
 			local bv = Instance.new("BodyVelocity")
@@ -10370,7 +9869,6 @@ function counterAttackPlayer(plr, part)
 			Debris:AddItem(bv, 0.3)
 			r.AssemblyLinearVelocity = vel
 		end
-		-- break grab line on grabber
 		if FTAP.DestroyGrabLine then
 			pcall(function() FTAP.DestroyGrabLine:FireServer(r) end)
 		end
@@ -10403,7 +9901,6 @@ function revengeFromGrabParts(grabModel)
 	end
 end
 
--- + : Struggle spam, kill GrabParts on us, optional revenge fling grabber
 doAntiGrabHard = function()
 	local c = char()
 	if not c then return end
@@ -10419,7 +9916,6 @@ doAntiGrabHard = function()
 		pcall(function() FTAP.RagdollRemote:FireServer(r, 0) end)
 	end
 
-	-- Only break GrabParts that are attacking US (never our own grabs)
 	for _, child in ipairs(workspace:GetChildren()) do
 		if child.Name == "GrabParts" and grabPartsIsAttackingUs(child, c) then
 			revengeFromGrabParts(child)
@@ -10432,7 +9928,6 @@ doAntiGrabHard = function()
 		end
 	end
 
-	-- do NOT strip all welds / DestroyGrabLine on every body part — that kills YOUR grab line
 
 	if h then
 		pcall(function()
@@ -10451,7 +9946,6 @@ doAntiGrabHard = function()
 		end)
 	end
 
-	-- while held: zero velocity (anchor handled by IsHeld Heartbeat)
 	if r then
 		local held = LP:FindFirstChild("IsHeld")
 		if held and held.Value then
@@ -10472,13 +9966,11 @@ antiGrabTick = function()
 	end
 end
 
--- Instant anti-grab the frame GrabParts appears (ChildAdded + DescendantAdded)
 bind("antiGrabChild", workspace.ChildAdded:Connect(function(child)
 	if not (S.toggles.antiGrab or S.toggles.antiGucci) then return end
 	if child.Name ~= "GrabParts" then return end
 	local function burst()
 		if not (S.toggles.antiGrab or S.toggles.antiGucci) then return end
-		-- only break if this GrabParts is on US
 		local c = char()
 		if c and grabPartsIsAttackingUs(child, c) then
 			gucciBreakGrabNow()
@@ -10495,7 +9987,6 @@ bind("antiGrabChild", workspace.ChildAdded:Connect(function(child)
 	end)
 end))
 
--- True when someone is holding YOU (not when you are grabbing others)
 function isLocalVictimGrabbed()
 	local held = LP:FindFirstChild("IsHeld")
 	if held and held.Value == true then return true end
@@ -10508,7 +9999,6 @@ function isLocalVictimGrabbed()
 			end
 		end
 	end
-	-- weld on our character from foreign GrabParts
 	for _, d in ipairs(c:GetDescendants()) do
 		if d:IsA("WeldConstraint") or d:IsA("Weld") then
 			local p0, p1 = d.Part0, d.Part1
@@ -10530,7 +10020,6 @@ function isLocalVictimGrabbed()
 	return false
 end
 
--- Full free: Struggle + DestroyGrabLine + break GrabParts on us (no sky/float boost)
 function freeFromGrabInstant()
 	resolveFTAP()
 	local c = char()
@@ -10538,7 +10027,6 @@ function freeFromGrabInstant()
 	local h = hum()
 	if not c or not r then return end
 
-	-- spam struggle ()
 	for _ = 1, 6 do
 		if FTAP.Struggle then
 			pcall(function() FTAP.Struggle:FireServer(LP) end)
@@ -10552,7 +10040,6 @@ function freeFromGrabInstant()
 		pcall(function() FTAP.RagdollRemote:FireServer(r, 0) end)
 	end
 
-	-- DestroyGrabLine on every BasePart of us (server-side break)
 	if FTAP.DestroyGrabLine then
 		pcall(function() FTAP.DestroyGrabLine:FireServer(r) end)
 		for _, part in ipairs(c:GetDescendants()) do
@@ -10562,7 +10049,6 @@ function freeFromGrabInstant()
 		end
 	end
 
-	-- client-side: kill GrabParts that are attacking us
 	for _, child in ipairs(workspace:GetChildren()) do
 		if child.Name == "GrabParts" then
 			local attacking = grabPartsIsAttackingUs and grabPartsIsAttackingUs(child, c)
@@ -10577,7 +10063,6 @@ function freeFromGrabInstant()
 		end
 	end
 
-	-- strip grab forces on our body (never leave BodyPosition floating us)
 	pcall(function()
 		r.Anchored = false
 		for _, part in ipairs(c:GetDescendants()) do
@@ -10604,7 +10089,6 @@ function freeFromGrabInstant()
 
 	restoreGroundPhysics()
 
-	-- short burst while still marked held — struggle only, NO upward velocity
 	task.spawn(function()
 		local t0 = tick()
 		while tick() - t0 < 0.45 do
@@ -10616,7 +10100,6 @@ function freeFromGrabInstant()
 			if rr then
 				pcall(function()
 					rr.Anchored = false
-					-- clamp upward only — never force float
 					local v = rr.AssemblyLinearVelocity
 					if v.Y > 5 then
 						rr.AssemblyLinearVelocity = Vector3.new(v.X, 5, v.Z)
@@ -10638,9 +10121,7 @@ function freeFromGrabInstant()
 	task.delay(0.35, restoreGroundPhysics)
 end
 
--- Instant escape: Space / Jump / mobile jump while grabbed
 function installInstantEscape()
-	-- always rebind cleanly
 	if S.conns.escapeJump then pcall(function() S.conns.escapeJump:Disconnect() end) S.conns.escapeJump = nil end
 	if S.conns.escapeInput then pcall(function() S.conns.escapeInput:Disconnect() end) S.conns.escapeInput = nil end
 	pcall(function() ContextActionService:UnbindAction("VOIDZ_InstantEscape") end)
@@ -10658,11 +10139,9 @@ function installInstantEscape()
 		notify(HUB_NAME, "Escape!", 0.8)
 	end
 
-	-- JumpRequest often blocked while grabbed — still hook it
 	S.conns.escapeJump = UserInputService.JumpRequest:Connect(function()
 		tryEscape()
 	end)
-	-- Space / gamepad A always
 	S.conns.escapeInput = UserInputService.InputBegan:Connect(function(input, _gp)
 		if input.KeyCode == Enum.KeyCode.Space
 			or input.KeyCode == Enum.KeyCode.ButtonA
@@ -10670,7 +10149,6 @@ function installInstantEscape()
 			tryEscape()
 		end
 	end)
-	-- high priority so game grab scripts don't eat Space
 	pcall(function()
 		ContextActionService:BindActionAtPriority(
 			"VOIDZ_InstantEscape",
@@ -10687,7 +10165,6 @@ function installInstantEscape()
 		)
 	end)
 
-	-- if grab starts, just notify (user presses Space to escape, like ruhub)
 	task.spawn(function()
 		local isHeld = LP:FindFirstChild("IsHeld") or LP:WaitForChild("IsHeld", 20)
 		if not isHeld then return end
@@ -10700,16 +10177,11 @@ function installInstantEscape()
 	end)
 end
 
-------------------------------------------------------------------------
--- Scroll Distance ( Further Extend) — SEPARATE from Massless Grab
--- 1) GrabbingScript senv.distance = how far you can START a grab
--- 2) DragPart1 at camera * pcDistance = how far you HOLD them (mouse wheel)
-------------------------------------------------------------------------
 local reachGamepassState = {}
 local grabSenvCache = nil
-local pcDistance = 0 -- live hold distance while grabbing (scroll this)
-S.extendAmount = S.extendAmount or 25 -- slider target / scroll step base
-S.scrollStep = S.scrollStep or 2 -- how much wheel changes distance
+local pcDistance = 0
+S.extendAmount = S.extendAmount or 25
+S.scrollStep = S.scrollStep or 2
 
 function getGrabbingScript()
 	local c = LP.Character
@@ -10717,7 +10189,6 @@ function getGrabbingScript()
 		local gs = c:FindFirstChild("GrabbingScript") or c:FindFirstChild("GrabbingScript", true)
 		if gs then return gs end
 	end
-	-- wait briefly (script often late after respawn)
 	if c then
 		local ok, gs = pcall(function() return c:WaitForChild("GrabbingScript", 2) end)
 		if ok and gs then return gs end
@@ -10735,7 +10206,6 @@ end
 function refreshGrabSenv(force)
 	if not getsenv then return nil end
 	if grabSenvCache and not force then
-		-- stale if character changed
 		local scr = getGrabbingScript()
 		if scr then
 			local ok, env = pcall(getsenv, scr)
@@ -10759,21 +10229,18 @@ function refreshGrabSenv(force)
 	return nil
 end
 
--- Force GrabbingScript env.distance (grab START range) — sets this via scroll
 function forceGrabDistance(amount)
 	amount = math.clamp(tonumber(amount) or S.extendAmount or 25, 3, 120)
 	S.extendAmount = amount
 	local env = refreshGrabSenv(true)
 	if not env then return false end
 	pcall(function()
-		-- only writes .distance; we force high so grab initiates far away
 		env.distance = amount
 		if type(env.maxDistance) == "number" then env.maxDistance = math.max(amount, env.maxDistance) end
 		if type(env.MaxDistance) == "number" then env.MaxDistance = math.max(amount, env.MaxDistance) end
 		if type(env.grabDistance) == "number" then env.grabDistance = amount end
 		if type(env.lineDistance) == "number" then env.lineDistance = amount end
 		if type(env.minDistance) == "number" then env.minDistance = math.min(env.minDistance, 3) end
-		-- common alternate names in forks
 		for k, v in pairs(env) do
 			if type(k) == "string" and type(v) == "number" then
 				local lk = k:lower()
@@ -10815,7 +10282,6 @@ function enableFurtherReachGamepass()
 				nv.Value = math.clamp(S.extendAmount or 25, 3, 120)
 			end
 		end
-		-- keep CharacterAndBeamMove alive (anti-lag turns it off and kills reach)
 		local ps = LP:FindFirstChild("PlayerScripts")
 		if ps then
 			local beam = ps:FindFirstChild("CharacterAndBeamMove") or ps:FindFirstChild("CharacterAndBeamMove", true)
@@ -10836,7 +10302,6 @@ function disableFurtherReachGamepass()
 	end)
 end
 
--- PC extend: BodyPosition on DragPart, drive to camera * pcDistance every frame
 function setupDragExtend(grabModel)
 	if not grabModel or not grabModel.Parent then return end
 	if grabModel:GetAttribute("VOIDZ_ReachSetup") then return end
@@ -10844,11 +10309,9 @@ function setupDragExtend(grabModel)
 	if not drag or not drag:IsA("BasePart") then return end
 	grabModel:SetAttribute("VOIDZ_ReachSetup", true)
 
-	-- disable original AlignPosition + AlignOrientation so they don't fight BodyPosition
 	pcall(function() drag.AlignPosition.Enabled = false end)
 	pcall(function() drag.AlignOrientation.Enabled = false end)
 
-	-- BodyPosition on the ORIGINAL DragPart (which pulls GrabPart + welded victim)
 	local bp = Instance.new("BodyPosition")
 	bp.Name = "VOIDZ_ScrollDrag"
 	bp.MaxForce = Vector3.new(1e5, 1e5, 1e5)
@@ -10857,7 +10320,6 @@ function setupDragExtend(grabModel)
 	bp.Position = drag.Position
 	bp.Parent = drag
 
-	-- start at extend distance (not raw distance which can be 0 if facing away)
 	pcDistance = math.clamp(S.extendAmount or 25, 11, 120)
 end
 
@@ -10882,7 +10344,6 @@ function installFurtherGrabHook()
 		if ch.Name ~= "GrabParts" then return end
 		if not ch:IsA("Model") then return end
 		task.spawn(function()
-			-- blitzbr pattern: WaitForChild for both parts before proceeding
 			local grabPart = ch:WaitForChild("GrabPart", 5)
 			local dragPart = ch:WaitForChild("DragPart", 5)
 			if not grabPart or not dragPart then return end
@@ -10913,7 +10374,6 @@ function installScrollDistanceWheel()
 	if S.conns.scrollDistWheel then return end
 	S.conns.scrollDistWheel = UserInputService.InputChanged:Connect(function(input)
 		if not S.toggles.lineExtend then return end
-		-- Support multiple mouse wheel input types for better executor compatibility
 		local z = 0
 		if input.UserInputType == Enum.UserInputType.MouseWheel then
 			z = input.Position.Z
@@ -11002,7 +10462,6 @@ function setLineExtend(on)
 	S.extendAmount = amt
 	pcDistance = amt
 	local ok = applyLineExtendDistance(amt)
-	-- re-force grab-start distance (game resets senv)
 	startLoop("lineExtend", 0.08, function()
 		if not S.toggles.lineExtend then return end
 		forceGrabDistance(math.max(S.extendAmount or 25, pcDistance > 0 and pcDistance or 25))
@@ -11026,11 +10485,7 @@ function setLineExtend(on)
 	end
 end
 
-------------------------------------------------------------------------
--- Silent aim + anti-kick in nested scope (keeps _voidzLateInit under 200 locals)
-------------------------------------------------------------------------
 local setSilentAim, setAntiKick, installAntiKickOnLoad, _startFovCircle, _stopFovCircle
--- nested to free ~15 locals from _voidzLateInit (Luau 200 limit)
 (function()
 local silentHooked = false
 local silentTarget = nil
@@ -11041,7 +10496,6 @@ local silentCircleBG = nil
 local silentAimBusy = false
 local SILENT_HITBOXES = {"Head", "HumanoidRootPart", "Torso", "UpperTorso"}
 
--- find nearest player to crosshair (screen-center distance)
 local function nearestSilentTarget()
 	local me = hrp()
 	if not me then return nil end
@@ -11063,7 +10517,6 @@ local function nearestSilentTarget()
 	return best
 end
 
--- pick random hitbox part from target (existence-checked fallback)
 local function pickHitbox(target)
 	local char = target and target.Character
 	if not char then return nil end
@@ -11074,7 +10527,6 @@ local function pickHitbox(target)
 	return nil
 end
 
--- FOV circle render loop
 local function startFovCircle()
 	if silentCircleObj then return end
 	local ok1, c1 = pcall(function()
@@ -11116,7 +10568,6 @@ local function startFovCircle()
 			end
 			task.wait()
 		end
-		-- cleanup
 		if silentCircleObj then pcall(function() silentCircleObj:Remove() end) silentCircleObj = nil end
 		if silentCircleBG then pcall(function() silentCircleBG:Remove() end) silentCircleBG = nil end
 	end)
@@ -11131,7 +10582,6 @@ end
 setSilentAim = function(on)
 	S.toggles.silentAim = on
 	if on then
-		-- start target updater
 		task.spawn(function()
 			while S.toggles.silentAim do
 				silentTarget = nearestSilentTarget()
@@ -11150,7 +10600,6 @@ setSilentAim = function(on)
 		old = hookmetamethod(game, "__namecall", function(self, ...)
 			local method = getnamecallmethod()
 			local args = { ... }
-			-- use silentAimBusy flag instead of checkcaller() (unreliable on many executors)
 			if self == workspace and not silentAimBusy and method == "Raycast"
 				and S.toggles.silentAim and silentTarget then
 				local target = silentTarget
@@ -11180,14 +10629,9 @@ setSilentAim = function(on)
 	if on then notify(HUB_NAME, "Silent aim ON", 1.5) end
 end
 
-------------------------------------------------------------------------
--- Anti-kick: scan YOUR client only (console + Roblox disconnect UI + Kick)
--- Strict phrases only — ignores hub buttons / other players' kicks
-------------------------------------------------------------------------
 local LogService = game:GetService("LogService")
 local AK = (getgenv and type(getgenv) == "function" and getgenv().VOIDZ_ANTIKICK) or {}
 if getgenv then getgenv().VOIDZ_ANTIKICK = AK end
--- reset on every inject so old hooks cannot instant-rejoin
 AK.enabled = false
 AK.rejoining = false
 AK.lastAt = 0
@@ -11195,25 +10639,22 @@ AK.readyAt = math.huge
 AK.weInitiatedTeleport = false
 AK.scanBound = false
 AK.gen = (AK.gen or 0) + 1
-AK.seen = AK.seen or {} -- dedupe console lines briefly
+AK.seen = AK.seen or {}
 
-local GRACE_SEC = 12 -- no rejoin during load / UI build
+local GRACE_SEC = 12
 
 local function antiKickReady()
 	return AK.enabled == true and os.clock() >= (AK.readyAt or math.huge)
 end
 
--- True only for REAL kick / disconnect language aimed at YOU
 local function isRealKickSignal(text, source)
 	source = tostring(source or "")
-	-- LocalPlayer:Kick namecall is always a real kick attempt on you
 	if source == "Player:Kick" then return true end
 
 	text = tostring(text or ""):gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
 	if text == "" then return false end
 	local low = text:lower()
 
-	-- ignore our own prints / rejoin notice
 	if low:find("[voidz]", 1, true) or low:find("voidz ·", 1, true) then return false end
 	if low:find("anti-kick checked", 1, true) then return false end
 	if low:find("anti-kick", 1, true) and (low:find("grace", 1, true) or low:find("active", 1, true) or low:find("off", 1, true)) then
@@ -11221,16 +10662,14 @@ local function isRealKickSignal(text, source)
 	end
 	if low:find("saved your butt", 1, true) then return false end
 
-	-- ignore hub / combat UI wording (never rejoin from button labels)
 	if source == "hub" then return false end
-	if #low < 16 then return false end -- "Kick Selected" etc. are short
+	if #low < 16 then return false end
 	if low:find("selected", 1, true) or low:find("toggle", 1, true) then return false end
 	if low:find("loop kick", 1, true) or low:find("kick type", 1, true) then return false end
 	if low:find("kick all", 1, true) or low:find("kick target", 1, true) then return false end
 	if low:find("aura", 1, true) and low:find("kick", 1, true) then return false end
 	if low:find("blobman", 1, true) or low:find("stackkick", 1, true) or low:find("grabkick", 1, true) then return false end
 
-	-- ignore other players being kicked (not you)
 	if low:find("has been kicked", 1, true) and not low:find("you have been kicked", 1, true) then
 		return false
 	end
@@ -11239,7 +10678,6 @@ local function isRealKickSignal(text, source)
 	end
 	if low:find("kicked player", 1, true) or low:find("kicking", 1, true) then return false end
 
-	-- strict YOU / client disconnect phrases only
 	local phrases = {
 		"you were kicked",
 		"you have been kicked",
@@ -11263,7 +10701,7 @@ local function isRealKickSignal(text, source)
 		"you have been banned",
 		"banned from this experience",
 		"account has been banned",
-		"error code: 267", -- kicked
+		"error code: 267",
 		"error code: 277",
 		"error code: 279",
 		"error code: 280",
@@ -11310,11 +10748,9 @@ local function doVoidzRejoin(reason)
 	task.spawn(function()
 		local placeId = game.PlaceId
 		local jobId = game.JobId
-		-- Queue rejoin FIRST so even if we self-kick, teleport is pending
 		pcall(function()
 			queue_teleport("print('[VOIDZ] anti-kick rejoin')")
 		end)
-		-- Teleport same server ASAP (beat game AC kick)
 		local tries = {
 			function()
 				if jobId and #jobId > 0 then
@@ -11333,8 +10769,6 @@ local function doVoidzRejoin(reason)
 			if ok then break end
 			task.wait(0.15)
 		end
-		-- Preemptive self-kick so YOU disconnect cleanly before game AC finishes
-		-- (message contains VOIDZ so namecall hook allows it)
 		task.delay(0.35, function()
 			pcall(function()
 				LP:Kick("VOIDZ anti-kick · rejoining before AC")
@@ -11350,7 +10784,6 @@ end
 local function onKickSignal(text, source)
 	if not antiKickReady() then return end
 	if not isRealKickSignal(text, source) then return end
-	-- short dedupe so same console line / prompt doesn't multi-fire
 	local key = (source or "?") .. "|" .. tostring(text):lower():sub(1, 120)
 	local t = os.clock()
 	if AK.seen[key] and (t - AK.seen[key]) < 6 then return end
@@ -11375,12 +10808,11 @@ local function installNamecallKickHook()
 					return old(self, ...)
 				end
 				if antiKickReady() then
-					-- about to kick → rejoin before disconnect finishes
 					print("[VOIDZ] Player:Kick intercepted:", msg)
 					task.defer(function()
 						onKickSignal(msg ~= "" and msg or "you were kicked", "Player:Kick")
 					end)
-					return -- swallow so teleport can run
+					return
 				end
 				return old(self, ...)
 			end
@@ -11407,7 +10839,6 @@ local function bindKickScanners()
 	if AK.scanBound then return end
 	AK.scanBound = true
 
-	-- 1) YOUR client console only (LogService = local output, not other players)
 	pcall(function()
 		LogService.MessageOut:Connect(function(message, _messageType)
 			if not antiKickReady() then return end
@@ -11415,7 +10846,6 @@ local function bindKickScanners()
 		end)
 	end)
 
-	-- 2) Official Roblox error message (disconnect / kick dialogs)
 	pcall(function()
 		GuiService.ErrorMessageChanged:Connect(function()
 			if not antiKickReady() then return end
@@ -11429,7 +10859,6 @@ local function bindKickScanners()
 		end)
 	end)
 
-	-- 3) RobloxPromptGui only (disconnect / leave prompts) — not our hub
 	local watched = setmetatable({}, { __mode = "k" })
 	local function watchPrompt(gui)
 		if not gui or watched[gui] then return end
@@ -11440,14 +10869,12 @@ local function bindKickScanners()
 			if d:IsA("TextLabel") or d:IsA("TextButton") or d:IsA("TextBox") then
 				task.defer(function()
 					onKickSignal(d.Text, "RobloxPromptGui")
-					-- text sometimes fills in a frame later
 					task.delay(0.15, function()
 						if d.Parent then onKickSignal(d.Text, "RobloxPromptGui") end
 					end)
 				end)
 			end
 		end)
-		-- property changes on existing labels
 		for _, d in ipairs(gui:GetDescendants()) do
 			if d:IsA("TextLabel") or d:IsA("TextButton") then
 				pcall(function()
@@ -11470,12 +10897,10 @@ local function bindKickScanners()
 		end)
 	end)
 
-	-- 4) Poll official error + prompt (catches late-filled text)
 	task.spawn(function()
 		while true do
 			task.wait(0.45)
 			if not AK.enabled then
-				-- keep loop alive for re-enable; cheap when off
 			elseif antiKickReady() then
 				pcall(function()
 					local msg = tostring(GuiService:GetErrorMessage() or "")
@@ -11488,7 +10913,6 @@ local function bindKickScanners()
 		end
 	end)
 
-	-- 5) Teleport retry only for rejoins WE started
 	pcall(function()
 		TeleportService.TeleportInitFailed:Connect(function(player, _result, errMsg)
 			if player ~= LP and player ~= nil then return end
@@ -11532,7 +10956,6 @@ setAntiKick = function(on, quiet)
 end
 
 installAntiKickOnLoad = function()
-	-- set up anti-kick infrastructure but do NOT auto-enable
 	AK.enabled = false
 	AK.rejoining = false
 	S.toggles.antiKick = false
@@ -11540,16 +10963,12 @@ installAntiKickOnLoad = function()
 	print("[VOIDZ] anti-kick infrastructure ready (not enabled)")
 end
 
--- expose FOV circle functions to outer scope for combat tab
 _startFovCircle = startFovCircle
 _stopFovCircle = stopFovCircle
 
 end)()
 
-------------------------------------------------------------------------
--- Unload
 local function unload()
-	-- hard-disable anti-kick so stacked hooks from prior injects never rejoin
 	pcall(function()
 		local ak = getgenv and type(getgenv) == "function" and getgenv().VOIDZ_ANTIKICK
 		if ak then
@@ -11561,7 +10980,6 @@ local function unload()
 	end)
 	for k in pairs(S.loops) do S.loops[k] = false end
 	for _, c in pairs(S.conns) do pcall(function() c:Disconnect() end) end
-	-- kill UI mouse-unlock force loop FIRST (lives outside S.conns)
 	pcall(function()
 		S.hubOpen = false
 		S.toggles.unlockMouse = false
@@ -11583,11 +11001,9 @@ local function unload()
 	pcall(function() ContextActionService:UnbindAction("VOIDZ_TabToy") end)
 	pcall(function() ContextActionService:UnbindAction("VOIDZ_InstantEscape") end)
 	pcall(function() ContextActionService:UnbindAction("VOIDZ_ControlK") end)
-	-- destroy UI before re-lock so no open-hub path re-unlocks
 	if S.gui then pcall(function() S.gui:Destroy() end) end
 	S.gui = nil
 	S.root = nil
-	-- hard re-lock camera mouse (game + leftover RenderStepped both fight this)
 	task.spawn(function()
 		for _ = 1, 120 do
 			pcall(function()
@@ -11602,12 +11018,8 @@ local function unload()
 end
 if getgenv and type(getgenv) == "function" then getgenv().VOIDZ_UNLOAD = unload end
 
-------------------------------------------------------------------------
--- UI nested scope (Luau max 200 locals per function — UI was pushing past limit)
--- global so unlock can re-call if late-init end-scoping skips the internal call
 function _voidzInitUI()
 Late._phase = "ui_start"
--- UI helpers (tooltips, settings drawers, dropdowns)
 local function showTip(text)
 	if not S.tipFrame then return end
 	S.tipLabel.Text = text or ""
@@ -11639,14 +11051,12 @@ local function makeScroll(parent)
 	return sc
 end
 
--- Feature search index (home search bar)
 S.featureIndex = S.featureIndex or {}
 S._buildingTab = nil
 
 local function indexFeature(kind, title, tip, extra)
 	local tab = S._buildingTab
 	if not tab or title == nil or title == "" then return end
-	-- skip pure layout noise on home
 	if tab == "home" and kind == "section" then return end
 	local titleS = tostring(title)
 	local tipS = tostring(tip or "")
@@ -11719,7 +11129,6 @@ local function fuzzyScore(query, entry)
 		elseif blob:find(w, 1, true) then best = 28
 		elseif tlab:find(w, 1, true) then best = 24
 		else
-			-- subsequence
 			local j = 1
 			for i = 1, #blob do
 				if blob:sub(i, i) == w:sub(j, j) then
@@ -11727,7 +11136,6 @@ local function fuzzyScore(query, entry)
 					if j > #w then best = math.max(best, 12); break end
 				end
 			end
-			-- typo tolerance vs title tokens
 			if best < 12 and #w >= 3 then
 				for tok in (title .. " " .. blob):gmatch("%w+") do
 					if #tok >= 3 then
@@ -11743,7 +11151,6 @@ local function fuzzyScore(query, entry)
 		if best > 0 then hits += 1; score += best end
 	end
 	if hits == 0 then return 0 end
-	-- require roughly half the words to hit for multi-word queries
 	if #words >= 2 and hits < math.ceil(#words * 0.45) then
 		return math.floor(score * 0.35)
 	end
@@ -11763,7 +11170,6 @@ local function searchFeatures(query, limit)
 		if a.s == b.s then return a.e.title < b.e.title end
 		return a.s > b.s
 	end)
-	-- dedupe same title+tab
 	local out, seen = {}, {}
 	for _, row in ipairs(scored) do
 		local key = row.e.tab .. "|" .. row.e.title
@@ -11826,7 +11232,6 @@ local function makeButton(parent, opts)
 	b.Parent = wrap
 	corner(b, mob and 10 or 8)
 	stroke(b, opts.danger and (C.dangerStroke or C.danger) or C.strokeSoft, 1.1, 0.4)
-	-- bubble tag for buttons
 	if opts.tag then
 		local tagColors = {
 			PREMIUM = { bg = Color3.fromRGB(180, 120, 255), text = Color3.fromRGB(255, 255, 255) },
@@ -11916,7 +11321,6 @@ local function makeToggle(parent, opts)
 	title.TextXAlignment = Enum.TextXAlignment.Left
 	title.Text = opts.title or "Toggle"
 	title.Parent = row
-	-- bubble tag (premium/op/new badge)
 	if opts.tag then
 		local tagColors = {
 			PREMIUM = { bg = Color3.fromRGB(180, 120, 255), text = Color3.fromRGB(255, 255, 255) },
@@ -11938,7 +11342,6 @@ local function makeToggle(parent, opts)
 		bubble.ZIndex = 12
 		corner(bubble, 6)
 		stroke(bubble, tc.bg, 1.5, 0)
-		-- position after title
 		bubble.Position = UDim2.new(0, 12 + title.TextBounds.X + 8, 0, opts.desc and 7 or (mob and 16 or 12))
 	end
 	if opts.desc then
@@ -12167,7 +11570,6 @@ local function makeDropdown(parent, opts)
 	stroke(listFrame, C.accent, 1)
 	local listLay = Instance.new("UIListLayout")
 	listLay.Parent = listFrame
-	-- search filter for dropdowns with many options
 	local searchBox = nil
 	local searchH = 24
 	if #options > 4 then
@@ -12265,8 +11667,6 @@ local function makeDropdown(parent, opts)
 	return row, api
 end
 
--- Reusable player search list — same look/feel as Loops tab
--- clickFn(p, lab) is called when a player is clicked
 local function makePlayerSearchList(sc, opts, orderFn)
 	opts = opts or {}
 	local clickFn = opts.clickFn or function(p) S.selected = p end
@@ -12300,7 +11700,6 @@ local function makePlayerSearchList(sc, opts, orderFn)
 		searchInput = box
 	end
 
-	-- Multi-select indicator bar
 	local multiBar = Instance.new("Frame")
 	multiBar.LayoutOrder = nn()
 	multiBar.Size = UDim2.new(1, -6, 0, 24)
@@ -12421,7 +11820,7 @@ local function makePlayerSearchList(sc, opts, orderFn)
 		updateMultiBar = updateMultiBar,
 		list = listSc,
 	}
-end -- makePlayerSearchList
+end
 
 local function makeAuraBlock(parent, order, meta)
 	local id = meta.id
@@ -12439,7 +11838,6 @@ local function makeAuraBlock(parent, order, meta)
 	lay.Parent = holder
 	pad(holder, 4, 4, 6, 4)
 
-	-- main toggle row
 	local head = Instance.new("Frame")
 	head.Size = UDim2.new(1, 0, 0, 30)
 	head.BackgroundTransparency = 1
@@ -12499,7 +11897,6 @@ local function makeAuraBlock(parent, order, meta)
 	sLay.Parent = settings
 	pad(settings, 6, 6, 6, 6)
 
-	-- target dropdown inside settings
 	local cfg = getAura(id)
 	local tLabel = Instance.new("TextLabel")
 	tLabel.Size = UDim2.new(1, 0, 0, 14)
@@ -12531,7 +11928,6 @@ local function makeAuraBlock(parent, order, meta)
 		tBtn.Text = cfg.target
 	end)
 
-	-- range slider mini
 	local rLabel = Instance.new("TextLabel")
 	rLabel.Size = UDim2.new(1, 0, 0, 14)
 	rLabel.BackgroundTransparency = 1
@@ -12663,11 +12059,7 @@ local function makeAuraBlock(parent, order, meta)
 	end)
 end
 
-------------------------------------------------------------------------
--- Build tabs
--- Tab names closer to / hubs
 local TAB_DEFS = {
-	-- core
 	{ id = "home", icon = "01", label = "Home" },
 	{ id = "combat", icon = "02", label = "Combat" },
 	{ id = "player", icon = "03", label = "Player" },
@@ -12675,11 +12067,9 @@ local TAB_DEFS = {
 	{ id = "auras", icon = "05", label = "Auras" },
 	{ id = "server", icon = "06", label = "Server" },
 	{ id = "loop", icon = "07", label = "Loops" },
-	-- self
 	{ id = "anti", icon = "08", label = "Protect" },
 	{ id = "move", icon = "09", label = "Movement" },
 	{ id = "visuals", icon = "10", label = "Visuals" },
-	-- world / toys
 	{ id = "toys", icon = "11", label = "Toys" },
 	{ id = "explosions", icon = "12", label = "Explosions" },
 	{ id = "world", icon = "13", label = "World" },
@@ -13258,12 +12648,10 @@ _TAB_BUILDERS["server"] = function(sc, n)
 									local r = rootOf(p)
 									if r then
 										pcall(function()
-											-- blitzbr pattern: ensure FoodBanana owned
 											if not bananaModel or not bananaModel.Parent then
 												bananaModel, bananaPrimary = ensureToy("FoodBanana")
 											end
 											if not bananaModel or not bananaPrimary then return end
-											-- find BananaPeel with TouchTransmitter (blitzbr ragdoll/vomit part)
 											local peel = nil
 											for _, d in ipairs(bananaModel:GetDescendants()) do
 												if d.Name == "BananaPeel" and d:FindFirstChildOfClass("TouchTransmitter") then
@@ -13271,21 +12659,17 @@ _TAB_BUILDERS["server"] = function(sc, n)
 													break
 												end
 											end
-											-- find HoldPart for eating
 											local holdPart = bananaModel:FindFirstChild("HoldPart", true)
 											local holdRF = holdPart and holdPart:FindFirstChild("HoldItemRemoteFunction")
 											local rigid = holdPart and holdPart:FindFirstChild("RigidConstraint")
 											local ediblePart = bananaModel:FindFirstChild("EdiblePart", true)
-											-- blitzbr pattern: make model big + invisible for touch hit
 											if peel then
 												peel.Size = Vector3.new(2, 2, 2)
 												peel.Transparency = 1
 												peel.CanCollide = false
 											end
-											-- disable AlignOrientation (blitzbr)
 											local ao = bananaPrimary:FindFirstChildOfClass("AlignOrientation")
 											if ao then ao.Enabled = false end
-											-- park model high with BodyPosition (blitzbr pattern)
 											local head = LP.Character and LP.Character:FindFirstChild("Head")
 											local parkY = head and (head.Position.Y + 500) or 500
 											local bp = bananaPrimary:FindFirstChild("VOIDZ_VomitPark")
@@ -13298,24 +12682,20 @@ _TAB_BUILDERS["server"] = function(sc, n)
 											end
 											bp.Position = Vector3.new(0, parkY, 0)
 											sno(bananaPrimary)
-											-- set all parts CanCollide false (blitzbr SetModelProperties)
 											for _, d in ipairs(bananaModel:GetDescendants()) do
 												if d:IsA("BasePart") then d.CanCollide = false end
 											end
-											-- hold with target's character
 											local alreadyHeld = rigid and rigid:FindFirstChild("Attachment1")
 											if not alreadyHeld and holdRF then
 												pcall(function() holdRF:InvokeServer(bananaModel, p.Character) end)
 												task.wait(0.2)
 											end
-											-- blitzbr pattern: touch BananaPeel to target for vomit trigger
 											if peel and r then
 												sno(peel, r.Position)
 												peel.Position = r.Position
 												task.wait()
 												peel.Position = bananaPrimary.Position
 											end
-											-- also fire Use if eating sound not playing
 											local eating = holdPart and holdPart:FindFirstChild("EatingSound")
 											local he = ReplicatedStorage:FindFirstChild("HoldEvents")
 											local useEvt = he and he:FindFirstChild("Use")
@@ -13643,7 +13023,7 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 			desc = "ON → 40ms break loop · instant on grab · recommended",
 			callback = function(on)
 				S.toggles.antiGucci = on
-				S.toggles.antiGrab = on -- keep plain anti-grab armed with Gucci
+				S.toggles.antiGrab = on
 				S.antiWanted = S.antiWanted or {}
 				S.antiWanted.antiGucci = on
 				S.antiWanted.antiGrab = on
@@ -13714,12 +13094,10 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 				S.antiWanted = S.antiWanted or {}
 				if on then
 					installAntis()
-					-- heartbeat loop: actively check if grabbed → fling grabber
 					stopLoop("autoFling")
 					startLoop("autoFling", 0.08, function()
 						if not S.autoCounter then return end
 						if not isLocalVictimGrabbed() then return end
-						-- find grabber from PartOwner on any body part
 						local c = char()
 						if not c then return end
 						for _, bp in ipairs({ c:FindFirstChild("Head"), c:FindFirstChild("HumanoidRootPart"), c:FindFirstChild("Torso"), c:FindFirstChild("UpperTorso") }) do
@@ -13738,7 +13116,6 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 								end
 							end
 						end
-						-- fallback: find grabber from GrabParts welds
 						for _, child in ipairs(workspace:GetChildren()) do
 							if child.Name == "GrabParts" and grabPartsIsAttackingUs(child, c) then
 								for _, d in ipairs(child:GetDescendants()) do
@@ -14142,7 +13519,6 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 				if ch:IsA("TextButton") then ch:Destroy() end
 			end
 			local q = S.playerSearch and S.playerSearch.Text or ""
-			-- count selected
 			local selCount = 0
 			for _ in pairs(S.loopTargets) do selCount += 1 end
 			for _, lab in ipairs(playerLabels(q)) do
@@ -14168,7 +13544,6 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 				end
 				b.MouseButton1Click:Connect(function()
 					S.selected = p
-					-- multi-select: always toggle into loopTargets
 					toggleLoopTarget(p)
 					S.loopTarget = p
 					S.loopName = p and p.Name or nil
@@ -14330,7 +13705,7 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 			{ id = "loopSpamSNO", title = "Loop Spam SNO Parts", tip = "Own every part · map-wide", fn = function(p) for _,part in ipairs(p.Character:GetDescendants()) do if part:IsA("BasePart") then sno(part) end end end },
 			{ id = "loopDestroyGrab", title = "Loop Destroy Their Grab", tip = "DestroyGrabLine · map-wide", fn = function(p) local r=rootOf(p); if r then destroyGrabOn(r) end end },
 		}
-		S.loopWait = S.loopWait or {} -- id -> { deadChar = Model?, home = CFrame }
+		S.loopWait = S.loopWait or {}
 		for _, L in ipairs(loops) do
 			makeToggle(sc, {
 				order = n(),
@@ -14339,7 +13714,6 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 				tip = L.tip or L.title,
 				callback = function(on)
 					stopLoop(L.id)
-					-- restore position when loop stops (use first available home)
 					if not on then
 						for k, w in pairs(S.loopWait) do
 							if k:sub(1, #L.id + 1) == L.id .. "_" or k == L.id then
@@ -14349,7 +13723,6 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 								end
 							end
 						end
-						-- clear all per-player wait states for this loop
 						for k in pairs(S.loopWait) do
 							if k:sub(1, #L.id + 1) == L.id .. "_" or k == L.id then
 								S.loopWait[k] = nil
@@ -14359,7 +13732,6 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 						return
 					end
 					notify(HUB_NAME, L.title .. " ON · map-wide", 1.2)
-					-- save home position when loop starts
 					local homeCF = hrp() and hrp().CFrame
 					S.loopWait[L.id] = S.loopWait[L.id] or {}
 					S.loopWait[L.id].home = homeCF
@@ -14367,7 +13739,6 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 				startLoop(L.id, interval, function()
 					local targets = getLoopTargets()
 					if #targets == 0 then
-						-- try re-acquire single target
 						if S.loopName then
 							local found = Players:FindFirstChild(S.loopName)
 							if found and found.Parent then
@@ -14387,7 +13758,6 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 					if not w then w = { home = homeCF }; S.loopWait[wkey] = w end
 					if not w.home then w.home = homeCF end
 
-					-- house check
 					if not plotBypass and isInSafePlot(p) then
 						if not w._houseWarned or (os.clock() - w._houseWarned) > 5 then
 							w._houseWarned = os.clock()
@@ -14396,7 +13766,6 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 						continue
 					end
 
-					-- wait for respawn (waitRespawn loops)
 					if L.waitRespawn then
 						if w.waiting then
 							if isAliveP(p) and p.Character and p.Character ~= w.deadChar then
@@ -14416,17 +13785,13 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 						if not isAliveP(p) and not validP(p) then continue end
 					end
 
-					-- TP to target
 					visitForSNO(p, 15)
 
-					-- act
 					local charBefore = p.Character
 					pcall(L.fn, p)
 
-					-- TP back to saved home
 					if w.home then pcall(function() teleportSelf(w.home) end) end
 
-					-- if they died from this hit, wait for next life
 					if L.waitRespawn then
 						task.defer(function()
 							task.wait(0.3)
@@ -14438,7 +13803,7 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 							end
 						end)
 					end
-					end -- for targets
+					end
 				end)
 				end,
 			})
@@ -14719,7 +14084,6 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 		end })
 		section(sc, "OWNED INVENTORY", n())
 		makeButton(sc, { order = n(), title = "Refresh Owned + Map Scan", tip = "Scan backpack/UI/map ownership", callback = function()
-			-- rebuild lists dynamically by re-opening would need frame refs; print + notify
 			local owned = getOwnedToyNames()
 			local map = getMapItems()
 			local unowned = {}
@@ -14728,7 +14092,6 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 			end
 			table.sort(unowned)
 			notify(HUB_NAME, "Owned "..#owned.." · Unowned map "..#unowned, 3)
-			-- fill UI lists if present
 			if S.ownedList then
 				for _, ch in ipairs(S.ownedList:GetChildren()) do if ch:IsA("TextButton") then ch:Destroy() end end
 				for _, name in ipairs(owned) do
@@ -15031,7 +14394,6 @@ _TAB_BUILDERS["visuals"] = function(sc, n)
 							end
 							local h = char() and char():FindFirstChildOfClass("Humanoid")
 							if cam and h and cam.CameraSubject ~= h then
-								-- don't steal control-player / freecam subject
 								if not (controlState and controlState.running) then
 									cam.CameraSubject = h
 								end
@@ -15076,7 +14438,6 @@ _TAB_BUILDERS["visuals"] = function(sc, n)
 		})
 		makeButton(sc, { order = n(), title = "Reset Lighting", callback = function()
 			setFullbright(false); Lighting.ClockTime=14; Lighting.FogEnd=100000
-			-- hub tint stays tied to open/close only
 			if S.hubOpen then setPurpleTint(true) else setPurpleTint(false) end
 		end })
 end
@@ -15167,7 +14528,6 @@ _TAB_BUILDERS["auto"] = function(sc, n)
 					notify(HUB_NAME, "Spinning " .. #handles .. "…", 1.5)
 					local was = S.toggles.autoSpin
 					S.toggles.autoSpin = true
-					-- force ready path: temporarily treat as ready by spinning handles directly
 					local me = hrp()
 					if not me then S.toggles.autoSpin = was; return end
 					local saved = me.CFrame
@@ -15218,7 +14578,6 @@ _TAB_BUILDERS["auto"] = function(sc, n)
 							end
 						end
 					end
-					-- also ProximityPrompts
 					for _, d in ipairs(workspace:GetDescendants()) do
 						if d:IsA("ProximityPrompt") then
 							local n = (d.ActionText .. " " .. d.ObjectText):lower()
@@ -15266,7 +14625,6 @@ _TAB_BUILDERS["auto"] = function(sc, n)
 		})
 end
 _TAB_BUILDERS["console"] = function(sc, n)
-		-- SURVIVAL
 		section(sc, "SURVIVAL", n())
 		makeToggle(sc, {
 			order = n(), id = "antiKill", title = "Anti-Kill (Water / Acid)",
@@ -15339,7 +14697,6 @@ _TAB_BUILDERS["console"] = function(sc, n)
 			callback = function(on)
 				S.toggles.invincible = on
 				if on then
-					-- TP to a house and lock position
 					local free, owned = collectHouseSpots()
 					local pool = #free > 0 and free or owned
 					if #pool == 0 then
@@ -15361,20 +14718,17 @@ _TAB_BUILDERS["console"] = function(sc, n)
 						local r = hrp()
 						local h = hum()
 						if not r or not S._invincibleCF then return end
-						-- lock position: keep snapping back to house
 						pcall(function()
 							r.CFrame = S._invincibleCF
 							r.AssemblyLinearVelocity = Vector3.zero
 							r.AssemblyAngularVelocity = Vector3.zero
 						end)
-						-- prevent walk out
 						if h then
 							pcall(function()
 								h.WalkSpeed = 0
 								h.PlatformStand = true
 							end)
 						end
-						-- break any grab holding you
 						if FTAP.Struggle then
 							pcall(function() FTAP.Struggle:FireServer(LP) end)
 						end
@@ -15399,7 +14753,6 @@ _TAB_BUILDERS["console"] = function(sc, n)
 			callback = function(on)
 				S.toggles.spamTP = on
 				if on then
-					-- blitzbr-style map locations for random TP
 					local tpSpots = {
 						CFrame.new(-352, 99, 354),
 						CFrame.new(-584, -6, 93),
@@ -15418,7 +14771,6 @@ _TAB_BUILDERS["console"] = function(sc, n)
 						local r = hrp()
 						if not r then return end
 						local spot = tpSpots[math.random(1, #tpSpots)]
-						-- add slight randomness so you never land exact same spot
 						spot = spot * CFrame.new(math.random(-8, 8), math.random(0, 4), math.random(-8, 8))
 						pcall(function()
 							r.AssemblyLinearVelocity = Vector3.zero
@@ -15434,7 +14786,6 @@ _TAB_BUILDERS["console"] = function(sc, n)
 			end,
 		})
 
-		-- ANTI-KICK
 		section(sc, "ANTI-KICK", n())
 		makeToggle(sc, {
 			order = n(), id = "antiKickMisc", title = "Anti-Kick (Rejoin)",
@@ -15481,7 +14832,6 @@ _TAB_BUILDERS["console"] = function(sc, n)
 			end,
 		})
 
-		-- MOVEMENT
 		section(sc, "MOVEMENT", n())
 		makeToggle(sc, {
 			order = n(), id = "noclip", title = "Noclip",
@@ -15530,7 +14880,6 @@ _TAB_BUILDERS["console"] = function(sc, n)
 			end,
 		})
 
-		-- SERVER
 		section(sc, "SERVER", n())
 		makeButton(sc, { order = n(), title = "Rejoin", callback = function()
 			pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LP) end)
@@ -15552,7 +14901,6 @@ _TAB_BUILDERS["console"] = function(sc, n)
 			notify(HUB_NAME, "Loops stopped", 1.2)
 		end })
 
-		-- COMMAND CONSOLE
 		section(sc, "COMMAND CONSOLE", n())
 		local outBox = Instance.new("ScrollingFrame")
 		outBox.LayoutOrder = n()
@@ -15637,7 +14985,6 @@ _TAB_BUILDERS["console"] = function(sc, n)
 			end
 		end)
 
-		-- TOYS
 		section(sc, "TOOLS", n())
 		makeButton(sc, { order = n(), title = "Delete my toys", danger = true, callback = function()
 			notify(HUB_NAME, "Cleared " .. destroyAllMyToys(), 1.2)
@@ -15870,7 +15217,6 @@ _TAB_BUILDERS["sounds"] = function(sc, n)
 		corner(sndNote, 8)
 		pad(sndNote, 8, 8, 8, 8)
 
-		-- FTAP chat trigger words -> the game plays a sound when these are typed in chat
 		local SOUND_TRIGGERS = {
 			{ label = "Hello",     word = "Hello" },
 			{ label = "Hi",        word = "Hi" },
@@ -15936,7 +15282,6 @@ _TAB_BUILDERS["sounds"] = function(sc, n)
 			end,
 		})
 
-		-- Play once
 		makeButton(sc, {
 			order = n(),
 			title = "Play Sound",
@@ -15947,7 +15292,6 @@ _TAB_BUILDERS["sounds"] = function(sc, n)
 			end,
 		})
 
-		-- Spam toggle
 		makeToggle(sc, {
 			order = n(),
 			id = "spamSounds",
@@ -15968,7 +15312,6 @@ _TAB_BUILDERS["sounds"] = function(sc, n)
 			end,
 		})
 
-		-- Spam speed slider
 		makeSlider(sc, {
 			order = n(),
 			id = "spamSoundSpeed",
@@ -15982,7 +15325,6 @@ _TAB_BUILDERS["sounds"] = function(sc, n)
 			end,
 		})
 
-		-- Quick play buttons for popular ones
 		section(sc, "QUICK PLAY", n())
 		local quickSounds = { "Mommy", "Daddy", "Oof", "Kill", "Yay", "UwU", "Hello", "Ayo", "Bruh", "Lol", "Noob" }
 		for _, name in ipairs(quickSounds) do
@@ -16002,9 +15344,6 @@ _TAB_BUILDERS["sounds"] = function(sc, n)
 		end
 end
 _TAB_BUILDERS["fun"] = function(sc, n)
-		-- ═══════════════════════════════════════════════════════════
-		-- CONTROL PLAYER (moved from dedicated tab)
-		-- ═══════════════════════════════════════════════════════════
 		section(sc, "CONTROL PLAYER", n())
 		local ctrlNote = Instance.new("TextLabel")
 		ctrlNote.LayoutOrder = n()
@@ -16083,9 +15422,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			callback = function() stopControl() end,
 		})
 
-		-- ═══════════════════════════════════════════════════════════
-		-- HOLD (eat food / use instruments)
-		-- ═══════════════════════════════════════════════════════════
 		section(sc, "HOLD · EAT / INSTRUMENTS", n())
 		local holdNote = Instance.new("TextLabel")
 		holdNote.LayoutOrder = n()
@@ -16114,21 +15450,18 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			callback = function(v) S.holdItem = v end,
 		})
 
-		-- Core hold+use function with proper state checks (blitzbr-style)
 		local function doHoldAndUse(itemName)
 			local me = hrp()
 			if not me then notify(HUB_NAME, "No character", 1.5) return false end
 			local char = LP.Character
 			if not char then return false end
 
-			-- Step 0: Check if we already own this item in SpawnedInToys
 			local myFolder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
 			local model = nil
 			if myFolder then
 				model = myFolder:FindFirstChild(itemName)
 			end
 
-			-- Step 1: If not found, spawn + buy
 			if not model then
 				pcall(function()
 					if FTAP.SpawnToy then
@@ -16139,7 +15472,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 				pcall(function()
 					if FTAP.BuyToy then FTAP.BuyToy:InvokeServer(itemName) end
 				end)
-				-- Wait for model to appear
 				for _ = 1, 30 do
 					if myFolder then model = myFolder:FindFirstChild(itemName) end
 					if not model then model = workspace:FindFirstChild(itemName, true) end
@@ -16150,7 +15482,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 
 			if not model then notify(HUB_NAME, "Failed to spawn " .. itemName, 1.5) return false end
 
-			-- Step 2: Wait for HoldPart and its children
 			local holdPart = model:FindFirstChild("HoldPart")
 			if not holdPart then
 				holdPart = model:WaitForChild("HoldPart", 3)
@@ -16163,7 +15494,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end
 			local rigid = holdPart:FindFirstChild("RigidConstraint")
 
-			-- Step 3: HOLD the item (if not already held)
 			local isHeld = false
 			if rigid and rigid:FindFirstChild("Attachment1") then
 				local att = rigid.Attachment1
@@ -16176,7 +15506,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 				pcall(function()
 					holdRF:InvokeServer(model, char)
 				end)
-				-- Wait for attachment to appear (hold confirmed)
 				for _ = 1, 20 do
 					if rigid and rigid:FindFirstChild("Attachment1") then
 						local att2 = rigid.Attachment1
@@ -16191,7 +15520,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 
 			if not isHeld then notify(HUB_NAME, "Failed to hold " .. itemName, 1.5) return false end
 
-			-- Step 4: USE the item (check EatingSound isn't already playing)
 			local eatingSound = holdPart:FindFirstChild("EatingSound")
 			local canUse = true
 			if eatingSound and eatingSound.IsPlaying then
@@ -16247,7 +15575,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
-		-- Paint spray (touch-based, different from hold items)
 		section(sc, "SPRAY PAINT", n())
 		local paintNote = Instance.new("TextLabel")
 		paintNote.LayoutOrder = n()
@@ -16277,17 +15604,14 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 				if not me then return end
 				local r = rootOf(p)
 				if not r then return end
-				-- buy
 				pcall(function() if FTAP.BuyToy then FTAP.BuyToy:InvokeServer("SprayCanWD") end end)
 				task.wait(0.3)
-				-- spawn
 				pcall(function()
 					if FTAP.SpawnToy then
 						FTAP.SpawnToy:InvokeServer("SprayCanWD", me.CFrame * CFrame.new(0, 3, -3), Vector3.zero)
 					end
 				end)
 				task.wait(0.5)
-				-- find the spray can and touch the target with it
 				pcall(function()
 					local myFolder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
 					local can = myFolder and myFolder:FindFirstChild("SprayCanWD")
@@ -16295,13 +15619,11 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 					if can then
 						local sticky = can:FindFirstChild("StickyRemoverPart")
 						if sticky then
-							-- fire touch interest on target
 							if firetouchinterest then
 								firetouchinterest(sticky, r, 0)
 								task.wait(0.1)
 								firetouchinterest(sticky, r, 1)
 							else
-								-- fallback: teleport sticky to target
 								sticky.CFrame = r.CFrame
 								task.wait(0.2)
 							end
@@ -16358,9 +15680,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
-		-- ═══════════════════════════════════════════════════════════
-		-- AUTO BREAK PLOT
-		-- ═══════════════════════════════════════════════════════════
 		section(sc, "AUTO BREAK PLOT", n())
 		local breakNote = Instance.new("TextLabel")
 		breakNote.LayoutOrder = n()
@@ -16395,7 +15714,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 							if p and validP(p) and p.Character then
 								local r = rootOf(p)
 								if r then
-									-- spawn missiles on them
 									pcall(function()
 										if FTAP.BuyToy then FTAP.BuyToy:InvokeServer("BombMissile") end
 										if FTAP.SpawnToy then
@@ -16406,7 +15724,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 										end
 									end)
 									task.wait(0.2)
-									-- detonate
 									pcall(function()
 										local be = ReplicatedStorage:FindFirstChild("BombEvents")
 										if be and be:FindFirstChild("BombExplode") then
@@ -16430,9 +15747,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
-		-- ═══════════════════════════════════════════════════════════
-		-- SPARKLERS
-		-- ═══════════════════════════════════════════════════════════
 		section(sc, "SPARKLERS", n())
 		local sparkNote = Instance.new("TextLabel")
 		sparkNote.LayoutOrder = n()
@@ -16450,7 +15764,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		corner(sparkNote, 8)
 		pad(sparkNote, 6, 6, 6, 6)
 
-		-- sparkler player dropdown
 		local function sparkPlayerOptions()
 			local opts = playerLabels()
 			if #opts == 0 then opts = { "nobody online" } end
@@ -16545,7 +15858,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 						radius * math.cos(angle), y, radius * math.sin(angle)
 					)
 				end
-			else -- Plane
+			else
 				for i = 1, count do
 					positions[#positions+1] = Vector3.new(
 						(math.random() - 0.5) * radius * 2,
@@ -16581,7 +15894,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 						local me = hrp()
 						local cf = CFrame.new(r.Position + Vector3.new(pos.X, pos.Y + height, pos.Z))
 						if me then cf = me.CFrame * CFrame.new(pos.X, pos.Y + height, pos.Z) end
-						-- spawn actual toy server-side
 						pcall(function()
 							if FTAP.BuyToy then FTAP.BuyToy:InvokeServer(toyName) end
 						end)
@@ -16590,7 +15902,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 								FTAP.SpawnToy:InvokeServer(toyName, cf, Vector3.zero)
 							end
 						end)
-						-- SNO the spawned toy so it stays in place
 						task.wait(0.15)
 						local myFolder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
 						if myFolder then
@@ -16599,12 +15910,10 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 									local pp = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart", true)
 									if pp and (pp.Position - cf.Position).Magnitude < 20 then
 										sno(pp, cf.Position)
-										-- anchor it in place
 										pcall(function()
 											pp.Anchored = true
 											pp.CanCollide = false
 										end)
-										-- auto-delete after 5 seconds
 										Debris:AddItem(model, 5)
 										break
 									end
@@ -16645,7 +15954,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 											if FTAP.SpawnToy then FTAP.SpawnToy:InvokeServer(toyName, cf, Vector3.zero) end
 										end)
 										task.wait(0.12)
-										-- SNO + anchor the toy
 										local myFolder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
 										if myFolder then
 											for _, model in ipairs(myFolder:GetChildren()) do
@@ -16671,9 +15979,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
-		-- ═══════════════════════════════════════════════════════════
-		-- WINGS (sparkler wings / bone wings)
-		-- ═══════════════════════════════════════════════════════════
 		section(sc, "WINGS", n())
 		local wingNote = Instance.new("TextLabel")
 		wingNote.LayoutOrder = n()
@@ -16697,9 +16002,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			tip = "Spawn server-sided wings from pallets (visible to all)",
 			callback = function()
 				if S.formBuilding then notify(HUB_NAME, "Already building form...", 1.5) return end
-				-- clear any existing form wear
 				clearFormWear(true)
-				-- spawn pallets using the form system with wing offsets
 				local offsets = formWingsOffsets()
 				spawnFormOffsets("PalletLightBrown", offsets, nil, {
 					label = "Wings",
@@ -16721,9 +16024,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
-		-- ═══════════════════════════════════════════════════════════
-		-- FORCE ANIMATIONS
-		-- ═══════════════════════════════════════════════════════════
 		section(sc, "FORCE ANIMATIONS", n())
 		local animNote = Instance.new("TextLabel")
 		animNote.LayoutOrder = n()
@@ -16842,9 +16142,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
-		-- ═══════════════════════════════════════════════════════════
-		-- TROLL TOOLS
-		-- ═══════════════════════════════════════════════════════════
 		section(sc, "TROLL TOOLS", n())
 		makeToggle(sc, {
 			order = n(),
@@ -16920,9 +16217,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
-		-- ═══════════════════════════════════════════════════════════
-		-- LIMBS (remove own / steal others)
-		-- ═══════════════════════════════════════════════════════════
 		section(sc, "LIMBS", n())
 		local limbNote = Instance.new("TextLabel")
 		limbNote.LayoutOrder = n()
@@ -16943,18 +16237,15 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		local LIMB_JOINTS = { "Right Shoulder", "Left Shoulder", "Right Hip", "Left Hip", "Neck", "RootJoint" }
 		local LIMB_PARTS = { "Right Arm", "Left Arm", "Right Leg", "Left Leg", "Head", "Torso" }
 
-		-- core function: break joints on a character and fling limbs
 		local function breakLimbs(character, flingPower)
 			if not character then return end
 			flingPower = flingPower or 2000
 			local r = character:FindFirstChild("HumanoidRootPart")
-			-- break all Motor6D joints
 			for _, d in ipairs(character:GetDescendants()) do
 				if d:IsA("Motor6D") then
 					pcall(function() d:Destroy() end)
 				end
 			end
-			-- fling each limb away
 			for _, partName in ipairs(LIMB_PARTS) do
 				local part = character:FindFirstChild(partName)
 				if part and part:IsA("BasePart") then
@@ -16968,10 +16259,8 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end
 		end
 
-		-- stolen parts tracker
 		local stolenParts = {}
 
-		-- find Motor6D that connects a specific part to its parent
 		local function findJointForLimb(char, limbPart)
 			for _, d in ipairs(char:GetDescendants()) do
 				if d:IsA("Motor6D") and d.Part1 == limbPart then
@@ -16981,7 +16270,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			return nil
 		end
 
-		-- steal a single limb from target → attach to YOUR character
 		local function stealSingleLimb(targetPlr, limbName)
 			local char = targetPlr and targetPlr.Character
 			if not char then return false end
@@ -16993,22 +16281,17 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			local limb = char:FindFirstChild(limbName)
 			if not limb or not limb:IsA("BasePart") then return false end
 
-			-- break the Motor6D connecting this limb
 			local joint = findJointForLimb(char, limb)
 			if joint then pcall(function() joint:Destroy() end) end
 
-			-- SNO the detached limb
 			sno(limb)
 
-			-- createGrabLine to grab the limb
 			pcall(function() FTAP.CreateGrabLine:FireServer(limb, limb.CFrame) end)
 			task.wait(0.05)
 			pcall(function() FTAP.CreateGrabLine:FireServer(limb, myRoot.CFrame * CFrame.new(0, 2, -5)) end)
 
-			-- pull to our character with BodyPosition
 			createBringBody(limb, myRoot.CFrame * CFrame.new(0, 2, -5))
 
-			-- weld to our character so it sticks
 			task.wait(0.1)
 			local weld = Instance.new("WeldConstraint")
 			weld.Name = "VOIDZ_StolenLimb"
@@ -17016,12 +16299,10 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			weld.Part1 = limb
 			weld.Parent = limb
 
-			-- track for return
 			stolenParts[#stolenParts + 1] = { part = limb, char = char, limbName = limbName }
 			return true
 		end
 
-		-- map of limb names we support stealing (R6 names)
 		local STEAL_LIMBS = {
 			{ label = "Left Arm",  part = "Left Arm" },
 			{ label = "Right Arm", part = "Right Arm" },
@@ -17030,23 +16311,19 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			{ label = "Head",      part = "Head" },
 		}
 
-		-- return all stolen limbs (destroy welds, fling away)
 		local function returnStolenLimbs()
 			local n = 0
 			for i = #stolenParts, 1, -1 do
 				local info = stolenParts[i]
 				local part = info.part
 				if part and part.Parent then
-					-- destroy the weld
 					for _, d in ipairs(part:GetDescendants()) do
 						if d:IsA("WeldConstraint") and d.Name == "VOIDZ_StolenLimb" then
 							pcall(function() d:Destroy() end)
 						end
 					end
-					-- remove BodyPosition
 					local bp = part:FindFirstChild("BringBody")
 					if bp then pcall(function() bp:Destroy() end) end
-					-- fling away
 					pcall(function()
 						part.AssemblyLinearVelocity = Vector3.new(math.random(-50,50), 100, math.random(-50,50))
 					end)
@@ -17057,7 +16334,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			return n
 		end
 
-		-- U keybind: remove YOUR own limbs
 		makeButton(sc, {
 			order = n(),
 			title = "Remove My Limbs [U]",
@@ -17085,9 +16361,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
-		-- ═══════════════════════════════════════════════════════════
-		-- STEAL BODY PARTS
-		-- ═══════════════════════════════════════════════════════════
 		section(sc, "STEAL BODY PARTS", n())
 		local stealNote = Instance.new("TextLabel")
 		stealNote.LayoutOrder = n()
@@ -17248,9 +16521,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
-		-- ═══════════════════════════════════════════════════════════
-		-- QUICK SERVER ACTIONS
-		-- ═══════════════════════════════════════════════════════════
 		section(sc, "QUICK SERVER ACTIONS", n())
 		makeButton(sc, {
 			order = n(),
@@ -17319,11 +16589,9 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 								end
 								snoPlayer(p, r.Position)
 								task.wait()
-								-- break all Motor6D joints
 								for _, d in ipairs(p.Character:GetDescendants()) do
 									if d:IsA("Motor6D") then pcall(function() d:Destroy() end) end
 								end
-								-- fling limbs
 								for _, partName in ipairs({"Right Arm","Left Arm","Right Leg","Left Leg","Head"}) do
 									local part = p.Character:FindFirstChild(partName)
 									if part and part:IsA("BasePart") then
@@ -17343,9 +16611,6 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
--- ════════════════════════════════════════════════════════════════
--- TRAIN CONTROL
--- ═══════════════════════════════════════════════════════════════
 section(sc, "TRAIN CONTROL", n())
 local trainNote = Instance.new("TextLabel")
 trainNote.LayoutOrder = n()
@@ -17405,9 +16670,6 @@ makeButton(sc, {
 	end,
 })
 
--- ════════════════════════════════════════════════════════════════
--- AUTO SNOWBALL MAKER
--- ═══════════════════════════════════════════════════════════════
 section(sc, "AUTO SNOWBALL MAKER", n())
 local ballNote = Instance.new("TextLabel")
 ballNote.LayoutOrder = n()
@@ -17602,7 +16864,6 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 				if S._wlRefresh then pcall(S._wlRefresh) end
 			end,
 		})
-		-- Whitelist player list
 		local wlLabel = Instance.new("TextLabel")
 		wlLabel.LayoutOrder = n()
 		wlLabel.Size = UDim2.new(1, -6, 0, 14)
@@ -17948,7 +17209,6 @@ local function switchTab(id)
 	end
 end
 
--- mouse / hub open state lives on S (no extra locals — Luau register budget)
 S.savedMouseBehavior = S.savedMouseBehavior or Enum.MouseBehavior.LockCenter
 S.hubOpen = true
 S.hubAnimating = false
@@ -17961,9 +17221,7 @@ local function stopMouseForce()
 	end
 end
 
--- unlocked=true: free cursor for UI · unlocked=false: lock cursor back into game
 local function setMouseUnlocked(unlocked)
-	-- mobile / touch: never force mouse lock
 	if isMobileMode() then
 		stopMouseForce()
 		pcall(function()
@@ -18071,7 +17329,6 @@ local function installKeybindHandler()
 		if gp then return end
 		if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
 		local code = input.KeyCode
-		-- UI always on RightShift
 		if code == Enum.KeyCode.RightShift then
 			if S.toggles.kb_toggleUI ~= false then toggleHub() end
 			return
@@ -18129,7 +17386,6 @@ local function installKeybindHandler()
 			S.toggles.aura_orbit = not S.toggles.aura_orbit
 			setAura("orbit", S.toggles.aura_orbit == true)
 		elseif pressed("U") then
-			-- U = remove own limbs (blitzbr/bloodyv2 style)
 			local char = LP.Character
 			if char then
 				local LIMB_PARTS = { "Right Arm", "Left Arm", "Right Leg", "Left Leg", "Head" }
@@ -18152,13 +17408,10 @@ local function installKeybindHandler()
 		elseif S.toggles.kb_serverFling and pressed(S.keybinds and S.keybinds.srv_fling or "J") then
 			S.toggles.srv_fling = not S.toggles.srv_fling
 			setServerFx("fling", S.toggles.srv_fling == true)
-		-- = control is installControlKeyC (always-on path)
 		end
 	end))
 end
 
-------------------------------------------------------------------------
--- Mobile touch HUD (always-on quick buttons)
 local function nearestPlayerForMobile()
 	local me = hrp()
 	if not me then return nil end
@@ -18179,7 +17432,6 @@ local function buildMobileHud(sg)
 	if not isMobileMode() or not sg then return end
 	S.mobileHudBtns = {}
 
-	-- floating menu (top-left)
 	local menu = Instance.new("TextButton")
 	menu.Name = "MobileMenu"
 	menu.AnchorPoint = Vector2.new(0, 0)
@@ -18202,7 +17454,6 @@ local function buildMobileHud(sg)
 		toggleHub()
 	end)
 
-	-- right rail: compact quick actions
 	local actionPad = Instance.new("Frame")
 	actionPad.Name = "MobilePad"
 	actionPad.AnchorPoint = Vector2.new(1, 0.5)
@@ -18310,7 +17561,6 @@ local function buildMobileHud(sg)
 		end,
 	})
 
-	-- bottom action bar
 	local bot = Instance.new("Frame")
 	bot.Name = "MobileBottom"
 	bot.AnchorPoint = Vector2.new(0.5, 1)
@@ -18376,16 +17626,12 @@ local function buildMobileHud(sg)
 	syncMobileChrome()
 end
 
-------------------------------------------------------------------------
--- Main window (global so key unlock can find it)
 function buildMain()
 	resolveFTAP()
-	-- defaults before UI build so toggles render ON correctly
 	S.toggles.unlockMouse = false
 	S.toggles.freeCamMass = false
 	S.toggles.kb_toggleUI = true
 	S.antiWanted = S.antiWanted or {}
-	-- auto-detect touch if user forgot to pick mobile
 	if S.device ~= "Mobile" and UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
 		S.device = "Mobile"
 		S.toggles.mobileUI = true
@@ -18403,7 +17649,6 @@ function buildMain()
 	sg.Parent = parent
 	S.gui = sg
 
-	-- viewport-based size
 	local cam = workspace.CurrentCamera
 	local vw = (cam and cam.ViewportSize.X) or 800
 	local vh = (cam and cam.ViewportSize.Y) or 600
@@ -18414,7 +17659,6 @@ function buildMain()
 		S.mainW, S.mainH = 680, 460
 	end
 
-	-- toast (clean pill)
 	local toast = Instance.new("Frame")
 	toast.AnchorPoint = Vector2.new(1, 0)
 	toast.Position = UDim2.new(1, -16, 0, mobile and 96 or 18)
@@ -18448,7 +17692,6 @@ function buildMain()
 	tb.Parent = toast
 	S.notify = { Frame = toast, Title = tt, Body = tb }
 
-	-- tip bubble
 	local tip = Instance.new("Frame")
 	tip.AnchorPoint = Vector2.new(0, 1)
 	tip.Position = UDim2.new(0, 14, 1, mobile and -68 or -14)
@@ -18489,7 +17732,6 @@ function buildMain()
 	local rootStroke = stroke(root, C.accent, 1.35, 0.2)
 	grad(root, C.bg2, C.bg, 125)
 	tween(root, { Size = hubOpenSize() }, 0.4, Enum.EasingStyle.Quint)
-	-- animated root glow pulse
 	task.spawn(function()
 		local glow = rootStroke
 		while root.Parent do
@@ -18512,7 +17754,6 @@ function buildMain()
 	header.BorderSizePixel = 0
 	header.ZIndex = 5
 	header.Parent = root
-	-- animated gradient top bar
 	local top = Instance.new("Frame")
 	top.Size = UDim2.new(1, 0, 0, 3)
 	top.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -18528,7 +17769,6 @@ function buildMain()
 	})
 	topGrad.Rotation = 0
 	topGrad.Parent = top
-	-- animate the gradient rotation
 	task.spawn(function()
 		local rot = 0
 		while top.Parent do
@@ -18537,7 +17777,6 @@ function buildMain()
 			task.wait(0.03)
 		end
 	end)
-	-- glow line below the gradient bar
 	local glowLine = Instance.new("Frame")
 	glowLine.Size = UDim2.new(1, 0, 0, 8)
 	glowLine.Position = UDim2.new(0, 0, 0, 3)
@@ -18583,7 +17822,6 @@ function buildMain()
 	logo.Text = "VOIDZ"
 	logo.ZIndex = 7
 	logo.Parent = header
-	-- gradient text effect on logo
 	local logoGrad = Instance.new("UIGradient")
 	logoGrad.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, C.accent2 or C.accent),
@@ -18643,7 +17881,6 @@ function buildMain()
 		tween(close, { TextColor3 = C.muted }, 0.2)
 	end)
 
-	-- drag
 	local dragging, dragStart, startPos
 	header.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -18676,7 +17913,6 @@ function buildMain()
 	side.Parent = root
 	corner(side, 12)
 	local sideStroke = stroke(side, C.strokeSoft, 1.2, 0.4)
-	-- sidebar glow pulse
 	task.spawn(function()
 		while side.Parent do
 			if S.hubOpen then
@@ -18706,7 +17942,6 @@ function buildMain()
 	content.Parent = root
 	corner(content, 12)
 	stroke(content, C.strokeSoft, 1, 0.5)
-	-- subtle gradient on content area
 	local contentGrad = Instance.new("UIGradient")
 	contentGrad.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, C.bg2),
@@ -18732,7 +17967,6 @@ function buildMain()
 		btn.Parent = side
 		corner(btn, 8)
 		local btnStroke = stroke(btn, C.strokeSoft, 0.8, 0.6)
-		-- hover glow on tab button
 		btn.MouseEnter:Connect(function()
 			tween(btn, { BackgroundTransparency = 0.15 }, 0.15)
 			tween(btnStroke, { Color = C.accent, Transparency = 0.3 }, 0.15)
@@ -18743,7 +17977,6 @@ function buildMain()
 				tween(btnStroke, { Color = C.strokeSoft, Transparency = 0.6 }, 0.15)
 			end
 		end)
-		-- monogram badge
 		local badge = Instance.new("Frame")
 		local bs = mobile and 22 or 20
 		badge.Size = UDim2.fromOffset(bs, bs)
@@ -18805,7 +18038,7 @@ function buildMain()
 	S._buildingTab = nil
 
 	switchTab("home")
-	setPurpleTint(true) -- hub open tint (auto-clears on close)
+	setPurpleTint(true)
 	S.toggles.kb_toggleUI = true
 	installKeybindHandler()
 	installControlKeyC(true, true)
@@ -18817,11 +18050,9 @@ function buildMain()
 
 	S.hubOpen = true
 
-	-- re-enable wanted antis after death/respawn
 	LP.CharacterAdded:Connect(function()
 		task.wait(0.8)
 		local w = S.antiWanted or {}
-		-- Only re-arm if user explicitly set antiWanted.antiGrab = true via UI
 		if w.antiGrab == true and S.toggles.antiGrab then
 			stopLoop("antiGrab")
 			startLoop("antiGrab", 0.1, antiGrabTick)
@@ -18839,7 +18070,6 @@ function buildMain()
 				S.toggles[key] = true
 			end
 		end
-		-- fix orphaned freezePart after death — reset camera
 		local fp = workspace:FindFirstChild("VOIDZ_FreezePart")
 		if fp then
 			unfreezeCam()
@@ -18851,7 +18081,6 @@ function buildMain()
 		end
 	end)
 
-	-- auto-update everything every 20s
 	task.spawn(function()
 		while S.gui and S.gui.Parent do
 			task.wait(20)
@@ -18870,7 +18099,6 @@ function buildMain()
 		end
 	end)
 
-	-- keep remotes alive faster
 	task.spawn(function()
 		while S.gui and S.gui.Parent do
 			if not FTAP.ok then resolveFTAP() end
@@ -18882,8 +18110,6 @@ function buildMain()
 	print("[VOIDZ HUB]", BUILD, "FTAP", FTAP.ok)
 end
 
-------------------------------------------------------------------------
--- Key gate
 local function buildKey()
 	local parent = getUiParent()
 	local old = parent:FindFirstChild("VOIDZ_KEY"); if old then old:Destroy() end
@@ -18989,7 +18215,6 @@ local function buildKey()
 	corner(unlock, 10); stroke(unlock, C.accent, 1.2)
 
 	local function showDeviceSplash(device, onDone)
-		-- gradient animated splash (shared with boot unlock path)
 		showVoidzSplash(device, onDone)
 	end
 
@@ -19083,7 +18308,6 @@ local function buildKey()
 	box.FocusLost:Connect(function(e) if e then task.spawn(try) end end)
 end
 
-	-- register entry points for boot (locals stay inside this UI scope)
 	local function openHub(device)
 		S.device = device or S.device or "PC"
 		S.toggles.mobileUI = (S.device == "Mobile")
@@ -19097,7 +18321,6 @@ end
 	_G.buildMain = buildMain
 	Late.openHub = openHub
 	Late._phase = "exported"
-	-- also park on getgenv so unlock can find it even if Late table is weird
 	pcall(function()
 		local g = getgenv and getgenv()
 		if g then
@@ -19111,15 +18334,13 @@ end
 	end)
 	print("[VOIDZ] UI core exported (openHub ready)")
 	Late._phase = "ui_exported"
-end -- _voidzInitUI
+end
 
-	-- Keep a handle even if scoping is weird
 	pcall(function()
 		local g = getgenv and getgenv()
 		if g then g._voidzInitUI = _voidzInitUI end
 	end)
 
-	-- MUST run: creates Late.openHub / VOIDZ_OPEN_HUB
 	print("[VOIDZ] _voidzInitUI starting…")
 	Late._phase = "ui_calling"
 	local _uiOk, _uiErr = pcall(_voidzInitUI)
@@ -19128,7 +18349,6 @@ end -- _voidzInitUI
 		error("[VOIDZ] _voidzInitUI failed: " .. tostring(_uiErr))
 	end
 	if not Late.openHub then
-		-- one more try via getgenv handle
 		local g = getgenv and getgenv()
 		if g and type(g._voidzInitUI) == "function" then
 			pcall(g._voidzInitUI)
@@ -19140,7 +18360,6 @@ end -- _voidzInitUI
 	print("[VOIDZ] _voidzInitUI ok · openHub set")
 	Late._phase = "ui_ok"
 
-	-- export boot-critical entry points onto Late
 	Late.installAntiKickOnLoad = installAntiKickOnLoad
 	Late.installGrabWatch = installGrabWatch
 	Late.installAntis = installAntis
@@ -19152,7 +18371,6 @@ end -- _voidzInitUI
 		if Late.openHub then getgenv().VOIDZ_OPEN_HUB = Late.openHub end
 	end
 
-	-- last-chance openHub if UI export path was skipped by scoping
 	if type(Late.openHub) ~= "function" then
 		warn("[VOIDZ] openHub missing at late-init tail — installing emergency opener")
 		Late.openHub = function(device)
@@ -19173,11 +18391,8 @@ end -- _voidzInitUI
 		end)
 	end
 	print("[VOIDZ] late init tail done · openHub=", type(Late.openHub))
-end -- function _voidzLateInit (line 4004)
+end
 
-------------------------------------------------------------------------
--- Emergency key UI if main path dies (always show something)
-------------------------------------------------------------------------
 local function emergencyKeyUI(errMsg)
 	pcall(function()
 		local parent = getUiParent()
@@ -19225,12 +18440,8 @@ local function emergencyKeyUI(errMsg)
 	end)
 end
 
-------------------------------------------------------------------------
--- Boot (UI first, then systems — never leave the user with a blank screen)
-------------------------------------------------------------------------
 print("[VOIDZ HUB] loading", BUILD)
 
--- 1) Always show a key card immediately (does not depend on late init)
 local function showImmediateKeyUI()
 	local parent = getUiParent()
 	local old = parent:FindFirstChild("VOIDZ_KEY")
@@ -19397,13 +18608,11 @@ local function showImmediateKeyUI()
 
 			local function ensureCore()
 				status.Text = "Loading hub core…"
-				-- always run late init (defines globals + UI)
 				local ok, err = pcall(_voidzLateInit)
 				if not ok then
 					return nil, "late init: " .. tostring(err):sub(1, 120)
 				end
 
-				-- force UI init even if late init skipped the call (end-scoping bugs)
 				local uiInit = pickFn("_voidzInitUI")
 				if type(uiInit) == "function" then
 					status.Text = "Building UI core…"
@@ -19419,7 +18628,6 @@ local function showImmediateKeyUI()
 					return openFn, nil
 				end
 
-				-- last ditch: if buildMain exists now, wrap it
 				local bm = pickFn("buildMain")
 				if bm then
 					Late._initDone = true
@@ -19458,7 +18666,6 @@ local function showImmediateKeyUI()
 					print("[VOIDZ HUB] main hub open")
 				end
 			end
-			-- cool gradient splash, then hub (click to skip)
 			local okSplash, splashErr = pcall(function()
 				showVoidzSplash(S.device or "PC", openMain)
 			end)
@@ -19479,14 +18686,12 @@ local function showImmediateKeyUI()
 	return sg
 end
 
--- show key UI first so the screen is never blank
 local uiOk, uiErr = pcall(showImmediateKeyUI)
 if not uiOk then
 	warn("[VOIDZ] immediate UI failed:", uiErr)
 	pcall(emergencyKeyUI, uiErr)
 end
 
--- warm systems in background (safe)
 task.spawn(function()
 	if Late._initDone then return end
 	Late._initStarted = true
@@ -19513,4 +18718,5 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB · v1.2.15 · 2026-07-28
+-- VOIDZ HUB · v1.2.16 · 2026-07-28
+-- hi im voidz

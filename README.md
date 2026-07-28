@@ -1,6 +1,10 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.42` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.43` · Access Key: `VOIDZHUB`
+
+## Recent (1.2.43)
+
+- **Snow farm** — Growing snowballs use a collision group so they never collide with each other (still hit the ground). Restored for grab when farm ends.
 
 ## Recent (1.2.42)
 

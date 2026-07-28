@@ -49,7 +49,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,92,90})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,92,91})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -8161,6 +8161,8 @@ function installGrabLineWatchdog()
 	S.conns.grabLineHB = RunService.Heartbeat:Connect(function(dt)
 		if not S._grabLineKeepAlive then return end
 		if S.toggles.invisLine then return end
+		-- Always keep grab script enabled (never leave grab broken)
+		ensureGrabbingScriptOn()
 		-- Do NOT bail on antiLag — that was permanently killing the rope
 		acc += dt
 		local holding = false
@@ -8173,6 +8175,7 @@ function installGrabLineWatchdog()
 		acc = 0
 
 		ensureGrabBeamScriptOn(true)
+		ensureGrabbingScriptOn()
 		forceAllGrabBeamsVisible()
 		if holding then
 			hideGrabHandleParts()
@@ -22911,6 +22914,6 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.75 | 2026-07-28
+-- VOIDZ HUB | v1.2.76 | 2026-07-28
 
 -- hi im voidz

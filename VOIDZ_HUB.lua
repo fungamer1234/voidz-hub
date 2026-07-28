@@ -44,7 +44,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,86,92})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,86,93})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -117,8 +117,6 @@ local THEMES = {
 }
 
 local C = {}
-do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
-
 function applyThemeColors(name)
 	local t = THEMES[name] or THEMES.Purple
 	for k, v in pairs(t) do C[k] = v end
@@ -247,18 +245,16 @@ function stroke(i, col, th, transparency)
 	s:SetAttribute("VOIDZ_Stroke", true)
 	return s
 end
-do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
-
 function pad(i, a,b,c,d)
 	local p = Instance.new("UIPadding")
 	p.PaddingTop=UDim.new(0,a or 6); p.PaddingRight=UDim.new(0,b or 6)
 	p.PaddingBottom=UDim.new(0,c or 6); p.PaddingLeft=UDim.new(0,d or 6); p.Parent=i; return p
 end
-do local _z797=(5*11); if _z797<0 and _Vj() then _z797=_z797+1 end end
-
 function grad(i, a, b, rot)
 	local g = Instance.new("UIGradient"); g.Color = ColorSequence.new(a or C.accentDim, b or C.bg); g.Rotation = rot or 90; g.Parent = i; return g
 end
+
+do local _z700=(2*6); if _z700<0 and _Vj() then _z700=_z700+1 end end
 
 function refreshThemeVisuals()
 	if not S.gui then return end
@@ -444,6 +440,8 @@ function addGearButton(parent, opts)
 	return g
 end
 
+do local _z464=(8*6); if _z464<0 and _Vj() then _z464=_z464+1 end end
+
 function notify(title, text, dur)
 	dur = dur or 2
 	pcall(function()
@@ -490,8 +488,6 @@ function voidzChat(msg)
 end
 
 local INV = "\u{3164}"
-do local _z257=(8*6); if _z257<0 and _Vj() then _z257=_z257+1 end end
-
 function voidzChatSpam(msg)
 	msg = tostring(msg or "")
 	if msg == "" then return end
@@ -505,8 +501,6 @@ function getUiParent()
 	if ok2 then return CoreGui end
 	return LP:WaitForChild("PlayerGui")
 end
-
-do local _z109=(5*6); if _z109<0 and _Vj() then _z109=_z109+1 end end
 
 function showVoidzSplash(device, onDone)
 	device = device or S.device or "PC"
@@ -853,20 +847,18 @@ function showVoidzSplash(device, onDone)
 end
 
 function char() return LP.Character end
-do local _z472=(6*3); if _z472<0 and _Vj() then _z472=_z472+1 end end
-
 function hum() local c=char(); return c and c:FindFirstChildOfClass(_Vzd({109,154,146,134,147,148,142,137})) end
 function hrp()
 	local c = char()
 	if not c then return end
 	return c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Torso") or c:FindFirstChild("UpperTorso")
 end
+do local _z305=(3*8); if _z305<0 and _Vj() then _z305=_z305+1 end end
+
 function camPart()
 	local c = char()
 	return (c and c:FindFirstChild("CamPart")) or hrp()
 end
-do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
-
 function rootOf(p)
 	local c = p and p.Character
 	if not c then return end
@@ -934,8 +926,6 @@ function getLoopTargets()
 	return out
 end
 
-do local _z887=(5*7); if _z887<0 and _Vj() then _z887=_z887+1 end end
-
 function toggleLoopTarget(p)
 	if not p then return end
 	local fresh = Players:FindFirstChild(p.Name) or p
@@ -981,6 +971,8 @@ local plotWatch = {}
 local plotBypass = false
 local plotAlertAt = {}
 local plotWatchInstalled = false
+
+do local _z641=(8*8); if _z641<0 and _Vj() then _z641=_z641+1 end end
 
 function isInSafePlot(p)
 	if not p or p == LP then return false end
@@ -1039,8 +1031,6 @@ function findPlayer(q)
 	return nil
 end
 
-do local _z999=(9*11); if _z999<0 and _Vj() then _z999=_z999+1 end end
-
 function playerNames()
 	local t = {}
 	for _, p in ipairs(Players:GetPlayers()) do
@@ -1072,8 +1062,6 @@ function playerLabels(filter)
 	table.sort(t)
 	return t
 end
-
-do local _z839=(3*3); if _z839<0 and _Vj() then _z839=_z839+1 end end
 
 function findPlayerFromLabel(label)
 	label = tostring(label or "")
@@ -1170,6 +1158,8 @@ function sno(part, fromPos)
 	end)
 	return true
 end
+
+do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
 
 function snoPlayer(p, fromPos)
 	if not p or not p.Character then return false end
@@ -1396,6 +1386,8 @@ function forceUnsit(p)
 	end)
 end
 
+do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
+
 function launchTarget(p, mode)
 	forceUnsit(p)
 	local r = rootOf(p)
@@ -1429,7 +1421,7 @@ function launchTarget(p, mode)
 	end
 end
 
-do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
+do local _z797=(5*11); if _z797<0 and _Vj() then _z797=_z797+1 end end
 
 function destroyGrabOn(part)
 	if FTAP.DestroyGrabLine and part then
@@ -1601,6 +1593,8 @@ function flingPlayer(p, power, quiet, mapWide)
 	return true
 end
 
+do local _z257=(8*6); if _z257<0 and _Vj() then _z257=_z257+1 end end
+
 function ragdoll(p, hard)
 	if not isAliveP(p) then return end
 	if not gatePlotAction(p, "ragdoll", { kind = "ragdoll", quiet = true }) then return end
@@ -1642,6 +1636,8 @@ function ragdollInstant(p)
 		end)
 	end
 end
+
+do local _z109=(5*6); if _z109<0 and _Vj() then _z109=_z109+1 end end
 
 function killPlayer(p, quiet)
 	if not p or not validP(p) then
@@ -1765,6 +1761,8 @@ function voidPlayer(p, quiet)
 	return true
 end
 
+do local _z472=(6*3); if _z472<0 and _Vj() then _z472=_z472+1 end end
+
 function bringPlayer(p, destCF, quiet)
 	if not p or not validP(p) then
 		if not quiet then notify(HUB_NAME, _Vzd({115,148,69,103,151,142,147,140,69,121,134,151,140,138,153,69,103,154,145,145,152,141,142,153}), 1.5) end
@@ -1841,6 +1839,8 @@ function freezeCam(cf)
 	end
 end
 
+do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
+
 function unfreezeCam()
 	local cam = workspace.CurrentCamera
 	local h = hum()
@@ -1894,8 +1894,6 @@ function clearControlConns()
 	controlState.conns = {}
 end
 
-do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
-
 function setControlQuery(model, can)
 	if not model then return end
 	for _, d in ipairs(model:GetDescendants()) do
@@ -1941,6 +1939,8 @@ function stopControl(quiet)
 	controlState.model = nil
 	if not quiet then notify(HUB_NAME, _Vzd({104,148,147,153,151,148,145,69,116,139,139,81,69,121,141,134,153,69,114,107,69,110,152,69,107,151,138,138,69,115,148,156}), 1.2) end
 end
+
+do local _z887=(5*7); if _z887<0 and _Vj() then _z887=_z887+1 end end
 
 function isControlNPC(model)
 	if not model or not model:IsA("Model") then return false end
@@ -2097,8 +2097,6 @@ function startControl(model)
 	return true
 end
 
-do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
-
 function controlSelectedPlayer()
 	local p = S.controlPick or S.selected or (combatTarget and combatTarget())
 	if not p or not validP(p) then
@@ -2111,6 +2109,8 @@ function controlSelectedPlayer()
 	end
 	return startControl(p.Character)
 end
+
+do local _z999=(9*11); if _z999<0 and _Vj() then _z999=_z999+1 end end
 
 function nearestControlPlayer(maxDist)
 	maxDist = maxDist or 1e9
@@ -2198,6 +2198,8 @@ function lookAtControlPlayer(maxDist)
 	if pl and validP(pl) then return pl end
 	return nil
 end
+
+do local _z839=(3*3); if _z839<0 and _Vj() then _z839=_z839+1 end end
 
 function controlLookNPC()
 	local model = lookAtControlModel(80)
@@ -2489,6 +2491,8 @@ function touchPartOnTarget(part, targetRoot, hold)
 	end)
 end
 
+do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
+
 function touchToyPartToPlayer(toyName, targetRoot)
 	if not targetRoot then return end
 	local model, primary, tip = getStatusToy(toyName)
@@ -2578,8 +2582,6 @@ function applyMapPoison(targetRoot)
 	end
 end
 
-do local _z560=(2*7); if _z560<0 and _Vj() then _z560=_z560+1 end end
-
 function applyMapPaint(targetRoot)
 	if not targetRoot then return end
 	local paint = nil
@@ -2656,8 +2658,6 @@ function firePlayerBlitz(p)
 	end)
 	return true
 end
-
-do local _z234=(3*4); if _z234<0 and _Vj() then _z234=_z234+1 end end
 
 function applyStatusToPlayer(kind, p)
 	if not p or not validP(p) then return false end
@@ -3094,14 +3094,14 @@ end
 function flingAllMap()
 	setMassToggle("fling", true, massFlingLoop)
 end
-do local _z679=(5*4); if _z679<0 and _Vj() then _z679=_z679+1 end end
-
 function bringAllHard()
 	setMassToggle("bring", true, massBringLoop)
 end
 function kickAllMap()
 	setMassToggle("kick", true, massKickLoop)
 end
+do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
+
 function ragdollAllMap()
 	setMassToggle("ragdoll", true, massRagdollLoop)
 end
@@ -3239,6 +3239,8 @@ function massBringOnce()
 	notify(HUB_NAME, _Vzd({103,151,142,147,140,69,102,145,145,69,220,69,137,148,147,138}), 1.5)
 end
 
+do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
+
 function massRagdollOnce()
 	local model, primary = ensureToy(_Vzd({107,148,148,137,103,134,147,134,147,134}))
 	if not model or not primary then notify(HUB_NAME, "Failed to spawn FoodBanana", 2); return end
@@ -3323,8 +3325,6 @@ local CRAZY_LINE_CF = CFrame.new(
 	0.05436277016997337, 5.9604644775390625e-8, 0.9985212683677673
 )
 
-
-do local _z668=(2*6); if _z668<0 and _Vj() then _z668=_z668+1 end end
 
 function torsoOf(p)
 	if not p or not p.Character then return nil end
@@ -4206,6 +4206,8 @@ destroyServerHybridLoop = function(keep)
 end
 
 Late = {}
+do local _z560=(2*7); if _z560<0 and _Vj() then _z560=_z560+1 end end
+
 function _voidzLateInit()
 Late = Late or {}
 Late._phase = _Vzd({138,147,153,138,151,138,137})
@@ -4220,6 +4222,8 @@ function clearAuraEffect(part, names)
 		if mover then pcall(function() mover:Destroy() end) end
 	end
 end
+
+do local _z234=(3*4); if _z234<0 and _Vj() then _z234=_z234+1 end end
 
 function restoreBuriedModel(model)
 	local saved = buriedPartState[model]
@@ -4250,8 +4254,6 @@ function cleanupAura(id)
 		end
 	end
 end
-
-do local _z416=(7*7); if _z416<0 and _Vj() then _z416=_z416+1 end end
 
 function inRange(pos, range)
 	local me = hrp()
@@ -4404,8 +4406,6 @@ function applyVelBurst(part, power, up)
 	end)
 end
 
-do local _z231=(6*5); if _z231<0 and _Vj() then _z231=_z231+1 end end
-
 function tick_netown(cfg, serverWide)
 	cfg = getAura("netown")
 	if not hrp() or not FTAP.SetNetworkOwner then return end
@@ -4471,6 +4471,8 @@ function tick_anchor(cfg, serverWide)
 		end)
 	end, serverWide)
 end
+
+do local _z679=(5*4); if _z679<0 and _Vj() then _z679=_z679+1 end end
 
 function tick_attract(cfg, serverWide)
 	cfg = getAura(_Vzd({134,153,153,151,134,136,153}))
@@ -4766,6 +4768,8 @@ function tick_yeet(cfg, serverWide)
 	end, serverWide)
 end
 
+do local _z668=(2*6); if _z668<0 and _Vj() then _z668=_z668+1 end end
+
 function tick_soft(cfg, serverWide)
 	cfg = getAura("soft")
 	local cam = workspace.CurrentCamera
@@ -4846,8 +4850,6 @@ function tick_launch(cfg, serverWide)
 		end)
 	end, serverWide)
 end
-
-do local _z654=(9*10); if _z654<0 and _Vj() then _z654=_z654+1 end end
 
 function tick_spike(cfg, serverWide)
 	cfg = getAura("spike")
@@ -4945,8 +4947,6 @@ function tick_burnaura(cfg, serverWide)
 end
 
 local tkAngles = {}
-do local _z128=(4*3); if _z128<0 and _Vj() then _z128=_z128+1 end end
-
 function tick_telekinesis(cfg, serverWide)
 	cfg = getAura("telekinesis")
 	local me = hrp()
@@ -5164,8 +5164,6 @@ function extinguishFire()
 	if canBurn then pcall(function() canBurn.Value = false end) end
 end
 
-do local _z770=(9*9); if _z770<0 and _Vj() then _z770=_z770+1 end end
-
 function antiBurnTick()
 	if not S.toggles.antiBurn then return end
 	extinguishFire()
@@ -5314,8 +5312,6 @@ function antiStickyTick()
 	end)
 end
 
-do local _z655=(2*3); if _z655<0 and _Vj() then _z655=_z655+1 end end
-
 function antiBlobmanTick()
 	if not S.toggles.antiBlobman then return end
 	local h = hum()
@@ -5333,6 +5329,8 @@ function antiBlobmanTick()
 		end)
 	end
 end
+
+do local _z416=(7*7); if _z416<0 and _Vj() then _z416=_z416+1 end end
 
 function setAntiLag(on)
 	S.toggles.antiLag = on == true
@@ -5645,7 +5643,7 @@ function getPlotInteriorCF(plot)
 	return nil
 end
 
-do local _z537=(9*10); if _z537<0 and _Vj() then _z537=_z537+1 end end
+do local _z231=(6*5); if _z231<0 and _Vj() then _z231=_z231+1 end end
 
 function collectHouseSpots()
 	local free, owned = {}, {}
@@ -5856,8 +5854,6 @@ function restoreGroundPhysics()
 	if r then
 		pcall(function()
 			r.Anchored = false
-			local v = r.AssemblyLinearVelocity
-			r.AssemblyLinearVelocity = Vector3.new(v.X * 0.3, math.min(v.Y, 0), v.Z * 0.3)
 			r.AssemblyAngularVelocity = Vector3.zero
 		end)
 	end
@@ -5871,18 +5867,17 @@ function restoreGroundPhysics()
 			h:SetStateEnabled(Enum.HumanoidStateType.GettingUp, true)
 			h:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 			h:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+			h:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
 			local st = h:GetState()
 			if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll
-				or st == Enum.HumanoidStateType.FallingDown or st == Enum.HumanoidStateType.Flying then
+				or st == Enum.HumanoidStateType.FallingDown or st == Enum.HumanoidStateType.Flying
+				or st == Enum.HumanoidStateType.Seated then
 				h:ChangeState(Enum.HumanoidStateType.GettingUp)
 			end
 			h:ChangeState(Enum.HumanoidStateType.Running)
-			h.Jump = false
 		end)
 	end
 end
-
-do local _z307=(5*6); if _z307<0 and _Vj() then _z307=_z307+1 end end
 
 function isGucciVictim(c)
 	c = c or char()
@@ -5897,7 +5892,19 @@ function isGucciVictim(c)
 		if val ~= nil and tostring(val) ~= "" and tostring(val) ~= LP.Name then
 			return true
 		end
-		if held and held.Value then return true end
+	end
+	for _, n in ipairs({ "HumanoidRootPart", "Torso", "UpperTorso" }) do
+		local p = c:FindFirstChild(n)
+		if p then
+			local po = p:FindFirstChild("PartOwner")
+			if po then
+				local val = nil
+				pcall(function() val = po.Value end)
+				if val ~= nil and tostring(val) ~= "" and tostring(val) ~= LP.Name then
+					return true
+				end
+			end
+		end
 	end
 	for _, child in ipairs(workspace:GetChildren()) do
 		if child.Name == "GrabParts" and grabPartsIsAttackingUs(child, c) then
@@ -5907,6 +5914,160 @@ function isGucciVictim(c)
 	return false
 end
 
+function gucciStripForeignConstraints(c)
+	c = c or char()
+	if not c then return end
+	for _, d in ipairs(c:GetDescendants()) do
+		if d:IsA("WeldConstraint") or d:IsA("Weld") or d:IsA("RigidConstraint")
+			or d:IsA("AlignPosition") or d:IsA("AlignOrientation")
+			or d:IsA("BallSocketConstraint") or d:IsA(_Vzd({109,142,147,140,138,104,148,147,152,153,151,134,142,147,153})) then
+			local p0 = d.Part0 or d.Attachment0
+			local p1 = d.Part1 or d.Attachment1
+			local a0 = d:IsA("Constraint") and d.Attachment0
+			local a1 = d:IsA("Constraint") and d.Attachment1
+			local foreign = false
+			if d:IsA("WeldConstraint") or d:IsA("Weld") then
+				if p0 and p0:IsDescendantOf(c) and p1 and not p1:IsDescendantOf(c) then foreign = true end
+				if p1 and p1:IsDescendantOf(c) and p0 and not p0:IsDescendantOf(c) then foreign = true end
+			elseif a0 and a1 then
+				local par0 = a0.Parent
+				local par1 = a1.Parent
+				if par0 and par0:IsDescendantOf(c) and par1 and not par1:IsDescendantOf(c) then foreign = true end
+				if par1 and par1:IsDescendantOf(c) and par0 and not par0:IsDescendantOf(c) then foreign = true end
+			end
+			if foreign then pcall(function() d:Destroy() end) end
+		end
+		if d:IsA("BodyVelocity") or d:IsA("BodyPosition") or d:IsA("BodyAngularVelocity")
+			or d:IsA("BodyForce") or d:IsA("LinearVelocity") or d:IsA("VectorForce")
+			or d:IsA("AngularVelocity") then
+			local n = d.Name
+			if n ~= "VOIDZ_Fly" and n ~= "VOIDZ_FlyG" and n ~= _Vzd({123,116,110,105,127,132,108,154,136,136,142,103,123})
+				and n ~= "TrainDriveBV" and n ~= "TrainDriveBG" and n ~= "BringBody" then
+				local par = d.Parent
+				if par and par:IsA("BasePart") and par:IsDescendantOf(c) then
+					pcall(function() d:Destroy() end)
+				end
+			end
+		end
+		if d.Name == "PartOwner" then
+			local val = nil
+			pcall(function() val = d.Value end)
+			if val ~= nil and tostring(val) ~= "" and tostring(val) ~= LP.Name then
+				pcall(function() d:Destroy() end)
+			end
+		end
+	end
+end
+
+function gucciDestroyAttackingGrabs(c)
+	c = c or char()
+	if not c then return end
+	for _, child in ipairs(workspace:GetChildren()) do
+		if child.Name == _Vzd({108,151,134,135,117,134,151,153,152}) and grabPartsIsAttackingUs(child, c) then
+			for _, d in ipairs(child:GetDescendants()) do
+				if d:IsA("WeldConstraint") or d:IsA("Weld") or d:IsA("AlignPosition")
+					or d:IsA("AlignOrientation") or d:IsA("Motor6D") or d:IsA("RigidConstraint") then
+					pcall(function() d:Destroy() end)
+				end
+			end
+			pcall(function() child:Destroy() end)
+		end
+	end
+end
+
+function gucciReclaimSelf()
+	local c = char()
+	local me = hrp()
+	if not c or not me then return end
+	for _, n in ipairs({ "HumanoidRootPart", "Head", "Torso", "UpperTorso", "LowerTorso",
+		_Vzd({113,138,139,153,69,102,151,146}), "Right Arm", _Vzd({113,138,139,153,69,113,138,140}), _Vzd({119,142,140,141,153,69,113,138,140}),
+		"LeftUpperArm", "RightUpperArm", "LeftLowerArm", "RightLowerArm",
+		"LeftUpperLeg", "RightUpperLeg", _Vzd({113,138,139,153,113,148,156,138,151,113,138,140}), "RightLowerLeg" }) do
+		local p = c:FindFirstChild(n)
+		if p and p:IsA("BasePart") then
+			sno(p, me.Position)
+			pcall(function()
+				p.Anchored = false
+				p.Massless = false
+			end)
+		end
+	end
+end
+
+function gucciForceFreeMove()
+	local h = hum()
+	local r = hrp()
+	local c = char()
+	if not h or not r or not c then return end
+	pcall(function()
+		r.Anchored = false
+		h.PlatformStand = false
+		h.Sit = false
+		h.AutoRotate = true
+		h:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+		h:SetStateEnabled(Enum.HumanoidStateType.Running, true)
+		h:SetStateEnabled(Enum.HumanoidStateType.GettingUp, true)
+		h:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+		h:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+		h:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
+		local st = h:GetState()
+		if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll
+			or st == Enum.HumanoidStateType.FallingDown or st == Enum.HumanoidStateType.Seated then
+			h:ChangeState(Enum.HumanoidStateType.GettingUp)
+			h:ChangeState(Enum.HumanoidStateType.Running)
+		end
+	end)
+
+	local md = h.MoveDirection
+	local spd = 16
+	if S.toggles.speed then
+		spd = tonumber(S.walkSpeed) or 50
+	else
+		spd = math.max(tonumber(h.WalkSpeed) or 16, 16)
+	end
+	if S.toggles.speedCFrame then
+		spd = spd * (tonumber(S.speedMult) or 1.5)
+	end
+
+	local bv = r:FindFirstChild("VOIDZ_GucciBV")
+	if not bv then
+		bv = Instance.new("BodyVelocity")
+		bv.Name = "VOIDZ_GucciBV"
+		bv.MaxForce = Vector3.new(1e5, 0, 1e5)
+		bv.P = 1250
+		bv.Parent = r
+	end
+
+	if md.Magnitude > 0.05 then
+		local dir = md.Unit
+		local push = dir * spd
+		pcall(function()
+			r.CFrame = r.CFrame + dir * (spd * 0.055)
+			local y = r.AssemblyLinearVelocity.Y
+			r.AssemblyLinearVelocity = Vector3.new(push.X * 1.15, y, push.Z * 1.15)
+			bv.MaxForce = Vector3.new(1e9, 0, 1e9)
+			bv.Velocity = Vector3.new(push.X, 0, push.Z)
+		end)
+	else
+		pcall(function()
+			bv.Velocity = Vector3.zero
+			bv.MaxForce = Vector3.new(0, 0, 0)
+		end)
+	end
+
+	if UserInputService:IsKeyDown(Enum.KeyCode.Space)
+		or (UserInputService.TouchEnabled and h.Jump) then
+		pcall(function()
+			h.Jump = true
+			h:ChangeState(Enum.HumanoidStateType.Jumping)
+			local v = r.AssemblyLinearVelocity
+			if v.Y < 35 then
+				r.AssemblyLinearVelocity = Vector3.new(v.X, 42, v.Z)
+			end
+		end)
+	end
+end
+
 function gucciBreakGrabNow()
 	local c = char()
 	local r = hrp()
@@ -5914,13 +6075,15 @@ function gucciBreakGrabNow()
 	if not c or not r then return end
 
 	pcall(function()
-		r.AssemblyLinearVelocity = Vector3.zero
-		r.AssemblyAngularVelocity = Vector3.zero
 		r.Anchored = false
+		if h then
+			h.PlatformStand = false
+			h.Sit = false
+		end
 	end)
 
 	if FTAP.Struggle then
-		for _ = 1, 4 do
+		for _ = 1, 6 do
 			pcall(function() FTAP.Struggle:FireServer(LP) end)
 			pcall(function() FTAP.Struggle:FireServer() end)
 		end
@@ -5933,82 +6096,25 @@ function gucciBreakGrabNow()
 	end
 
 	if FTAP.DestroyGrabLine then
-		for _, n in ipairs({ "HumanoidRootPart", "Torso", "UpperTorso", "LowerTorso", "Head", _Vzd({113,138,139,153,69,102,151,146}), "Right Arm", _Vzd({113,138,139,153,69,113,138,140}), _Vzd({119,142,140,141,153,69,113,138,140}), "LeftUpperArm", _Vzd({119,142,140,141,153,122,149,149,138,151,102,151,146}) }) do
+		for _, n in ipairs({ "HumanoidRootPart", "Torso", "UpperTorso", "LowerTorso", "Head",
+			_Vzd({113,138,139,153,69,102,151,146}), _Vzd({119,142,140,141,153,69,102,151,146}), "Left Leg", "Right Leg",
+			"LeftUpperArm", "RightUpperArm", "LeftLowerArm", _Vzd({119,142,140,141,153,113,148,156,138,151,102,151,146}) }) do
 			local p = c:FindFirstChild(n)
 			if p then pcall(function() FTAP.DestroyGrabLine:FireServer(p) end) end
 		end
 		pcall(function() FTAP.DestroyGrabLine:FireServer(r) end)
 	end
 
-	for _, child in ipairs(workspace:GetChildren()) do
-		if child.Name == "GrabParts" and grabPartsIsAttackingUs(child, c) then
-			for _, d in ipairs(child:GetDescendants()) do
-				if d:IsA("WeldConstraint") or d:IsA("Weld") or d:IsA("AlignPosition") or d:IsA("AlignOrientation") then
-					pcall(function() d:Destroy() end)
-				end
-			end
-			pcall(function() child:Destroy() end)
-		end
-	end
-
-	for _, d in ipairs(c:GetDescendants()) do
-		if d:IsA("WeldConstraint") or d:IsA("Weld") then
-			local p0, p1 = d.Part0, d.Part1
-			local other = nil
-			if p0 and p0:IsDescendantOf(c) and p1 and not p1:IsDescendantOf(c) then other = p1 end
-			if p1 and p1:IsDescendantOf(c) and p0 and not p0:IsDescendantOf(c) then other = p0 end
-			if other then pcall(function() d:Destroy() end) end
-		end
-	end
-
-	if h then
-		pcall(function()
-			h.PlatformStand = false
-			h.Sit = false
-			h.AutoRotate = true
-			h:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
-			h:SetStateEnabled(Enum.HumanoidStateType.Running, true)
-			h:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-			h:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
-			local st = h:GetState()
-			if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll
-				or st == Enum.HumanoidStateType.FallingDown or st == Enum.HumanoidStateType.Seated then
-				h:ChangeState(Enum.HumanoidStateType.GettingUp)
-				h:ChangeState(Enum.HumanoidStateType.Running)
-			end
-		end)
-	end
-
-	task.defer(function()
-		if not r.Parent then return end
-		r.Anchored = false
-		local still = isGucciVictim(c)
-		if not still then
-			r.AssemblyLinearVelocity = Vector3.zero
-			restoreGroundPhysics()
-		elseif S.toggles.antiGucci then
-			local move = h and h.MoveDirection or Vector3.zero
-			if move.Magnitude > 0.1 then
-				local spd = (S.toggles.speed and S.walkSpeed) or (h and h.WalkSpeed) or 16
-				r.AssemblyLinearVelocity = Vector3.new(move.X * spd * 1.15, 0, move.Z * spd * 1.15)
-			else
-				r.AssemblyLinearVelocity = Vector3.zero
-			end
-		end
-	end)
-	task.delay(0.12, function()
-		if r.Parent and not isGucciVictim(c) then
-			r.Anchored = false
-			restoreGroundPhysics()
-		end
-	end)
+	gucciDestroyAttackingGrabs(c)
+	gucciStripForeignConstraints(c)
+	gucciReclaimSelf()
+	gucciForceFreeMove()
 end
 
 function gucciAntiTick()
 	if not (S.toggles.antiGucci or S.toggles.antiGrab) then return end
 	local c = char()
 	local r = hrp()
-	local h = hum()
 	if not c or not r then return end
 
 	if S.toggles.antiBurn or S.toggles.antiGucci then
@@ -6019,11 +6125,10 @@ function gucciAntiTick()
 	end
 
 	if not isGucciVictim(c) then
+		local bv = r:FindFirstChild("VOIDZ_GucciBV")
+		if bv then pcall(function() bv:Destroy() end) end
 		if r.Anchored and not S.toggles.antiExplode then
-			local held = LP:FindFirstChild("IsHeld")
-			if not (held and held.Value) then
-				r.Anchored = false
-			end
+			r.Anchored = false
 		end
 		return
 	end
@@ -6034,6 +6139,7 @@ function gucciAntiTick()
 
 	gucciBreakGrabNow()
 	if doAntiGrabHard then pcall(doAntiGrabHard) end
+	gucciForceFreeMove()
 
 	if S.autoCounter or S.toggles.autoCounter then
 		for _, bp in ipairs({ c:FindFirstChild("Head"), c:FindFirstChild("HumanoidRootPart"), c:FindFirstChild("Torso"), c:FindFirstChild("UpperTorso") }) do
@@ -6041,7 +6147,7 @@ function gucciAntiTick()
 				local po = bp:FindFirstChild("PartOwner")
 				if po then
 					local val = po.Value
-					local grabberName = (typeof(val) == "Instance" and val:IsA("Player")) and val.Name or tostring(val or "")
+					local grabberName = (typeof(val) == _Vzd({110,147,152,153,134,147,136,138}) and val:IsA("Player")) and val.Name or tostring(val or "")
 					if grabberName ~= "" and grabberName ~= LP.Name then
 						local grabberPlr = Players:FindFirstChild(grabberName)
 						if grabberPlr and validP(grabberPlr) then
@@ -6066,7 +6172,7 @@ function installAntis()
 		if not r or not h then return end
 
 		task.spawn(function()
-			local fpp = r:FindFirstChild("FirePlayerPart") or r:WaitForChild(_Vzd({107,142,151,138,117,145,134,158,138,151,117,134,151,153}), 5)
+			local fpp = r:FindFirstChild(_Vzd({107,142,151,138,117,145,134,158,138,151,117,134,151,153})) or r:WaitForChild("FirePlayerPart", 5)
 			if not fpp then return end
 			local canBurn = fpp:FindFirstChild("CanBurn") or fpp:WaitForChild("CanBurn", 3)
 			if canBurn and canBurn:IsA(_Vzd({103,148,148,145,123,134,145,154,138})) then
@@ -6097,7 +6203,7 @@ function installAntis()
 						if S.autoCounter or S.toggles.autoCounter then
 							local grabberVal = ch.Value
 							local grabberName = nil
-							if typeof(grabberVal) == "Instance" and grabberVal:IsA("Player") then
+							if typeof(grabberVal) == "Instance" and grabberVal:IsA(_Vzd({117,145,134,158,138,151})) then
 								grabberName = grabberVal.Name
 							elseif grabberVal then
 								grabberName = tostring(grabberVal)
@@ -6132,7 +6238,7 @@ function installAntis()
 							local po = bp:FindFirstChild("PartOwner")
 							if po then
 								local val = po.Value
-								local grabberName = (typeof(val) == "Instance" and val:IsA("Player")) and val.Name or tostring(val or "")
+								local grabberName = (typeof(val) == _Vzd({110,147,152,153,134,147,136,138}) and val:IsA("Player")) and val.Name or tostring(val or "")
 								if grabberName ~= "" and grabberName ~= LP.Name then
 									local grabberPlr = Players:FindFirstChild(grabberName)
 									if grabberPlr and validP(grabberPlr) then
@@ -6183,26 +6289,52 @@ function installAntis()
 
 	local gucciAcc = 0
 	bind("gucciAntiHB", RunService.Heartbeat:Connect(function(dt)
-		if not (S.toggles.antiGucci or S.toggles.antiGrab) then return end
+		if not (S.toggles.antiGucci or S.toggles.antiGrab) then
+			local rr = hrp()
+			if rr then
+				local bv = rr:FindFirstChild("VOIDZ_GucciBV")
+				if bv then pcall(function() bv:Destroy() end) end
+			end
+			return
+		end
+		if isGucciVictim() then
+			gucciForceFreeMove()
+			gucciStripForeignConstraints()
+			gucciDestroyAttackingGrabs()
+		end
 		gucciAcc += dt
-		local need = S.toggles.antiGucci and 0.04 or 0.1
+		local need = S.toggles.antiGucci and 0.05 or 0.1
 		if gucciAcc < need then return end
 		gucciAcc = 0
 		gucciAntiTick()
 	end))
 
+	bind("gucciAntiRS", RunService.RenderStepped:Connect(function()
+		if not (S.toggles.antiGucci or S.toggles.antiGrab) then return end
+		if not isGucciVictim() then return end
+		gucciForceFreeMove()
+	end))
+
 	task.spawn(function()
-		local isHeld = LP:FindFirstChild("IsHeld") or LP:WaitForChild("IsHeld", 15)
+		local isHeld = LP:FindFirstChild("IsHeld") or LP:WaitForChild(_Vzd({110,152,109,138,145,137}), 15)
 		if not isHeld then return end
 		isHeld.Changed:Connect(function(held)
 			if held == true and (S.toggles.antiGrab or S.toggles.antiGucci) then
 				gucciBreakGrabNow()
 				if doAntiGrabHard then doAntiGrabHard() end
-				gucciAntiTick()
+				gucciForceFreeMove()
 				task.defer(gucciBreakGrabNow)
 				task.delay(0.03, gucciBreakGrabNow)
 				task.delay(0.08, gucciBreakGrabNow)
 				task.delay(0.15, gucciBreakGrabNow)
+				task.delay(0.3, gucciBreakGrabNow)
+			elseif held == false then
+				local rr = hrp()
+				if rr then
+					local bv = rr:FindFirstChild(_Vzd({123,116,110,105,127,132,108,154,136,136,142,103,123}))
+					if bv then pcall(function() bv:Destroy() end) end
+				end
+				restoreGroundPhysics()
 			end
 		end)
 	end)
@@ -6220,7 +6352,7 @@ function setCrazyLine(on)
 		stopLoop("invisLine")
 	end
 	if not FTAP.CreateGrabLine then resolveFTAP() end
-	notify(HUB_NAME, _Vzd({104,151,134,159,158,69,113,142,147,138,69,116,115,69,77,152,148,139,153,69,145,134,140,69,145,142,147,138,152,78}), 1.5)
+	notify(HUB_NAME, "Crazy Line ON (soft lag lines)", 1.5)
 	local lagCF = CFrame.new(
 		0.12640380859375, 0.9606337547302246, -0.5000009536743164,
 		0.9985212683677673, 0, -0.05436277016997337,
@@ -6242,14 +6374,14 @@ end
 
 function setInvisibleLine(on)
 	S.toggles.invisLine = on == true
-	stopLoop(_Vzd({142,147,155,142,152,113,142,147,138}))
+	stopLoop("invisLine")
 	if on and S.toggles.crazyLine then
-		notify(HUB_NAME, "Turn Crazy Line OFF for Invisible Line", 2)
+		notify(HUB_NAME, _Vzd({121,154,151,147,69,104,151,134,159,158,69,113,142,147,138,69,116,107,107,69,139,148,151,69,110,147,155,142,152,142,135,145,138,69,113,142,147,138}), 2)
 	end
 	if on then
 		startLoop("invisLine", 0.25, function()
 			for _, ch in ipairs(workspace:GetChildren()) do
-				if ch.Name == "GrabParts" then
+				if ch.Name == _Vzd({108,151,134,135,117,134,151,153,152}) then
 					for _, d in ipairs(ch:GetDescendants()) do
 						if d:IsA("Beam") then
 							pcall(function()
@@ -6261,7 +6393,7 @@ function setInvisibleLine(on)
 				end
 			end
 		end)
-		notify(HUB_NAME, _Vzd({110,147,155,142,152,142,135,145,138,69,113,142,147,138,69,116,115}), 1.5)
+		notify(HUB_NAME, "Invisible Line ON", 1.5)
 	else
 		notify(HUB_NAME, "Invisible Line OFF", 1)
 	end
@@ -6295,6 +6427,8 @@ function invisSetNoclip(enabled)
 	end)
 end
 
+do local _z654=(9*10); if _z654<0 and _Vj() then _z654=_z654+1 end end
+
 function setCharacterInvis(on, quiet)
 	S.toggles.charInvis = on == true
 	local r = hrp()
@@ -6311,11 +6445,11 @@ function setCharacterInvis(on, quiet)
 			end)
 		end
 		invisState.origY = nil
-		if not quiet then notify(HUB_NAME, _Vzd({110,147,155,142,152,142,135,142,145,142,153,158,69,116,107,107}), 1.2) end
+		if not quiet then notify(HUB_NAME, "Invisibility OFF", 1.2) end
 		return
 	end
 	if not r or not cam then
-		if not quiet then notify(HUB_NAME, "No character for invis", 1.5) end
+		if not quiet then notify(HUB_NAME, _Vzd({115,148,69,136,141,134,151,134,136,153,138,151,69,139,148,151,69,142,147,155,142,152}), 1.5) end
 		S.toggles.charInvis = false
 		return
 	end
@@ -6353,7 +6487,7 @@ function setCharacterInvis(on, quiet)
 		local camPos = Vector3.new(rr.Position.X, camTargetY, rr.Position.Z)
 		ccam.CFrame = CFrame.new(camPos, camPos + look)
 	end)
-	if not quiet then notify(HUB_NAME, "Invisibility ON (body under map)", 1.5) end
+	if not quiet then notify(HUB_NAME, _Vzd({110,147,155,142,152,142,135,142,145,142,153,158,69,116,115,69,77,135,148,137,158,69,154,147,137,138,151,69,146,134,149,78}), 1.5) end
 end
 
 function surfaceForGrab()
@@ -6365,8 +6499,6 @@ function surfaceForGrab()
 	r.Transparency = 0.7
 	return true
 end
-do local _z567=(5*9); if _z567<0 and _Vj() then _z567=_z567+1 end end
-
 function hideAfterGrab()
 	if not invisState.on or not S.toggles.charInvis then return end
 	local r = hrp()
@@ -6391,14 +6523,12 @@ function findSlotsFolder()
 	if s then return s end
 	for _, ch in ipairs(workspace:GetChildren()) do
 		local n = ch.Name:lower()
-		if (n == "slots" or n:find("slot", 1, true)) and (ch:IsA(_Vzd({107,148,145,137,138,151})) or ch:IsA("Model")) then
+		if (n == "slots" or n:find("slot", 1, true)) and (ch:IsA("Folder") or ch:IsA("Model")) then
 			return ch
 		end
 	end
 	return nil
 end
-
-do local _z797=(9*10); if _z797<0 and _Vj() then _z797=_z797+1 end end
 
 function scanSlotMachines()
 	local root = findSlotsFolder()
@@ -6407,8 +6537,8 @@ function scanSlotMachines()
 	for _, slot in ipairs(root:GetChildren()) do
 		local sh = slot:FindFirstChild("SlotHandle")
 		if sh then
-			local handle = sh:FindFirstChild(_Vzd({109,134,147,137,145,138}))
-			local lb = sh:FindFirstChild("LightBall")
+			local handle = sh:FindFirstChild("Handle")
+			local lb = sh:FindFirstChild(_Vzd({113,142,140,141,153,103,134,145,145}))
 			if handle and handle:IsA("BasePart") then
 				handles[#handles + 1] = handle
 			end
@@ -6419,9 +6549,9 @@ function scanSlotMachines()
 	end
 	if #handles == 0 then
 		for _, d in ipairs(root:GetDescendants()) do
-			if d.Name == _Vzd({109,134,147,137,145,138}) and d:IsA("BasePart") then
+			if d.Name == "Handle" and d:IsA("BasePart") then
 				local par = d.Parent
-				if par and par.Name == _Vzd({120,145,148,153,109,134,147,137,145,138}) then
+				if par and par.Name == "SlotHandle" then
 					handles[#handles + 1] = d
 				end
 			end
@@ -6432,6 +6562,8 @@ function scanSlotMachines()
 	end
 	return handles, lights, root
 end
+
+do local _z128=(4*3); if _z128<0 and _Vj() then _z128=_z128+1 end end
 
 function collectSlotHandles(slotsFolder)
 	local handles = scanSlotMachines()
@@ -6454,7 +6586,7 @@ function slotsSpinReady(slotsFolder)
 end
 
 function snoSlotHandle(handle)
-	if not handle or not handle:IsA(_Vzd({103,134,152,138,117,134,151,153})) then return end
+	if not handle or not handle:IsA("BasePart") then return end
 	local me = hrp()
 	if not me then return end
 	local origin = me.Position
@@ -6501,7 +6633,7 @@ function autoSpinCoinsOnce()
 		return false, _Vzd({147,148,69,156,148,151,144,152,149,134,136,138,83,120,145,148,153,152})
 	end
 	if #handles == 0 then
-		return false, _Vzd({147,148,69,120,145,148,153,109,134,147,137,145,138,83,109,134,147,137,145,138})
+		return false, "no SlotHandle.Handle"
 	end
 	local ready, neonN, lightN = slotsSpinReady()
 	if not ready then
@@ -6565,7 +6697,7 @@ function autoSpinCoinsOnce()
 			rr.AssemblyLinearVelocity = Vector3.zero
 		end)
 	end
-	return true, _Vzd({152,149,154,147,69}) .. spun .. "/" .. #handles
+	return true, "spun " .. spun .. "/" .. #handles
 end
 
 function setAutoSpinCoins(on)
@@ -6578,7 +6710,7 @@ function setAutoSpinCoins(on)
 	end
 	local handles, lights, root = scanSlotMachines()
 	if not root then
-		notify(HUB_NAME, _Vzd({102,154,153,148,82,120,149,142,147,95,69,156,148,151,144,152,149,134,136,138,83,120,145,148,153,152,69,146,142,152,152,142,147,140}), 3)
+		notify(HUB_NAME, "Auto-Spin: workspace.Slots missing", 3)
 	else
 		notify(HUB_NAME, "Auto-Spin ON · " .. #handles .. _Vzd({69,141,134,147,137,145,138,152,69,220,69}) .. #lights .. " lights", 2.5)
 	end
@@ -6605,7 +6737,7 @@ function setAutoSpinCoins(on)
 				end
 			else
 				if os.clock() - lastWaitMsg > 30 then
-					notify(HUB_NAME, "Auto-Spin · " .. tostring(info or "waiting"), 1.2)
+					notify(HUB_NAME, _Vzd({102,154,153,148,82,120,149,142,147,69,220,69}) .. tostring(info or "waiting"), 1.2)
 					lastWaitMsg = os.clock()
 				end
 				task.wait(1)
@@ -6623,7 +6755,7 @@ function setFly(on)
 	local r = hrp()
 	if not r then return end
 	local bv = Instance.new("BodyVelocity")
-	bv.Name = "VOIDZ_Fly"
+	bv.Name = _Vzd({123,116,110,105,127,132,107,145,158})
 	bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
 	bv.Velocity = Vector3.zero
 	bv.Parent = r
@@ -6640,7 +6772,7 @@ function setFly(on)
 		if not rr then return end
 		if not S.flyBv or not S.flyBv.Parent then
 			S.flyBv = Instance.new("BodyVelocity")
-			S.flyBv.Name = _Vzd({123,116,110,105,127,132,107,145,158})
+			S.flyBv.Name = "VOIDZ_Fly"
 			S.flyBv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
 			S.flyBv.Parent = rr
 		end
@@ -6677,7 +6809,7 @@ bind("moveHB", RunService.Heartbeat:Connect(function()
 	end
 	if S.toggles.noclip and char() then
 		for _, p in ipairs(char():GetDescendants()) do
-			if p:IsA("BasePart") then p.CanCollide = false end
+			if p:IsA(_Vzd({103,134,152,138,117,134,151,153})) then p.CanCollide = false end
 		end
 	end
 	if S.toggles.speedCFrame and r and h and h.MoveDirection.Magnitude > 0 then
@@ -6692,20 +6824,22 @@ bind("infJump", UserInputService.JumpRequest:Connect(function()
 end))
 
 local KNOWN_TOYS = {
-	"Airhorn", _Vzd({102,147,155,142,145,108,151,134,158}), _Vzd({102,151,146,104,141,134,142,151,103,145,154,138}), "ArmChairBrownGray", "ArmChairPink",
-	"BallBasketball", "BallMagicLight", "BallSnowball", "BathroomShower", _Vzd({103,134,153,141,151,148,148,146,120,142,147,144}),
-	"BedBlanketBlue", "BedFramedOrange", "BedFuton", "BellBig", "BellSmall",
-	"BombBalloon", "BombDarkMatter", "BombMissile", "BookManyPages", _Vzd({103,148,148,144,115,148,151,146,134,145}),
+	"Airhorn", "AnvilGray", "ArmChairBlue", "ArmChairBrownGray", "ArmChairPink",
+	"BallBasketball", "BallMagicLight", "BallSnowball", "BathroomShower", "BathroomSink",
+	"BedBlanketBlue", "BedFramedOrange", "BedFuton", _Vzd({103,138,145,145,103,142,140}), "BellSmall",
+	"BombBalloon", "BombDarkMatter", "BombMissile", "BookManyPages", "BookNormal",
 	"Boombox", "BoxCrateWood", "BubbleBlower", "BucketPaint", "Campfire",
-	"ChildrensChair", "ChildrensCouch", "ChildrensDesk", "ChildrensShelf", "ChildrensTable",
-	"ClockAlarm", "ComputerLaptopOld", "CouchBlue", "CouchBrownGray", _Vzd({104,148,154,136,141,105,134,151,144,108,151,134,158}),
-	"CouchLightBrownGray", "CouchPink", "CouchWhite", "CouchPurple",
-	_Vzd({104,148,154,147,153,138,151,104,148,151,147,138,151}), "CounterSink", "CounterStraight", "CreatureBlobman", "CreatureRobot",
+	_Vzd({104,141,142,145,137,151,138,147,152,104,141,134,142,151}), "ChildrensCouch", "ChildrensDesk", "ChildrensShelf", "ChildrensTable",
+	"ClockAlarm", "ComputerLaptopOld", "CouchBlue", _Vzd({104,148,154,136,141,103,151,148,156,147,108,151,134,158}), "CouchDarkGray",
+	"CouchLightBrownGray", "CouchPink", _Vzd({104,148,154,136,141,124,141,142,153,138}), _Vzd({104,148,154,136,141,117,154,151,149,145,138}),
+	"CounterCorner", _Vzd({104,148,154,147,153,138,151,120,142,147,144}), "CounterStraight", _Vzd({104,151,138,134,153,154,151,138,103,145,148,135,146,134,147}), "CreatureRobot",
 	"CupMugBrown", "CupMugWhite", "DiceBig", "DiceSmall", "DiscoColorBall",
-	"DrawerLightBrown", "FactoryBench", "FactoryCabinet", "FactoryChair", _Vzd({107,134,136,153,148,151,158,104,148,154,136,141}),
+	"DrawerLightBrown", "FactoryBench", "FactoryCabinet", "FactoryChair", "FactoryCouch",
 	"FoodBanana", "NinjaKunai", "PalletLightBrown", "Pallet", "SprayCanWD",
 	"SoccerBall", "BoxingGlove", "Firework", "Balloon", "PaintBucket",
 }
+
+do local _z770=(9*9); if _z770<0 and _Vj() then _z770=_z770+1 end end
 
 function getOwnedToyNames()
 	local owned = {}
@@ -6722,7 +6856,7 @@ function getOwnedToyNames()
 	local pg = LP:FindFirstChild("PlayerGui")
 	if pg then
 		for _, d in ipairs(pg:GetDescendants()) do
-			if d:IsA("TextLabel") or d:IsA("TextButton") then
+			if d:IsA("TextLabel") or d:IsA(_Vzd({121,138,157,153,103,154,153,153,148,147})) then
 				local tx = d.Text
 				if type(tx) == "string" and #tx > 1 and #tx < 40 then
 					for _, toy in ipairs(KNOWN_TOYS) do
@@ -6741,7 +6875,7 @@ function getOwnedToyNames()
 		end
 	end
 	for _, m in ipairs(workspace:GetDescendants()) do
-		if m:IsA(_Vzd({120,153,151,142,147,140,123,134,145,154,138})) and m.Name == "PartOwner" and m.Value == LP.Name then
+		if m:IsA("StringValue") and m.Name == "PartOwner" and m.Value == LP.Name then
 			local model = m.Parent
 			if model then owned[model.Name] = true end
 		end
@@ -6752,8 +6886,6 @@ function getOwnedToyNames()
 	return list
 end
 
-do local _z282=(9*3); if _z282<0 and _Vj() then _z282=_z282+1 end end
-
 function getMapItems()
 	local map = {}
 	local me = hrp()
@@ -6762,10 +6894,10 @@ function getMapItems()
 		if inst:IsA("Model") and inst:FindFirstChildWhichIsA("BasePart", true) then
 			if not Players:GetPlayerFromCharacter(inst) then
 				local name = inst.Name
-				if #name > 1 and name ~= "Map" and name ~= "Plots" and name ~= _Vzd({124,148,151,144,152,149,134,136,138}) then
+				if #name > 1 and name ~= "Map" and name ~= "Plots" and name ~= "Workspace" then
 					local owner = nil
 					local po = inst:FindFirstChild("PartOwner", true)
-					if po and po:IsA(_Vzd({120,153,151,142,147,140,123,134,145,154,138})) then owner = po.Value end
+					if po and po:IsA("StringValue") then owner = po.Value end
 					local part = inst:FindFirstChildWhichIsA("BasePart", true)
 					if part and (part.Position - origin).Magnitude < 2000 then
 						if not map[name] then map[name] = { owned = false, samples = {} } end
@@ -6802,7 +6934,7 @@ function waitForCanSpawn(timeout)
 end
 
 function rotFromCF(cf)
-	if typeof(cf) ~= _Vzd({104,107,151,134,146,138}) then return Vector3.zero end
+	if typeof(cf) ~= "CFrame" then return Vector3.zero end
 	local _, y = cf:ToOrientation()
 	return Vector3.new(0, math.deg(y), 0)
 end
@@ -6816,6 +6948,8 @@ function resolveSpawnCF(name, opts)
 	return cp.CFrame * CFrame.new(0, opts.y or 0, -dist)
 end
 
+do local _z655=(2*3); if _z655<0 and _Vj() then _z655=_z655+1 end end
+
 function spawnToyNow(name, opts)
 	opts = opts or {}
 	name = name or S.selectedToy or _Vzd({117,134,145,145,138,153,113,142,140,141,153,103,151,148,156,147})
@@ -6826,7 +6960,7 @@ function spawnToyNow(name, opts)
 		resolveFTAP()
 	end
 	if not FTAP.SpawnToy then
-		if not opts.silent then notify(HUB_NAME, "No SpawnToy remote — link remotes", 2) end
+		if not opts.silent then notify(HUB_NAME, _Vzd({115,148,69,120,149,134,156,147,121,148,158,69,151,138,146,148,153,138,69,57,69,145,142,147,144,69,151,138,146,148,153,138,152}), 2) end
 		return false
 	end
 
@@ -6896,11 +7030,11 @@ function spawnToy(name, opts)
 	if name == "Pallet" then name = "PalletLightBrown" end
 	if opts.sync then
 		local ok = spawnToyNow(name, opts)
-		if ok and not opts.silent then notify(HUB_NAME, _Vzd({120,149,134,156,147,69}) .. name, 0.8) end
+		if ok and not opts.silent then notify(HUB_NAME, "Spawn " .. name, 0.8) end
 		return ok
 	end
 	if not opts.silent then
-		notify(HUB_NAME, "Spawn " .. name, 0.6)
+		notify(HUB_NAME, _Vzd({120,149,134,156,147,69}) .. name, 0.6)
 	end
 	local jobOpts = {}
 	for k, v in pairs(opts) do jobOpts[k] = v end
@@ -6912,7 +7046,7 @@ end
 
 function spawnToyBurst(name, count)
 	count = math.clamp(tonumber(count) or 1, 1, 80)
-	name = name or "PalletLightBrown"
+	name = name or _Vzd({117,134,145,145,138,153,113,142,140,141,153,103,151,148,156,147})
 	task.spawn(function()
 		if FTAP.BuyToy then pcall(function() FTAP.BuyToy:InvokeServer(name) end) end
 		waitForCanSpawn(3)
@@ -6922,7 +7056,7 @@ function spawnToyBurst(name, count)
 			local cf = base * CFrame.new(0, (i - 1) * 1.1, -3)
 			spawnToyNow(name, { cf = cf, skipBuy = true, silent = true, gap = 0.07 })
 		end
-		notify(HUB_NAME, "Spawned x" .. count .. " " .. tostring(name), 1.5)
+		notify(HUB_NAME, _Vzd({120,149,134,156,147,138,137,69,157}) .. count .. " " .. tostring(name), 1.5)
 	end)
 end
 
@@ -6943,6 +7077,8 @@ function destroyAllMyToys(filterName)
 	end
 	return n
 end
+
+do local _z537=(9*10); if _z537<0 and _Vj() then _z537=_z537+1 end end
 
 function countMyToys(filterName)
 	local folder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
@@ -6983,13 +7119,11 @@ function stopTrainDrive(quiet)
 	if not quiet then notify(HUB_NAME, "Train stopped", 1) end
 end
 
-do local _z792=(5*10); if _z792<0 and _Vj() then _z792=_z792+1 end end
-
 function _vB1(inst)
 	if not inst then return 0 end
 	local path = inst:GetFullName():lower()
 	local score = 0
-	for _, k in ipairs({ "train", "locomotive", "rail", "caboose", "engine", "steam", "minecart", "cart", "trolley", "wagon", "driver" }) do
+	for _, k in ipairs({ "train", _Vzd({145,148,136,148,146,148,153,142,155,138}), "rail", _Vzd({136,134,135,148,148,152,138}), "engine", "steam", "minecart", "cart", "trolley", "wagon", "driver" }) do
 		if path:find(k, 1, true) then score = score + 3 end
 	end
 	if inst:IsA("VehicleSeat") then score = score + 2 end
@@ -7019,8 +7153,6 @@ function _vB5(pos, maxDist)
 	end
 	return best
 end
-
-do local _z138=(7*4); if _z138<0 and _Vj() then _z138=_z138+1 end end
 
 function findAnyTrainSeat()
 	local me = hrp()
@@ -7083,12 +7215,14 @@ function _vB3(seat)
 			end
 		elseif seat.Parent then
 			for _, d in ipairs(seat.Parent:GetDescendants()) do
-				if d:IsA(_Vzd({103,134,152,138,117,134,151,153})) then sno(d, origin) end
+				if d:IsA("BasePart") then sno(d, origin) end
 			end
 		end
 		RunService.Heartbeat:Wait()
 	end
 end
+
+do local _z307=(5*6); if _z307<0 and _Vj() then _z307=_z307+1 end end
 
 function _vB4(seat)
 	local h = hum()
@@ -7120,7 +7254,7 @@ function startTrainDrive()
 	resolveFTAP()
 	local me = hrp()
 	if not me then
-		notify(HUB_NAME, "No character", 1.5)
+		notify(HUB_NAME, _Vzd({115,148,69,136,141,134,151,134,136,153,138,151}), 1.5)
 		return false
 	end
 	local prevAntiBlob = S.toggles.antiBlobman
@@ -7128,7 +7262,7 @@ function startTrainDrive()
 	S.toggles.antiBlobman = false
 	S.toggles.antiTrain = false
 
-	notify(HUB_NAME, _Vzd({120,153,151,138,134,146,142,147,140,69,153,151,134,142,147,69,136,134,155,138,75}), 1.2)
+	notify(HUB_NAME, "Streaming train cave…", 1.2)
 	pcall(function() me.CFrame = CFrame.new(TRAIN_CAVE_POS + Vector3.new(0, 8, 0)) end)
 	task.wait(0.6)
 
@@ -7154,7 +7288,7 @@ function startTrainDrive()
 	if not seat then
 		S.toggles.antiBlobman = prevAntiBlob
 		S.toggles.antiTrain = prevAntiTrain
-		notify(HUB_NAME, "No train near cave · walk closer / rejoin map", 2.5)
+		notify(HUB_NAME, _Vzd({115,148,69,153,151,134,142,147,69,147,138,134,151,69,136,134,155,138,69,220,69,156,134,145,144,69,136,145,148,152,138,151,69,84,69,151,138,143,148,142,147,69,146,134,149}), 2.5)
 		return false
 	end
 
@@ -7212,7 +7346,7 @@ function startTrainDrive()
 		if drivePart and drivePart.Parent then sno(drivePart, origin) end
 		if model then
 			for _, d in ipairs(model:GetDescendants()) do
-				if d:IsA("BasePart") and (d == seat or d == drivePart or math.random() < 0.08) then
+				if d:IsA(_Vzd({103,134,152,138,117,134,151,153})) and (d == seat or d == drivePart or math.random() < 0.08) then
 					sno(d, origin)
 				end
 			end
@@ -7304,12 +7438,10 @@ function snowSoundOf(model)
 		or model:FindFirstChild("SoundPart", true)
 end
 
-do local _z454=(3*6); if _z454<0 and _Vj() then _z454=_z454+1 end end
-
 function _vA3(part)
 	if not part then return false end
 	local po = part:FindFirstChild("PartOwner")
-	if po and (po:IsA("StringValue") or po:IsA(_Vzd({116,135,143,138,136,153,123,134,145,154,138}))) then
+	if po and (po:IsA("StringValue") or po:IsA("ObjectValue")) then
 		local v = po.Value
 		if typeof(v) == "string" then return v == LP.Name end
 		if typeof(v) == "Instance" then return v == LP end
@@ -7373,6 +7505,8 @@ function _vA2(part)
 	return _vA3(part)
 end
 
+do local _z567=(5*9); if _z567<0 and _Vj() then _z567=_z567+1 end end
+
 function _vA4(sound)
 	if not sound then return nil end
 	local bp = sound:FindFirstChild("FarmSnowball")
@@ -7421,6 +7555,8 @@ function farmSnowballLoop(model)
 	end
 end
 
+do local _z797=(9*10); if _z797<0 and _Vj() then _z797=_z797+1 end end
+
 function startSnowFarm()
 	if S._snowFarmOn then return end
 	resolveFTAP()
@@ -7432,7 +7568,7 @@ function startSnowFarm()
 	S._snowGrown = {}
 	local want = math.clamp(tonumber(S.ballCount) or 10, 1, 50)
 	local maxSz = S.ballSize or 15
-	notify(HUB_NAME, _Vzd({120,147,148,156,69,139,134,151,146,69,116,115,69,220,69,151,148,145,145,69,148,147,69,146,148,154,147,153,134,142,147,69,220,69,140,151,148,156,69}) .. tostring(maxSz), 2.5)
+	notify(HUB_NAME, "Snow farm ON · roll on mountain · grow " .. tostring(maxSz), 2.5)
 
 	_vA1()
 	task.wait(0.25)
@@ -7487,7 +7623,7 @@ function startSnowFarm()
 			local grown = countGrownSnowballs()
 			if grown >= want then
 				stopSnowFarm(true)
-				notify(HUB_NAME, _Vzd({108,151,148,156,147,69}) .. grown .. " · fling or explode", 2.5)
+				notify(HUB_NAME, "Grown " .. grown .. _Vzd({69,220,69,139,145,142,147,140,69,148,151,69,138,157,149,145,148,137,138}), 2.5)
 				break
 			end
 			if have < want then
@@ -7538,7 +7674,7 @@ function flingGrownSnowballsAt(targetPlayer)
 						local bv = sound:FindFirstChild("VOIDZ_SnowFling")
 						if not bv then
 							bv = Instance.new("BodyVelocity")
-							bv.Name = _Vzd({123,116,110,105,127,132,120,147,148,156,107,145,142,147,140})
+							bv.Name = "VOIDZ_SnowFling"
 							bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
 							bv.Parent = sound
 						end
@@ -7553,7 +7689,7 @@ function flingGrownSnowballsAt(targetPlayer)
 			S._snowGrown[sound] = nil
 		end
 	end
-	notify(HUB_NAME, _Vzd({107,145,154,147,140,69}) .. n .. _Vzd({69,152,147,148,156,135,134,145,145,152,69,134,153,69}) .. (targetPlayer and targetPlayer.Name or "?"), 1.8)
+	notify(HUB_NAME, "Flung " .. n .. _Vzd({69,152,147,148,156,135,134,145,145,152,69,134,153,69}) .. (targetPlayer and targetPlayer.Name or "?"), 1.8)
 	return n
 end
 
@@ -7588,14 +7724,14 @@ function explodeGrownSnowballs()
 			S._snowGrown[sound] = nil
 		end
 	end
-	notify(HUB_NAME, _Vzd({106,157,149,145,148,137,138,137,69}) .. n .. " snowballs", 1.5)
+	notify(HUB_NAME, "Exploded " .. n .. _Vzd({69,152,147,148,156,135,134,145,145,152}), 1.5)
 	return n
 end
 
 function makeAndFlingSnowballsNow()
 	local p = S.selected
 	if not p or not validP(p) or not p.Character then
-		notify(HUB_NAME, "Select a target", 1.5)
+		notify(HUB_NAME, _Vzd({120,138,145,138,136,153,69,134,69,153,134,151,140,138,153}), 1.5)
 		return
 	end
 	local want = math.clamp(tonumber(S.ballCount) or 10, 1, 50)
@@ -7683,6 +7819,8 @@ end
 function formToyFolder()
 	return workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
 end
+
+do local _z282=(9*3); if _z282<0 and _Vj() then _z282=_z282+1 end end
 
 function clearFormWear(doDestroy)
 	if S.formWearConn then
@@ -7874,7 +8012,7 @@ end
 
 function spawnFormOffsets(toy, offsets, scaleMul, opts)
 	opts = opts or {}
-	toy = toy or _Vzd({117,134,145,145,138,153,113,142,140,141,153,103,151,148,156,147})
+	toy = toy or "PalletLightBrown"
 	if toy == "Pallet" then toy = "PalletLightBrown" end
 	local sizeScale = (opts.sizeScale or S.formSizeScale or 1.2) * (scaleMul or 1)
 	local pitch = (opts.pitch or WEAR_PITCH) * sizeScale
@@ -7902,7 +8040,7 @@ function spawnFormOffsets(toy, offsets, scaleMul, opts)
 	local want = #offsets
 	offsets = clampOffsetList(offsets, math.max(2, room - 1))
 	if #offsets < want then
-		notify(HUB_NAME, _Vzd({107,148,151,146,69,136,145,142,149,149,138,137,69,153,148,69}) .. #offsets .. " (limit " .. getToyLimit() .. ")", 2)
+		notify(HUB_NAME, _Vzd({107,148,151,146,69,136,145,142,149,149,138,137,69,153,148,69}) .. #offsets .. _Vzd({69,77,145,142,146,142,153,69}) .. getToyLimit() .. ")", 2)
 	end
 	if not opts.keep then
 		clearFormWear(true)
@@ -8002,7 +8140,7 @@ function formCircleOffsets(count, radius)
 			x = math.cos(a) * radius,
 			y = 0.2,
 			z = math.sin(a) * radius,
-			anim = _Vzd({148,151,135,142,153}),
+			anim = "orbit",
 			phase = a,
 			radius = radius,
 		}
@@ -8063,6 +8201,8 @@ function formSuitOffsets()
 	return pts
 end
 
+do local _z792=(5*10); if _z792<0 and _Vj() then _z792=_z792+1 end end
+
 function formRobotOffsets()
 	local pts = {}
 	local function box(cx, cy, cz, sx, sy, sz, step)
@@ -8095,6 +8235,8 @@ function formArrowOffsets()
 	end
 	return pts
 end
+
+do local _z138=(7*4); if _z138<0 and _Vj() then _z138=_z138+1 end end
 
 function formCrossOffsets()
 	local pts = {}
@@ -8156,8 +8298,6 @@ function formTriangleOffsets()
 	return pts
 end
 
-do local _z843=(8*8); if _z843<0 and _Vj() then _z843=_z843+1 end end
-
 function formSmileyOffsets()
 	local pts = formCircleOffsets(14, 1.5)
 	for _, p in ipairs(pts) do
@@ -8175,17 +8315,17 @@ function formSmileyOffsets()
 end
 
 local FORM_BUILDS = {
-	{ id = "heart", title = "Heart", tip = "Floats above your head + soft bob", offsets = formHeartOffsets, scale = 1.0, anchor = "head", anim = "bob" },
-	{ id = "wings", title = "Wings", tip = "On your back · flaps up/down", offsets = formWingsOffsets, scale = 1.05, anim = "flap" },
-	{ id = "suit", title = "Suit", tip = "Pallet armor shell around your body", offsets = formSuitOffsets, scale = 0.95 },
+	{ id = "heart", title = "Heart", tip = _Vzd({107,145,148,134,153,152,69,134,135,148,155,138,69,158,148,154,151,69,141,138,134,137,69,80,69,152,148,139,153,69,135,148,135}), offsets = formHeartOffsets, scale = 1.0, anchor = "head", anim = "bob" },
+	{ id = "wings", title = "Wings", tip = _Vzd({116,147,69,158,148,154,151,69,135,134,136,144,69,220,69,139,145,134,149,152,69,154,149,84,137,148,156,147}), offsets = formWingsOffsets, scale = 1.05, anim = "flap" },
+	{ id = "suit", title = "Suit", tip = _Vzd({117,134,145,145,138,153,69,134,151,146,148,151,69,152,141,138,145,145,69,134,151,148,154,147,137,69,158,148,154,151,69,135,148,137,158}), offsets = formSuitOffsets, scale = 0.95 },
 	{ id = "robot", title = "Robot", tip = "Wearable head · torso · limbs shell", offsets = formRobotOffsets, scale = 0.9 },
-	{ id = "star", title = "Star", tip = _Vzd({120,153,134,151,69,148,147,69,158,148,154,151,69,135,134,136,144,69,220,69,152,149,142,147,152}), offsets = formStarOffsets, scale = 1.0, anim = "spin" },
-	{ id = "circle", title = "Circle", tip = "Orbiting ring around you", offsets = formCircleOffsets, scale = 1.0, anim = "orbit" },
-	{ id = "arrow", title = "Arrow", tip = "Arrow shape worn in front", offsets = formArrowOffsets, scale = 1.0 },
+	{ id = "star", title = "Star", tip = "Star on your back · spins", offsets = formStarOffsets, scale = 1.0, anim = "spin" },
+	{ id = "circle", title = "Circle", tip = _Vzd({116,151,135,142,153,142,147,140,69,151,142,147,140,69,134,151,148,154,147,137,69,158,148,154}), offsets = formCircleOffsets, scale = 1.0, anim = _Vzd({148,151,135,142,153}) },
+	{ id = "arrow", title = "Arrow", tip = _Vzd({102,151,151,148,156,69,152,141,134,149,138,69,156,148,151,147,69,142,147,69,139,151,148,147,153}), offsets = formArrowOffsets, scale = 1.0 },
 	{ id = "cross", title = "Cross", tip = _Vzd({117,145,154,152,69,84,69,136,151,148,152,152,69,148,147,69,158,148,154}), offsets = formCrossOffsets, scale = 1.0 },
-	{ id = "cube", title = "Cube", tip = _Vzd({109,148,145,145,148,156,69,136,154,135,138,69,139,151,134,146,138,69,134,151,148,154,147,137,69,158,148,154}), offsets = formCubeOffsets, scale = 0.9 },
+	{ id = "cube", title = "Cube", tip = "Hollow cube frame around you", offsets = formCubeOffsets, scale = 0.9 },
 	{ id = "sphere", title = "Sphere", tip = _Vzd({120,149,141,138,151,138,69,152,141,138,145,145,69,134,151,148,154,147,137,69,158,148,154}), offsets = formSphereOffsets, scale = 0.9 },
-	{ id = "triangle", title = "Triangle", tip = _Vzd({121,151,142,134,147,140,145,138,69,148,154,153,145,142,147,138,69,148,147,69,158,148,154}), offsets = formTriangleOffsets, scale = 1.0 },
+	{ id = _Vzd({153,151,142,134,147,140,145,138}), title = "Triangle", tip = _Vzd({121,151,142,134,147,140,145,138,69,148,154,153,145,142,147,138,69,148,147,69,158,148,154}), offsets = formTriangleOffsets, scale = 1.0 },
 	{ id = "smiley", title = "Smiley", tip = "Face worn in front", offsets = formSmileyOffsets, scale = 1.0 },
 }
 
@@ -8215,10 +8355,10 @@ end
 function cancelFormBuild()
 	S.formCancel = true
 	toySpawnQueue = {}
-	notify(HUB_NAME, _Vzd({107,148,151,146,69,136,134,147,136,138,145,69,220,69,154,152,138,69,119,138,146,148,155,138,69,107,148,151,146,69,153,148,69,137,138,153,134,136,141}), 1.2)
+	notify(HUB_NAME, "Form cancel · use Remove Form to detach", 1.2)
 end
 
-S.missileType = S.missileType or _Vzd({103,148,146,135,114,142,152,152,142,145,138})
+S.missileType = S.missileType or "BombMissile"
 S.missileCount = S.missileCount or 3
 S.missileTarget = S.missileTarget or nil
 
@@ -8227,6 +8367,8 @@ local missileState = {
 	pending = {},
 	conn = nil,
 }
+
+do local _z454=(3*6); if _z454<0 and _Vj() then _z454=_z454+1 end end
 
 function bombBodyOf(model)
 	if not model then return nil end
@@ -8237,10 +8379,10 @@ function bombBodyOf(model)
 	if n == "BombBalloon" then
 		return model:FindFirstChild("Balloon") or model:FindFirstChild("PartHitDetector")
 	end
-	if n == "BombDarkMatter" then
+	if n == _Vzd({103,148,146,135,105,134,151,144,114,134,153,153,138,151}) then
 		return model:FindFirstChild("Pyramid") or model:FindFirstChild("PartHitDetector")
 	end
-	if n == "PresentBig" or n == _Vzd({117,151,138,152,138,147,153,120,146,134,145,145}) then
+	if n == _Vzd({117,151,138,152,138,147,153,103,142,140}) or n == "PresentSmall" then
 		return model:FindFirstChild("Box") or model:FindFirstChild("PartHitDetector")
 	end
 	return model:FindFirstChild("PartHitDetector")
@@ -8309,10 +8451,8 @@ function stopMissileStrike(quiet)
 		missileState.conn = nil
 	end
 	missileState.pending = {}
-	if not quiet then notify(HUB_NAME, "Missile strike OFF", 1.2) end
+	if not quiet then notify(HUB_NAME, _Vzd({114,142,152,152,142,145,138,69,152,153,151,142,144,138,69,116,107,107}), 1.2) end
 end
-
-do local _z489=(4*4); if _z489<0 and _Vj() then _z489=_z489+1 end end
 
 function startMissileStrike()
 	if missileState.running then return end
@@ -8331,7 +8471,7 @@ function startMissileStrike()
 		return
 	end
 	if not FTAP.BombExplode then
-		notify(HUB_NAME, _Vzd({115,148,69,103,148,146,135,106,157,149,145,148,137,138,69,220,69,146,142,152,152,142,145,138,152,69,156,142,145,145,69,152,149,134,156,147,69,135,154,153,69,147,148,153,69,137,138,153,148,147,134,153,138}), 2.5)
+		notify(HUB_NAME, "No BombExplode · missiles will spawn but not detonate", 2.5)
 	end
 
 	local folder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
@@ -8416,17 +8556,17 @@ function fireMissilesOnce()
 	task.spawn(function()
 		resolveFTAP()
 		if not FTAP.SpawnToy then
-			notify(HUB_NAME, _Vzd({115,148,69,120,149,134,156,147,121,148,158,69,151,138,146,148,153,138}), 2)
+			notify(HUB_NAME, "No SpawnToy remote", 2)
 			return
 		end
 		if not FTAP.BuyToy then
-			notify(HUB_NAME, "No BuyToy remote", 2)
+			notify(HUB_NAME, _Vzd({115,148,69,103,154,158,121,148,158,69,151,138,146,148,153,138}), 2)
 			return
 		end
 		local p = S.missileTarget or S.selected or S.controlPick
-		if type(p) == "string" then p = findPlayer(p) end
+		if type(p) == _Vzd({152,153,151,142,147,140}) then p = findPlayer(p) end
 		if not p or not validP(p) then
-			notify(HUB_NAME, "Pick a missile target", 1.5)
+			notify(HUB_NAME, _Vzd({117,142,136,144,69,134,69,146,142,152,152,142,145,138,69,153,134,151,140,138,153}), 1.5)
 			return
 		end
 		local r = rootOf(p)
@@ -8437,11 +8577,11 @@ function fireMissilesOnce()
 		local n = math.clamp(tonumber(S.missileCount) or 3, 1, 12)
 		n = math.min(n, math.max(1, toysRoom()))
 		if n < 1 then
-			notify(HUB_NAME, _Vzd({121,148,158,69,145,142,146,142,153,69,139,154,145,145}), 1.5)
+			notify(HUB_NAME, "Toy limit full", 1.5)
 			return
 		end
 		if not FTAP.BombExplode then
-			notify(HUB_NAME, "No BombExplode remote · spawning anyway", 2)
+			notify(HUB_NAME, _Vzd({115,148,69,103,148,146,135,106,157,149,145,148,137,138,69,151,138,146,148,153,138,69,220,69,152,149,134,156,147,142,147,140,69,134,147,158,156,134,158}), 2)
 		end
 		local typ = S.missileType or "BombMissile"
 		pcall(function() FTAP.BuyToy:InvokeServer(typ) end)
@@ -8463,7 +8603,7 @@ function fireMissilesOnce()
 			end
 		end
 		if #spawned < 1 then
-			notify(HUB_NAME, _Vzd({115,148,69,135,148,146,135,152,69,152,149,134,156,147,138,137}), 2)
+			notify(HUB_NAME, "No bombs spawned", 2)
 			return
 		end
 		task.wait(0.15)
@@ -8484,10 +8624,10 @@ end
 
 local SUSPICIOUS_NAMES = {
 	"voidz", "fe6", "rayfield", "orion", "dex", "infiniteyield", "iy_", "darkdex",
-	"flingaura", "skyvelocity", "bringbody", "kethhook", "hydroxide", "simple spy",
-	"simplespy", _Vzd({151,138,146,148,153,138,69,152,149,158}), "remotespy", "windui", _Vzd({145,142,147,148,151,142,134}), "sirius", "bloody",
-	"blitz", "endoris", "poophub", "nameless", _Vzd({152,136,151,142,149,153,82,156,134,151,138}), "synapse", "drawing",
-	"esp", "chams", "aimbot", "silentaim", "freecam", "noclip", "flybv", "bodyvelocity",
+	"flingaura", "skyvelocity", "bringbody", "kethhook", _Vzd({141,158,137,151,148,157,142,137,138}), _Vzd({152,142,146,149,145,138,69,152,149,158}),
+	"simplespy", _Vzd({151,138,146,148,153,138,69,152,149,158}), "remotespy", "windui", "linoria", "sirius", "bloody",
+	"blitz", "endoris", "poophub", "nameless", "script-ware", _Vzd({152,158,147,134,149,152,138}), "drawing",
+	"esp", "chams", "aimbot", "silentaim", _Vzd({139,151,138,138,136,134,146}), "noclip", _Vzd({139,145,158,135,155}), _Vzd({135,148,137,158,155,138,145,148,136,142,153,158}),
 }
 
 function scanPlayerExploits(p)
@@ -8507,22 +8647,22 @@ function scanPlayerExploits(p)
 	end
 	pcall(function()
 		checkName(p.Name, "name")
-		checkName(p.DisplayName, _Vzd({137,142,152,149,145,134,158}))
+		checkName(p.DisplayName, "display")
 		local c = p.Character
 		if c then
 			for _, d in ipairs(c:GetDescendants()) do
 				checkName(d.Name, "char")
-				if d:IsA(_Vzd({109,142,140,141,145,142,140,141,153})) then mark(_Vzd({109,142,140,141,145,142,140,141,153,69,106,120,117,69,148,147,69,136,141,134,151,134,136,153,138,151})) end
+				if d:IsA("Highlight") then mark(_Vzd({109,142,140,141,145,142,140,141,153,69,106,120,117,69,148,147,69,136,141,134,151,134,136,153,138,151})) end
 				if d:IsA("BodyVelocity") or d:IsA("BodyPosition") or d:IsA("BodyAngularVelocity") then
 					mark(_Vzd({149,141,158,152,142,136,152,69,146,148,155,138,151,95,69}) .. d.ClassName .. " " .. d.Name)
 				end
 				if d:IsA("BillboardGui") and d.AlwaysOnTop then
-					mark("AlwaysOnTop billboard (name ESP?)")
+					mark(_Vzd({102,145,156,134,158,152,116,147,121,148,149,69,135,142,145,145,135,148,134,151,137,69,77,147,134,146,138,69,106,120,117,100,78}))
 				end
 			end
-			local h = c:FindFirstChildOfClass(_Vzd({109,154,146,134,147,148,142,137}))
-			if h and h.WalkSpeed > 30 then mark("WalkSpeed " .. tostring(h.WalkSpeed)) end
-			if h and h.JumpPower > 80 then mark(_Vzd({111,154,146,149,117,148,156,138,151,69}) .. tostring(h.JumpPower)) end
+			local h = c:FindFirstChildOfClass("Humanoid")
+			if h and h.WalkSpeed > 30 then mark(_Vzd({124,134,145,144,120,149,138,138,137,69}) .. tostring(h.WalkSpeed)) end
+			if h and h.JumpPower > 80 then mark("JumpPower " .. tostring(h.JumpPower)) end
 		end
 		local bp = p:FindFirstChild("Backpack")
 		if bp then
@@ -8530,7 +8670,7 @@ function scanPlayerExploits(p)
 				checkName(t.Name, "backpack")
 			end
 		end
-		local pg = p:FindFirstChild("PlayerGui")
+		local pg = p:FindFirstChild(_Vzd({117,145,134,158,138,151,108,154,142}))
 		if pg then
 			for _, g in ipairs(pg:GetChildren()) do
 				checkName(g.Name, "PlayerGui")
@@ -8565,14 +8705,14 @@ function runConsoleCommand(raw)
 		consoleLog(_Vzd({135,151,142,147,140,69,97,147,134,146,138,99,69,161,69,152,149,134,156,147,69,97,153,148,158,99,69,161,69,149,134,145,145,138,153,69,161,69,151,138,134,136,141,69,128,147,130,69,161,69,152,147,148,69,97,147,134,146,138,99,69,161,69,149,145,134,158,138,151,152}), C.muted)
 		consoleLog(_Vzd({138,157,138,136,69,97,145,154,134,83,83,83,99,69,77,145,148,134,137,152,153,151,142,147,140,69,145,148,136,134,145,69,148,147,145,158,78}), C.muted)
 		consoleLog(_Vzd({115,116,121,106,95,69,136,134,147,147,148,153,69,151,138,134,137,69,148,153,141,138,151,69,136,145,142,138,147,153,152,76,69,149,151,142,155,134,153,138,69,138,157,138,136,154,153,148,151,69,152,136,151,142,149,153,152,83}), C.warn)
-	elseif cmd == "clear" then
+	elseif cmd == _Vzd({136,145,138,134,151}) then
 		if S.consoleOut then
 			for _, ch in ipairs(S.consoleOut:GetChildren()) do
 				if ch:IsA("TextLabel") then ch:Destroy() end
 			end
 		end
 		consoleLog("cleared", C.muted)
-	elseif cmd == "players" then
+	elseif cmd == _Vzd({149,145,134,158,138,151,152}) then
 		for _, p in ipairs(Players:GetPlayers()) do
 			if p ~= LP then consoleLog(playerLabel(p), C.text) end
 		end
@@ -8597,33 +8737,33 @@ function runConsoleCommand(raw)
 		if #suspects == 0 then
 			consoleLog("none flagged", C.muted)
 		else
-			consoleLog("possible exploits (" .. #suspects .. "):", C.warn)
+			consoleLog(_Vzd({149,148,152,152,142,135,145,138,69,138,157,149,145,148,142,153,152,69,77}) .. #suspects .. "):", C.warn)
 			for _, name in ipairs(suspects) do
 				consoleLog(name, C.text)
 			end
 		end
-		notify(HUB_NAME, #suspects > 0 and (#suspects .. " flagged") or _Vzd({115,148,147,138,69,139,145,134,140,140,138,137}), 1.2)
+		notify(HUB_NAME, #suspects > 0 and (#suspects .. " flagged") or "None flagged", 1.2)
 	elseif cmd == "fling" then
 		local p = findPlayer(rest)
 		if p then task.spawn(flingPlayer, p, S.flingPower, false, true) else consoleLog("usage: fling <name>", C.danger) end
 	elseif cmd == "kick" then
 		local p = findPlayer(rest)
-		if p then task.spawn(kickPlayer, p, S.kickType, false) else consoleLog("usage: kick <name>", C.danger) end
+		if p then task.spawn(kickPlayer, p, S.kickType, false) else consoleLog(_Vzd({154,152,134,140,138,95,69,144,142,136,144,69,97,147,134,146,138,99}), C.danger) end
 	elseif cmd == "kill" then
 		local p = findPlayer(rest)
-		if p then task.spawn(killPlayer, p, false) else consoleLog("usage: kill <name>", C.danger) end
-	elseif cmd == _Vzd({135,151,142,147,140}) then
+		if p then task.spawn(killPlayer, p, false) else consoleLog(_Vzd({154,152,134,140,138,95,69,144,142,145,145,69,97,147,134,146,138,99}), C.danger) end
+	elseif cmd == "bring" then
 		local p = findPlayer(rest)
 		if p then task.spawn(bringPlayer, p, nil, false) else consoleLog("usage: bring <name>", C.danger) end
 	elseif cmd == "sno" then
 		local p = findPlayer(rest)
 		if p then snoPlayer(p); consoleLog("SNO " .. p.Name, C.success); notify(HUB_NAME, "SNO " .. p.Name, 1)
-		else consoleLog(_Vzd({154,152,134,140,138,95,69,152,147,148,69,97,147,134,146,138,99}), C.danger) end
-	elseif cmd == _Vzd({152,149,134,156,147}) then
+		else consoleLog("usage: sno <name>", C.danger) end
+	elseif cmd == "spawn" then
 		local toy = rest ~= "" and rest or "PalletLightBrown"
 		spawnToy(toy)
 		consoleLog("spawn " .. toy, C.success)
-	elseif cmd == _Vzd({149,134,145,145,138,153}) then
+	elseif cmd == "pallet" then
 		spawnToy("PalletLightBrown", { dist = 2.5 })
 		consoleLog(_Vzd({149,134,145,145,138,153,69,136,145,154,153,136,141}), C.success)
 	elseif cmd == "reach" then
@@ -8638,17 +8778,17 @@ function runConsoleCommand(raw)
 		notify(HUB_NAME, _Vzd({119,138,134,136,141,69}) .. n, 1)
 	elseif cmd == "exec" or cmd == "lua" then
 		local code = rest
-		if code == "" then consoleLog(_Vzd({154,152,134,140,138,95,69,138,157,138,136,69,97,145,154,134,69,136,148,137,138,99}), C.danger); return end
+		if code == "" then consoleLog("usage: exec <lua code>", C.danger); return end
 		local fn, err = loadstring(code)
 		if not fn then
-			consoleLog("compile: " .. tostring(err), C.danger)
+			consoleLog(_Vzd({136,148,146,149,142,145,138,95,69}) .. tostring(err), C.danger)
 			return
 		end
 		local ok, res = pcall(fn)
 		if ok then
 			consoleLog("ok: " .. tostring(res), C.success)
 		else
-			consoleLog("err: " .. tostring(res), C.danger)
+			consoleLog(_Vzd({138,151,151,95,69}) .. tostring(res), C.danger)
 		end
 	else
 		consoleLog("unknown cmd · type help", C.danger)
@@ -8661,9 +8801,9 @@ S.bringHoldConn = S.bringHoldConn or nil
 function modelGrabbedLocally(model)
 	if not model then return false end
 	for _, ch in ipairs(workspace:GetChildren()) do
-		if ch.Name == _Vzd({108,151,134,135,117,134,151,153,152}) then
+		if ch.Name == "GrabParts" then
 			for _, d in ipairs(ch:GetDescendants()) do
-				if d:IsA("WeldConstraint") or d:IsA("Weld") then
+				if d:IsA(_Vzd({124,138,145,137,104,148,147,152,153,151,134,142,147,153})) or d:IsA("Weld") then
 					local a = d.Part0 or d.Part1
 					local b = d.Part1 or d.Part0
 					if (a and a:IsDescendantOf(model)) or (b and b:IsDescendantOf(model)) then
@@ -8683,7 +8823,7 @@ function clearBringForces(model)
 	if not model then return end
 	for _, d in ipairs(model:GetDescendants()) do
 		if d:IsA("BasePart") then
-			for _, nm in ipairs({ "VOIDZ_BringBP", "VOIDZ_BringBG", _Vzd({123,116,110,105,127,132,103,151,142,147,140,103,123}) }) do
+			for _, nm in ipairs({ "VOIDZ_BringBP", "VOIDZ_BringBG", "VOIDZ_BringBV" }) do
 				local x = d:FindFirstChild(nm)
 				if x then pcall(function() x:Destroy() end) end
 			end
@@ -8844,7 +8984,7 @@ function bringModel(model, opts)
 
 	local claimed = false
 	for _, part in ipairs(model:GetDescendants()) do
-		if part:IsA("BasePart") then
+		if part:IsA(_Vzd({103,134,152,138,117,134,151,153})) then
 			if claimPartOwnership(part, 8) then claimed = true end
 		end
 	end
@@ -8873,8 +9013,6 @@ function bringModel(model, opts)
 	startBringHoldLoop()
 	return claimed or true
 end
-
-do local _z958=(4*4); if _z958<0 and _Vj() then _z958=_z958+1 end end
 
 function findMapModelsByName(name)
 	name = tostring(name or "")
@@ -8921,7 +9059,7 @@ function bringUnownedByName(name)
 			return
 		end
 		local n, maxN = 0, math.min(5, #found)
-		notify(HUB_NAME, "Bringing " .. name .. "…", 1)
+		notify(HUB_NAME, _Vzd({103,151,142,147,140,142,147,140,69}) .. name .. "…", 1)
 		for i = 1, maxN do
 			local ok = bringModel(found[i].model, { holdSec = 60, slot = i - 1 })
 			if ok then n += 1 end
@@ -9030,12 +9168,12 @@ function setPurpleTint(on)
 		if bloom then bloom:Destroy() end
 		return
 	end
-	if not cc then cc = Instance.new("ColorCorrectionEffect"); cc.Name = "VOIDZ_CC"; cc.Parent = Lighting end
+	if not cc then cc = Instance.new(_Vzd({104,148,145,148,151,104,148,151,151,138,136,153,142,148,147,106,139,139,138,136,153})); cc.Name = "VOIDZ_CC"; cc.Parent = Lighting end
 	cc.TintColor = Color3.fromRGB(200, 160, 255)
 	cc.Saturation = 0.15
 	cc.Contrast = 0.08
 	cc.Brightness = 0.02
-	if not bloom then bloom = Instance.new(_Vzd({103,145,148,148,146,106,139,139,138,136,153})); bloom.Name = "VOIDZ_Bloom"; bloom.Parent = Lighting end
+	if not bloom then bloom = Instance.new("BloomEffect"); bloom.Name = "VOIDZ_Bloom"; bloom.Parent = Lighting end
 	bloom.Intensity = 0.4
 	bloom.Size = 20
 	bloom.Threshold = 0.9
@@ -9045,7 +9183,7 @@ function watchUntilDead(p, actionName, attackerFn)
 	if not p then return end
 	local name = p.Name
 	startLoop("watch_" .. name .. actionName, 0.25, function()
-		if not p.Parent then stopLoop(_Vzd({156,134,153,136,141,132}) .. name .. actionName); return end
+		if not p.Parent then stopLoop("watch_" .. name .. actionName); return end
 		if not validP(p) then
 			stopLoop("watch_" .. name .. actionName)
 			notify(HUB_NAME, actionName .. _Vzd({69,137,148,147,138,69,220,69}) .. name, 2)
@@ -9064,7 +9202,7 @@ local effectParts = {}
 local grabWatchInstalled = false
 
 function isValidGrabItem(part)
-	if not part or not part:IsA("BasePart") or not part.Parent then return false end
+	if not part or not part:IsA(_Vzd({103,134,152,138,117,134,151,153})) or not part.Parent then return false end
 	if part.Anchored then return false end
 	local n = part.Name:lower()
 	if n == "baseplate" or n == "ground" or n == "floor" or n:find("map") or n:find("wall") then
@@ -9073,22 +9211,20 @@ function isValidGrabItem(part)
 	return true
 end
 
-do local _z657=(5*4); if _z657<0 and _Vj() then _z657=_z657+1 end end
-
 function clearPartForces(part)
 	if not part then return end
 	effectParts[part] = nil
 	pcall(function()
 		for _, ch in ipairs(part:GetChildren()) do
-			if ch:IsA("BodyVelocity") or ch:IsA("BodyForce") or ch:IsA("BodyAngularVelocity")
+			if ch:IsA("BodyVelocity") or ch:IsA("BodyForce") or ch:IsA(_Vzd({103,148,137,158,102,147,140,154,145,134,151,123,138,145,148,136,142,153,158}))
 				or ch:IsA("BodyGyro") or ch:IsA("BodyPosition") then
 				if ch.Name == "VOIDZ_ThrowArm" or ch.Name == "SuperStrength" then
 					if ch:IsA("BodyVelocity") and ch.MaxForce.Magnitude > 1 then
 						ch:Destroy()
 					end
 				elseif tostring(ch.Name):sub(1, 5) == "VOIDZ" or ch.Name == "ZeroGravityForce"
-					or ch.Name == "FlingBV" or ch.Name == _Vzd({120,149,142,147,102,123}) or ch.Name == "GravBF"
-					or ch.Name == "FreezeBP" or ch.Name == "FreezeBG" or ch.Name == "FollowBP" then
+					or ch.Name == "FlingBV" or ch.Name == "SpinAV" or ch.Name == "GravBF"
+					or ch.Name == "FreezeBP" or ch.Name == "FreezeBG" or ch.Name == _Vzd({107,148,145,145,148,156,103,117}) then
 					ch:Destroy()
 				end
 			end
@@ -9111,7 +9247,7 @@ function resolveReleaseRoot(part)
 end
 
 function ensureThrowArm(part)
-	if not part or not part:IsA(_Vzd({103,134,152,138,117,134,151,153})) then return nil end
+	if not part or not part:IsA("BasePart") then return nil end
 	local bv = part:FindFirstChild("VOIDZ_ThrowArm")
 	if bv and bv:IsA("BodyVelocity") then return bv end
 	local ok, created = pcall(function()
@@ -9142,7 +9278,7 @@ function launchThrowArm(part, power, dir)
 		local bv = ensureThrowArm(part)
 		if not bv then
 			bv = Instance.new("BodyVelocity")
-			bv.Name = "VOIDZ_ThrowArm"
+			bv.Name = _Vzd({123,116,110,105,127,132,121,141,151,148,156,102,151,146})
 			bv.Parent = part
 		end
 		bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
@@ -9150,7 +9286,7 @@ function launchThrowArm(part, power, dir)
 		Debris:AddItem(bv, 0.9)
 		part.AssemblyLinearVelocity = vel
 		part.AssemblyAngularVelocity = Vector3.new(18, 36, 12)
-		local spare = part:FindFirstChild("FlingBV")
+		local spare = part:FindFirstChild(_Vzd({107,145,142,147,140,103,123}))
 		if not spare then
 			spare = Instance.new("BodyVelocity")
 			spare.Name = "FlingBV"
@@ -9237,12 +9373,12 @@ function applyReleaseEffects(part)
 			end)
 		end
 		effectParts[root] = true
-		notify(HUB_NAME, _Vzd({121,141,151,148,156,147,69,220,69}) .. math.floor(power), 1)
+		notify(HUB_NAME, "Thrown · " .. math.floor(power), 1)
 	end
 
 	if wantFreeze then
 		local bp = Instance.new("BodyPosition")
-		bp.Name = "FreezeBP"
+		bp.Name = _Vzd({107,151,138,138,159,138,103,117})
 		bp.D = 1000
 		bp.P = 1e5
 		bp.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
@@ -9255,7 +9391,7 @@ function applyReleaseEffects(part)
 
 	if wantFollow then
 		local bp = Instance.new("BodyPosition")
-		bp.Name = "FollowBP"
+		bp.Name = _Vzd({107,148,145,145,148,156,103,117})
 		bp.D = 50
 		bp.P = (S.grabFollowSpeed or 50) * 20
 		bp.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
@@ -9286,10 +9422,10 @@ function applyReleaseEffects(part)
 end
 
 function boostGrabAlign(grabModel, on)
-	local drag = grabModel:FindFirstChild(_Vzd({105,151,134,140,117,134,151,153}), true)
+	local drag = grabModel:FindFirstChild("DragPart", true)
 		or grabModel:FindFirstChild("GrabPart", true)
 	if not drag then return end
-	local ap = drag:FindFirstChildOfClass(_Vzd({102,145,142,140,147,117,148,152,142,153,142,148,147})) or drag:FindFirstChild("AlignPosition", true)
+	local ap = drag:FindFirstChildOfClass("AlignPosition") or drag:FindFirstChild("AlignPosition", true)
 	local ao = drag:FindFirstChildOfClass("AlignOrientation") or drag:FindFirstChild("AlignOrientation", true)
 	if on then
 		if ap then
@@ -9315,6 +9451,8 @@ local palletLocks = {}
 local palletPinned = {}
 local palletCageNotified = false
 
+do local _z843=(8*8); if _z843<0 and _Vj() then _z843=_z843+1 end end
+
 function _destroyPalletCage(key)
 	if key then palletLocks[key] = nil end
 end
@@ -9325,7 +9463,7 @@ function _isPalletPart(part)
 	for _ = 1, 14 do
 		if not p then break end
 		local n = tostring(p.Name):lower()
-		if n:find("pallet", 1, true) or n == _Vzd({149,134,145,145,138,153,145,142,140,141,153,135,151,148,156,147}) then return true end
+		if n:find(_Vzd({149,134,145,145,138,153}), 1, true) or n == "palletlightbrown" then return true end
 		if p:IsA("Model") and n:find("pallet", 1, true) then return true end
 		p = p.Parent
 	end
@@ -9347,12 +9485,12 @@ function resolvePalletBase(palletPart)
 	local p = palletPart
 	for _ = 1, 14 do
 		if not p then break end
-		if p:IsA("BasePart") and tostring(p.Name):lower():find("pallet", 1, true) then
+		if p:IsA("BasePart") and tostring(p.Name):lower():find(_Vzd({149,134,145,145,138,153}), 1, true) then
 			return p
 		end
 		p = p.Parent
 	end
-	local model = palletPart:FindFirstAncestorOfClass(_Vzd({114,148,137,138,145})) or palletPart.Parent
+	local model = palletPart:FindFirstAncestorOfClass("Model") or palletPart.Parent
 	local base, best = nil, -1
 	if model then
 		for _, d in ipairs(model:GetDescendants()) do
@@ -9360,7 +9498,7 @@ function resolvePalletBase(palletPart)
 				local n = tostring(d.Name):lower()
 				local area = d.Size.X * d.Size.Z
 				local score = area
-				if n:find("pallet", 1, true) then score = area * 10 end
+				if n:find(_Vzd({149,134,145,145,138,153}), 1, true) then score = area * 10 end
 				if d.Size.Y < 3 then score = score * 1.5 end
 				if score > best then base, best = d, score end
 			end
@@ -9372,7 +9510,7 @@ end
 function clearPalletLockForces(root)
 	if not root then return end
 	pcall(function()
-		for _, n in ipairs({ "VOIDZ_PalletLock", "VOIDZ_PalletLockG", _Vzd({123,116,110,105,127,132,117,134,145,145,138,153,103,123}), _Vzd({123,116,110,105,127,132,117,134,145,145,138,153,124,138,145,137}), "VOIDZ_PalletAlign" }) do
+		for _, n in ipairs({ "VOIDZ_PalletLock", _Vzd({123,116,110,105,127,132,117,134,145,145,138,153,113,148,136,144,108}), "VOIDZ_PalletBV", "VOIDZ_PalletWeld", "VOIDZ_PalletAlign" }) do
 			local x = root:FindFirstChild(n)
 			if x then x:Destroy() end
 		end
@@ -9465,6 +9603,8 @@ function pinRootToPalletCenter(root, base, plr)
 	palletPinned[root] = true
 end
 
+do local _z489=(4*4); if _z489<0 and _Vj() then _z489=_z489+1 end end
+
 function pinEveryoneOnPallet(base)
 	if not base or not base.Parent then return end
 	local still = {}
@@ -9485,10 +9625,10 @@ function pinEveryoneOnPallet(base)
 				bp.Parent = myR
 			end
 			bp.Position = top.Position
-			local bv = myR:FindFirstChild(_Vzd({123,116,110,105,127,132,117,134,145,145,138,153,103,123}))
+			local bv = myR:FindFirstChild("VOIDZ_PalletBV")
 			if not bv then
 				bv = Instance.new("BodyVelocity")
-				bv.Name = "VOIDZ_PalletBV"
+				bv.Name = _Vzd({123,116,110,105,127,132,117,134,145,145,138,153,103,123})
 				bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
 				bv.Parent = myR
 			end
@@ -9605,7 +9745,7 @@ function _setPalletCage(on)
 	if not on then
 		for k in pairs(palletLocks) do palletLocks[k] = nil end
 		clearAllPalletPins()
-		notify(HUB_NAME, "Pallet lock OFF", 1)
+		notify(HUB_NAME, _Vzd({117,134,145,145,138,153,69,145,148,136,144,69,116,107,107}), 1)
 		return
 	end
 	installGrabWatch()
@@ -9627,7 +9767,7 @@ function onGrabPartsAdded(child)
 			gp = child:WaitForChild("GrabPart", 3)
 			if not gp then return end
 			for _ = 1, 30 do
-				weld = gp:FindFirstChildOfClass("WeldConstraint") or gp:FindFirstChild(_Vzd({124,138,145,137,104,148,147,152,153,151,134,142,147,153}))
+				weld = gp:FindFirstChildOfClass("WeldConstraint") or gp:FindFirstChild("WeldConstraint")
 				if weld and (weld.Part0 or weld.Part1) then break end
 				task.wait(0.05)
 			end
@@ -9643,7 +9783,7 @@ function onGrabPartsAdded(child)
 
 		grabMap[child] = grabbed
 		heldParts[grabbed] = true
-		local model = grabbed:FindFirstAncestorOfClass(_Vzd({114,148,137,138,145})) or grabbed.Parent
+		local model = grabbed:FindFirstAncestorOfClass("Model") or grabbed.Parent
 		local targetHum = model and model:FindFirstChildOfClass("Humanoid")
 		local targetPlr = model and Players:GetPlayerFromCharacter(model)
 		local targetRoot = targetPlr and rootOf(targetPlr) or grabbed
@@ -9666,7 +9806,7 @@ function onGrabPartsAdded(child)
 				pcall(function() applyReleaseEffects(part) end)
 				task.defer(function()
 					local r = resolveReleaseRoot(part) or part
-					local arm = r and r:FindFirstChild("VOIDZ_ThrowArm")
+					local arm = r and r:FindFirstChild(_Vzd({123,116,110,105,127,132,121,141,151,148,156,102,151,146}))
 					if arm and arm:IsA("BodyVelocity") and arm.MaxForce.Magnitude < 1 then
 						pcall(function() applyReleaseEffects(part) end)
 					end
@@ -9675,7 +9815,7 @@ function onGrabPartsAdded(child)
 		end
 
 		if targetPlr then
-			grabMap[child .. _Vzd({132,153,134,151,140,138,153,117,145,151})] = targetPlr
+			grabMap[child .. "_targetPlr"] = targetPlr
 			grabMap[child .. "_targetRoot"] = targetRoot
 		end
 
@@ -9704,7 +9844,7 @@ function onGrabPartsAdded(child)
 						tostring(part.Name):lower():find("shuriken", 1, true)
 						or tostring(part.Name):lower():find("kunai", 1, true)
 						or (part:FindFirstAncestorOfClass("Model") and tostring(part:FindFirstAncestorOfClass("Model").Name):lower():find("shuriken", 1, true))
-						or (part:FindFirstAncestorOfClass("Model") and tostring(part:FindFirstAncestorOfClass(_Vzd({114,148,137,138,145})).Name):lower():find("kunai", 1, true))
+						or (part:FindFirstAncestorOfClass("Model") and tostring(part:FindFirstAncestorOfClass("Model").Name):lower():find("kunai", 1, true))
 					)
 					if (isPallet and S.toggles.palletSilentAim) or (isShuriken and S.toggles.shurikenSilentAim) then
 						local me = hrp()
@@ -9771,10 +9911,10 @@ function onGrabPartsAdded(child)
 		if S.superStrength or (S.toggles and S.toggles.superStr) then
 			pcall(function()
 				local target = releaseRoot or grabbed
-				local old = target:FindFirstChild(_Vzd({120,154,149,138,151,120,153,151,138,147,140,153,141}))
+				local old = target:FindFirstChild("SuperStrength")
 				if old then old:Destroy() end
 				local bv = Instance.new("BodyVelocity")
-				bv.Name = "SuperStrength"
+				bv.Name = _Vzd({120,154,149,138,151,120,153,151,138,147,140,153,141})
 				bv.MaxForce = Vector3.zero
 				bv.Velocity = Vector3.zero
 				bv.Parent = target
@@ -9903,7 +10043,7 @@ function onGrabPartsAdded(child)
 		if S.grabZeroG then
 			clearPartForces(grabbed)
 			local bf = Instance.new("BodyForce")
-			bf.Name = "ZeroGravityForce"
+			bf.Name = _Vzd({127,138,151,148,108,151,134,155,142,153,158,107,148,151,136,138})
 			bf.Force = Vector3.new(0, S.grabZeroGForce or 50000, 0)
 			bf.Parent = grabbed
 		end
@@ -9978,7 +10118,7 @@ function installGrabWatch()
 		local foot = me.Position - Vector3.new(0, 2.5, 0)
 		for part, _ in pairs(effectParts) do
 			if part and part.Parent then
-				local bp = part:FindFirstChild("FollowBP")
+				local bp = part:FindFirstChild(_Vzd({107,148,145,145,148,156,103,117}))
 				if bp and bp:IsA("BodyPosition") then
 					bp.Position = foot
 					bp.P = (S.grabFollowSpeed or 50) * 20
@@ -9988,10 +10128,8 @@ function installGrabWatch()
 			end
 		end
 	end))
-	print(_Vzd({128,123,116,110,105,127,130,69,140,151,134,135,82,151,138,145,138,134,152,138,69,156,134,153,136,141,69,142,147,152,153,134,145,145,138,137}))
+	print("[VOIDZ] grab-release watch installed")
 end
-
-do local _z166=(3*3); if _z166<0 and _Vj() then _z166=_z166+1 end end
 
 function counterAttackPlayer(plr, part)
 	if not plr or not validP(plr) then return end
@@ -10033,7 +10171,7 @@ function counterAttackPlayer(plr, part)
 			local look = lookAt(me.Position, r.Position)
 			local vel = Vector3.new(look.LookVector.X, 0.5, look.LookVector.Z) * math.clamp(force / 100, 80, 300)
 			local bv = Instance.new("BodyVelocity")
-			bv.Name = "VOIDZ_Counter"
+			bv.Name = _Vzd({123,116,110,105,127,132,104,148,154,147,153,138,151})
 			bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
 			bv.Velocity = vel
 			bv.Parent = r
@@ -10079,19 +10217,29 @@ doAntiGrabHard = function()
 	local h = hum()
 
 	if FTAP.Struggle then
-		pcall(function() FTAP.Struggle:FireServer(LP) end)
-		pcall(function() FTAP.Struggle:FireServer() end)
+		for _ = 1, 4 do
+			pcall(function() FTAP.Struggle:FireServer(LP) end)
+			pcall(function() FTAP.Struggle:FireServer() end)
+		end
 	end
 	if FTAP.StopAllVelocity then pcall(function() FTAP.StopAllVelocity:FireServer() end) end
 	if r and FTAP.RagdollRemote then
 		pcall(function() FTAP.RagdollRemote:FireServer(r, 0) end)
 	end
+	if r and FTAP.DestroyGrabLine then
+		pcall(function() FTAP.DestroyGrabLine:FireServer(r) end)
+		for _, part in ipairs(c:GetDescendants()) do
+			if part:IsA(_Vzd({103,134,152,138,117,134,151,153})) then
+				pcall(function() FTAP.DestroyGrabLine:FireServer(part) end)
+			end
+		end
+	end
 
 	for _, child in ipairs(workspace:GetChildren()) do
-		if child.Name == _Vzd({108,151,134,135,117,134,151,153,152}) and grabPartsIsAttackingUs(child, c) then
-			revengeFromGrabParts(child)
+		if child.Name == "GrabParts" and grabPartsIsAttackingUs(child, c) then
+			if revengeFromGrabParts then pcall(revengeFromGrabParts, child) end
 			for _, d in ipairs(child:GetDescendants()) do
-				if d:IsA("WeldConstraint") or d:IsA("Weld") then
+				if d:IsA(_Vzd({124,138,145,137,104,148,147,152,153,151,134,142,147,153})) or d:IsA("Weld") or d:IsA("AlignPosition") or d:IsA(_Vzd({102,145,142,140,147,116,151,142,138,147,153,134,153,142,148,147})) then
 					pcall(function() d:Destroy() end)
 				end
 			end
@@ -10099,7 +10247,8 @@ doAntiGrabHard = function()
 		end
 	end
 
-
+	gucciStripForeignConstraints(c)
+	gucciReclaimSelf()
 	if h then
 		pcall(function()
 			h.PlatformStand = false
@@ -10109,26 +10258,26 @@ doAntiGrabHard = function()
 			h:SetStateEnabled(Enum.HumanoidStateType.Running, true)
 			h:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 			h:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+			h:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
 			local st = h:GetState()
 			if st == Enum.HumanoidStateType.Physics or st == Enum.HumanoidStateType.Ragdoll
-				or st == Enum.HumanoidStateType.FallingDown then
+				or st == Enum.HumanoidStateType.FallingDown or st == Enum.HumanoidStateType.Seated then
 				h:ChangeState(Enum.HumanoidStateType.Running)
 			end
 		end)
 	end
 
 	if r then
-		local held = LP:FindFirstChild("IsHeld")
-		if held and held.Value then
-			r.AssemblyLinearVelocity = Vector3.zero
-		end
+		pcall(function() r.Anchored = false end)
 		for _, d in ipairs(r:GetChildren()) do
 			if (d:IsA("BodyVelocity") or d:IsA("BodyAngularVelocity") or d:IsA("BodyForce"))
-				and d.Name ~= "VOIDZ_Fly" and d.Name ~= "VOIDZ_FlyG" and d.Name ~= "BringBody" then
+				and d.Name ~= _Vzd({123,116,110,105,127,132,107,145,158}) and d.Name ~= "VOIDZ_FlyG"
+				and d.Name ~= "VOIDZ_GucciBV" and d.Name ~= "BringBody" then
 				pcall(function() d:Destroy() end)
 			end
 		end
 	end
+	gucciForceFreeMove()
 end
 
 antiGrabTick = function()
@@ -10237,10 +10386,10 @@ function freeFromGrabInstant()
 	pcall(function()
 		r.Anchored = false
 		for _, part in ipairs(c:GetDescendants()) do
-			if part:IsA("BasePart") then
+			if part:IsA(_Vzd({103,134,152,138,117,134,151,153})) then
 				for _, ch in ipairs(part:GetChildren()) do
 					if ch:IsA("BodyVelocity") or ch:IsA("BodyPosition") or ch:IsA("BodyForce")
-						or ch:IsA("BodyAngularVelocity") or ch:IsA(_Vzd({102,145,142,140,147,117,148,152,142,153,142,148,147})) or ch:IsA("AlignOrientation")
+						or ch:IsA("BodyAngularVelocity") or ch:IsA("AlignPosition") or ch:IsA("AlignOrientation")
 						or ch:IsA("LinearVelocity") or ch:IsA("VectorForce") then
 						local n = ch.Name
 						if n ~= "VOIDZ_Fly" and n ~= "VOIDZ_FlyG" then
@@ -10292,8 +10441,6 @@ function freeFromGrabInstant()
 	task.delay(0.35, restoreGroundPhysics)
 end
 
-do local _z544=(2*3); if _z544<0 and _Vj() then _z544=_z544+1 end end
-
 function installInstantEscape()
 	if S.conns.escapeJump then pcall(function() S.conns.escapeJump:Disconnect() end) S.conns.escapeJump = nil end
 	if S.conns.escapeInput then pcall(function() S.conns.escapeInput:Disconnect() end) S.conns.escapeInput = nil end
@@ -10324,7 +10471,7 @@ function installInstantEscape()
 	end)
 	pcall(function()
 		ContextActionService:BindActionAtPriority(
-			"VOIDZ_InstantEscape",
+			_Vzd({123,116,110,105,127,132,110,147,152,153,134,147,153,106,152,136,134,149,138}),
 			function(_, state)
 				if state == Enum.UserInputState.Begin then
 					tryEscape()
@@ -10368,7 +10515,7 @@ function getGrabbingScript()
 	end
 	local ps = LP:FindFirstChild("PlayerScripts")
 	if ps then
-		for _, n in ipairs({ "GrabbingScript", "CharacterAndBeamMove", _Vzd({104,141,134,151,134,136,153,138,151,102,147,137,103,138,134,146}), "BeamMove" }) do
+		for _, n in ipairs({ "GrabbingScript", "CharacterAndBeamMove", "CharacterAndBeam", "BeamMove" }) do
 			local s = ps:FindFirstChild(n, true)
 			if s then return s end
 		end
@@ -10376,13 +10523,15 @@ function getGrabbingScript()
 	return nil
 end
 
+do local _z958=(4*4); if _z958<0 and _Vj() then _z958=_z958+1 end end
+
 function refreshGrabSenv(force)
 	if not getsenv then return nil end
 	if grabSenvCache and not force then
 		local scr = getGrabbingScript()
 		if scr then
 			local ok, env = pcall(getsenv, scr)
-			if ok and type(env) == _Vzd({153,134,135,145,138}) then
+			if ok and type(env) == "table" then
 				grabSenvCache = env
 				return env
 			end
@@ -10395,7 +10544,7 @@ function refreshGrabSenv(force)
 		return nil
 	end
 	local ok, env = pcall(getsenv, scr)
-	if ok and type(env) == "table" then
+	if ok and type(env) == _Vzd({153,134,135,145,138}) then
 		grabSenvCache = env
 		return env
 	end
@@ -10409,16 +10558,16 @@ function forceGrabDistance(amount)
 	if not env then return false end
 	pcall(function()
 		env.distance = amount
-		if type(env.maxDistance) == _Vzd({147,154,146,135,138,151}) then env.maxDistance = math.max(amount, env.maxDistance) end
+		if type(env.maxDistance) == "number" then env.maxDistance = math.max(amount, env.maxDistance) end
 		if type(env.MaxDistance) == "number" then env.MaxDistance = math.max(amount, env.MaxDistance) end
 		if type(env.grabDistance) == "number" then env.grabDistance = amount end
-		if type(env.lineDistance) == _Vzd({147,154,146,135,138,151}) then env.lineDistance = amount end
-		if type(env.minDistance) == "number" then env.minDistance = math.min(env.minDistance, 3) end
+		if type(env.lineDistance) == "number" then env.lineDistance = amount end
+		if type(env.minDistance) == _Vzd({147,154,146,135,138,151}) then env.minDistance = math.min(env.minDistance, 3) end
 		for k, v in pairs(env) do
 			if type(k) == "string" and type(v) == "number" then
 				local lk = k:lower()
 				if lk == "distance" or lk == "grabdistance" or lk == "linedistance"
-					or lk == _Vzd({146,134,157,137,142,152,153,134,147,136,138}) or lk == "reach" or lk == "range" then
+					or lk == "maxdistance" or lk == "reach" or lk == "range" then
 					env[k] = amount
 				end
 			end
@@ -10430,12 +10579,12 @@ end
 function enableFurtherReachGamepass()
 	pcall(function()
 		local old = LP:FindFirstChild("FartherReach")
-		if old and not (old:IsA("BoolValue") or old:IsA(_Vzd({115,154,146,135,138,151,123,134,145,154,138})) or old:IsA("IntValue")) then
+		if old and not (old:IsA("BoolValue") or old:IsA("NumberValue") or old:IsA("IntValue")) then
 			old:Destroy()
 			old = nil
 		end
 		if not old then
-			local bv = Instance.new(_Vzd({103,148,148,145,123,134,145,154,138}))
+			local bv = Instance.new("BoolValue")
 			bv.Name = "FartherReach"
 			bv.Value = true
 			bv.Parent = LP
@@ -10500,8 +10649,8 @@ function tickDragExtend(grabModel)
 	if not grabModel or not grabModel.Parent then return end
 	if not S.toggles.lineExtend then return end
 	setupDragExtend(grabModel)
-	local drag = grabModel:FindFirstChild(_Vzd({105,151,134,140,117,134,151,153}))
-	local bp = drag and drag:FindFirstChild("VOIDZ_ScrollDrag")
+	local drag = grabModel:FindFirstChild("DragPart")
+	local bp = drag and drag:FindFirstChild(_Vzd({123,116,110,105,127,132,120,136,151,148,145,145,105,151,134,140}))
 	local cam = workspace.CurrentCamera
 	if not cam or not bp then return end
 	local pos = cam.CFrame.Position + cam.CFrame.LookVector * pcDistance
@@ -10531,7 +10680,7 @@ function installFurtherGrabHook()
 		end)
 	end)
 	for _, ch in ipairs(workspace:GetChildren()) do
-		if ch.Name == _Vzd({108,151,134,135,117,134,151,153,152}) and ch:IsA("Model") then
+		if ch.Name == "GrabParts" and ch:IsA("Model") then
 			task.spawn(function()
 				setupDragExtend(ch)
 				while ch.Parent and S.toggles.lineExtend do
@@ -10570,7 +10719,7 @@ function installScrollDistanceWheel()
 			pcDistance = pcDistance - step
 		end
 		pcDistance = math.clamp(pcDistance, 11, 120)
-		notify(HUB_NAME, "Scroll distance: " .. math.floor(pcDistance), 0.5)
+		notify(HUB_NAME, _Vzd({120,136,151,148,145,145,69,137,142,152,153,134,147,136,138,95,69}) .. math.floor(pcDistance), 0.5)
 	end)
 end
 
@@ -10584,7 +10733,7 @@ function applyLineExtendDistance(amount)
 		pcall(function()
 			if FTAP.ExtendGrabLine:IsA("RemoteEvent") then
 				FTAP.ExtendGrabLine:FireServer(amount)
-			elseif FTAP.ExtendGrabLine:IsA(_Vzd({119,138,146,148,153,138,107,154,147,136,153,142,148,147})) then
+			elseif FTAP.ExtendGrabLine:IsA("RemoteFunction") then
 				FTAP.ExtendGrabLine:InvokeServer(amount)
 			end
 		end)
@@ -10621,7 +10770,7 @@ function setLineExtend(on)
 					ap.Enabled = true
 					ap.MaxForce = 60000
 				end
-				local ao = drag and (drag:FindFirstChildOfClass("AlignOrientation") or drag:FindFirstChild("AlignOrientation", true))
+				local ao = drag and (drag:FindFirstChildOfClass("AlignOrientation") or drag:FindFirstChild(_Vzd({102,145,142,140,147,116,151,142,138,147,153,134,153,142,148,147}), true))
 				if ao then ao.Enabled = true end
 			end
 		end
@@ -10651,10 +10800,10 @@ function setLineExtend(on)
 
 	local msg = ok
 		and ("Scroll distance ON · " .. tostring(amt) .. _Vzd({69,77,156,141,138,138,145,69,156,141,142,145,138,69,141,148,145,137,142,147,140,78}))
-		or "Scroll distance ON · grab someone once to lock GrabbingScript"
+		or _Vzd({120,136,151,148,145,145,69,137,142,152,153,134,147,136,138,69,116,115,69,220,69,140,151,134,135,69,152,148,146,138,148,147,138,69,148,147,136,138,69,153,148,69,145,148,136,144,69,108,151,134,135,135,142,147,140,120,136,151,142,149,153})
 	notify(HUB_NAME, msg, 2.5)
 	if not getsenv then
-		notify(HUB_NAME, "No getsenv — hold-extend still works via DragPart", 2.5)
+		notify(HUB_NAME, _Vzd({115,148,69,140,138,153,152,138,147,155,69,57,69,141,148,145,137,82,138,157,153,138,147,137,69,152,153,142,145,145,69,156,148,151,144,152,69,155,142,134,69,105,151,134,140,117,134,151,153}), 2.5)
 	end
 end
 
@@ -10802,7 +10951,7 @@ setSilentAim = function(on)
 	if on then notify(HUB_NAME, "Silent aim ON", 1.5) end
 end
 
-local LogService = game:GetService("LogService")
+local LogService = game:GetService(_Vzd({113,148,140,120,138,151,155,142,136,138}))
 local AK = (getgenv and type(getgenv) == "function" and getgenv().VOIDZ_ANTIKICK) or {}
 if getgenv then getgenv().VOIDZ_ANTIKICK = AK end
 AK.enabled = false
@@ -10822,28 +10971,28 @@ end
 
 local function isRealKickSignal(text, source)
 	source = tostring(source or "")
-	if source == _Vzd({117,145,134,158,138,151,95,112,142,136,144}) then return true end
+	if source == "Player:Kick" then return true end
 
 	text = tostring(text or ""):gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
 	if text == "" then return false end
 	local low = text:lower()
 
-	if low:find("[voidz]", 1, true) or low:find("voidz ·", 1, true) then return false end
-	if low:find(_Vzd({134,147,153,142,82,144,142,136,144,69,136,141,138,136,144,138,137}), 1, true) then return false end
-	if low:find(_Vzd({134,147,153,142,82,144,142,136,144}), 1, true) and (low:find("grace", 1, true) or low:find("active", 1, true) or low:find("off", 1, true)) then
+	if low:find("[voidz]", 1, true) or low:find(_Vzd({155,148,142,137,159,69,220}), 1, true) then return false end
+	if low:find("anti-kick checked", 1, true) then return false end
+	if low:find("anti-kick", 1, true) and (low:find("grace", 1, true) or low:find("active", 1, true) or low:find("off", 1, true)) then
 		return false
 	end
-	if low:find(_Vzd({152,134,155,138,137,69,158,148,154,151,69,135,154,153,153}), 1, true) then return false end
+	if low:find("saved your butt", 1, true) then return false end
 
 	if source == "hub" then return false end
 	if #low < 16 then return false end
-	if low:find("selected", 1, true) or low:find("toggle", 1, true) then return false end
-	if low:find("loop kick", 1, true) or low:find("kick type", 1, true) then return false end
+	if low:find("selected", 1, true) or low:find(_Vzd({153,148,140,140,145,138}), 1, true) then return false end
+	if low:find(_Vzd({145,148,148,149,69,144,142,136,144}), 1, true) or low:find("kick type", 1, true) then return false end
 	if low:find("kick all", 1, true) or low:find(_Vzd({144,142,136,144,69,153,134,151,140,138,153}), 1, true) then return false end
 	if low:find("aura", 1, true) and low:find("kick", 1, true) then return false end
 	if low:find("blobman", 1, true) or low:find("stackkick", 1, true) or low:find("grabkick", 1, true) then return false end
 
-	if low:find(_Vzd({141,134,152,69,135,138,138,147,69,144,142,136,144,138,137}), 1, true) and not low:find(_Vzd({158,148,154,69,141,134,155,138,69,135,138,138,147,69,144,142,136,144,138,137}), 1, true) then
+	if low:find(_Vzd({141,134,152,69,135,138,138,147,69,144,142,136,144,138,137}), 1, true) and not low:find("you have been kicked", 1, true) then
 		return false
 	end
 	if low:find(_Vzd({156,134,152,69,144,142,136,144,138,137}), 1, true) and not low:find("you were kicked", 1, true) then
@@ -10853,37 +11002,37 @@ local function isRealKickSignal(text, source)
 
 	local phrases = {
 		"you were kicked",
-		"you have been kicked",
-		_Vzd({158,148,154,69,140,148,153,69,144,142,136,144,138,137}),
+		_Vzd({158,148,154,69,141,134,155,138,69,135,138,138,147,69,144,142,136,144,138,137}),
+		"you got kicked",
 		"kicked from this experience",
 		_Vzd({144,142,136,144,138,137,69,139,151,148,146,69,153,141,138,69,138,157,149,138,151,142,138,147,136,138}),
-		"kicked from the game",
+		_Vzd({144,142,136,144,138,137,69,139,151,148,146,69,153,141,138,69,140,134,146,138}),
 		"kicked from this game",
 		_Vzd({151,138,146,148,155,138,137,69,139,151,148,146,69,153,141,142,152,69,138,157,149,138,151,142,138,147,136,138}),
 		"you have been removed from",
 		_Vzd({158,148,154,69,156,138,151,138,69,151,138,146,148,155,138,137,69,139,151,148,146}),
 		_Vzd({137,142,152,136,148,147,147,138,136,153,138,137,69,139,151,148,146,69,153,141,138,69,140,134,146,138}),
 		_Vzd({137,142,152,136,148,147,147,138,136,153,138,137,69,139,151,148,146,69,138,157,149,138,151,142,138,147,136,138}),
-		"lost connection to the game",
-		_Vzd({145,148,152,153,69,136,148,147,147,138,136,153,142,148,147,69,153,148,69,153,141,138,69,152,138,151,155,138,151}),
-		"connection lost",
+		_Vzd({145,148,152,153,69,136,148,147,147,138,136,153,142,148,147,69,153,148,69,153,141,138,69,140,134,146,138}),
+		"lost connection to the server",
+		_Vzd({136,148,147,147,138,136,153,142,148,147,69,145,148,152,153}),
 		_Vzd({149,145,138,134,152,138,69,136,141,138,136,144,69,158,148,154,151,69,142,147,153,138,151,147,138,153,69,136,148,147,147,138,136,153,142,148,147}),
-		"same account launched",
+		_Vzd({152,134,146,138,69,134,136,136,148,154,147,153,69,145,134,154,147,136,141,138,137}),
 		"another device has joined",
 		_Vzd({136,145,142,138,147,153,69,156,134,152,69,144,142,136,144,138,137}),
 		_Vzd({158,148,154,69,141,134,155,138,69,135,138,138,147,69,135,134,147,147,138,137}),
-		_Vzd({135,134,147,147,138,137,69,139,151,148,146,69,153,141,142,152,69,138,157,149,138,151,142,138,147,136,138}),
+		"banned from this experience",
 		_Vzd({134,136,136,148,154,147,153,69,141,134,152,69,135,138,138,147,69,135,134,147,147,138,137}),
-		_Vzd({138,151,151,148,151,69,136,148,137,138,95,69,87,91,92}),
+		"error code: 267",
 		"error code: 277",
-		_Vzd({138,151,151,148,151,69,136,148,137,138,95,69,87,92,94}),
-		"error code: 280",
+		"error code: 279",
+		_Vzd({138,151,151,148,151,69,136,148,137,138,95,69,87,93,85}),
 		"error code: 256",
-		"error code: 268",
-		_Vzd({138,151,151,148,151,69,136,148,137,138,95,69,92,92,88}),
-		_Vzd({151,138,136,148,147,147,138,136,153,69,153,148,69,153,141,138,69,138,157,149,138,151,142,138,147,136,138}),
-		_Vzd({145,138,134,155,138,69,134,147,137,69,151,138,143,148,142,147}),
-		"try rejoining",
+		_Vzd({138,151,151,148,151,69,136,148,137,138,95,69,87,91,93}),
+		"error code: 773",
+		"reconnect to the experience",
+		"leave and rejoin",
+		_Vzd({153,151,158,69,151,138,143,148,142,147,142,147,140}),
 	}
 	for _, p in ipairs(phrases) do
 		if low:find(p, 1, true) then return true end
@@ -10904,13 +11053,13 @@ local function doVoidzRejoin(reason)
 	AK.rejoining = true
 	AK.weInitiatedTeleport = true
 
-	local fancy = _Vzd({75,69,123,116,110,105,127,69,220,69,134,147,153,142,82,144,142,136,144,69,136,141,138,136,144,138,137,75,69,151,138,143,148,142,147,142,147,140,69,75})
+	local fancy = "✦ VOIDZ · anti-kick checked… rejoining ✦"
 	pcall(function() voidzChat(fancy) end)
 	pcall(function()
-		notify(HUB_NAME, _Vzd({102,147,153,142,82,144,142,136,144,69,220,69,145,138,134,155,142,147,140,69,135,138,139,148,151,138,69,102,104,69,220,69,151,138,143,148,142,147,142,147,140,75}), 3)
+		notify(HUB_NAME, "Anti-kick · leaving before AC · rejoining…", 3)
 	end)
 	pcall(function()
-		StarterGui:SetCore("ChatMakeSystemMessage", {
+		StarterGui:SetCore(_Vzd({104,141,134,153,114,134,144,138,120,158,152,153,138,146,114,138,152,152,134,140,138}), {
 			Text = fancy,
 			Color = Color3.fromRGB(180, 120, 255),
 			Font = Enum.Font.GothamBold,
@@ -10922,7 +11071,7 @@ local function doVoidzRejoin(reason)
 		local placeId = game.PlaceId
 		local jobId = game.JobId
 		pcall(function()
-			queue_teleport(_Vzd({149,151,142,147,153,77,76,128,123,116,110,105,127,130,69,134,147,153,142,82,144,142,136,144,69,151,138,143,148,142,147,76,78}))
+			queue_teleport("print('[VOIDZ] anti-kick rejoin')")
 		end)
 		local tries = {
 			function()
@@ -10944,7 +11093,7 @@ local function doVoidzRejoin(reason)
 		end
 		task.delay(0.35, function()
 			pcall(function()
-				LP:Kick(_Vzd({123,116,110,105,127,69,134,147,153,142,82,144,142,136,144,69,220,69,151,138,143,148,142,147,142,147,140,69,135,138,139,148,151,138,69,102,104}))
+				LP:Kick("VOIDZ anti-kick · rejoining before AC")
 			end)
 		end)
 		task.delay(10, function()
@@ -10961,7 +11110,7 @@ local function onKickSignal(text, source)
 	local t = os.clock()
 	if AK.seen[key] and (t - AK.seen[key]) < 6 then return end
 	AK.seen[key] = t
-	print("[VOIDZ] kick signal from", source, "→", tostring(text):sub(1, 100))
+	print(_Vzd({128,123,116,110,105,127,130,69,144,142,136,144,69,152,142,140,147,134,145,69,139,151,148,146}), source, "→", tostring(text):sub(1, 100))
 	doVoidzRejoin(text)
 end
 
@@ -10999,7 +11148,7 @@ end
 local function scanPromptGuiText(gui)
 	if not gui then return end
 	for _, d in ipairs(gui:GetDescendants()) do
-		if d:IsA("TextLabel") or d:IsA("TextButton") or d:IsA("TextBox") then
+		if d:IsA("TextLabel") or d:IsA(_Vzd({121,138,157,153,103,154,153,153,148,147})) or d:IsA("TextBox") then
 			local t = d.Text
 			if t and #t >= 16 then
 				onKickSignal(t, "RobloxPromptGui")
@@ -11053,7 +11202,7 @@ local function bindKickScanners()
 				pcall(function()
 					d:GetPropertyChangedSignal("Text"):Connect(function()
 						if not antiKickReady() then return end
-						onKickSignal(d.Text, _Vzd({119,148,135,145,148,157,117,151,148,146,149,153,108,154,142}))
+						onKickSignal(d.Text, "RobloxPromptGui")
 					end)
 				end)
 			end
@@ -11063,7 +11212,7 @@ local function bindKickScanners()
 	pcall(function()
 		watchPrompt(CoreGui:FindFirstChild("RobloxPromptGui"))
 		CoreGui.ChildAdded:Connect(function(ch)
-			if ch.Name == _Vzd({119,148,135,145,148,157,117,151,148,146,149,153,108,154,142}) then
+			if ch.Name == "RobloxPromptGui" then
 				task.wait(0.05)
 				watchPrompt(ch)
 			end
@@ -11093,7 +11242,7 @@ local function bindKickScanners()
 			if not antiKickReady() then return end
 			task.delay(1, function()
 				AK.rejoining = false
-				doVoidzRejoin("TeleportInitFailed " .. tostring(errMsg))
+				doVoidzRejoin(_Vzd({121,138,145,138,149,148,151,153,110,147,142,153,107,134,142,145,138,137,69}) .. tostring(errMsg))
 			end)
 		end)
 	end)
@@ -11108,7 +11257,7 @@ setAntiKick = function(on, quiet)
 	S.toggles.autoRejoin = AK.enabled
 	if not AK.enabled then
 		AK.readyAt = math.huge
-		print(_Vzd({128,123,116,110,105,127,130,69,134,147,153,142,82,144,142,136,144,69,116,107,107}))
+		print("[VOIDZ] anti-kick OFF")
 		if not quiet then notify(HUB_NAME, "Anti-kick OFF", 2) end
 		return
 	end
@@ -11118,12 +11267,12 @@ setAntiKick = function(on, quiet)
 	bindKickScanners()
 	print(_Vzd({128,123,116,110,105,127,130,69,134,147,153,142,82,144,142,136,144,69,116,115,69,220,69,152,136,134,147,152,69,136,148,147,152,148,145,138,69,80,69,119,148,135,145,148,157,69,144,142,136,144,69,122,110,69,220,69}) .. GRACE_SEC .. "s grace")
 	if not quiet then
-		notify(HUB_NAME, "Anti-kick ON · " .. GRACE_SEC .. "s grace, then scanning", 3)
+		notify(HUB_NAME, _Vzd({102,147,153,142,82,144,142,136,144,69,116,115,69,220,69}) .. GRACE_SEC .. "s grace, then scanning", 3)
 	end
 	task.delay(GRACE_SEC, function()
 		if AK.enabled and AK.gen == gen then
-			if not quiet then notify(HUB_NAME, _Vzd({102,147,153,142,82,144,142,136,144,69,152,136,134,147,147,142,147,140,69,77,136,148,147,152,148,145,138,69,80,69,144,142,136,144,69,122,110,78}), 2) end
-			print("[VOIDZ] anti-kick active — console + RobloxPromptGui + Player:Kick")
+			if not quiet then notify(HUB_NAME, "Anti-kick scanning (console + kick UI)", 2) end
+			print(_Vzd({128,123,116,110,105,127,130,69,134,147,153,142,82,144,142,136,144,69,134,136,153,142,155,138,69,57,69,136,148,147,152,148,145,138,69,80,69,119,148,135,145,148,157,117,151,148,146,149,153,108,154,142,69,80,69,117,145,134,158,138,151,95,112,142,136,144}))
 		end
 	end)
 end
@@ -11133,7 +11282,7 @@ installAntiKickOnLoad = function()
 	AK.rejoining = false
 	S.toggles.antiKick = false
 	S.toggles.autoRejoin = false
-	print("[VOIDZ] anti-kick infrastructure ready (not enabled)")
+	print(_Vzd({128,123,116,110,105,127,130,69,134,147,153,142,82,144,142,136,144,69,142,147,139,151,134,152,153,151,154,136,153,154,151,138,69,151,138,134,137,158,69,77,147,148,153,69,138,147,134,135,145,138,137,78}))
 end
 
 _startFovCircle = startFovCircle
@@ -11171,8 +11320,8 @@ local function unload()
 	pcall(function() releaseAllBrought(true) end)
 	pcall(function() setPalletCage(false) end)
 	pcall(function() ContextActionService:UnbindAction(_Vzd({123,116,110,105,127,132,117,134,145,145,138,153,118})) end)
-	pcall(function() ContextActionService:UnbindAction("VOIDZ_TabToy") end)
-	pcall(function() ContextActionService:UnbindAction("VOIDZ_InstantEscape") end)
+	pcall(function() ContextActionService:UnbindAction(_Vzd({123,116,110,105,127,132,121,134,135,121,148,158})) end)
+	pcall(function() ContextActionService:UnbindAction(_Vzd({123,116,110,105,127,132,110,147,152,153,134,147,153,106,152,136,134,149,138})) end)
 	pcall(function() ContextActionService:UnbindAction("VOIDZ_ControlK") end)
 	if S.gui then pcall(function() S.gui:Destroy() end) end
 	S.gui = nil
@@ -11187,7 +11336,7 @@ local function unload()
 		end
 	end)
 	if getgenv and type(getgenv) == "function" then getgenv().VOIDZ_LOADED = nil; getgenv().VOIDZ_UNLOAD = nil end
-	print(_Vzd({128,123,116,110,105,127,130,69,154,147,145,148,134,137,138,137}))
+	print("[VOIDZ] unloaded")
 end
 if getgenv and type(getgenv) == "function" then getgenv().VOIDZ_UNLOAD = unload end
 
@@ -11358,7 +11507,7 @@ end
 local function section(parent, text, order)
 	indexFeature("section", text, _Vzd({152,138,136,153,142,148,147,69,141,138,134,137,138,151}), text)
 	local mob = isMobileMode()
-	local wrap = Instance.new("Frame")
+	local wrap = Instance.new(_Vzd({107,151,134,146,138}))
 	wrap.LayoutOrder = order or 0
 	wrap.Size = UDim2.new(1, -4, 0, mob and 22 or 20)
 	wrap.BackgroundTransparency = 1
@@ -11370,7 +11519,7 @@ local function section(parent, text, order)
 	bar.BorderSizePixel = 0
 	bar.Parent = wrap
 	corner(bar, 2)
-	local l = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
+	local l = Instance.new("TextLabel")
 	l.BackgroundTransparency = 1
 	l.Size = UDim2.new(1, -14, 1, 0)
 	l.Position = UDim2.fromOffset(12, 0)
@@ -11442,7 +11591,7 @@ local function makeButton(parent, opts)
 		if opts.callback then
 			local ok, err = pcall(opts.callback)
 			if not ok then
-				warn("[VOIDZ]", err)
+				warn(_Vzd({128,123,116,110,105,127,130}), err)
 				notify(HUB_NAME, _Vzd({106,151,151,95,69}) .. tostring(err):sub(1, 50), 3)
 			end
 		end
@@ -11462,7 +11611,7 @@ local function makeButton(parent, opts)
 	gear.MouseButton1Click:Connect(function()
 		openOptionPanel({
 			title = opts.title or "Action",
-			tip = opts.tip or opts.desc or "Run this action with the button.",
+			tip = opts.tip or opts.desc or _Vzd({119,154,147,69,153,141,142,152,69,134,136,153,142,148,147,69,156,142,153,141,69,153,141,138,69,135,154,153,153,148,147,83}),
 			settings = opts.settings,
 		})
 	end)
@@ -11475,7 +11624,7 @@ local function makeToggle(parent, opts)
 	local id = opts.id
 	local mob = isMobileMode()
 	local rowH = opts.desc and (mob and 56 or 44) or (mob and 48 or 36)
-	local row = Instance.new(_Vzd({107,151,134,146,138}))
+	local row = Instance.new("Frame")
 	row.LayoutOrder = opts.order or 0
 	row.Size = UDim2.new(1, -6, 0, rowH)
 	row.BackgroundColor3 = C.card
@@ -11503,7 +11652,7 @@ local function makeToggle(parent, opts)
 			HOT = { bg = Color3.fromRGB(255, 100, 50), text = Color3.fromRGB(255, 255, 255) },
 		}
 		local tc = tagColors[opts.tag] or { bg = C.accent, text = C.text }
-		local bubble = Instance.new("TextLabel")
+		local bubble = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
 		bubble.Size = UDim2.fromOffset(0, 0)
 		bubble.AutomaticSize = Enum.AutomaticSize.X
 		bubble.BackgroundColor3 = tc.bg
@@ -11536,7 +11685,7 @@ local function makeToggle(parent, opts)
 
 	addGearButton(row, {
 		title = opts.title or id,
-		tip = opts.tip or opts.desc or "Toggle this feature on/off.",
+		tip = opts.tip or opts.desc or _Vzd({121,148,140,140,145,138,69,153,141,142,152,69,139,138,134,153,154,151,138,69,148,147,84,148,139,139,83}),
 		settings = opts.settings,
 	})
 
@@ -11614,7 +11763,7 @@ local function makeSlider(parent, opts)
 	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.Text = opts.title or "Slider"
 	label.Parent = row
-	local val = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
+	local val = Instance.new("TextLabel")
 	val.BackgroundTransparency = 1
 	val.Size = UDim2.new(0.3, -8, 0, mob and 16 or 14)
 	val.Position = UDim2.new(0.68, 0, 0, 6)
@@ -11666,7 +11815,7 @@ end
 
 local function makeInput(parent, opts)
 	opts = opts or {}
-	local row = Instance.new(_Vzd({107,151,134,146,138}))
+	local row = Instance.new("Frame")
 	row.LayoutOrder = opts.order or 0
 	row.Size = UDim2.new(1, -6, 0, 34)
 	row.BackgroundColor3 = C.card
@@ -11696,7 +11845,7 @@ end
 
 local function makeDropdown(parent, opts)
 	opts = opts or {}
-	indexFeature(_Vzd({137,151,148,149,137,148,156,147}), opts.title, opts.tip, table.concat(opts.options or {}, " "))
+	indexFeature("dropdown", opts.title, opts.tip, table.concat(opts.options or {}, " "))
 	local options = opts.options or { "—" }
 	local selected = opts.default or options[1]
 	local row = Instance.new("Frame")
@@ -11707,7 +11856,7 @@ local function makeDropdown(parent, opts)
 	row.Parent = parent
 	corner(row, 8)
 	stroke(row, C.strokeSoft, 1)
-	local lbl = Instance.new("TextLabel")
+	local lbl = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
 	lbl.BackgroundTransparency = 1
 	lbl.Size = UDim2.new(0.4, 0, 1, 0)
 	lbl.Position = UDim2.fromOffset(10, 0)
@@ -11772,7 +11921,7 @@ local function makeDropdown(parent, opts)
 		local filter = searchBox and searchBox.Text:lower() or ""
 		for _, opt in ipairs(options) do
 			if filter == "" or opt:lower():find(filter, 1, true) then
-				local ob = Instance.new(_Vzd({121,138,157,153,103,154,153,153,148,147}))
+				local ob = Instance.new("TextButton")
 				ob.Size = UDim2.new(1, 0, 0, 24)
 				ob.BackgroundColor3 = C.card
 				ob.BorderSizePixel = 0
@@ -11848,7 +11997,7 @@ local function makePlayerSearchList(sc, opts, orderFn)
 
 	local searchInput = nil
 	do
-		local row = Instance.new(_Vzd({107,151,134,146,138}))
+		local row = Instance.new("Frame")
 		row.LayoutOrder = nn()
 		row.Size = UDim2.new(1, 0, 0, 32)
 		row.BackgroundTransparency = 1
@@ -11860,7 +12009,7 @@ local function makePlayerSearchList(sc, opts, orderFn)
 		box.BorderSizePixel = 0
 		box.Font = Enum.Font.Gotham
 		box.TextSize = 11
-		box.PlaceholderText = "Search display or @username..."
+		box.PlaceholderText = _Vzd({120,138,134,151,136,141,69,137,142,152,149,145,134,158,69,148,151,69,101,154,152,138,151,147,134,146,138,83,83,83})
 		box.PlaceholderColor3 = C.muted
 		box.TextColor3 = C.text
 		box.TextXAlignment = Enum.TextXAlignment.Left
@@ -11911,7 +12060,7 @@ local function makePlayerSearchList(sc, opts, orderFn)
 		refresh()
 	end)
 
-	local listBox = Instance.new(_Vzd({107,151,134,146,138}))
+	local listBox = Instance.new("Frame")
 	listBox.LayoutOrder = nn()
 	listBox.Size = UDim2.new(1, -6, 0, height)
 	listBox.BackgroundColor3 = C.bg
@@ -11937,7 +12086,7 @@ local function makePlayerSearchList(sc, opts, orderFn)
 		for _ in pairs(S.loopTargets) do count = count + 1 end
 		if count > 0 then
 			multiBar.Visible = true
-			multiLabel.Text = "  " .. count .. _Vzd({69,149,145,134,158,138,151}) .. (count > 1 and "s" or "") .. _Vzd({69,152,138,145,138,136,153,138,137,69,139,148,151,69,145,148,148,149,152})
+			multiLabel.Text = "  " .. count .. " player" .. (count > 1 and "s" or "") .. _Vzd({69,152,138,145,138,136,153,138,137,69,139,148,151,69,145,148,148,149,152})
 		else
 			multiBar.Visible = false
 		end
@@ -12028,7 +12177,7 @@ local function makeAuraBlock(parent, order, meta)
 	head.MouseEnter:Connect(function() showTip(meta.tip) end)
 	head.MouseLeave:Connect(function() showTip("") end)
 
-	local gear = Instance.new("TextButton")
+	local gear = Instance.new(_Vzd({121,138,157,153,103,154,153,153,148,147}))
 	gear.Size = UDim2.fromOffset(28, 22)
 	gear.Position = UDim2.new(1, -78, 0.5, -11)
 	gear.BackgroundColor3 = C.bg
@@ -12081,8 +12230,8 @@ local function makeAuraBlock(parent, order, meta)
 	tLabel.Text = "Target"
 	tLabel.Parent = settings
 
-	local targets = { "Players", "Objects", _Vzd({117,145,134,158,138,151,152,69,134,147,137,69,116,135,143,138,136,153,152}) }
-	local tBtn = Instance.new("TextButton")
+	local targets = { "Players", "Objects", "Players and Objects" }
+	local tBtn = Instance.new(_Vzd({121,138,157,153,103,154,153,153,148,147}))
 	tBtn.Size = UDim2.new(1, 0, 0, 24)
 	tBtn.BackgroundColor3 = C.card
 	tBtn.BorderSizePixel = 0
@@ -12110,7 +12259,7 @@ local function makeAuraBlock(parent, order, meta)
 	rLabel.TextXAlignment = Enum.TextXAlignment.Left
 	rLabel.Text = _Vzd({119,134,147,140,138,95,69}) .. tostring(cfg.range or 50)
 	rLabel.Parent = settings
-	local rTrack = Instance.new(_Vzd({121,138,157,153,103,154,153,153,148,147}))
+	local rTrack = Instance.new("TextButton")
 	rTrack.Size = UDim2.new(1, 0, 0, 10)
 	rTrack.BackgroundColor3 = Color3.fromRGB(30, 20, 48)
 	rTrack.Text = ""
@@ -12133,10 +12282,10 @@ local function makeAuraBlock(parent, order, meta)
 		end
 		cfg.range = nextV
 		cfg._customRange = true
-		rLabel.Text = "Range: " .. (nextV >= 9999 and "MAP" or tostring(nextV))
+		rLabel.Text = _Vzd({119,134,147,140,138,95,69}) .. (nextV >= 9999 and "MAP" or tostring(nextV))
 		rFill.Size = UDim2.new(math.clamp((math.min(nextV, 500) - 10) / 500, 0, 1), 0, 1, 0)
 	end)
-	local mapBtn = Instance.new(_Vzd({121,138,157,153,103,154,153,153,148,147}))
+	local mapBtn = Instance.new("TextButton")
 	mapBtn.Size = UDim2.new(1, 0, 0, 22)
 	mapBtn.BackgroundColor3 = C.card
 	mapBtn.BorderSizePixel = 0
@@ -12150,7 +12299,7 @@ local function makeAuraBlock(parent, order, meta)
 	mapBtn.MouseButton1Click:Connect(function()
 		cfg.range = 99999
 		cfg._customRange = true
-		rLabel.Text = _Vzd({119,134,147,140,138,95,69,114,102,117})
+		rLabel.Text = "Range: MAP"
 		rFill.Size = UDim2.new(1, 0, 1, 0)
 	end)
 
@@ -12186,7 +12335,7 @@ local function makeAuraBlock(parent, order, meta)
 		end
 		cfg.power = nextV
 		cfg._customPower = true
-		pLabel.Text = _Vzd({117,148,156,138,151,95,69}) .. tostring(nextV)
+		pLabel.Text = "Power: " .. tostring(nextV)
 		pFill.Size = UDim2.new((nextV - 400) / 20000, 0, 1, 0)
 	end)
 
@@ -12204,7 +12353,7 @@ local function makeAuraBlock(parent, order, meta)
 		corner(grabT, 6)
 		grabT.MouseButton1Click:Connect(function()
 			S.toggles.netownGrab = not S.toggles.netownGrab
-			grabT.Text = _Vzd({107,148,151,136,138,69,108,151,134,135,69,113,142,147,138,152,95,69}) .. (S.toggles.netownGrab and "ON" or "OFF")
+			grabT.Text = "Force Grab Lines: " .. (S.toggles.netownGrab and "ON" or "OFF")
 		end)
 	end
 
@@ -12222,7 +12371,7 @@ local function makeAuraBlock(parent, order, meta)
 	pill.MouseButton1Click:Connect(function()
 		S.toggles["aura_" .. id] = not S.toggles["aura_" .. id]
 		render()
-		setAura(id, S.toggles["aura_" .. id] == true)
+		setAura(id, S.toggles[_Vzd({134,154,151,134,132}) .. id] == true)
 		if S.toggles["aura_" .. id] then notify(HUB_NAME, meta.title .. " ON", 1.2) end
 	end)
 	gear.MouseButton1Click:Connect(function()
@@ -12234,14 +12383,14 @@ end
 
 local TAB_DEFS = {
 	{ id = "home", icon = "01", label = "Home" },
-	{ id = "combat", icon = "02", label = "Combat" },
+	{ id = _Vzd({136,148,146,135,134,153}), icon = "02", label = "Combat" },
 	{ id = "player", icon = "03", label = "Player" },
 	{ id = "grab", icon = "04", label = "Grab" },
 	{ id = "auras", icon = "05", label = "Auras" },
-	{ id = "server", icon = "06", label = "Server" },
-	{ id = "loop", icon = "07", label = _Vzd({113,148,148,149,152}) },
+	{ id = _Vzd({152,138,151,155,138,151}), icon = "06", label = "Server" },
+	{ id = "loop", icon = "07", label = "Loops" },
 	{ id = "anti", icon = "08", label = "Protect" },
-	{ id = "move", icon = "09", label = _Vzd({114,148,155,138,146,138,147,153}) },
+	{ id = "move", icon = "09", label = "Movement" },
 	{ id = "visuals", icon = "10", label = "Visuals" },
 	{ id = "toys", icon = "11", label = "Toys" },
 	{ id = "explosions", icon = "12", label = "Explosions" },
@@ -12249,15 +12398,15 @@ local TAB_DEFS = {
 	{ id = "auto", icon = "14", label = "Auto" },
 	{ id = "console", icon = "15", label = "Misc" },
 	{ id = "trans", icon = "16", label = "Trans" },
-	{ id = _Vzd({152,148,154,147,137,152}), icon = "17", label = "Sounds" },
+	{ id = "sounds", icon = "17", label = "Sounds" },
 	{ id = "fun", icon = "18", label = "Fun" },
-	{ id = "settings", icon = "19", label = "Config" },
+	{ id = _Vzd({152,138,153,153,142,147,140,152}), icon = "19", label = "Config" },
 }
 
 local _TAB_BUILDERS = {}
 _TAB_BUILDERS["home"] = function(sc, n)
 		section(sc, "WELCOME", n())
-		local hero = Instance.new("Frame")
+		local hero = Instance.new(_Vzd({107,151,134,146,138}))
 		hero.LayoutOrder = n()
 		hero.Size = UDim2.new(1, -6, 0, 100)
 		hero.BackgroundColor3 = C.card
@@ -12308,9 +12457,9 @@ _TAB_BUILDERS["home"] = function(sc, n)
 		stroke(guide, C.strokeSoft, 1)
 
 		section(sc, "STATUS", n())
-		makeButton(sc, { order = n(), title = _Vzd({113,142,147,144,69,108,134,146,138,69,119,138,146,148,153,138,152}), tip = "Refresh remotes if features stop working", callback = function()
+		makeButton(sc, { order = n(), title = "Link Game Remotes", tip = "Refresh remotes if features stop working", callback = function()
 			local ok = resolveFTAP()
-			notify(HUB_NAME, ok and "Remotes linked" or _Vzd({120,153,142,145,145,69,145,148,134,137,142,147,140,69,151,138,146,148,153,138,152,75}), 2)
+			notify(HUB_NAME, ok and _Vzd({119,138,146,148,153,138,152,69,145,142,147,144,138,137}) or _Vzd({120,153,142,145,145,69,145,148,134,137,142,147,140,69,151,138,146,148,153,138,152,75}), 2)
 		end })
 		local st = Instance.new("TextLabel")
 		st.LayoutOrder = n()
@@ -12323,7 +12472,7 @@ _TAB_BUILDERS["home"] = function(sc, n)
 		st.TextXAlignment = Enum.TextXAlignment.Left
 		st.TextYAlignment = Enum.TextYAlignment.Top
 		st.TextWrapped = true
-		st.Text = _Vzd({69,103,154,142,145,137,95,69}) .. BUILD .. "\n Place: " .. tostring(game.PlaceId) .. "\n Key: VOIDZHUB"
+		st.Text = " Build: " .. BUILD .. "\n Place: " .. tostring(game.PlaceId) .. "\n Key: VOIDZHUB"
 		st.Parent = sc
 		corner(st, 8)
 		pad(st, 8, 8, 8, 8)
@@ -12335,25 +12484,25 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 			order = n(),
 			title = _Vzd({109,148,156,69,121,148,69,112,142,136,144}),
 			options = KICK_TYPES,
-			default = S.kickType or "Sky Anchor",
+			default = S.kickType or _Vzd({120,144,158,69,102,147,136,141,148,151}),
 			callback = function(v) S.kickType = v end,
-			tip = _Vzd({120,144,158,69,102,147,136,141,148,151,69,84,69,107,145,148,134,153,69,117,142,147,69,148,156,147,138,151,152,141,142,149,69,144,142,136,144,152}),
+			tip = "Sky Anchor / Float Pin ownership kicks",
 		})
-		if not S.kickType then S.kickType = "Sky Anchor" end
+		if not S.kickType then S.kickType = _Vzd({120,144,158,69,102,147,136,141,148,151}) end
 		makePlayerSearchList(sc, {
 			clickFn = function(p) S.selected = p; toggleLoopTarget(p) end,
 		}, n)
 		local function runOnTarget(label, fn)
 			local p = combatTarget()
 			if not p then
-				notify(HUB_NAME, _Vzd({115,148,69,153,134,151,140,138,153,69,57,69,149,142,136,144,69,124,141,148}), 1.5)
+				notify(HUB_NAME, "No target — pick Who", 1.5)
 				return
 			end
 			notify(HUB_NAME, label .. " → " .. playerLabel(p), 1.2)
 			task.spawn(function()
 				local ok, err = pcall(fn, p)
 				if not ok then
-					warn(_Vzd({128,123,116,110,105,127,130,69,136,148,146,135,134,153}), err)
+					warn("[VOIDZ] combat", err)
 					notify(HUB_NAME, "Err: " .. tostring(err):sub(1, 40), 2)
 				end
 			end)
@@ -12362,12 +12511,12 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 		if S.toggles.plotAmbush == nil then S.toggles.plotAmbush = true end
 		if S.toggles.plotPullTry == nil then S.toggles.plotPullTry = true end
 		makeToggle(sc, {
-			order = n(), id = "plotAmbush", title = _Vzd({102,146,135,154,152,141,69,116,147,69,117,145,148,153,69,106,157,142,153}),
+			order = n(), id = _Vzd({149,145,148,153,102,146,135,154,152,141}), title = "Ambush On Plot Exit",
 			tip = "If they are in a house: alert you, wait, then auto-grab + attack when they walk out",
-			desc = _Vzd({105,138,139,134,154,145,153,69,116,115,69,220,69,144,142,145,145,152,81,69,139,145,142,147,140,152,81,69,145,148,148,149,152,81,69,134,154,151,134,152}),
+			desc = "Default ON · kills, flings, loops, auras",
 			callback = function(on)
 				S.toggles.plotAmbush = on
-				notify(HUB_NAME, "Plot ambush " .. (on and "ON" or "OFF"), 1.5)
+				notify(HUB_NAME, _Vzd({117,145,148,153,69,134,146,135,154,152,141,69}) .. (on and "ON" or "OFF"), 1.5)
 			end,
 		})
 		makeToggle(sc, {
@@ -12376,7 +12525,7 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 			desc = _Vzd({105,138,139,134,154,145,153,69,116,115,69,220,69,107,121,102,117,69,154,152,154,134,145,145,158,69,135,145,148,136,144,152,69,139,154,145,145,69,148,156,147,138,151,152,141,142,149,69,142,147,152,142,137,138,69,149,145,148,153,152}),
 			callback = function(on)
 				S.toggles.plotPullTry = on
-				notify(HUB_NAME, "House pull try " .. (on and "ON" or "OFF"), 1.5)
+				notify(HUB_NAME, _Vzd({109,148,154,152,138,69,149,154,145,145,69,153,151,158,69}) .. (on and "ON" or "OFF"), 1.5)
 			end,
 		})
 		makeButton(sc, {
@@ -12391,25 +12540,25 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 					if S.toggles.plotPullTry then task.spawn(tryPullFromPlot, p) end
 				else
 					task.spawn(function() forceGrabOnExit(p) end)
-					notify(HUB_NAME, _Vzd({108,151,134,135,135,138,137,69}) .. playerLabel(p) .. _Vzd({69,77,147,148,153,69,142,147,69,141,148,154,152,138,78}), 1.5)
+					notify(HUB_NAME, "Grabbed " .. playerLabel(p) .. " (not in house)", 1.5)
 				end
 			end,
 		})
 		makeButton(sc, {
-			order = n(), title = "Blobman Extract From Plot",
+			order = n(), title = _Vzd({103,145,148,135,146,134,147,69,106,157,153,151,134,136,153,69,107,151,148,146,69,117,145,148,153}),
 			danger = true,
 			tip = "Spawns blobman → mounts → CreatureGrab target in their plot (bypasses house protection)",
 			callback = function()
 				local p = combatTarget()
-				if not p then notify(HUB_NAME, _Vzd({120,138,145,138,136,153,69,134,69,149,145,134,158,138,151}), 1.5); return end
+				if not p then notify(HUB_NAME, "Select a player", 1.5); return end
 				notify(HUB_NAME, "Blobman extract → " .. playerLabel(p), 1.2)
 				task.spawn(function() blobGrabSingle(p) end)
 			end,
 		})
 		makeButton(sc, {
-			order = n(), title = _Vzd({103,145,148,135,146,134,147,69,106,157,153,151,134,136,153,69,102,145,145,69,107,151,148,146,69,117,145,148,153,152}),
+			order = n(), title = "Blobman Extract All From Plots",
 			danger = true,
-			tip = _Vzd({120,149,134,156,147,152,69,135,145,148,135,146,134,147,69,183,69,104,151,138,134,153,154,151,138,108,151,134,135,69,138,155,138,151,158,69,149,145,134,158,138,151,69,142,147,69,149,145,148,153,152}),
+			tip = "Spawns blobman → CreatureGrab every player in plots",
 			callback = function()
 				notify(HUB_NAME, "Blobman extract ALL from plots", 1.5)
 				task.spawn(function()
@@ -12424,7 +12573,7 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 		})
 		section(sc, _Vzd({102,104,121,110,116,115,120,69,77,152,138,145,138,136,153,138,137,69,149,145,134,158,138,151,78}), n())
 		makeButton(sc, {
-			order = n(), title = _Vzd({121,117,69,121,148,69,121,141,138,146}), tip = "Teleport to the selected player",
+			order = n(), title = _Vzd({121,117,69,121,148,69,121,141,138,146}), tip = _Vzd({121,138,145,138,149,148,151,153,69,153,148,69,153,141,138,69,152,138,145,138,136,153,138,137,69,149,145,134,158,138,151}),
 			callback = function()
 				runOnTarget("TP", function(p)
 					local r = rootOf(p)
@@ -12435,17 +12584,17 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 		makeButton(sc, {
 			order = n(), title = "Throw Them", danger = true, tip = _Vzd({107,145,142,147,140,69,152,138,145,138,136,153,138,137,69,77,146,134,149,82,156,142,137,138,69,155,142,152,142,153,69,120,115,116,78}),
 			callback = function()
-				runOnTarget("Throw", function(p) flingPlayer(p, S.flingPower, false, true) end)
+				runOnTarget(_Vzd({121,141,151,148,156}), function(p) flingPlayer(p, S.flingPower, false, true) end)
 			end,
 		})
 		makeButton(sc, {
-			order = n(), title = "Kick Them", danger = true, tip = "Kick selected with kick type",
+			order = n(), title = _Vzd({112,142,136,144,69,121,141,138,146}), danger = true, tip = "Kick selected with kick type",
 			callback = function()
 				runOnTarget("Kick", function(p) kickPlayer(p, S.kickType or "Hard", false) end)
 			end,
 		})
 		makeButton(sc, {
-			order = n(), title = "Kill Them", danger = true, tip = _Vzd({112,142,145,145,69,152,138,145,138,136,153,138,137}),
+			order = n(), title = "Kill Them", danger = true, tip = "Kill selected",
 			callback = function()
 				runOnTarget("Kill", function(p) killPlayer(p, false) end)
 			end,
@@ -12457,13 +12606,13 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 			end,
 		})
 		makeButton(sc, {
-			order = n(), title = _Vzd({119,134,140,137,148,145,145,69,121,141,138,146}), tip = "Ragdoll selected",
+			order = n(), title = "Ragdoll Them", tip = "Ragdoll selected",
 			callback = function()
-				runOnTarget(_Vzd({119,134,140,137,148,145,145}), function(p) ragdoll(p, true) end)
+				runOnTarget("Ragdoll", function(p) ragdoll(p, true) end)
 			end,
 		})
 		makeButton(sc, {
-			order = n(), title = _Vzd({123,148,142,137,69,121,141,138,146}), danger = true, tip = "Slam selected into void",
+			order = n(), title = _Vzd({123,148,142,137,69,121,141,138,146}), danger = true, tip = _Vzd({120,145,134,146,69,152,138,145,138,136,153,138,137,69,142,147,153,148,69,155,148,142,137}),
 			callback = function()
 				runOnTarget("Void", function(p) voidPlayer(p, false) end)
 			end,
@@ -12471,16 +12620,16 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 		makeButton(sc, { order = n(), title = _Vzd({103,154,151,147,69,121,141,138,146}), danger = true, tip = "Apply fire via status toy", callback = function()
 			runOnTarget("Burn", function(p) applyStatusToPlayer("fire", p) end)
 		end })
-		makeButton(sc, { order = n(), title = "Poison Them", danger = true, tip = "Apply poison via hurt parts", callback = function()
-			runOnTarget("Poison", function(p) local r = rootOf(p); if r then applyMapPoison(r) end end)
+		makeButton(sc, { order = n(), title = "Poison Them", danger = true, tip = _Vzd({102,149,149,145,158,69,149,148,142,152,148,147,69,155,142,134,69,141,154,151,153,69,149,134,151,153,152}), callback = function()
+			runOnTarget(_Vzd({117,148,142,152,148,147}), function(p) local r = rootOf(p); if r then applyMapPoison(r) end end)
 		end })
-		makeButton(sc, { order = n(), title = _Vzd({107,151,138,138,159,138,69,121,141,138,146}), tip = "Set WalkSpeed + JumpPower to 0", callback = function()
+		makeButton(sc, { order = n(), title = _Vzd({107,151,138,138,159,138,69,121,141,138,146}), tip = _Vzd({120,138,153,69,124,134,145,144,120,149,138,138,137,69,80,69,111,154,146,149,117,148,156,138,151,69,153,148,69,85}), callback = function()
 			runOnTarget("Freeze", function(p)
 				local h = p.Character and p.Character:FindFirstChildOfClass(_Vzd({109,154,146,134,147,148,142,137}))
 				if h then h.WalkSpeed = 0; h.JumpPower = 0; h.JumpHeight = 0 end
 			end)
 		end })
-		makeButton(sc, { order = n(), title = "Unfreeze Them", tip = "Restore WalkSpeed 16 + JumpPower 50", callback = function()
+		makeButton(sc, { order = n(), title = _Vzd({122,147,139,151,138,138,159,138,69,121,141,138,146}), tip = _Vzd({119,138,152,153,148,151,138,69,124,134,145,144,120,149,138,138,137,69,86,91,69,80,69,111,154,146,149,117,148,156,138,151,69,90,85}), callback = function()
 			runOnTarget("Unfreeze", function(p)
 				local h = p.Character and p.Character:FindFirstChildOfClass("Humanoid")
 				if h then h.WalkSpeed = 16; h.JumpPower = 50; h.JumpHeight = 7.2 end
@@ -12494,7 +12643,7 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 		end })
 
 		section(sc, "BLOB MAIN GRAB", n())
-		local blobNote = Instance.new("TextLabel")
+		local blobNote = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
 		blobNote.LayoutOrder = n()
 		blobNote.Size = UDim2.new(1, -6, 0, 32)
 		blobNote.BackgroundColor3 = C.card
@@ -12512,7 +12661,7 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 			tip = "Spawn blobman → TP to target → CreatureGrab (works in plots)",
 			callback = function()
 				local p = combatTarget()
-				if not p then notify(HUB_NAME, "Select a player", 1.5); return end
+				if not p then notify(HUB_NAME, _Vzd({120,138,145,138,136,153,69,134,69,149,145,134,158,138,151}), 1.5); return end
 				notify(HUB_NAME, "Blob Grab → " .. playerLabel(p), 1.2)
 				task.spawn(function() blobGrabSingle(p) end)
 			end,
@@ -12524,7 +12673,7 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 			end,
 		})
 		makeButton(sc, { order = n(), title = _Vzd({103,145,148,135,69,108,151,134,135,69,113,148,148,149}), danger = true,
-			tip = _Vzd({113,148,148,149,69,135,145,148,135,69,140,151,134,135,69,152,138,145,138,136,153,138,137,69,154,147,153,142,145,69,153,148,140,140,145,138,137,69,148,139,139,69,220,69,149,138,151,152,142,152,153,152,69,153,141,151,148,154,140,141,69,151,138,143,148,142,147}),
+			tip = "Loop blob grab selected until toggled off · persists through rejoin",
 			callback = function()
 				local p = combatTarget()
 				if not p then notify(HUB_NAME, _Vzd({120,138,145,138,136,153,69,134,69,149,145,134,158,138,151}), 1.5); return end
@@ -12547,7 +12696,7 @@ _TAB_BUILDERS["combat"] = function(sc, n)
 			order = n(),
 			id = "fovCircle",
 			title = "FOV Circle",
-			tip = "Show FOV circle on screen center",
+			tip = _Vzd({120,141,148,156,69,107,116,123,69,136,142,151,136,145,138,69,148,147,69,152,136,151,138,138,147,69,136,138,147,153,138,151}),
 			default = true,
 			callback = function(on)
 				silentFovCircle = on
@@ -12583,12 +12732,12 @@ _TAB_BUILDERS[_Vzd({134,154,151,134,152})] = function(sc, n)
 		pad(auraNote, 6, 6, 6, 6)
 		if S.toggles.auraMapWide == nil then S.toggles.auraMapWide = false end
 		makeToggle(sc, {
-			order = n(), id = "auraMapWide", title = "Extended Range (Objects)",
+			order = n(), id = "auraMapWide", title = _Vzd({106,157,153,138,147,137,138,137,69,119,134,147,140,138,69,77,116,135,143,138,136,153,152,78}),
 			tip = _Vzd({116,115,69,98,69,156,142,137,138,151,69,151,134,147,140,138,69,139,148,151,69,148,135,143,138,136,153,69,134,154,151,134,152,83,69,117,145,134,158,138,151,69,134,154,151,134,152,69,134,145,156,134,158,152,69,120,115,116,69,151,134,147,140,138,83}),
-			desc = _Vzd({120,115,116,69,151,134,147,140,138,69,163,88,85,69,152,153,154,137,152,69,139,148,151,69,149,145,134,158,138,151,152,69,134,145,156,134,158,152}),
+			desc = "SNO range ~30 studs for players always",
 			callback = function(on)
 				S.toggles.auraMapWide = on
-				notify(HUB_NAME, _Vzd({102,154,151,134,69,151,134,147,140,138,69}) .. (on and "extended" or "nearby only"), 1.5)
+				notify(HUB_NAME, "Aura range " .. (on and "extended" or "nearby only"), 1.5)
 			end,
 		})
 		makeSlider(sc, {
@@ -12629,13 +12778,13 @@ _TAB_BUILDERS[_Vzd({134,154,151,134,152})] = function(sc, n)
 				notify(HUB_NAME, _Vzd({121,112,69,152,141,134,149,138,69,183,69}) .. v, 1.2)
 			end,
 		})
-		section(sc, "AURAS (map-wide · ⚙ customize)", n())
+		section(sc, _Vzd({102,122,119,102,120,69,77,146,134,149,82,156,142,137,138,69,220,69,190,69,136,154,152,153,148,146,142,159,138,78}), n())
 		for _, meta in ipairs(AURA_META) do
 			makeAuraBlock(sc, n(), meta)
 		end
 end
 _TAB_BUILDERS["server"] = function(sc, n)
-		section(sc, _Vzd({114,102,117,82,124,110,105,106,69,102,104,121,110,116,115,120}), n())
+		section(sc, "MAP-WIDE ACTIONS", n())
 		local srvNote = Instance.new("TextLabel")
 		srvNote.LayoutOrder = n()
 		srvNote.Size = UDim2.new(1, -6, 0, 52)
@@ -12652,8 +12801,8 @@ _TAB_BUILDERS["server"] = function(sc, n)
 		corner(srvNote, 8)
 		pad(srvNote, 6, 6, 6, 6)
 
-		section(sc, "LAG / DESTROY SERVER", n())
-		local lagNote = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
+		section(sc, _Vzd({113,102,108,69,84,69,105,106,120,121,119,116,126,69,120,106,119,123,106,119}), n())
+		local lagNote = Instance.new("TextLabel")
 		lagNote.LayoutOrder = n()
 		lagNote.Size = UDim2.new(1, -6, 0, 52)
 		lagNote.BackgroundColor3 = C.danger
@@ -12670,12 +12819,12 @@ _TAB_BUILDERS["server"] = function(sc, n)
 		pad(lagNote, 6, 6, 6, 6)
 
 		makeSlider(sc, {
-			order = n(), title = "Lag Intensity", min = 1, max = 500, default = 150, step = 1,
+			order = n(), title = _Vzd({113,134,140,69,110,147,153,138,147,152,142,153,158}), min = 1, max = 500, default = 150, step = 1,
 			stateKey = "lagIntensity",
 			tip = "Higher = more remote spam per wave (can kick you)",
 		})
 		makeToggle(sc, {
-			order = n(), id = "lagServer", title = "Lag Server",
+			order = n(), id = "lagServer", title = _Vzd({113,134,140,69,120,138,151,155,138,151}),
 			tip = "Spam CreateGrabLine + SetNetworkOwner on whole server",
 			callback = function(on)
 				if on then setMassToggle("lagSrv", true, lagServerLoop) else stopMass("lagSrv") end
@@ -12683,16 +12832,16 @@ _TAB_BUILDERS["server"] = function(sc, n)
 		})
 		makeToggle(sc, {
 			order = n(), id = "destroyServer", title = _Vzd({124,151,138,136,144,69,120,138,151,155,138,151,69,77,103,145,148,135,146,134,147,78}),
-			tip = _Vzd({120,149,134,156,147,69,103,145,148,135,146,134,147,81,69,151,142,137,138,69,142,153,81,69,140,151,134,135,69,138,155,138,151,158,69,149,145,134,158,138,151,69,148,147,69,153,141,138,69,152,138,151,155,138,151}),
+			tip = "Spawn Blobman, ride it, grab every player on the server",
 			callback = function(on)
-				if on then setMassToggle("destroySrv", true, destroyServerLoop) else stopMass("destroySrv") end
+				if on then setMassToggle(_Vzd({137,138,152,153,151,148,158,120,151,155}), true, destroyServerLoop) else stopMass("destroySrv") end
 			end,
 		})
 		makeButton(sc, {
-			order = n(), title = "Stop Lag / Wreck", danger = true,
+			order = n(), title = _Vzd({120,153,148,149,69,113,134,140,69,84,69,124,151,138,136,144}), danger = true,
 			tip = "Kill all lag and wreck loops instantly",
 			callback = function()
-				for _, name in ipairs({ "lagSrv", "softLag", "hardLag", _Vzd({137,138,152,153,151,148,158,120,151,155}), "destroyHyb", "blobSrv" }) do
+				for _, name in ipairs({ _Vzd({145,134,140,120,151,155}), "softLag", "hardLag", "destroySrv", "destroyHyb", "blobSrv" }) do
 					stopMass(name)
 				end
 				S.toggles.lagServer = false
@@ -12701,7 +12850,7 @@ _TAB_BUILDERS["server"] = function(sc, n)
 			end,
 		})
 
-		section(sc, _Vzd({112,110,113,113,69,84,69,121,109,119,116,124,69,84,69,112,110,104,112}), n())
+		section(sc, "KILL / THROW / KICK", n())
 		local killNote = Instance.new("TextLabel")
 		killNote.LayoutOrder = n()
 		killNote.Size = UDim2.new(1, -6, 0, 36)
@@ -12718,22 +12867,22 @@ _TAB_BUILDERS["server"] = function(sc, n)
 		corner(killNote, 8)
 		pad(killNote, 6, 6, 6, 6)
 		makeSlider(sc, {
-			order = n(), title = "Cycle Delay (sec)", min = 0.1, max = 5, default = 0.2, step = 0.1,
+			order = n(), title = _Vzd({104,158,136,145,138,69,105,138,145,134,158,69,77,152,138,136,78}), min = 0.1, max = 5, default = 0.2, step = 0.1,
 			stateKey = "massCycleDelay",
-			tip = "Seconds between each full pass across all players",
+			tip = _Vzd({120,138,136,148,147,137,152,69,135,138,153,156,138,138,147,69,138,134,136,141,69,139,154,145,145,69,149,134,152,152,69,134,136,151,148,152,152,69,134,145,145,69,149,145,134,158,138,151,152}),
 		})
 		makeToggle(sc, {
 			order = n(), id = "mass_kill", title = _Vzd({113,148,148,149,69,112,142,145,145,69,102,145,145}), danger = true,
-			tip = _Vzd({113,148,148,149,95,69,155,142,152,142,153,69,138,134,136,141,69,149,145,134,158,138,151,69,183,69,120,115,116,69,183,69,109,154,146,134,147,148,142,137,95,104,141,134,147,140,138,120,153,134,153,138,77,105,138,134,137,78,83,69,104,134,146,138,151,134,69,145,148,136,144,152,69,141,148,146,138,83}),
+			tip = "Loop: visit each player → SNO → Humanoid:ChangeState(Dead). Camera locks home.",
 			callback = function(on)
 				if on then setMassToggle("kill", true, massKillLoop) else stopMass("kill") end
 			end,
 		})
 		makeToggle(sc, {
 			order = n(), id = "mass_fling", title = "Loop Throw All", danger = true,
-			tip = _Vzd({113,148,148,149,95,69,155,142,152,142,153,69,138,134,136,141,69,149,145,134,158,138,151,69,183,69,134,149,149,145,158,107,145,142,147,140,69,77,103,148,137,158,123,138,145,148,136,142,153,158,78,83,69,104,134,146,138,151,134,69,145,148,136,144,152,69,141,148,146,138,83}),
+			tip = "Loop: visit each player → applyFling (BodyVelocity). Camera locks home.",
 			callback = function(on)
-				if on then setMassToggle(_Vzd({139,145,142,147,140}), true, massFlingLoop) else stopMass("fling") end
+				if on then setMassToggle("fling", true, massFlingLoop) else stopMass("fling") end
 			end,
 		})
 		makeToggle(sc, {
@@ -12744,7 +12893,7 @@ _TAB_BUILDERS["server"] = function(sc, n)
 			end,
 		})
 
-		section(sc, _Vzd({103,119,110,115,108,69,84,69,119,102,108,105,116,113,113,69,84,69,103,122,119,115}), n())
+		section(sc, "BRING / RAGDOLL / BURN", n())
 		local bringNote = Instance.new("TextLabel")
 		bringNote.LayoutOrder = n()
 		bringNote.Size = UDim2.new(1, -6, 0, 36)
@@ -12761,7 +12910,7 @@ _TAB_BUILDERS["server"] = function(sc, n)
 		corner(bringNote, 8)
 		pad(bringNote, 6, 6, 6, 6)
 		makeToggle(sc, {
-			order = n(), id = "mass_bring", title = _Vzd({113,148,148,149,69,103,151,142,147,140,69,102,145,145}),
+			order = n(), id = _Vzd({146,134,152,152,132,135,151,142,147,140}), title = "Loop Bring All",
 			tip = _Vzd({113,148,148,149,95,69,155,142,152,142,153,69,138,134,136,141,69,149,145,134,158,138,151,69,183,69,120,115,116,69,183,69,149,154,145,145,69,153,148,69,158,148,154,151,69,149,148,152,142,153,142,148,147,83,69,104,134,146,138,151,134,69,145,148,136,144,152,69,141,148,146,138,83}),
 			callback = function(on)
 				if on then setMassToggle("bring", true, massBringLoop) else stopMass("bring") end
@@ -12782,7 +12931,7 @@ _TAB_BUILDERS["server"] = function(sc, n)
 			end,
 		})
 
-		section(sc, _Vzd({113,116,116,117,69,123,116,114,110,121,69,77,114,102,117,82,124,110,105,106,78}), n())
+		section(sc, "LOOP VOMIT (MAP-WIDE)", n())
 		local vomitNote = Instance.new("TextLabel")
 		vomitNote.LayoutOrder = n()
 		vomitNote.Size = UDim2.new(1, -6, 0, 36)
@@ -12799,12 +12948,12 @@ _TAB_BUILDERS["server"] = function(sc, n)
 		corner(vomitNote, 8)
 		pad(vomitNote, 6, 6, 6, 6)
 		makeSlider(sc, {
-			order = n(), title = _Vzd({123,148,146,142,153,69,119,134,153,138,69,77,152,138,136,78}), min = 0.5, max = 5, default = 2, step = 0.5,
+			order = n(), title = "Vomit Rate (sec)", min = 0.5, max = 5, default = 2, step = 0.5,
 			stateKey = "vomitRate",
-			tip = _Vzd({120,138,136,148,147,137,152,69,135,138,153,156,138,138,147,69,138,134,136,141,69,155,148,146,142,153,69,136,158,136,145,138}),
+			tip = "Seconds between each vomit cycle",
 		})
 		makeToggle(sc, {
-			order = n(), id = "mass_vomit", title = _Vzd({113,148,148,149,69,123,148,146,142,153,69,106,155,138,151,158,148,147,138}),
+			order = n(), id = _Vzd({146,134,152,152,132,155,148,146,142,153}), title = "Loop Vomit Everyone",
 			tip = _Vzd({120,149,134,156,147,69,107,148,148,137,103,134,147,134,147,134,69,183,69,141,148,145,137,69,156,142,153,141,69,153,134,151,140,138,153,69,183,69,154,152,138,69,77,153,151,142,140,140,138,151,152,69,138,134,153,69,80,69,155,148,146,142,153,78}),
 			callback = function(on)
 				if on then
@@ -12812,7 +12961,7 @@ _TAB_BUILDERS["server"] = function(sc, n)
 						local home = hrp() and hrp().CFrame
 						local overview = home and CFrame.lookAt(home.Position + Vector3.new(-15, 22, 8), home.Position) or CFrame.new(0, 50, 0)
 						if home then freezeCam(overview) end
-						notify(HUB_NAME, "Vomit Loop ON", 2)
+						notify(HUB_NAME, _Vzd({123,148,146,142,153,69,113,148,148,149,69,116,115}), 2)
 						local bananaModel, bananaPrimary = nil, nil
 						while keep() do
 							for _, p in ipairs(allTargets()) do
@@ -12848,7 +12997,7 @@ _TAB_BUILDERS["server"] = function(sc, n)
 											local bp = bananaPrimary:FindFirstChild("VOIDZ_VomitPark")
 											if not bp then
 												bp = Instance.new("BodyPosition")
-												bp.Name = _Vzd({123,116,110,105,127,132,123,148,146,142,153,117,134,151,144})
+												bp.Name = "VOIDZ_VomitPark"
 												bp.MaxForce = Vector3.new(12500, 12500, 12500)
 												bp.P = 12500
 												bp.Parent = bananaPrimary
@@ -12887,15 +13036,15 @@ _TAB_BUILDERS["server"] = function(sc, n)
 						notify(HUB_NAME, _Vzd({123,148,146,142,153,69,113,148,148,149,69,116,107,107}), 1.5)
 					end)
 				else
-					stopMass("vomit")
+					stopMass(_Vzd({155,148,146,142,153}))
 				end
 			end,
 		})
 		makeButton(sc, {
-			order = n(), title = "Stop All Server", danger = true,
+			order = n(), title = _Vzd({120,153,148,149,69,102,145,145,69,120,138,151,155,138,151}), danger = true,
 			tip = _Vzd({112,142,145,145,69,138,155,138,151,158,69,152,138,151,155,138,151,82,156,142,137,138,69,145,148,148,149,69,134,153,69,148,147,136,138}),
 			callback = function()
-				for _, name in ipairs({ "lagSrv", "softLag", "hardLag", _Vzd({137,138,152,153,151,148,158,120,151,155}), "destroyHyb", "blobSrv", "kill", "fling", "kick", "bring", "ragdoll", "fire", "banana", "paint", "vomit" }) do
+				for _, name in ipairs({ "lagSrv", _Vzd({152,148,139,153,113,134,140}), "hardLag", "destroySrv", "destroyHyb", "blobSrv", "kill", _Vzd({139,145,142,147,140}), "kick", "bring", "ragdoll", "fire", "banana", "paint", "vomit" }) do
 					stopMass(name)
 				end
 				S.toggles.lagServer = false
@@ -12907,25 +13056,25 @@ _TAB_BUILDERS["server"] = function(sc, n)
 				S.toggles.mass_ragdoll = false
 				S.toggles.mass_fire = false
 				S.toggles.mass_vomit = false
-				notify(HUB_NAME, "All server loops stopped", 1.5)
+				notify(HUB_NAME, _Vzd({102,145,145,69,152,138,151,155,138,151,69,145,148,148,149,152,69,152,153,148,149,149,138,137}), 1.5)
 			end,
 		})
 end
 _TAB_BUILDERS["grab"] = function(sc, n)
-		section(sc, "SCROLL DISTANCE", n())
+		section(sc, _Vzd({120,104,119,116,113,113,69,105,110,120,121,102,115,104,106}), n())
 		makeToggle(sc, {
 			order = n(),
-			id = _Vzd({145,142,147,138,106,157,153,138,147,137}),
-			title = "Scroll Distance",
+			id = "lineExtend",
+			title = _Vzd({120,136,151,148,145,145,69,105,142,152,153,134,147,136,138}),
 			tip = "How far you can grab + hold. Scroll wheel while holding to stretch.",
-			desc = "Separate from Massless Grab below",
+			desc = _Vzd({120,138,149,134,151,134,153,138,69,139,151,148,146,69,114,134,152,152,145,138,152,152,69,108,151,134,135,69,135,138,145,148,156}),
 			callback = function(on)
 				setLineExtend(on)
 			end,
 		})
 		makeSlider(sc, {
 			order = n(),
-			title = _Vzd({120,136,151,148,145,145,69,105,142,152,153,134,147,136,138}),
+			title = "Scroll Distance",
 			min = 11,
 			max = 120,
 			default = S.extendAmount or 25,
@@ -12947,18 +13096,18 @@ _TAB_BUILDERS["grab"] = function(sc, n)
 			default = S.scrollStep or 2,
 			callback = function(v) S.scrollStep = v end,
 		})
-		section(sc, "GRAB LINE", n())
+		section(sc, _Vzd({108,119,102,103,69,113,110,115,106}), n())
 		makeToggle(sc, {
-			order = n(), id = _Vzd({142,147,155,142,152,113,142,147,138}), title = "Invisible Line",
-			tip = _Vzd({106,146,149,153,158,69,104,151,138,134,153,138,108,151,134,135,113,142,147,138,69,148,147,69,140,151,134,135,69,153,148,69,141,142,137,138,69,153,141,138,69,145,142,147,138,83,69,116,139,139,69,142,139,69,104,151,134,159,158,69,113,142,147,138,69,142,152,69,148,147,83}),
+			order = n(), id = _Vzd({142,147,155,142,152,113,142,147,138}), title = _Vzd({110,147,155,142,152,142,135,145,138,69,113,142,147,138}),
+			tip = "Empty CreateGrabLine on grab to hide the line. Off if Crazy Line is on.",
 			callback = function(on)
 				setInvisibleLine(on)
 				if on then installGrabWatch() end
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "crazyLine", title = "Crazy Line (Soft Lag)",
-			tip = _Vzd({120,149,134,146,69,104,151,138,134,153,138,108,151,134,135,113,142,147,138,69,148,147,69,138,155,138,151,158,69,149,145,134,158,138,151,69,153,148,151,152,148,69,77,152,148,139,153,69,145,134,140,78,83,69,105,142,152,134,135,145,138,152,69,110,147,155,142,152,142,135,145,138,69,113,142,147,138,83}),
+			order = n(), id = _Vzd({136,151,134,159,158,113,142,147,138}), title = "Crazy Line (Soft Lag)",
+			tip = "Spam CreateGrabLine on every player torso (soft lag). Disables Invisible Line.",
 			callback = function(on)
 				setCrazyLine(on)
 			end,
@@ -12982,50 +13131,50 @@ _TAB_BUILDERS["grab"] = function(sc, n)
 		installGrabWatch()
 
 		makeToggle(sc, {
-			order = n(), id = "grabFlingOn", title = "Throw When Let Go",
-			tip = "Pre-arms BodyVelocity while you hold · fires on release along camera",
-			desc = _Vzd({108,151,134,135,69,183,69,151,138,145,138,134,152,138,69,153,148,69,158,138,138,153,69,220,69,156,148,151,144,152,69,148,147,69,149,145,134,158,138,151,152,69,80,69,148,135,143,138,136,153,152}),
+			order = n(), id = _Vzd({140,151,134,135,107,145,142,147,140,116,147}), title = _Vzd({121,141,151,148,156,69,124,141,138,147,69,113,138,153,69,108,148}),
+			tip = _Vzd({117,151,138,82,134,151,146,152,69,103,148,137,158,123,138,145,148,136,142,153,158,69,156,141,142,145,138,69,158,148,154,69,141,148,145,137,69,220,69,139,142,151,138,152,69,148,147,69,151,138,145,138,134,152,138,69,134,145,148,147,140,69,136,134,146,138,151,134}),
+			desc = "Grab → release to yeet · works on players + objects",
 			callback = function(on)
 				S.grabFling = on
 				S.toggles.grabFlingOn = on
 				installGrabWatch()
-				notify(HUB_NAME, "Throw When Let Go " .. (on and "ON" or "OFF"), 1)
+				notify(HUB_NAME, _Vzd({121,141,151,148,156,69,124,141,138,147,69,113,138,153,69,108,148,69}) .. (on and "ON" or "OFF"), 1)
 			end,
 		})
 		makeSlider(sc, {
-			order = n(), title = _Vzd({121,141,151,148,156,69,120,153,151,138,147,140,153,141}), min = 0, max = 500, default = 80, stateKey = "grabFlingPower",
+			order = n(), title = "Throw Strength", min = 0, max = 500, default = 80, stateKey = "grabFlingPower",
 		})
 		makeToggle(sc, {
-			order = n(), id = "grabSpinOn", title = "Spin When Let Go",
-			tip = _Vzd({120,149,142,147,69,156,141,134,153,69,158,148,154,69,151,138,145,138,134,152,138}),
+			order = n(), id = "grabSpinOn", title = _Vzd({120,149,142,147,69,124,141,138,147,69,113,138,153,69,108,148}),
+			tip = "Spin what you release",
 			callback = function(on) S.grabSpin = on; if on then installGrabWatch() end end,
 		})
 		makeToggle(sc, {
-			order = n(), id = _Vzd({152,149,142,147,124,141,142,145,138,109,148,145,137}), title = _Vzd({120,149,142,147,69,124,141,142,145,138,69,109,148,145,137,142,147,140}),
-			tip = _Vzd({120,149,142,147,69,148,135,143,138,136,153,69,156,141,142,145,138,69,158,148,154,69,141,148,145,137,69,142,153}),
+			order = n(), id = "spinWhileHold", title = "Spin While Holding",
+			tip = "Spin object while you hold it",
 			callback = function(on) if on then installGrabWatch() end end,
 		})
 		makeSlider(sc, {
 			order = n(), title = "Spin Speed", min = 1, max = 500, default = 80, stateKey = _Vzd({140,151,134,135,120,149,142,147,120,149,138,138,137}),
 		})
 		makeToggle(sc, {
-			order = n(), id = "grabGravOn", title = "Launch Up When Let Go",
+			order = n(), id = "grabGravOn", title = _Vzd({113,134,154,147,136,141,69,122,149,69,124,141,138,147,69,113,138,153,69,108,148}),
 			tip = _Vzd({120,138,147,137,69,142,153,69,154,149,156,134,151,137,69,148,147,69,151,138,145,138,134,152,138}),
 			callback = function(on) S.grabGravity = on; if on then installGrabWatch() end end,
 		})
 		makeSlider(sc, {
-			order = n(), title = _Vzd({108,151,134,155,142,153,158,69,107,148,151,136,138}), min = 0, max = 20000, default = 5000, step = 100, stateKey = _Vzd({140,151,134,135,108,151,134,155,142,153,158,107,148,151,136,138}),
+			order = n(), title = _Vzd({108,151,134,155,142,153,158,69,107,148,151,136,138}), min = 0, max = 20000, default = 5000, step = 100, stateKey = "grabGravityForce",
 		})
 		makeToggle(sc, {
-			order = n(), id = "grabZeroGOn", title = _Vzd({127,138,151,148,82,108,69,124,141,142,145,138,69,109,148,145,137,142,147,140}),
-			tip = "Float what you hold (BodyForce up)",
+			order = n(), id = "grabZeroGOn", title = "Zero-G While Holding",
+			tip = _Vzd({107,145,148,134,153,69,156,141,134,153,69,158,148,154,69,141,148,145,137,69,77,103,148,137,158,107,148,151,136,138,69,154,149,78}),
 			callback = function(on) S.grabZeroG = on; if on then installGrabWatch() end end,
 		})
 		makeSlider(sc, {
 			order = n(), title = "Zero-G Force", min = 0, max = 100000, default = 50000, step = 1000, stateKey = "grabZeroGForce",
 		})
 		makeToggle(sc, {
-			order = n(), id = _Vzd({140,151,134,135,107,151,138,138,159,138,116,147}), title = _Vzd({107,151,138,138,159,138,69,148,147,69,119,138,145,138,134,152,138}),
+			order = n(), id = "grabFreezeOn", title = _Vzd({107,151,138,138,159,138,69,148,147,69,119,138,145,138,134,152,138}),
 			tip = _Vzd({113,148,136,144,69,151,138,145,138,134,152,138,137,69,149,134,151,153,152,84,149,145,134,158,138,151,152,69,142,147,69,149,145,134,136,138,69,77,103,148,137,158,117,148,152,142,153,142,148,147,78}),
 			callback = function(on) S.grabFreeze = on; if on then installGrabWatch() end end,
 		})
@@ -13035,21 +13184,21 @@ _TAB_BUILDERS["grab"] = function(sc, n)
 			callback = function(on) S.grabFollow = on; if on then installGrabWatch() end end,
 		})
 		makeSlider(sc, {
-			order = n(), title = "Follow Speed", min = 0, max = 100, default = 50, stateKey = "grabFollowSpeed",
+			order = n(), title = _Vzd({107,148,145,145,148,156,69,120,149,138,138,137}), min = 0, max = 100, default = 50, stateKey = "grabFollowSpeed",
 		})
 		makeButton(sc, {
-			order = n(), title = _Vzd({104,145,138,134,151,69,102,145,145,69,108,151,134,135,69,107,148,151,136,138,152}), danger = true,
+			order = n(), title = "Clear All Grab Forces", danger = true,
 			callback = function()
 				for part, _ in pairs(effectParts) do clearPartForces(part) end
 				effectParts = {}
-				notify(HUB_NAME, _Vzd({104,145,138,134,151,138,137,69,139,148,151,136,138,152}), 1.5)
+				notify(HUB_NAME, "Cleared forces", 1.5)
 			end,
 		})
 
-		section(sc, _Vzd({124,109,110,113,106,69,126,116,122,69,109,116,113,105}), n())
+		section(sc, "WHILE YOU HOLD", n())
 		makeToggle(sc, {
-			order = n(), id = "superStr", title = "Super Throw On Release",
-			tip = _Vzd({113,134,154,147,136,141,69,140,151,134,135,135,138,137,69,148,135,143,138,136,153,69,148,147,69,151,138,145,138,134,152,138,69,134,145,148,147,140,69,136,134,146,138,151,134}),
+			order = n(), id = "superStr", title = _Vzd({120,154,149,138,151,69,121,141,151,148,156,69,116,147,69,119,138,145,138,134,152,138}),
+			tip = "Launch grabbed object on release along camera",
 			callback = function(on)
 				S.superStrength = on
 				S.toggles.superStr = on
@@ -13057,11 +13206,11 @@ _TAB_BUILDERS["grab"] = function(sc, n)
 			end,
 		})
 		makeSlider(sc, {
-			order = n(), title = "Super Throw Strength", min = 400, max = 20000, default = 4000, step = 100,
+			order = n(), title = _Vzd({120,154,149,138,151,69,121,141,151,148,156,69,120,153,151,138,147,140,153,141}), min = 400, max = 20000, default = 4000, step = 100,
 			stateKey = "superStrengthPower",
 		})
 		makeToggle(sc, {
-			order = n(), id = _Vzd({146,134,152,152,145,138,152,152,108,151,134,135}), title = _Vzd({114,134,152,152,145,138,152,152,69,108,151,134,135}),
+			order = n(), id = "masslessGrab", title = "Massless Grab",
 			tip = "Massless Grab: max AlignPosition / AlignOrientation force while holding (not scroll distance)",
 			desc = _Vzd({109,148,145,137,69,139,138,138,145,152,69,140,145,154,138,137,69,220,69,137,148,138,152,69,147,148,153,69,136,141,134,147,140,138,69,141,148,156,69,139,134,151,69,158,148,154,69,136,134,147,69,140,151,134,135}),
 			callback = function(on)
@@ -13077,41 +13226,41 @@ _TAB_BUILDERS["grab"] = function(sc, n)
 		})
 		makeToggle(sc, {
 			order = n(), id = "noclipGrab", title = "Hold Through Walls",
-			tip = _Vzd({109,138,145,137,69,146,148,137,138,145,69,104,134,147,104,148,145,145,142,137,138,69,139,134,145,152,138,69,156,141,142,145,138,69,158,148,154,69,141,148,145,137}),
+			tip = "Held model CanCollide false while you hold",
 			callback = function(on) S.noclipGrab = on; S.toggles.noclipGrab = on; if on then installGrabWatch() end end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "killGrab", title = "Kill Who You Hold",
-			tip = "Death Grab: force Dead state on held player",
+			order = n(), id = "killGrab", title = _Vzd({112,142,145,145,69,124,141,148,69,126,148,154,69,109,148,145,137}),
+			tip = _Vzd({105,138,134,153,141,69,108,151,134,135,95,69,139,148,151,136,138,69,105,138,134,137,69,152,153,134,153,138,69,148,147,69,141,138,145,137,69,149,145,134,158,138,151}),
 			callback = function(on) S.killGrab = on; S.toggles.killGrab = on; if on then installGrabWatch() end end,
 		})
 		makeToggle(sc, {
 			order = n(), id = "ragdollGrab", title = "Ragdoll Grab",
-			tip = "Instant ragdoll while holding a player",
+			tip = _Vzd({110,147,152,153,134,147,153,69,151,134,140,137,148,145,145,69,156,141,142,145,138,69,141,148,145,137,142,147,140,69,134,69,149,145,134,158,138,151}),
 			callback = function(on) S.ragdollGrab = on; S.toggles.ragdollGrab = on; if on then installGrabWatch() end end,
 		})
 		makeToggle(sc, {
 			order = n(), id = "poisonGrab", title = "Poison Grab",
-			tip = "PoisonHurtPart on head while holding (map poison)",
+			tip = _Vzd({117,148,142,152,148,147,109,154,151,153,117,134,151,153,69,148,147,69,141,138,134,137,69,156,141,142,145,138,69,141,148,145,137,142,147,140,69,77,146,134,149,69,149,148,142,152,148,147,78}),
 			callback = function(on) S.poisonGrab = on; S.toggles.poisonGrab = on; if on then installGrabWatch() end end,
 		})
 		makeToggle(sc, {
-			order = n(), id = _Vzd({135,154,151,147,108,151,134,135}), title = _Vzd({103,154,151,147,69,108,151,134,135}),
-			tip = _Vzd({104,134,146,149,139,142,151,138,69,139,142,151,138,69,153,148,154,136,141,69,156,141,142,145,138,69,141,148,145,137,142,147,140}),
+			order = n(), id = "burnGrab", title = _Vzd({103,154,151,147,69,108,151,134,135}),
+			tip = "Campfire fire touch while holding",
 			callback = function(on) S.burnGrab = on; S.toggles.burnGrab = on; if on then installGrabWatch() end end,
 		})
 		makeToggle(sc, {
-			order = n(), id = _Vzd({134,147,136,141,148,151,108,151,134,135}), title = _Vzd({107,151,138,138,159,138,69,124,141,134,153,69,126,148,154,69,109,148,145,137}),
+			order = n(), id = "anchorGrab", title = _Vzd({107,151,138,138,159,138,69,124,141,134,153,69,126,148,154,69,109,148,145,137}),
 			tip = "keep held part Anchored while you hold",
 			callback = function(on) S.anchorGrab = on; S.toggles.anchorGrab = on; if on then installGrabWatch() end end,
 		})
 		makeToggle(sc, {
 			order = n(), id = "radioactiveGrab", title = "Radioactive Grab",
-			tip = _Vzd({122,107,116,69,117,134,142,147,153,117,145,134,158,138,151,117,134,151,153,69,82,69,149,134,142,147,153,152,69,153,134,151,140,138,153,69,156,141,142,145,138,69,141,148,145,137,142,147,140,69,77,146,134,149,82,156,142,137,138,78}),
+			tip = "UFO PaintPlayerPart - paints target while holding (map-wide)",
 			callback = function(on) S.radioactiveGrab = on; S.toggles.radioactiveGrab = on; if on then installGrabWatch() end end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "uncollisionGrab", title = "No Collision Hold",
+			order = n(), id = _Vzd({154,147,136,148,145,145,142,152,142,148,147,108,151,134,135}), title = _Vzd({115,148,69,104,148,145,145,142,152,142,148,147,69,109,148,145,137}),
 			tip = _Vzd({147,134,146,138,69,139,148,151,69,115,148,136,145,142,149,69,108,151,134,135}),
 			callback = function(on)
 				S.noclipGrab = on
@@ -13121,32 +13270,32 @@ _TAB_BUILDERS["grab"] = function(sc, n)
 			end,
 		})
 		makeSlider(sc, {
-			order = n(), title = _Vzd({120,153,151,138,147,140,153,141,69,114,154,145,153,142,149,145,142,138,151}), min = 1, max = 10, default = 1, step = 0.5,
-			stateKey = "strengthMult",
+			order = n(), title = "Strength Multiplier", min = 1, max = 10, default = 1, step = 0.5,
+			stateKey = _Vzd({152,153,151,138,147,140,153,141,114,154,145,153}),
 			tip = _Vzd({152,153,151,138,147,140,153,141,69,146,154,145,153,142,149,145,142,138,151,69,139,148,151,69,139,145,142,147,140,69,84,69,152,154,149,138,151,69,152,153,151,138,147,140,153,141,69,84,69,151,138,155,138,147,140,138}),
 		})
-		section(sc, "SILENT AIM (GRAB)", n())
+		section(sc, _Vzd({120,110,113,106,115,121,69,102,110,114,69,77,108,119,102,103,78}), n())
 		makeToggle(sc, {
-			order = n(), id = "palletSilentAim", title = _Vzd({117,134,145,145,138,153,69,120,142,145,138,147,153,69,102,142,146}),
+			order = n(), id = "palletSilentAim", title = "Pallet Silent Aim",
 			tip = "Aim pallet throws at nearest player instead of camera direction",
 			callback = function(on) S.toggles.palletSilentAim = on end,
 		})
 		makeToggle(sc, {
 			order = n(), id = "shurikenSilentAim", title = "Shuriken Silent Aim",
-			tip = "Aim shuriken/kunai throws at nearest player instead of camera direction",
+			tip = _Vzd({102,142,146,69,152,141,154,151,142,144,138,147,84,144,154,147,134,142,69,153,141,151,148,156,152,69,134,153,69,147,138,134,151,138,152,153,69,149,145,134,158,138,151,69,142,147,152,153,138,134,137,69,148,139,69,136,134,146,138,151,134,69,137,142,151,138,136,153,142,148,147}),
 			callback = function(on) S.toggles.shurikenSilentAim = on end,
 		})
 		section(sc, _Vzd({115,106,102,119,103,126,69,120,121,122,107,107}), n())
 		makeToggle(sc, {
-			order = n(), id = "flingObjects", title = "Throw Nearby Objects",
-			tip = _Vzd({120,115,116,69,80,69,139,145,142,147,140,69,147,148,147,82,149,145,134,158,138,151,69,149,134,151,153,152,69,142,147,69,134,154,151,134,69,151,134,147,140,138}),
+			order = n(), id = _Vzd({139,145,142,147,140,116,135,143,138,136,153,152}), title = "Throw Nearby Objects",
+			tip = "SNO + fling non-player parts in aura range",
 			callback = function(on)
 				if on then setMassToggle("flingObj", true, massFlingObjectsLoop) else stopMass("flingObj") end
 			end,
 		})
 		makeButton(sc, {
-			order = n(), title = "Float Nearby Objects (30s)",
-			tip = _Vzd({103,148,137,158,107,148,151,136,138,69,154,149,69,148,147,69,147,138,134,151,135,158,69,148,135,143,138,136,153,152,69,139,148,151,69,88,85,69,152,138,136,148,147,137,152}),
+			order = n(), title = _Vzd({107,145,148,134,153,69,115,138,134,151,135,158,69,116,135,143,138,136,153,152,69,77,88,85,152,78}),
+			tip = "BodyForce up on nearby objects for 30 seconds",
 			callback = function() zeroGNearbyObjects(30) end,
 		})
 		makeButton(sc, {
@@ -13155,11 +13304,11 @@ _TAB_BUILDERS["grab"] = function(sc, n)
 			callback = function() balloonTroll(S.selected) end,
 		})
 		makeButton(sc, {
-			order = n(), title = "Balloon On Everyone",
-			tip = "Throw balloons over every player",
+			order = n(), title = _Vzd({103,134,145,145,148,148,147,69,116,147,69,106,155,138,151,158,148,147,138}),
+			tip = _Vzd({121,141,151,148,156,69,135,134,145,145,148,148,147,152,69,148,155,138,151,69,138,155,138,151,158,69,149,145,134,158,138,151}),
 			callback = function() balloonTroll(nil) end,
 		})
-		makeToggle(sc, { order = n(), id = "autoGrabNearest", title = _Vzd({102,154,153,148,82,108,151,134,135,69,104,145,148,152,138,152,153}), tip = _Vzd({104,151,138,134,153,138,108,151,134,135,113,142,147,138,69,80,69,120,115,116,69,147,138,134,151,138,152,153}), callback = function(on)
+		makeToggle(sc, { order = n(), id = "autoGrabNearest", title = "Auto-Grab Closest", tip = _Vzd({104,151,138,134,153,138,108,151,134,135,113,142,147,138,69,80,69,120,115,116,69,147,138,134,151,138,152,153}), callback = function(on)
 			stopLoop("autoGrab")
 			if on then startLoop("autoGrab", 0.25, function()
 				if not FTAP.CreateGrabLine then return end
@@ -13184,16 +13333,16 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 		S.toggles.antiKick = (getgenv and type(getgenv) == "function" and getgenv().VOIDZ_ANTIKICK and getgenv().VOIDZ_ANTIKICK.enabled) == true
 		makeToggle(sc, {
 			order = n(), id = "antiKick", title = _Vzd({119,138,143,148,142,147,69,110,139,69,112,142,136,144,138,137}),
-			tip = _Vzd({105,138,153,138,136,153,69,144,142,136,144,69,138,134,151,145,158,69,183,69,152,138,145,139,82,144,142,136,144,69,80,69,151,138,143,148,142,147,69,103,106,107,116,119,106,69,140,134,146,138,69,102,104,69,139,142,147,142,152,141,138,152}),
-			desc = _Vzd({104,148,147,152,148,145,138,69,80,69,144,142,136,144,69,122,110,69,80,69,117,145,134,158,138,151,95,112,142,136,144,69,220,69,149,151,138,138,146,149,153,142,155,138,69,151,138,143,148,142,147}),
+			tip = "Detect kick early → self-kick + rejoin BEFORE game AC finishes",
+			desc = "Console + kick UI + Player:Kick · preemptive rejoin",
 			callback = function(on)
 				setAntiKick(on)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "antiGucci", title = "Gucci Anti (Grab Only)",
+			order = n(), id = "antiGucci", title = _Vzd({108,154,136,136,142,69,102,147,153,142,69,77,108,151,134,135,69,116,147,145,158,78}),
 			tip = "Hard anti-grab: IsHeld + PartOwner + GrabParts · Struggle spam · DestroyGrabLine. Does NOT unsit Blobman/train.",
-			desc = _Vzd({116,115,69,183,69,89,85,146,152,69,135,151,138,134,144,69,145,148,148,149,69,220,69,142,147,152,153,134,147,153,69,148,147,69,140,151,134,135,69,220,69,151,138,136,148,146,146,138,147,137,138,137}),
+			desc = "ON → 40ms break loop · instant on grab · recommended",
 			callback = function(on)
 				S.toggles.antiGucci = on
 				S.toggles.antiGrab = on
@@ -13203,11 +13352,11 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 				installAntis()
 				stopLoop("antiGrab")
 				if on then
-					startLoop("antiGrab", 0.05, antiGrabTick)
+					startLoop(_Vzd({134,147,153,142,108,151,134,135}), 0.05, antiGrabTick)
 					gucciBreakGrabNow()
 					if doAntiGrabHard then doAntiGrabHard() end
 					gucciAntiTick()
-					notify(HUB_NAME, "Gucci Anti ON · grab break only (no blob unsit)", 1.8)
+					notify(HUB_NAME, _Vzd({108,154,136,136,142,69,102,147,153,142,69,116,115,69,220,69,140,151,134,135,69,135,151,138,134,144,69,148,147,145,158,69,77,147,148,69,135,145,148,135,69,154,147,152,142,153,78}), 1.8)
 				else
 					local r = hrp()
 					if r then r.Anchored = false end
@@ -13217,7 +13366,7 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 		})
 		makeButton(sc, {
 			order = n(),
-			title = _Vzd({121,138,152,153,69,108,154,136,136,142,69,103,151,138,134,144,69,115,148,156}),
+			title = "Test Gucci Break Now",
 			tip = _Vzd({107,148,151,136,138,69,148,147,138,69,139,154,145,145,69,134,147,153,142,82,140,151,134,135,69,135,154,151,152,153,69,77,120,153,151,154,140,140,145,138,69,80,69,105,138,152,153,151,148,158,108,151,134,135,113,142,147,138,78}),
 			callback = function()
 				installAntis()
@@ -13228,7 +13377,7 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "antiTrain", title = _Vzd({102,147,153,142,69,121,151,134,142,147,69,84,69,103,145,148,135,146,134,147,69,120,138,134,153}),
+			order = n(), id = "antiTrain", title = "Anti Train / Blobman Seat",
 			tip = _Vzd({107,148,151,136,138,69,154,147,152,142,153,69,142,139,69,152,148,146,138,148,147,138,69,152,153,142,136,144,152,69,158,148,154,69,148,147,69,134,69,153,151,134,142,147,69,148,151,69,135,145,148,135,69,152,138,134,153}),
 			callback = function(on)
 				S.toggles.antiBlobman = on
@@ -13237,7 +13386,7 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "antiGrab", title = "Stop Being Grabbed",
+			order = n(), id = "antiGrab", title = _Vzd({120,153,148,149,69,103,138,142,147,140,69,108,151,134,135,135,138,137}),
 			tip = _Vzd({120,153,151,154,140,140,145,138,69,80,69,137,138,152,153,151,148,158,69,108,151,134,135,117,134,151,153,152,69,80,69,110,152,109,138,145,137,69,135,151,138,134,144}),
 			callback = function(on)
 				S.antiWanted = S.antiWanted or {}
@@ -13257,7 +13406,7 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = _Vzd({134,154,153,148,104,148,154,147,153,138,151}), title = "Auto Attacker",
+			order = n(), id = "autoCounter", title = _Vzd({102,154,153,148,69,102,153,153,134,136,144,138,151}),
 			tip = "When someone grabs you or you're low HP: instantly attack them (mode below)",
 			callback = function(on)
 				S.autoCounter = on
@@ -13267,8 +13416,8 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 				S.antiWanted = S.antiWanted or {}
 				if on then
 					installAntis()
-					stopLoop("autoFling")
-					startLoop("autoFling", 0.08, function()
+					stopLoop(_Vzd({134,154,153,148,107,145,142,147,140}))
+					startLoop(_Vzd({134,154,153,148,107,145,142,147,140}), 0.08, function()
 						if not S.autoCounter then return end
 						if not isLocalVictimGrabbed() then return end
 						local c = char()
@@ -13278,7 +13427,7 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 								local po = bp:FindFirstChild("PartOwner")
 								if po then
 									local val = po.Value
-									local grabberName = (typeof(val) == _Vzd({110,147,152,153,134,147,136,138}) and val:IsA("Player")) and val.Name or tostring(val or "")
+									local grabberName = (typeof(val) == "Instance" and val:IsA("Player")) and val.Name or tostring(val or "")
 									if grabberName ~= "" and grabberName ~= LP.Name then
 										local grabberPlr = Players:FindFirstChild(grabberName)
 										if grabberPlr and validP(grabberPlr) then
@@ -13294,7 +13443,7 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 								for _, d in ipairs(child:GetDescendants()) do
 									if d:IsA("WeldConstraint") or d:IsA("Weld") then
 										for _, side in ipairs({ d.Part0, d.Part1 }) do
-											if side and side:IsA("BasePart") and not side:IsDescendantOf(c) then
+											if side and side:IsA(_Vzd({103,134,152,138,117,134,151,153})) and not side:IsDescendantOf(c) then
 												local m = side:FindFirstAncestorOfClass("Model")
 												local plr = m and Players:GetPlayerFromCharacter(m)
 												if plr and plr ~= LP and validP(plr) then
@@ -13321,21 +13470,21 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 			default = S.counterMode or "Repulsion",
 			callback = function(v)
 				S.counterMode = v
-				notify(HUB_NAME, _Vzd({107,145,142,147,140,69,183,69}) .. v, 1.2)
+				notify(HUB_NAME, "Fling → " .. v, 1.2)
 			end,
 		})
 		makeSlider(sc, {
-			order = n(), title = "Attack Force", min = 2000, max = 30000, default = 12000, step = 500,
+			order = n(), title = _Vzd({102,153,153,134,136,144,69,107,148,151,136,138}), min = 2000, max = 30000, default = 12000, step = 500,
 			stateKey = "revengeForce",
 			tip = "Force multiplier for auto attacker",
 		})
-		makeToggle(sc, { order = n(), id = "antiFling", title = "Anti-Fling", tip = _Vzd({127,138,151,148,69,138,157,153,151,138,146,138,69,155,138,145,148,136,142,153,158}), callback = function(on)
-			stopLoop(_Vzd({134,147,153,142,107,145,142,147,140}))
-			if on then startLoop(_Vzd({134,147,153,142,107,145,142,147,140}), 0.12, antiFlingTick) end
+		makeToggle(sc, { order = n(), id = "antiFling", title = _Vzd({102,147,153,142,82,107,145,142,147,140}), tip = _Vzd({127,138,151,148,69,138,157,153,151,138,146,138,69,155,138,145,148,136,142,153,158}), callback = function(on)
+			stopLoop("antiFling")
+			if on then startLoop("antiFling", 0.12, antiFlingTick) end
 		end })
 		makeToggle(sc, {
 			order = n(), id = "antiBurn", title = "Anti-Burn / Fire",
-			tip = _Vzd({106,157,153,142,147,140,154,142,152,141,69,139,142,151,138,69,134,152,69,152,148,148,147,69,134,152,69,142,153,69,134,149,149,145,142,138,152}),
+			tip = "Extinguish fire as soon as it applies",
 			callback = function(on)
 				S.toggles.antiBurn = on
 				stopLoop("antiBurn")
@@ -13345,22 +13494,22 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 		})
 		makeToggle(sc, {
 			order = n(), id = "antiPaint", title = "Anti-Paint",
-			tip = "Strip paint/spray effects",
+			tip = _Vzd({120,153,151,142,149,69,149,134,142,147,153,84,152,149,151,134,158,69,138,139,139,138,136,153,152}),
 			callback = function(on)
 				S.toggles.antiPaint = on
 				stopLoop("antiPaint")
-				if on then startLoop("antiPaint", 0.15, antiPaintTick) end
+				if on then startLoop(_Vzd({134,147,153,142,117,134,142,147,153}), 0.15, antiPaintTick) end
 			end,
 		})
-		makeToggle(sc, { order = n(), id = _Vzd({134,147,153,142,103,134,147,134,147,134}), title = _Vzd({102,147,153,142,82,103,134,147,134,147,134,69,84,69,120,145,142,149}), tip = "Remove banana/slip + unsit", callback = function(on)
-			stopLoop("antiBanana")
+		makeToggle(sc, { order = n(), id = _Vzd({134,147,153,142,103,134,147,134,147,134}), title = "Anti-Banana / Slip", tip = "Remove banana/slip + unsit", callback = function(on)
+			stopLoop(_Vzd({134,147,153,142,103,134,147,134,147,134}))
 			if on then startLoop("antiBanana", 0.15, antiBananaTick) end
 		end })
-		makeToggle(sc, { order = n(), id = "antiVoid", title = _Vzd({102,147,153,142,82,123,148,142,137}), tip = "Rescue if you fall too low", callback = function(on)
-			stopLoop(_Vzd({134,147,153,142,123,148,142,137}))
+		makeToggle(sc, { order = n(), id = "antiVoid", title = "Anti-Void", tip = _Vzd({119,138,152,136,154,138,69,142,139,69,158,148,154,69,139,134,145,145,69,153,148,148,69,145,148,156}), callback = function(on)
+			stopLoop("antiVoid")
 			if on then
 				pcall(function() workspace.FallenPartsDestroyHeight = -50000 end)
-				startLoop(_Vzd({134,147,153,142,123,148,142,137}), 0.15, antiVoidTick)
+				startLoop("antiVoid", 0.15, antiVoidTick)
 			else
 				pcall(function() workspace.FallenPartsDestroyHeight = -500 end)
 			end
@@ -13372,12 +13521,12 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 				S.toggles.antiExplode = on
 				stopLoop("antiExplode")
 				installAntis()
-				if on then startLoop(_Vzd({134,147,153,142,106,157,149,145,148,137,138}), 0.15, antiFlingTick) end
+				if on then startLoop("antiExplode", 0.15, antiFlingTick) end
 			end,
 		})
 		makeToggle(sc, {
 			order = n(), id = "antiSticky", title = "Anti-Sticky",
-			tip = _Vzd({114,134,152,152,145,138,152,152,98,139,134,145,152,138,69,80,69,135,151,138,134,144,69,120,153,142,136,144,158,124,138,145,137,152,69,80,69,152,153,142,136,144,158,69,151,138,146,148,155,138,151,69,153,148,154,136,141}),
+			tip = "Massless=false + break StickyWelds + sticky remover touch",
 			callback = function(on)
 				S.toggles.antiSticky = on
 				stopLoop("antiSticky")
@@ -13385,12 +13534,12 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "antiBlobman", title = _Vzd({102,147,153,142,69,103,145,148,135,146,134,147,69,84,69,121,151,134,142,147}),
+			order = n(), id = "antiBlobman", title = "Anti Blobman / Train",
 			tip = "Force unsit blob/train seats near you",
 			callback = function(on)
 				S.toggles.antiBlobman = on
 				stopLoop("antiBlob")
-				if on then startLoop("antiBlob", 0.15, antiBlobmanTick) end
+				if on then startLoop(_Vzd({134,147,153,142,103,145,148,135}), 0.15, antiBlobmanTick) end
 			end,
 		})
 		makeToggle(sc, {
@@ -13399,11 +13548,11 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 			callback = function(on) setAntiLag(on) end,
 		})
 		makeToggle(sc, { order = n(), id = "antiSit", title = _Vzd({102,147,153,142,82,120,142,153,69,84,69,120,138,134,153,69,121,151,134,149}), tip = _Vzd({107,148,151,136,138,69,154,147,152,142,153}), callback = function(on)
-			stopLoop("antiSit")
+			stopLoop(_Vzd({134,147,153,142,120,142,153}))
 			if on then startLoop("antiSit", 0.1, function() local h=hum(); if h then h.Sit=false end end) end
 		end })
 		makeToggle(sc, { order = n(), id = "antiRagdoll", title = "Anti-Ragdoll", tip = "Disable ragdoll states", callback = function(on)
-			stopLoop("antiRag")
+			stopLoop(_Vzd({134,147,153,142,119,134,140}))
 			if on then startLoop("antiRag", 0.1, function()
 				local h = hum(); if not h then return end
 				h:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
@@ -13411,7 +13560,7 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 				h.PlatformStand = false
 			end) end
 		end })
-		makeToggle(sc, { order = n(), id = "god", title = _Vzd({104,145,142,138,147,153,69,108,148,137,69,109,138,134,145}), tip = "Keep health max", callback = function(on)
+		makeToggle(sc, { order = n(), id = "god", title = _Vzd({104,145,142,138,147,153,69,108,148,137,69,109,138,134,145}), tip = _Vzd({112,138,138,149,69,141,138,134,145,153,141,69,146,134,157}), callback = function(on)
 			stopLoop("god")
 			if on then startLoop("god", 0.15, function() local h=hum(); if h then h.Health=h.MaxHealth end end) end
 		end })
@@ -13423,15 +13572,15 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 			callback = function(on)
 				plotBypass = on
 				S.toggles.plotBypass = on
-				notify(HUB_NAME, "House bypass " .. (on and "ON" or "OFF"), 1.2)
+				notify(HUB_NAME, _Vzd({109,148,154,152,138,69,135,158,149,134,152,152,69}) .. (on and "ON" or "OFF"), 1.2)
 			end,
 		})
 end
 _TAB_BUILDERS["player"] = function(sc, n)
-		section(sc, _Vzd({104,109,102,119,102,104,121,106,119,69,114,116,105,120}), n())
+		section(sc, "CHARACTER MODS", n())
 		makeToggle(sc, {
-			order = n(), id = "infjump", title = _Vzd({110,147,139,142,147,142,153,138,69,111,154,146,149}),
-			tip = _Vzd({111,154,146,149,119,138,150,154,138,152,153,69,183,69,139,148,151,136,138,69,143,154,146,149,69,138,155,138,151,158,69,153,142,146,138,69,77,141,148,145,137,69,152,149,134,136,138,69,153,148,69,139,145,158,78}),
+			order = n(), id = "infjump", title = "Infinite Jump",
+			tip = "JumpRequest → force jump every time (hold space to fly)",
 			callback = function(on)
 				S.toggles.infjump = on
 				if S.conns.infJump then pcall(function() S.conns.infJump:Disconnect() end) S.conns.infJump = nil end
@@ -13455,12 +13604,12 @@ _TAB_BUILDERS["player"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "autoHeal", title = _Vzd({102,154,153,148,69,109,138,134,145}),
-			tip = "Gradually heals when below 50% health",
+			order = n(), id = _Vzd({134,154,153,148,109,138,134,145}), title = "Auto Heal",
+			tip = _Vzd({108,151,134,137,154,134,145,145,158,69,141,138,134,145,152,69,156,141,138,147,69,135,138,145,148,156,69,90,85,74,69,141,138,134,145,153,141}),
 			callback = function(on)
 				S.toggles.autoHeal = on
 				stopLoop("autoHeal")
-				if on then startLoop("autoHeal", 0.25, function()
+				if on then startLoop(_Vzd({134,154,153,148,109,138,134,145}), 0.25, function()
 					local h = hum()
 					if h and h.Health < h.MaxHealth * 0.5 then
 						h.Health = math.min(h.Health + h.MaxHealth * 0.08, h.MaxHealth)
@@ -13470,7 +13619,7 @@ _TAB_BUILDERS["player"] = function(sc, n)
 		})
 		makeToggle(sc, {
 			order = n(), id = "noclip", title = "Noclip",
-			tip = "CanCollide false on all body parts",
+			tip = _Vzd({104,134,147,104,148,145,145,142,137,138,69,139,134,145,152,138,69,148,147,69,134,145,145,69,135,148,137,158,69,149,134,151,153,152}),
 			callback = function(on)
 				S.toggles.noclip = on
 				stopLoop("noclip")
@@ -13496,8 +13645,8 @@ _TAB_BUILDERS["player"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = _Vzd({153,142,147,158,109,138,134,137}), title = "Tiny Head",
-			tip = _Vzd({120,136,134,145,138,69,141,138,134,137,69,153,148,69,85,83,88,157,69,152,142,159,138}),
+			order = n(), id = "tinyHead", title = _Vzd({121,142,147,158,69,109,138,134,137}),
+			tip = "Scale head to 0.3x size",
 			callback = function(on)
 				local h = char() and char():FindFirstChild("Head")
 				if h then
@@ -13508,7 +13657,7 @@ _TAB_BUILDERS["player"] = function(sc, n)
 		})
 		makeToggle(sc, {
 			order = n(), id = "bigTorso", title = "Big Torso",
-			tip = _Vzd({120,136,134,145,138,69,153,148,151,152,148,69,153,148,69,87,157,69,152,142,159,138}),
+			tip = "Scale torso to 2x size",
 			callback = function(on)
 				local c = char()
 				if c then
@@ -13524,7 +13673,7 @@ _TAB_BUILDERS["player"] = function(sc, n)
 		})
 		makeToggle(sc, {
 			order = n(), id = "playerSpin", title = _Vzd({120,149,142,147,69,120,138,145,139}),
-			tip = "Spin your character fast",
+			tip = _Vzd({120,149,142,147,69,158,148,154,151,69,136,141,134,151,134,136,153,138,151,69,139,134,152,153}),
 			callback = function(on)
 				S.toggles.playerSpin = on
 				stopLoop("playerSpin")
@@ -13540,7 +13689,7 @@ _TAB_BUILDERS["player"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "playerFloat", title = _Vzd({107,145,148,134,153,69,84,69,109,148,155,138,151}),
+			order = n(), id = "playerFloat", title = "Float / Hover",
 			tip = _Vzd({103,148,137,158,117,148,152,142,153,142,148,147,69,141,148,155,138,151,69,134,135,148,155,138,69,140,151,148,154,147,137}),
 			callback = function(on)
 				local r = hrp()
@@ -13562,12 +13711,12 @@ _TAB_BUILDERS["player"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "antiDrown", title = "Anti-Drown",
+			order = n(), id = "antiDrown", title = _Vzd({102,147,153,142,82,105,151,148,156,147}),
 			tip = _Vzd({105,138,153,138,136,153,69,156,134,153,138,151,69,134,147,137,69,121,117,69,153,148,69,147,138,134,151,138,152,153,69,141,148,154,152,138,84,145,134,147,137}),
 			callback = function(on)
 				S.toggles.antiDrown = on
-				stopLoop("antiDrown")
-				if on then startLoop(_Vzd({134,147,153,142,105,151,148,156,147}), 0.12, function()
+				stopLoop(_Vzd({134,147,153,142,105,151,148,156,147}))
+				if on then startLoop("antiDrown", 0.12, function()
 					local h = hum(); if not h then return end
 					local r = hrp(); if not r then return end
 					local inWater = false
@@ -13589,7 +13738,7 @@ _TAB_BUILDERS["player"] = function(sc, n)
 				end) end
 			end,
 		})
-		section(sc, _Vzd({114,116,123,106,114,106,115,121,69,117,116,124,106,119,120}), n())
+		section(sc, "MOVEMENT POWERS", n())
 		makeToggle(sc, {
 			order = n(), id = "highJump", title = "Super Jump",
 			tip = _Vzd({111,154,146,149,117,148,156,138,151,69,148,155,138,151,151,142,137,138,69,77,152,153,134,136,144,152,69,156,142,153,141,69,142,147,139,69,143,154,146,149,78}),
@@ -13621,7 +13770,7 @@ _TAB_BUILDERS["player"] = function(sc, n)
 		})
 		makeSlider(sc, { order = n(), title = "Speed", min = 16, max = 300, default = 100, stateKey = "superSpeedPower" })
 		makeButton(sc, {
-			order = n(), title = _Vzd({119,138,152,138,153,69,117,145,134,158,138,151}),
+			order = n(), title = "Reset Player",
 			tip = "Restore everything to default",
 			callback = function()
 				S.toggles.infjump = false
@@ -13636,7 +13785,7 @@ _TAB_BUILDERS["player"] = function(sc, n)
 				S.toggles.superSpeed = false
 				S.toggles.noclip = false
 				if S.conns.infJump then pcall(function() S.conns.infJump:Disconnect() end) S.conns.infJump = nil end
-				for _, id in ipairs({"god","autoHeal","playerSpin","antiDrown","highJump",_Vzd({152,154,149,138,151,120,149,138,138,137}),"noclip"}) do stopLoop(id) end
+				for _, id in ipairs({"god","autoHeal","playerSpin","antiDrown","highJump","superSpeed","noclip"}) do stopLoop(id) end
 				local h = hum()
 				if h then
 					h.WalkSpeed = 16
@@ -13662,8 +13811,8 @@ _TAB_BUILDERS["player"] = function(sc, n)
 		})
 end
 _TAB_BUILDERS["loop"] = function(sc, n)
-		section(sc, "PICK WHO · LOOP TARGET", n())
-		makeInput(sc, { order = n(), id = "playerSearch", placeholder = _Vzd({120,138,134,151,136,141,69,137,142,152,149,145,134,158,69,148,151,69,101,154,152,138,151,147,134,146,138,83,83,83}) })
+		section(sc, _Vzd({117,110,104,112,69,124,109,116,69,220,69,113,116,116,117,69,121,102,119,108,106,121}), n())
+		makeInput(sc, { order = n(), id = "playerSearch", placeholder = "Search display or @username..." })
 		local listBox = Instance.new("Frame")
 		listBox.LayoutOrder = n()
 		listBox.Size = UDim2.new(1, -6, 0, 160)
@@ -13680,7 +13829,7 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 		listSc.AutomaticCanvasSize = Enum.AutomaticSize.Y
 		listSc.CanvasSize = UDim2.new()
 		listSc.Parent = listBox
-		local listLay = Instance.new("UIListLayout")
+		local listLay = Instance.new(_Vzd({122,110,113,142,152,153,113,134,158,148,154,153}))
 		listLay.Padding = UDim.new(0, 3)
 		listLay.Parent = listSc
 		pad(listSc, 4, 4, 4, 4)
@@ -13738,12 +13887,12 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 		S.playerDropdowns.playersRefresh = refreshPlayerList
 		S._loopSearchRefresh = refreshPlayerList
 
-		section(sc, _Vzd({105,116,69,121,116,69,121,109,106,114}), n())
+		section(sc, "DO TO THEM", n())
 		makeDropdown(sc, {
 			order = n(), title = _Vzd({112,142,136,144,69,121,158,149,138}), options = KICK_TYPES, default = S.kickType or _Vzd({120,144,158,69,102,147,136,141,148,151}),
-			callback = function(v) S.kickType = v; notify(HUB_NAME, _Vzd({112,142,136,144,69,153,158,149,138,69,183,69}) .. v, 1) end,
+			callback = function(v) S.kickType = v; notify(HUB_NAME, "Kick type → " .. v, 1) end,
 		})
-		makeButton(sc, { order = n(), title = _Vzd({107,145,142,147,140,69,120,138,145,138,136,153,138,137}), danger = true, tip = "SNO + velocity fling", callback = function()
+		makeButton(sc, { order = n(), title = "Fling Selected", danger = true, tip = _Vzd({120,115,116,69,80,69,155,138,145,148,136,142,153,158,69,139,145,142,147,140}), callback = function()
 			local targets = getLoopTargets()
 			if #targets == 0 then notify(HUB_NAME, _Vzd({117,142,136,144,69,134,69,149,145,134,158,138,151,69,139,142,151,152,153}), 1.2) return end
 			for _, p in ipairs(targets) do
@@ -13753,7 +13902,7 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 				end)
 			end
 		end })
-		makeButton(sc, { order = n(), title = "Kick Selected", danger = true, tip = _Vzd({122,152,138,152,69,144,142,136,144,69,153,158,149,138,69,134,135,148,155,138}), callback = function()
+		makeButton(sc, { order = n(), title = "Kick Selected", danger = true, tip = "Uses kick type above", callback = function()
 			local targets = getLoopTargets()
 			if #targets == 0 then notify(HUB_NAME, "Pick a player first", 1.2) return end
 			for _, p in ipairs(targets) do
@@ -13763,7 +13912,7 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 				end)
 			end
 		end })
-		makeButton(sc, { order = n(), title = _Vzd({112,142,145,145,69,120,138,145,138,136,153,138,137}), danger = true, tip = _Vzd({120,144,158,69,80,69,137,138,134,153,141,69,152,153,134,153,138}), callback = function()
+		makeButton(sc, { order = n(), title = _Vzd({112,142,145,145,69,120,138,145,138,136,153,138,137}), danger = true, tip = "Sky + death state", callback = function()
 			local targets = getLoopTargets()
 			if #targets == 0 then notify(HUB_NAME, _Vzd({117,142,136,144,69,134,69,149,145,134,158,138,151,69,139,142,151,152,153}), 1.2) return end
 			for _, p in ipairs(targets) do
@@ -13773,9 +13922,9 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 				end)
 			end
 		end })
-		makeButton(sc, { order = n(), title = "Bring Selected", tip = "TP grab pull to you", callback = function()
+		makeButton(sc, { order = n(), title = "Bring Selected", tip = _Vzd({121,117,69,140,151,134,135,69,149,154,145,145,69,153,148,69,158,148,154}), callback = function()
 			local targets = getLoopTargets()
-			if #targets == 0 then notify(HUB_NAME, _Vzd({117,142,136,144,69,134,69,149,145,134,158,138,151,69,139,142,151,152,153}), 1.2) return end
+			if #targets == 0 then notify(HUB_NAME, "Pick a player first", 1.2) return end
 			for _, p in ipairs(targets) do
 				task.spawn(function()
 					local ok, err = pcall(bringPlayer, p, nil, false)
@@ -13804,7 +13953,7 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 			local cam, h = workspace.CurrentCamera, hum()
 			if cam and h then cam.CameraSubject = h; notify(HUB_NAME, "Unspectate", 1) end
 		end })
-		makeToggle(sc, { order = n(), id = "wlFriends", title = _Vzd({124,141,142,153,138,145,142,152,153,69,107,151,142,138,147,137,152}), tip = _Vzd({120,144,142,149,69,139,151,142,138,147,137,152,69,142,147,69,134,154,151,134,152,84,146,134,152,152}), callback = function(on)
+		makeToggle(sc, { order = n(), id = _Vzd({156,145,107,151,142,138,147,137,152}), title = _Vzd({124,141,142,153,138,145,142,152,153,69,107,151,142,138,147,137,152}), tip = _Vzd({120,144,142,149,69,139,151,142,138,147,137,152,69,142,147,69,134,154,151,134,152,84,146,134,152,152}), callback = function(on)
 			notify(HUB_NAME, _Vzd({124,113,69,139,151,142,138,147,137,152,69}) .. (on and "ON" or "OFF"), 1)
 		end })
 		makeButton(sc, { order = n(), title = "Whitelist Selected", callback = function()
@@ -13813,9 +13962,9 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 		makeButton(sc, { order = n(), title = _Vzd({122,147,156,141,142,153,138,145,142,152,153,69,120,138,145,138,136,153,138,137}), callback = function()
 			if S.selected then S.whitelist[S.selected.Name] = nil; notify(HUB_NAME, "Un-WL", 1); if S._wlRefresh then pcall(S._wlRefresh) end end
 		end })
-		makeToggle(sc, { order = n(), id = "stalk", title = "Stalk Teleport", tip = "Loop TP behind selected", callback = function(on)
+		makeToggle(sc, { order = n(), id = "stalk", title = _Vzd({120,153,134,145,144,69,121,138,145,138,149,148,151,153}), tip = "Loop TP behind selected", callback = function(on)
 			stopLoop(_Vzd({152,153,134,145,144}))
-			notify(HUB_NAME, "Stalk " .. (on and "ON" or "OFF"), 1)
+			notify(HUB_NAME, _Vzd({120,153,134,145,144,69}) .. (on and "ON" or "OFF"), 1)
 			if on then startLoop("stalk", 0.2, function()
 				local me, r = hrp(), S.selected and rootOf(S.selected)
 				if me and r then me.CFrame = r.CFrame * CFrame.new(0, 0, 4) end
@@ -13824,12 +13973,12 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 
 		section(sc, _Vzd({113,116,116,117,69,102,104,121,110,116,115,120}), n())
 		local loops = {
-			{ id = _Vzd({145,148,148,149,107,145,142,147,140}), title = "Keep Throwing", tip = _Vzd({102,147,147,148,158,142,147,140,69,136,148,147,152,153,134,147,153,69,139,145,142,147,140,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p)
+			{ id = "loopFling", title = _Vzd({112,138,138,149,69,121,141,151,148,156,142,147,140}), tip = _Vzd({102,147,147,148,158,142,147,140,69,136,148,147,152,153,134,147,153,69,139,145,142,147,140,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p)
 				local r = rootOf(p); if not r then return end
 				clearTargetMovers(p.Character)
 				applyVel(r, S.flingPower or 600, 0.3)
 			end },
-			{ id = _Vzd({145,148,148,149,112,142,136,144}), title = "Keep Kicking", tip = "Kick · map-wide", waitRespawn = true, fn = function(p) kickPlayer(p, S.kickType, true) end },
+			{ id = "loopKick", title = "Keep Kicking", tip = "Kick · map-wide", waitRespawn = true, fn = function(p) kickPlayer(p, S.kickType, true) end },
 			{ id = "loopKill", title = _Vzd({112,138,138,149,69,112,142,145,145,142,147,140}), tip = "Instant kill · map-wide", waitRespawn = true, fn = function(p)
 				local r = rootOf(p); if not r then return end
 				local h = p.Character and p.Character:FindFirstChildOfClass("Humanoid")
@@ -13844,39 +13993,39 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 					skyVel(r)
 				end)
 			end },
-			{ id = "loopRagdoll", title = "Keep Ragdolling", tip = _Vzd({120,149,134,146,69,151,134,140,137,148,145,145,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p) ragdoll(p, true) end },
-			{ id = "loopBring", title = "Keep Bringing", tip = _Vzd({103,151,142,147,140,69,153,148,69,158,148,154,69,220,69,146,134,149,82,156,142,137,138}), fn = function(p) bringPlayer(p, nil, true) end },
-			{ id = "loopTp", title = "Loop Teleport To", tip = _Vzd({120,153,134,158,69,148,147,69,153,141,138,146}), fn = function(p) local me,r=hrp(),rootOf(p); if me and r then me.CFrame=r.CFrame+Vector3.new(0,3,0) end end },
-			{ id = "loopSky", title = _Vzd({113,148,148,149,69,120,144,158,69,113,134,154,147,136,141}), tip = "Sky launch · map-wide", waitRespawn = true, fn = function(p) kickPlayer(p, "Sky", true) end },
-			{ id = "loopVoid", title = _Vzd({113,148,148,149,69,123,148,142,137}), tip = _Vzd({123,148,142,137,69,152,145,134,146,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p) voidPlayer(p, true) end },
-			{ id = "loopSpin", title = _Vzd({113,148,148,149,69,120,149,142,147}), tip = "Spin them · map-wide", waitRespawn = true, fn = function(p) local r=rootOf(p); if r then snoPlayer(p); r.AssemblyAngularVelocity=Vector3.new(0,120,0) end end },
-			{ id = "loopSNO", title = _Vzd({113,148,148,149,69,115,138,153,156,148,151,144,69,116,156,147}), tip = _Vzd({120,115,116,69,152,149,134,146,69,220,69,146,134,149,82,156,142,137,138}), fn = function(p) snoPlayer(p) end },
+			{ id = "loopRagdoll", title = _Vzd({112,138,138,149,69,119,134,140,137,148,145,145,142,147,140}), tip = _Vzd({120,149,134,146,69,151,134,140,137,148,145,145,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p) ragdoll(p, true) end },
+			{ id = _Vzd({145,148,148,149,103,151,142,147,140}), title = "Keep Bringing", tip = _Vzd({103,151,142,147,140,69,153,148,69,158,148,154,69,220,69,146,134,149,82,156,142,137,138}), fn = function(p) bringPlayer(p, nil, true) end },
+			{ id = "loopTp", title = _Vzd({113,148,148,149,69,121,138,145,138,149,148,151,153,69,121,148}), tip = "Stay on them", fn = function(p) local me,r=hrp(),rootOf(p); if me and r then me.CFrame=r.CFrame+Vector3.new(0,3,0) end end },
+			{ id = "loopSky", title = "Loop Sky Launch", tip = "Sky launch · map-wide", waitRespawn = true, fn = function(p) kickPlayer(p, "Sky", true) end },
+			{ id = "loopVoid", title = "Loop Void", tip = "Void slam · map-wide", waitRespawn = true, fn = function(p) voidPlayer(p, true) end },
+			{ id = "loopSpin", title = "Loop Spin", tip = _Vzd({120,149,142,147,69,153,141,138,146,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p) local r=rootOf(p); if r then snoPlayer(p); r.AssemblyAngularVelocity=Vector3.new(0,120,0) end end },
+			{ id = "loopSNO", title = "Loop Network Own", tip = _Vzd({120,115,116,69,152,149,134,146,69,220,69,146,134,149,82,156,142,137,138}), fn = function(p) snoPlayer(p) end },
 			{ id = "loopGrab", title = _Vzd({113,148,148,149,69,108,151,134,135,69,113,142,147,138}), tip = "CreateGrabLine spam · map-wide", fn = function(p) if FTAP.CreateGrabLine then local t=rootOf(p); pcall(function() FTAP.CreateGrabLine:FireServer(t,t.CFrame) end) end end },
-			{ id = "loopHardFling", title = "Loop Hard Fling", tip = _Vzd({114,134,157,69,139,145,142,147,140,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p)
+			{ id = "loopHardFling", title = _Vzd({113,148,148,149,69,109,134,151,137,69,107,145,142,147,140}), tip = _Vzd({114,134,157,69,139,145,142,147,140,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p)
 				local r = rootOf(p); if not r then return end
 				clearTargetMovers(p.Character)
 				applyVel(r, 20000, 0.1)
 			end },
-			{ id = _Vzd({145,148,148,149,103,145,148,135,112,142,136,144}), title = "Loop Blobman Kick", tip = _Vzd({103,145,148,135,69,144,142,136,144,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p) kickPlayer(p, "Blobman", true) end },
-			{ id = "loopGrabKick", title = _Vzd({113,148,148,149,69,108,151,134,135,69,112,142,136,144}), tip = "Grab kick · map-wide", waitRespawn = true, fn = function(p) kickPlayer(p, _Vzd({108,151,134,135,112,142,136,144}), true) end },
+			{ id = "loopBlobKick", title = "Loop Blobman Kick", tip = _Vzd({103,145,148,135,69,144,142,136,144,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p) kickPlayer(p, "Blobman", true) end },
+			{ id = "loopGrabKick", title = "Loop Grab Kick", tip = _Vzd({108,151,134,135,69,144,142,136,144,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p) kickPlayer(p, "GrabKick", true) end },
 			{ id = "loopStackKick", title = "Loop Stack Kick", tip = "Stack kick · map-wide", waitRespawn = true, fn = function(p) kickPlayer(p, "StackKick", true) end },
-			{ id = "loopSilentKick", title = _Vzd({113,148,148,149,69,120,142,145,138,147,153,69,112,142,136,144}), tip = "Silent kick · map-wide", waitRespawn = true, fn = function(p) kickPlayer(p, "Silent", true) end },
-			{ id = "loopFire", title = _Vzd({113,148,148,149,69,107,142,151,138}), tip = _Vzd({103,154,151,147,69,153,141,138,146,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p) firePlayerBlitz(p) end },
-			{ id = _Vzd({145,148,148,149,117,148,142,152,148,147}), title = "Loop Poison", tip = _Vzd({117,148,142,152,148,147,69,220,69,146,134,149,82,156,142,137,138}), fn = function(p) applyStatusToPlayer("poison", p) end },
-			{ id = "loopBanana", title = "Loop Banana", tip = _Vzd({120,145,142,149,69,220,69,146,134,149,82,156,142,137,138}), fn = function(p) applyStatusToPlayer("banana", p) end },
-			{ id = "loopPaint", title = _Vzd({113,148,148,149,69,117,134,142,147,153}), tip = "Paint · map-wide", fn = function(p) applyStatusToPlayer("paint", p) end },
-			{ id = "loopBringFling", title = "Loop Bring+Fling", tip = _Vzd({103,151,142,147,140,69,153,141,138,147,69,139,145,142,147,140,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p)
+			{ id = _Vzd({145,148,148,149,120,142,145,138,147,153,112,142,136,144}), title = _Vzd({113,148,148,149,69,120,142,145,138,147,153,69,112,142,136,144}), tip = "Silent kick · map-wide", waitRespawn = true, fn = function(p) kickPlayer(p, "Silent", true) end },
+			{ id = "loopFire", title = "Loop Fire", tip = _Vzd({103,154,151,147,69,153,141,138,146,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p) firePlayerBlitz(p) end },
+			{ id = "loopPoison", title = _Vzd({113,148,148,149,69,117,148,142,152,148,147}), tip = _Vzd({117,148,142,152,148,147,69,220,69,146,134,149,82,156,142,137,138}), fn = function(p) applyStatusToPlayer(_Vzd({149,148,142,152,148,147}), p) end },
+			{ id = "loopBanana", title = _Vzd({113,148,148,149,69,103,134,147,134,147,134}), tip = _Vzd({120,145,142,149,69,220,69,146,134,149,82,156,142,137,138}), fn = function(p) applyStatusToPlayer("banana", p) end },
+			{ id = _Vzd({145,148,148,149,117,134,142,147,153}), title = "Loop Paint", tip = "Paint · map-wide", fn = function(p) applyStatusToPlayer("paint", p) end },
+			{ id = _Vzd({145,148,148,149,103,151,142,147,140,107,145,142,147,140}), title = _Vzd({113,148,148,149,69,103,151,142,147,140,80,107,145,142,147,140}), tip = _Vzd({103,151,142,147,140,69,153,141,138,147,69,139,145,142,147,140,69,220,69,146,134,149,82,156,142,137,138}), waitRespawn = true, fn = function(p)
 				bringPlayer(p, nil, true)
 				local r = rootOf(p); if not r then return end
 				clearTargetMovers(p.Character)
 				applyVel(r, S.flingPower or 600, 0.3)
 			end },
-			{ id = "loopLongBring", title = "Loop Long Reach Bring", tip = _Vzd({114,134,157,69,151,138,134,136,141,69,80,69,135,151,142,147,140}), fn = function(p)
+			{ id = "loopLongBring", title = _Vzd({113,148,148,149,69,113,148,147,140,69,119,138,134,136,141,69,103,151,142,147,140}), tip = _Vzd({114,134,157,69,151,138,134,136,141,69,80,69,135,151,142,147,140}), fn = function(p)
 				if S.toggles.lineExtend then applyLineExtendDistance(S.extendAmount or 80) end
 				bringPlayer(p, nil, true)
 			end },
-			{ id = "loopSpamSNO", title = _Vzd({113,148,148,149,69,120,149,134,146,69,120,115,116,69,117,134,151,153,152}), tip = "Own every part · map-wide", fn = function(p) for _,part in ipairs(p.Character:GetDescendants()) do if part:IsA("BasePart") then sno(part) end end end },
-			{ id = _Vzd({145,148,148,149,105,138,152,153,151,148,158,108,151,134,135}), title = _Vzd({113,148,148,149,69,105,138,152,153,151,148,158,69,121,141,138,142,151,69,108,151,134,135}), tip = "DestroyGrabLine · map-wide", fn = function(p) local r=rootOf(p); if r then destroyGrabOn(r) end end },
+			{ id = "loopSpamSNO", title = "Loop Spam SNO Parts", tip = _Vzd({116,156,147,69,138,155,138,151,158,69,149,134,151,153,69,220,69,146,134,149,82,156,142,137,138}), fn = function(p) for _,part in ipairs(p.Character:GetDescendants()) do if part:IsA("BasePart") then sno(part) end end end },
+			{ id = _Vzd({145,148,148,149,105,138,152,153,151,148,158,108,151,134,135}), title = "Loop Destroy Their Grab", tip = _Vzd({105,138,152,153,151,148,158,108,151,134,135,113,142,147,138,69,220,69,146,134,149,82,156,142,137,138}), fn = function(p) local r=rootOf(p); if r then destroyGrabOn(r) end end },
 		}
 		S.loopWait = S.loopWait or {}
 		for _, L in ipairs(loops) do
@@ -13919,7 +14068,7 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 								S.loopTargets[found] = true
 								targets = { found }
 								if S._loopSearchRefresh then pcall(S._loopSearchRefresh) end
-								notify(HUB_NAME, playerLabel(found) .. _Vzd({69,151,138,82,134,136,150,154,142,151,138,137,70}), 1.5)
+								notify(HUB_NAME, playerLabel(found) .. " re-acquired!", 1.5)
 							end
 						end
 						if #targets == 0 then return end
@@ -13983,17 +14132,17 @@ _TAB_BUILDERS["loop"] = function(sc, n)
 		end
 end
 _TAB_BUILDERS["move"] = function(sc, n)
-		section(sc, _Vzd({114,126,69,114,116,123,106,114,106,115,121}), n())
+		section(sc, "MY MOVEMENT", n())
 		makeToggle(sc, { order = n(), id = "speed", title = _Vzd({124,134,145,144,120,149,138,138,137,69,116,155,138,151,151,142,137,138}), tip = "Re-applies every frame (FTAP resets speed)", callback = function() end })
 		makeSlider(sc, { order = n(), title = "WalkSpeed", min = 16, max = 300, default = 50, stateKey = "walkSpeed" })
-		makeToggle(sc, { order = n(), id = "speedCFrame", title = _Vzd({104,107,151,134,146,138,69,120,149,138,138,137,69,103,148,148,152,153}), tip = _Vzd({106,157,153,151,134,69,104,107,151,134,146,138,69,149,154,152,141,69,145,142,144,138,69,146,154,145,153}), callback = function() end })
-		makeSlider(sc, { order = n(), title = _Vzd({104,107,151,134,146,138,69,114,154,145,153}), min = 1, max = 8, default = 2, stateKey = "speedMult" })
+		makeToggle(sc, { order = n(), id = "speedCFrame", title = "CFrame Speed Boost", tip = "Extra CFrame push like mult", callback = function() end })
+		makeSlider(sc, { order = n(), title = "CFrame Mult", min = 1, max = 8, default = 2, stateKey = "speedMult" })
 		makeToggle(sc, { order = n(), id = "fly", title = "Fly", tip = "BodyVelocity + BodyGyro fly", desc = _Vzd({124,102,120,105,69,220,69,120,149,134,136,138,69,220,69,120,141,142,139,153}), callback = setFly })
-		makeSlider(sc, { order = n(), title = "Fly Speed", min = 20, max = 400, default = 80, stateKey = _Vzd({139,145,158,120,149,138,138,137}) })
+		makeSlider(sc, { order = n(), title = "Fly Speed", min = 20, max = 400, default = 80, stateKey = "flySpeed" })
 		makeToggle(sc, { order = n(), id = "noclip", title = "Noclip", tip = _Vzd({104,134,147,104,148,145,145,142,137,138,69,139,134,145,152,138,69,138,155,138,151,158,69,139,151,134,146,138}), callback = function() end })
 		makeToggle(sc, {
 			order = n(), id = _Vzd({142,147,139,143,154,146,149}), title = _Vzd({110,147,139,142,147,142,153,138,69,111,154,146,149,69,77,84,78}),
-			tip = _Vzd({111,154,146,149,119,138,150,154,138,152,153,69,183,69,139,148,151,136,138,69,111,154,146,149,69,156,141,142,145,138,69,116,115}),
+			tip = "JumpRequest → force Jump while ON",
 			callback = function(on)
 				S.toggles.infjump = on
 				if S.conns.infJump then pcall(function() S.conns.infJump:Disconnect() end) S.conns.infJump = nil end
@@ -14007,13 +14156,13 @@ _TAB_BUILDERS["move"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "waterWalk", title = "Water Walk",
+			order = n(), id = "waterWalk", title = _Vzd({124,134,153,138,151,69,124,134,145,144}),
 			tip = _Vzd({114,134,144,138,152,69,153,141,138,69,156,141,148,145,138,69,156,134,153,138,151,69,146,134,149,69,152,148,145,142,137,69,152,148,69,158,148,154,69,156,134,145,144,69,148,147,69,142,153,69,77,147,148,69,139,145,148,134,153,69,149,145,134,153,139,148,151,146,78}),
-			desc = "Solidifies water parts + terrain · restores when off",
+			desc = _Vzd({120,148,145,142,137,142,139,142,138,152,69,156,134,153,138,151,69,149,134,151,153,152,69,80,69,153,138,151,151,134,142,147,69,220,69,151,138,152,153,148,151,138,152,69,156,141,138,147,69,148,139,139}),
 			callback = function(on) setWaterWalk(on) end,
 		})
 		makeToggle(sc, { order = n(), id = "jump", title = "JumpPower Override", callback = function() end })
-		makeSlider(sc, { order = n(), title = _Vzd({111,154,146,149,69,117,148,156,138,151}), min = 50, max = 500, default = 80, stateKey = _Vzd({143,154,146,149,117,148,156,138,151}) })
+		makeSlider(sc, { order = n(), title = "Jump Power", min = 50, max = 500, default = 80, stateKey = "jumpPower" })
 		makeButton(sc, { order = n(), title = _Vzd({119,138,152,138,153,69,114,148,155,138,146,138,147,153}), callback = function()
 			S.toggles.speed=false; S.toggles.fly=false; S.toggles.noclip=false; S.toggles.infjump=false; S.toggles.jump=false; S.toggles.speedCFrame=false
 			setFly(false)
@@ -14022,27 +14171,27 @@ _TAB_BUILDERS["move"] = function(sc, n)
 		section(sc, _Vzd({114,102,117,69,121,106,113,106,117,116,119,121}), n())
 		local MAP_POSITIONS = {
 			{ name = "Green House", pos = Vector3.new(-352, 99, 354) },
-			{ name = _Vzd({108,151,138,138,147,69,120,134,139,138,82,109,148,154,152,138}), pos = Vector3.new(-584, -6, 93) },
-			{ name = _Vzd({104,141,142,147,138,152,138,69,120,134,139,138,82,109,148,154,152,138}), pos = Vector3.new(579, 124, -94) },
-			{ name = _Vzd({107,134,151,146,69,109,148,154,152,138}), pos = Vector3.new(-234, 83, -324) },
+			{ name = "Green Safe-House", pos = Vector3.new(-584, -6, 93) },
+			{ name = "Chinese Safe-House", pos = Vector3.new(579, 124, -94) },
+			{ name = "Farm House", pos = Vector3.new(-234, 83, -324) },
 			{ name = "Spawn", pos = Vector3.new(4, -7, -3) },
-			{ name = _Vzd({103,145,154,138,69,120,134,139,138,82,109,148,154,152,138}), pos = Vector3.new(538, 96, -372) },
-			{ name = "Secret Big Cave", pos = Vector3.new(17, -7, 539) },
+			{ name = "Blue Safe-House", pos = Vector3.new(538, 96, -372) },
+			{ name = _Vzd({120,138,136,151,138,153,69,103,142,140,69,104,134,155,138}), pos = Vector3.new(17, -7, 539) },
 			{ name = _Vzd({120,138,136,151,138,153,69,121,151,134,142,147,69,104,134,155,138}), pos = Vector3.new(500, 62, -307) },
 			{ name = "Mine Cave", pos = Vector3.new(-254, -7, 518) },
 			{ name = _Vzd({124,142,153,136,141,69,120,134,139,138,82,109,148,154,152,138}), pos = Vector3.new(296, -4, 494) },
-			{ name = "Red Safe-House", pos = Vector3.new(-516, -6, -162) },
+			{ name = _Vzd({119,138,137,69,120,134,139,138,82,109,148,154,152,138}), pos = Vector3.new(-516, -6, -162) },
 		}
 		local mapNames = {}
 		for _, mp in ipairs(MAP_POSITIONS) do mapNames[#mapNames + 1] = mp.name end
 		S.selectedMap = S.selectedMap or mapNames[1]
 		makeDropdown(sc, {
-			order = n(), title = "Map Location", options = mapNames, default = S.selectedMap,
-			tip = _Vzd({117,142,136,144,69,134,69,146,134,149,69,145,148,136,134,153,142,148,147,69,153,148,69,153,138,145,138,149,148,151,153,69,153,148}),
+			order = n(), title = _Vzd({114,134,149,69,113,148,136,134,153,142,148,147}), options = mapNames, default = S.selectedMap,
+			tip = "Pick a map location to teleport to",
 			callback = function(v) S.selectedMap = v end,
 		})
 		makeButton(sc, {
-			order = n(), title = "Teleport to Map", tip = "Teleport to the selected map location",
+			order = n(), title = _Vzd({121,138,145,138,149,148,151,153,69,153,148,69,114,134,149}), tip = _Vzd({121,138,145,138,149,148,151,153,69,153,148,69,153,141,138,69,152,138,145,138,136,153,138,137,69,146,134,149,69,145,148,136,134,153,142,148,147}),
 			callback = function()
 				local target
 				for _, mp in ipairs(MAP_POSITIONS) do
@@ -14050,12 +14199,12 @@ _TAB_BUILDERS["move"] = function(sc, n)
 				end
 				if target then
 					local me = hrp()
-					if me then me.CFrame = CFrame.new(target.pos + Vector3.new(0, 5, 0)); notify(HUB_NAME, _Vzd({121,138,145,138,149,148,151,153,138,137,69,153,148,69}) .. target.name, 1.5) end
+					if me then me.CFrame = CFrame.new(target.pos + Vector3.new(0, 5, 0)); notify(HUB_NAME, "Teleported to " .. target.name, 1.5) end
 				end
 			end,
 		})
 		makeButton(sc, {
-			order = n(), title = "Teleport to Selected Player", tip = "Teleport to the player you selected in any search list",
+			order = n(), title = _Vzd({121,138,145,138,149,148,151,153,69,153,148,69,120,138,145,138,136,153,138,137,69,117,145,134,158,138,151}), tip = _Vzd({121,138,145,138,149,148,151,153,69,153,148,69,153,141,138,69,149,145,134,158,138,151,69,158,148,154,69,152,138,145,138,136,153,138,137,69,142,147,69,134,147,158,69,152,138,134,151,136,141,69,145,142,152,153}),
 			callback = function()
 				local p = S.selected
 				if not p or not validP(p) then notify(HUB_NAME, _Vzd({115,148,69,153,134,151,140,138,153,69,57,69,149,142,136,144,69,134,69,149,145,134,158,138,151,69,139,142,151,152,153}), 1.5); return end
@@ -14067,8 +14216,8 @@ _TAB_BUILDERS["move"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "loopTP", title = "Loop Teleport to Selected",
-			tip = "Keeps teleporting to selected player every frame",
+			order = n(), id = "loopTP", title = _Vzd({113,148,148,149,69,121,138,145,138,149,148,151,153,69,153,148,69,120,138,145,138,136,153,138,137}),
+			tip = _Vzd({112,138,138,149,152,69,153,138,145,138,149,148,151,153,142,147,140,69,153,148,69,152,138,145,138,136,153,138,137,69,149,145,134,158,138,151,69,138,155,138,151,158,69,139,151,134,146,138}),
 			callback = function(on)
 				S.toggles.loopTP = on
 				if on then
@@ -14101,17 +14250,17 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 		limNote.TextColor3 = C.muted
 		limNote.TextXAlignment = Enum.TextXAlignment.Left
 		limNote.TextWrapped = true
-		limNote.Text = "  Free = 100 toys · Gamepass = 200 · forms stop before the cap"
+		limNote.Text = _Vzd({69,69,107,151,138,138,69,98,69,86,85,85,69,153,148,158,152,69,220,69,108,134,146,138,149,134,152,152,69,98,69,87,85,85,69,220,69,139,148,151,146,152,69,152,153,148,149,69,135,138,139,148,151,138,69,153,141,138,69,136,134,149})
 		limNote.Parent = sc
 		corner(limNote, 8)
 		pad(limNote, 6, 6, 6, 6)
 		makeDropdown(sc, {
 			order = n(),
-			title = _Vzd({102,136,136,148,154,147,153,69,153,158,149,138}),
-			options = { "Auto-detect", _Vzd({115,148,69,140,134,146,138,149,134,152,152,69,77,86,85,85,78}), _Vzd({108,134,146,138,149,134,152,152,69,77,87,85,85,78}) },
-			default = (S.toyPassMode == "pass" and _Vzd({108,134,146,138,149,134,152,152,69,77,87,85,85,78}))
+			title = "Account type",
+			options = { "Auto-detect", _Vzd({115,148,69,140,134,146,138,149,134,152,152,69,77,86,85,85,78}), "Gamepass (200)" },
+			default = (S.toyPassMode == "pass" and "Gamepass (200)")
 				or (S.toyPassMode == "free" and "No gamepass (100)")
-				or "Auto-detect",
+				or _Vzd({102,154,153,148,82,137,138,153,138,136,153}),
 			callback = function(v)
 				if v:find("Gamepass", 1, true) then S.toyPassMode = "pass"
 				elseif v:find(_Vzd({115,148,69,140,134,146,138,149,134,152,152}), 1, true) then S.toyPassMode = "free"
@@ -14126,9 +14275,9 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 				notify(HUB_NAME, "Toys " .. countMyToys() .. " / " .. getToyLimit() .. _Vzd({69,220,69,151,148,148,146,69}) .. toysRoom(), 2)
 			end,
 		})
-		section(sc, _Vzd({120,117,102,124,115,69,112,106,126,103,110,115,105,120}), n())
-		makeToggle(sc, { order = n(), id = "palletQ", title = "Q = Spawn Pallet", tip = "PalletLightBrown via MenuToys", desc = "Toggle on/off", callback = setPalletQ })
-		makeToggle(sc, { order = n(), id = "tabSpawn", title = "TAB = Spawn Selected Toy", tip = "Spawn selected toy on TAB", callback = function(on)
+		section(sc, "SPAWN KEYBINDS", n())
+		makeToggle(sc, { order = n(), id = "palletQ", title = _Vzd({118,69,98,69,120,149,134,156,147,69,117,134,145,145,138,153}), tip = _Vzd({117,134,145,145,138,153,113,142,140,141,153,103,151,148,156,147,69,155,142,134,69,114,138,147,154,121,148,158,152}), desc = "Toggle on/off", callback = setPalletQ })
+		makeToggle(sc, { order = n(), id = "tabSpawn", title = "TAB = Spawn Selected Toy", tip = _Vzd({120,149,134,156,147,69,152,138,145,138,136,153,138,137,69,153,148,158,69,148,147,69,121,102,103}), callback = function(on)
 			pcall(function() ContextActionService:UnbindAction("VOIDZ_TabToy") end)
 			if not on then return end
 			ContextActionService:BindAction("VOIDZ_TabToy", function(_, state)
@@ -14138,19 +14287,19 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 		section(sc, "PALLET", n())
 		makeToggle(sc, {
 			order = n(),
-			id = _Vzd({149,134,145,145,138,153,104,134,140,138}),
+			id = "palletCage",
 			title = _Vzd({120,153,142,136,144,69,121,148,69,117,134,145,145,138,153,69,104,138,147,153,138,151}),
 			tip = "Hold a pallet: SNO + pin people on it to the top center (FE ownership)",
-			desc = _Vzd({121,141,138,158,69,146,154,152,153,69,135,138,69,147,138,134,151,69,158,148,154,69,77,163,88,85,69,152,153,154,137,152,78,69,139,148,151,69,120,115,116,69,220,69,151,138,145,138,134,152,138,152,69,156,141,138,147,69,158,148,154,69,137,151,148,149,69,153,141,138,69,149,134,145,145,138,153}),
+			desc = "They must be near you (~30 studs) for SNO · releases when you drop the pallet",
 			callback = function(on)
 				setPalletCage(on)
 			end,
 		})
-		section(sc, _Vzd({118,122,110,104,112,69,120,117,102,124,115}), n())
+		section(sc, "QUICK SPAWN", n())
 		for _, toy in ipairs({
 			"PalletLightBrown", "CreatureBlobman", "BombMissile", "Campfire", "NinjaKunai",
-			"NinjaShuriken", "FoodBanana", _Vzd({105,142,136,138,120,146,134,145,145}), "SprayCanWD", "BallSnowball",
-			"YouDecoy", "GlassBoxGray", "FoodBread", "InstrumentDrumSnare",
+			"NinjaShuriken", _Vzd({107,148,148,137,103,134,147,134,147,134}), "DiceSmall", "SprayCanWD", "BallSnowball",
+			"YouDecoy", "GlassBoxGray", _Vzd({107,148,148,137,103,151,138,134,137}), "InstrumentDrumSnare",
 		}) do
 			makeButton(sc, { order = n(), title = "Spawn " .. toy, tip = _Vzd({103,154,158,80,120,149,134,156,147,69}) .. toy .. _Vzd({69,77,150,154,138,154,138,137,78}), callback = function()
 				S.selectedToy = toy
@@ -14181,7 +14330,7 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 			callback = function(v) S.formDistance = v end,
 		})
 		makeSlider(sc, {
-			order = n(), title = "Form Height", min = -5, max = 30, default = S.formHeight or 2, step = 1,
+			order = n(), title = _Vzd({107,148,151,146,69,109,138,142,140,141,153}), min = -5, max = 30, default = S.formHeight or 2, step = 1,
 			callback = function(v) S.formHeight = v end,
 		})
 		makeSlider(sc, {
@@ -14189,13 +14338,13 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 			callback = function(v) S.formOrientation = v end,
 		})
 		makeSlider(sc, {
-			order = n(), title = _Vzd({120,149,134,156,147,69,108,134,149,69,77,152,138,136,78}), min = 0.04, max = 0.35, default = S.formGap or 0.09, step = 0.01,
+			order = n(), title = "Spawn Gap (sec)", min = 0.04, max = 0.35, default = S.formGap or 0.09, step = 0.01,
 			callback = function(v) S.formGap = v end,
 		})
 		for _, def in ipairs(FORM_BUILDS) do
 			makeButton(sc, {
 				order = n(),
-				title = "Build " .. def.title,
+				title = _Vzd({103,154,142,145,137,69}) .. def.title,
 				tip = def.tip or ("Form · " .. def.title),
 				callback = function()
 					runFormBuild(def.id, S.selectedToy or _Vzd({117,134,145,145,138,153,113,142,140,141,153,103,151,148,156,147}))
@@ -14205,8 +14354,8 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 		makeButton(sc, {
 			order = n(),
 			title = "Build Heart (Dice / sparkle)",
-			tip = "Same heart using DiceSmall",
-			callback = function() runFormBuild("heart", _Vzd({105,142,136,138,120,146,134,145,145})) end,
+			tip = _Vzd({120,134,146,138,69,141,138,134,151,153,69,154,152,142,147,140,69,105,142,136,138,120,146,134,145,145}),
+			callback = function() runFormBuild(_Vzd({141,138,134,151,153}), "DiceSmall") end,
 		})
 		makeButton(sc, {
 			order = n(),
@@ -14217,7 +14366,7 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 		})
 		makeButton(sc, {
 			order = n(),
-			title = "Remove Form (detach)",
+			title = _Vzd({119,138,146,148,155,138,69,107,148,151,146,69,77,137,138,153,134,136,141,78}),
 			danger = true,
 			tip = _Vzd({120,153,148,149,69,156,138,134,151,69,145,148,148,149,69,80,69,105,138,152,153,151,148,158,121,148,158,69,139,148,151,146,69,149,142,138,136,138,152}),
 			callback = function()
@@ -14229,7 +14378,7 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 		makeButton(sc, { order = n(), title = "Spawn Pallet Stack (5)", tip = "5 pallets stacked (serial)", callback = function()
 			spawnToyBurst("PalletLightBrown", 5)
 		end })
-		makeButton(sc, { order = n(), title = _Vzd({120,149,134,156,147,69,117,134,145,145,138,153,69,120,153,134,136,144,69,77,86,90,78}), tip = "Big stack", callback = function()
+		makeButton(sc, { order = n(), title = _Vzd({120,149,134,156,147,69,117,134,145,145,138,153,69,120,153,134,136,144,69,77,86,90,78}), tip = _Vzd({103,142,140,69,152,153,134,136,144}), callback = function()
 			spawnToyBurst("PalletLightBrown", 15)
 		end })
 		makeButton(sc, { order = n(), title = "Blobman Army (3)", danger = true, callback = function()
@@ -14238,25 +14387,25 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 		makeButton(sc, { order = n(), title = _Vzd({120,147,148,156,135,134,145,145,69,120,153,134,136,144,69,77,86,85,78}), tip = "BallSnowball", callback = function()
 			spawnToyBurst("BallSnowball", 10)
 		end })
-		makeToggle(sc, { order = n(), id = "autoPallet", title = _Vzd({102,154,153,148,69,117,134,145,145,138,153,69,117,134,153,141}), tip = "Queued pallets while walking", callback = function(on)
+		makeToggle(sc, { order = n(), id = _Vzd({134,154,153,148,117,134,145,145,138,153}), title = _Vzd({102,154,153,148,69,117,134,145,145,138,153,69,117,134,153,141}), tip = "Queued pallets while walking", callback = function(on)
 			stopLoop("autoPallet")
 			notify(HUB_NAME, _Vzd({102,154,153,148,69,149,134,145,145,138,153,69}) .. (on and "ON" or "OFF"), 1)
 			if on then startLoop("autoPallet", 0.2, function() spawnToy("PalletLightBrown", { silent = true, dist = 2.5 }) end) end
 		end })
 		section(sc, "TOY MANAGEMENT", n())
-		makeButton(sc, { order = n(), title = "Destroy All My Toys", danger = true, tip = _Vzd({105,138,152,153,151,148,158,121,148,158,69,148,147,69,120,149,134,156,147,138,137,110,147,121,148,158,152,69,139,148,145,137,138,151}), callback = function()
+		makeButton(sc, { order = n(), title = _Vzd({105,138,152,153,151,148,158,69,102,145,145,69,114,158,69,121,148,158,152}), danger = true, tip = _Vzd({105,138,152,153,151,148,158,121,148,158,69,148,147,69,120,149,134,156,147,138,137,110,147,121,148,158,152,69,139,148,145,137,138,151}), callback = function()
 			local n = destroyAllMyToys()
-			notify(HUB_NAME, _Vzd({105,138,152,153,151,148,158,138,137,69}) .. n .. " toys", 2)
+			notify(HUB_NAME, "Destroyed " .. n .. " toys", 2)
 		end })
-		makeButton(sc, { order = n(), title = _Vzd({105,138,152,153,151,148,158,69,102,145,145,69,114,158,69,117,134,145,145,138,153,152}), danger = true, callback = function()
+		makeButton(sc, { order = n(), title = "Destroy All My Pallets", danger = true, callback = function()
 			local n = destroyAllMyToys(_Vzd({117,134,145,145,138,153}))
-			notify(HUB_NAME, "Destroyed " .. n .. " pallets", 2)
+			notify(HUB_NAME, "Destroyed " .. n .. _Vzd({69,149,134,145,145,138,153,152}), 2)
 		end })
-		makeButton(sc, { order = n(), title = "Count My Toys", tip = _Vzd({120,149,134,156,147,138,137,110,147,121,148,158,152,69,136,141,142,145,137,151,138,147}), callback = function()
-			notify(HUB_NAME, _Vzd({121,148,158,152,95,69}) .. countMyToys() .. _Vzd({69,220,69,117,134,145,145,138,153,152,95,69}) .. countMyToys("PalletLightBrown"), 2)
+		makeButton(sc, { order = n(), title = _Vzd({104,148,154,147,153,69,114,158,69,121,148,158,152}), tip = _Vzd({120,149,134,156,147,138,137,110,147,121,148,158,152,69,136,141,142,145,137,151,138,147}), callback = function()
+			notify(HUB_NAME, "Toys: " .. countMyToys() .. " · Pallets: " .. countMyToys("PalletLightBrown"), 2)
 		end })
 		section(sc, _Vzd({116,124,115,106,105,69,110,115,123,106,115,121,116,119,126}), n())
-		makeButton(sc, { order = n(), title = "Refresh Owned + Map Scan", tip = _Vzd({120,136,134,147,69,135,134,136,144,149,134,136,144,84,122,110,84,146,134,149,69,148,156,147,138,151,152,141,142,149}), callback = function()
+		makeButton(sc, { order = n(), title = _Vzd({119,138,139,151,138,152,141,69,116,156,147,138,137,69,80,69,114,134,149,69,120,136,134,147}), tip = _Vzd({120,136,134,147,69,135,134,136,144,149,134,136,144,84,122,110,84,146,134,149,69,148,156,147,138,151,152,141,142,149}), callback = function()
 			local owned = getOwnedToyNames()
 			local map = getMapItems()
 			local unowned = {}
@@ -14266,7 +14415,7 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 			table.sort(unowned)
 			notify(HUB_NAME, "Owned "..#owned.._Vzd({69,220,69,122,147,148,156,147,138,137,69,146,134,149,69})..#unowned, 3)
 			if S.ownedList then
-				for _, ch in ipairs(S.ownedList:GetChildren()) do if ch:IsA("TextButton") then ch:Destroy() end end
+				for _, ch in ipairs(S.ownedList:GetChildren()) do if ch:IsA(_Vzd({121,138,157,153,103,154,153,153,148,147})) then ch:Destroy() end end
 				for _, name in ipairs(owned) do
 					local b = Instance.new("TextButton")
 					b.Size = UDim2.new(1, -4, 0, 24)
@@ -14298,7 +14447,7 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 				end
 			end
 		end })
-		local ownedBox = Instance.new("Frame")
+		local ownedBox = Instance.new(_Vzd({107,151,134,146,138}))
 		ownedBox.LayoutOrder = n()
 		ownedBox.Size = UDim2.new(1, -6, 0, 120)
 		ownedBox.BackgroundColor3 = C.bg
@@ -14314,7 +14463,7 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 		ownedSc.AutomaticCanvasSize = Enum.AutomaticSize.Y
 		ownedSc.CanvasSize = UDim2.new()
 		ownedSc.Parent = ownedBox
-		local ol = Instance.new("UIListLayout"); ol.Padding = UDim.new(0, 3); ol.Parent = ownedSc
+		local ol = Instance.new(_Vzd({122,110,113,142,152,153,113,134,158,148,154,153})); ol.Padding = UDim.new(0, 3); ol.Parent = ownedSc
 		pad(ownedSc, 4, 4, 4, 4)
 		S.ownedList = ownedSc
 
@@ -14329,13 +14478,13 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 		unInfo.TextColor3 = C.muted
 		unInfo.TextXAlignment = Enum.TextXAlignment.Left
 		unInfo.TextWrapped = true
-		unInfo.Text = "  Click a name → real SNO bring · held in front of you until you grab it"
+		unInfo.Text = _Vzd({69,69,104,145,142,136,144,69,134,69,147,134,146,138,69,183,69,151,138,134,145,69,120,115,116,69,135,151,142,147,140,69,220,69,141,138,145,137,69,142,147,69,139,151,148,147,153,69,148,139,69,158,148,154,69,154,147,153,142,145,69,158,148,154,69,140,151,134,135,69,142,153})
 		unInfo.Parent = sc
 		corner(unInfo, 8)
 		pad(unInfo, 6, 6, 6, 6)
 		makeButton(sc, {
 			order = n(),
-			title = "Release brought items",
+			title = _Vzd({119,138,145,138,134,152,138,69,135,151,148,154,140,141,153,69,142,153,138,146,152}),
 			danger = true,
 			tip = _Vzd({120,153,148,149,69,141,148,145,137,142,147,140,69,142,153,138,146,152,69,77,144,138,138,149,152,69,148,156,147,138,151,152,141,142,149,69,142,139,69,158,148,154,69,134,145,151,138,134,137,158,69,140,151,134,135,135,138,137,78}),
 			callback = function() releaseAllBrought() end,
@@ -14361,8 +14510,8 @@ _TAB_BUILDERS["toys"] = function(sc, n)
 		S.unownedList = unSc
 end
 _TAB_BUILDERS["explosions"] = function(sc, n)
-		section(sc, _Vzd({114,110,120,120,110,113,106,69,120,121,119,110,112,106}), n())
-		local exNote = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
+		section(sc, "MISSILE STRIKE", n())
+		local exNote = Instance.new("TextLabel")
 		exNote.LayoutOrder = n()
 		exNote.Size = UDim2.new(1, -6, 0, 48)
 		exNote.BackgroundColor3 = C.card
@@ -14380,20 +14529,20 @@ _TAB_BUILDERS["explosions"] = function(sc, n)
 		makeDropdown(sc, {
 			order = n(),
 			title = _Vzd({114,142,152,152,142,145,138,69,153,158,149,138}),
-			options = { "BombMissile", "FireworkMissile", "BombBalloon", "BombDarkMatter" },
+			options = { "BombMissile", "FireworkMissile", "BombBalloon", _Vzd({103,148,146,135,105,134,151,144,114,134,153,153,138,151}) },
 			default = S.missileType or "BombMissile",
 			callback = function(v) S.missileType = v end,
 		})
 		makeDropdown(sc, {
 			order = n(),
-			title = "Account type",
-			options = { "Auto-detect", _Vzd({115,148,69,140,134,146,138,149,134,152,152,69,77,86,85,85,78}), "Gamepass (200)" },
+			title = _Vzd({102,136,136,148,154,147,153,69,153,158,149,138}),
+			options = { "Auto-detect", "No gamepass (100)", _Vzd({108,134,146,138,149,134,152,152,69,77,87,85,85,78}) },
 			default = (S.toyPassMode == "pass" and "Gamepass (200)")
-				or (S.toyPassMode == "free" and "No gamepass (100)")
-				or _Vzd({102,154,153,148,82,137,138,153,138,136,153}),
+				or (S.toyPassMode == "free" and _Vzd({115,148,69,140,134,146,138,149,134,152,152,69,77,86,85,85,78}))
+				or "Auto-detect",
 			callback = function(v)
-				if v:find("Gamepass", 1, true) then S.toyPassMode = "pass"
-				elseif v:find(_Vzd({115,148,69,140,134,146,138,149,134,152,152}), 1, true) then S.toyPassMode = "free"
+				if v:find(_Vzd({108,134,146,138,149,134,152,152}), 1, true) then S.toyPassMode = "pass"
+				elseif v:find("No gamepass", 1, true) then S.toyPassMode = "free"
 				else S.toyPassMode = "auto" end
 			end,
 		})
@@ -14412,7 +14561,7 @@ _TAB_BUILDERS["explosions"] = function(sc, n)
 		makeToggle(sc, {
 			order = n(),
 			id = "missileStrike",
-			title = "Auto strike target",
+			title = _Vzd({102,154,153,148,69,152,153,151,142,144,138,69,153,134,151,140,138,153}),
 			tip = "Keeps spawning + exploding on the selected player",
 			danger = true,
 			callback = function(on)
@@ -14423,12 +14572,12 @@ _TAB_BUILDERS["explosions"] = function(sc, n)
 			order = n(),
 			title = _Vzd({107,142,151,138,69,148,147,136,138,69,77,135,154,151,152,153,78}),
 			danger = true,
-			tip = _Vzd({120,149,134,156,147,69,115,69,146,142,152,152,142,145,138,152,69,134,147,137,69,138,157,149,145,148,137,138,69,153,141,138,146,69,148,147,69,153,141,138,69,153,134,151,140,138,153,69,147,148,156}),
+			tip = "Spawn N missiles and explode them on the target now",
 			callback = fireMissilesOnce,
 		})
 		makeButton(sc, {
 			order = n(),
-			title = _Vzd({120,153,148,149,69,152,153,151,142,144,138}),
+			title = "Stop strike",
 			danger = true,
 			callback = function() stopMissileStrike() end,
 		})
@@ -14438,23 +14587,23 @@ _TAB_BUILDERS["explosions"] = function(sc, n)
 			danger = true,
 			callback = function()
 				local n = 0
-				for _, name in ipairs({ "BombMissile", "FireworkMissile", _Vzd({103,148,146,135,103,134,145,145,148,148,147}), "BombDarkMatter" }) do
+				for _, name in ipairs({ "BombMissile", "FireworkMissile", "BombBalloon", "BombDarkMatter" }) do
 					n += destroyAllMyToys(name)
 				end
-				notify(HUB_NAME, "Cleared " .. n, 1.2)
+				notify(HUB_NAME, _Vzd({104,145,138,134,151,138,137,69}) .. n, 1.2)
 			end,
 		})
 end
-_TAB_BUILDERS[_Vzd({156,148,151,145,137})] = function(sc, n)
-		section(sc, _Vzd({124,116,119,113,105,69,84,69,116,103,111,106,104,121,120}), n())
-		makeToggle(sc, { order = n(), id = "aura_netown", title = _Vzd({115,138,153,156,148,151,144,69,116,156,147,138,151,152,141,142,149,69,102,154,151,134}), tip = _Vzd({116,117,69,136,148,147,153,142,147,154,148,154,152,69,120,115,116}), callback = function(on) setAura(_Vzd({147,138,153,148,156,147}), on) end })
-		makeToggle(sc, { order = n(), id = "aura_fling", title = _Vzd({116,135,143,138,136,153,84,117,145,134,158,138,151,69,107,145,142,147,140,69,102,154,151,134}), tip = _Vzd({122,152,138,69,190,69,142,147,69,102,154,151,134,152,69,139,148,151,69,153,134,151,140,138,153,69,146,148,137,138}), callback = function(on) setAura("fling", on) end })
+_TAB_BUILDERS["world"] = function(sc, n)
+		section(sc, "WORLD / OBJECTS", n())
+		makeToggle(sc, { order = n(), id = "aura_netown", title = "Network Ownership Aura", tip = "OP continuous SNO", callback = function(on) setAura("netown", on) end })
+		makeToggle(sc, { order = n(), id = "aura_fling", title = "Object/Player Fling Aura", tip = _Vzd({122,152,138,69,190,69,142,147,69,102,154,151,134,152,69,139,148,151,69,153,134,151,140,138,153,69,146,148,137,138}), callback = function(on) setAura("fling", on) end })
 		makeButton(sc, { order = n(), title = _Vzd({107,145,142,147,140,69,115,138,134,151,135,158,69,116,147,136,138}), danger = true, callback = function()
 			local cfg = getAura("fling")
 			eachAuraTarget(cfg, function(p,r) flingPlayer(p, cfg.power, true) end, function(part) sno(part); applyVel(part, cfg.power, 0.5) end)
 			notify(HUB_NAME, "Pulse fling", 1)
 		end })
-		makeToggle(sc, { order = n(), id = "unanchorAura", title = _Vzd({122,147,134,147,136,141,148,151,69,102,154,151,134}), tip = _Vzd({122,147,134,147,136,141,148,151,69,80,69,120,115,116,69,147,138,134,151,135,158}), callback = function(on)
+		makeToggle(sc, { order = n(), id = "unanchorAura", title = "Unanchor Aura", tip = _Vzd({122,147,134,147,136,141,148,151,69,80,69,120,115,116,69,147,138,134,151,135,158}), callback = function(on)
 			stopLoop("unanchor")
 			if on then startLoop("unanchor", 0.25, function()
 				local me = hrp(); if not me then return end
@@ -14485,7 +14634,7 @@ _TAB_BUILDERS[_Vzd({156,148,151,145,137})] = function(sc, n)
 				end
 			end)
 		end })
-		makeButton(sc, { order = n(), title = "Bring All Nearby Objects", callback = function()
+		makeButton(sc, { order = n(), title = _Vzd({103,151,142,147,140,69,102,145,145,69,115,138,134,151,135,158,69,116,135,143,138,136,153,152}), callback = function()
 			local me = hrp(); if not me then return end
 			local n = 0
 			for _, p in ipairs(workspace:GetDescendants()) do
@@ -14499,27 +14648,27 @@ _TAB_BUILDERS[_Vzd({156,148,151,145,137})] = function(sc, n)
 					end
 				end
 			end
-			notify(HUB_NAME, _Vzd({103,151,148,154,140,141,153,69})..n.." parts", 2)
+			notify(HUB_NAME, "Brought "..n.." parts", 2)
 		end })
 end
 _TAB_BUILDERS["visuals"] = function(sc, n)
 		section(sc, "STEALTH", n())
 		makeToggle(sc, {
 			order = n(), id = "charInvis", title = "Character Invisibility",
-			tip = _Vzd({103,148,137,158,69,154,147,137,138,151,69,146,134,149,69,220,69,136,134,146,138,151,134,69,152,153,134,158,152,69,148,147,69,152,154,151,139,134,136,138,83,69,109,134,151,137,138,151,69,153,148,69,140,151,134,135,84,152,138,138,83}),
+			tip = "Body under map · camera stays on surface. Harder to grab/see.",
 			callback = function(on)
 				setCharacterInvis(on)
 			end,
 		})
 		section(sc, "WHAT I SEE", n())
-		makeToggle(sc, { order = n(), id = "esp", title = "Player ESP + Names", tip = _Vzd({109,142,140,141,145,142,140,141,153,69,80,69,135,142,145,145,135,148,134,151,137}), callback = setESP })
-		makeSlider(sc, { order = n(), title = "ESP Fill Transparency", min = 0, max = 1, default = 0.5, step = 0.1,
-			stateKey = "espFillTransparency", tip = "How see-through the highlight fill is", callback = function(v) S.espFillTransparency = v; if S.toggles.esp then setESP(true) end end })
-		makeSlider(sc, { order = n(), title = "ESP Outline Transparency", min = 0, max = 1, default = 0.3, step = 0.1,
-			stateKey = "espOutlineTransparency", tip = "How see-through the outline is", callback = function(v) S.espOutlineTransparency = v; if S.toggles.esp then setESP(true) end end })
-		makeDropdown(sc, { order = n(), title = "ESP Depth Mode", options = { "AlwaysOnTop", "Occluded" }, default = "AlwaysOnTop",
+		makeToggle(sc, { order = n(), id = "esp", title = "Player ESP + Names", tip = "Highlight + billboard", callback = setESP })
+		makeSlider(sc, { order = n(), title = _Vzd({106,120,117,69,107,142,145,145,69,121,151,134,147,152,149,134,151,138,147,136,158}), min = 0, max = 1, default = 0.5, step = 0.1,
+			stateKey = "espFillTransparency", tip = _Vzd({109,148,156,69,152,138,138,82,153,141,151,148,154,140,141,69,153,141,138,69,141,142,140,141,145,142,140,141,153,69,139,142,145,145,69,142,152}), callback = function(v) S.espFillTransparency = v; if S.toggles.esp then setESP(true) end end })
+		makeSlider(sc, { order = n(), title = _Vzd({106,120,117,69,116,154,153,145,142,147,138,69,121,151,134,147,152,149,134,151,138,147,136,158}), min = 0, max = 1, default = 0.3, step = 0.1,
+			stateKey = "espOutlineTransparency", tip = _Vzd({109,148,156,69,152,138,138,82,153,141,151,148,154,140,141,69,153,141,138,69,148,154,153,145,142,147,138,69,142,152}), callback = function(v) S.espOutlineTransparency = v; if S.toggles.esp then setESP(true) end end })
+		makeDropdown(sc, { order = n(), title = "ESP Depth Mode", options = { _Vzd({102,145,156,134,158,152,116,147,121,148,149}), "Occluded" }, default = "AlwaysOnTop",
 			tip = "AlwaysOnTop = see through walls · Occluded = hidden by walls", callback = function(v) S.espDepthMode = v; if S.toggles.esp then setESP(true) end end })
-		makeToggle(sc, { order = n(), id = "fullbright", title = "Fullbright", tip = _Vzd({114,134,157,69,135,151,142,140,141,153,147,138,152,152,69,84,69,147,148,69,139,148,140}), callback = setFullbright })
+		makeToggle(sc, { order = n(), id = _Vzd({139,154,145,145,135,151,142,140,141,153}), title = "Fullbright", tip = _Vzd({114,134,157,69,135,151,142,140,141,153,147,138,152,152,69,84,69,147,148,69,139,148,140}), callback = setFullbright })
 		makeToggle(sc, { order = n(), id = "noFog", title = _Vzd({115,148,69,107,148,140}), callback = function(on) if on then Lighting.FogEnd=1e9 else Lighting.FogEnd=100000 end end })
 		makeToggle(sc, { order = n(), id = "night", title = "Night Mode", callback = function(on) Lighting.ClockTime = on and 0 or 14 end })
 		makeToggle(sc, { order = n(), id = "day", title = "Day Mode", callback = function(on) if on then Lighting.ClockTime = 14 end end })
@@ -14532,8 +14681,8 @@ _TAB_BUILDERS["visuals"] = function(sc, n)
 			order = n(),
 			id = "thirdPerson",
 			title = "3rd Person Mode",
-			tip = _Vzd({107,148,151,136,138,69,104,145,134,152,152,142,136,69,136,134,146,138,151,134,69,159,148,148,146,138,137,69,148,154,153,69,77,135,145,148,136,144,152,69,139,142,151,152,153,82,149,138,151,152,148,147,69,145,148,136,144,78}),
-			desc = _Vzd({120,136,151,148,145,145,69,159,148,148,146,69,152,153,142,145,145,69,156,148,151,144,152,69,156,142,153,141,142,147,69,151,134,147,140,138}),
+			tip = "Force Classic camera zoomed out (blocks first-person lock)",
+			desc = "Scroll zoom still works within range",
 			callback = function(on)
 				stopLoop("thirdPerson")
 				S.toggles.thirdPerson = on
@@ -14550,7 +14699,7 @@ _TAB_BUILDERS["visuals"] = function(sc, n)
 							cam.CameraSubject = h
 						end
 					end)
-					startLoop("thirdPerson", 0.12, function()
+					startLoop(_Vzd({153,141,142,151,137,117,138,151,152,148,147}), 0.12, function()
 						if not S.toggles.thirdPerson then return end
 						local d = tonumber(S.thirdPersonDist) or 12
 						pcall(function()
@@ -14565,7 +14714,7 @@ _TAB_BUILDERS["visuals"] = function(sc, n)
 							if cam and cam.CameraType ~= Enum.CameraType.Custom and cam.CameraType ~= Enum.CameraType.Follow then
 								cam.CameraType = Enum.CameraType.Custom
 							end
-							local h = char() and char():FindFirstChildOfClass(_Vzd({109,154,146,134,147,148,142,137}))
+							local h = char() and char():FindFirstChildOfClass("Humanoid")
 							if cam and h and cam.CameraSubject ~= h then
 								if not (controlState and controlState.running) then
 									cam.CameraSubject = h
@@ -14588,13 +14737,13 @@ _TAB_BUILDERS["visuals"] = function(sc, n)
 							end
 						end
 					end)
-					notify(HUB_NAME, _Vzd({88,151,137,69,149,138,151,152,148,147,69,116,107,107}), 1)
+					notify(HUB_NAME, "3rd person OFF", 1)
 				end
 			end,
 		})
 		makeSlider(sc, {
 			order = n(),
-			title = "3rd Person Distance",
+			title = _Vzd({88,151,137,69,117,138,151,152,148,147,69,105,142,152,153,134,147,136,138}),
 			min = 4,
 			max = 40,
 			default = S.thirdPersonDist or 12,
@@ -14609,7 +14758,7 @@ _TAB_BUILDERS["visuals"] = function(sc, n)
 				end
 			end,
 		})
-		makeButton(sc, { order = n(), title = _Vzd({119,138,152,138,153,69,113,142,140,141,153,142,147,140}), callback = function()
+		makeButton(sc, { order = n(), title = "Reset Lighting", callback = function()
 			setFullbright(false); Lighting.ClockTime=14; Lighting.FogEnd=100000
 			if S.hubOpen then setPurpleTint(true) else setPurpleTint(false) end
 		end })
@@ -14622,9 +14771,9 @@ _TAB_BUILDERS["auto"] = function(sc, n)
 				pcall(function() VirtualUser:CaptureController(); VirtualUser:ClickButton2(Vector2.new()) end)
 			end) end
 		end })
-		makeToggle(sc, { order = n(), id = _Vzd({134,154,153,148,107,145,142,147,140,115,138,134,151,138,152,153}), title = "Auto Fling Nearest", tip = "Quiet loop until they die", callback = function(on)
+		makeToggle(sc, { order = n(), id = "autoFlingNearest", title = "Auto Fling Nearest", tip = _Vzd({118,154,142,138,153,69,145,148,148,149,69,154,147,153,142,145,69,153,141,138,158,69,137,142,138}), callback = function(on)
 			stopLoop("autoFlingN")
-			if on then startLoop("autoFlingN", 0.35, function()
+			if on then startLoop(_Vzd({134,154,153,148,107,145,142,147,140,115}), 0.35, function()
 				local me = hrp(); if not me then return end
 				local best, bd = nil, S.auraRange or 50
 				for _, p in ipairs(Players:GetPlayers()) do
@@ -14636,9 +14785,9 @@ _TAB_BUILDERS["auto"] = function(sc, n)
 				if best then flingPlayer(best, S.flingPower, true) end
 			end) end
 		end })
-		makeToggle(sc, { order = n(), id = "autoKickNearest", title = "Auto Kick Nearest", callback = function(on)
+		makeToggle(sc, { order = n(), id = "autoKickNearest", title = _Vzd({102,154,153,148,69,112,142,136,144,69,115,138,134,151,138,152,153}), callback = function(on)
 			stopLoop("autoKickN")
-			if on then startLoop("autoKickN", 0.4, function()
+			if on then startLoop(_Vzd({134,154,153,148,112,142,136,144,115}), 0.4, function()
 				local me = hrp(); if not me then return end
 				for _, p in ipairs(Players:GetPlayers()) do
 					if validP(p) and (rootOf(p).Position-me.Position).Magnitude < (S.auraRange or 50) then
@@ -14647,8 +14796,8 @@ _TAB_BUILDERS["auto"] = function(sc, n)
 				end
 			end) end
 		end })
-		makeToggle(sc, { order = n(), id = "autoSNO", title = _Vzd({102,154,153,148,69,115,138,153,156,148,151,144,69,116,156,147,69,102,154,151,134}), tip = _Vzd({102,145,142,134,152,69,148,139,69,147,138,153,148,156,147,69,134,154,151,134}), callback = function(on)
-			S.toggles.aura_netown = on; setAura(_Vzd({147,138,153,148,156,147}), on)
+		makeToggle(sc, { order = n(), id = "autoSNO", title = "Auto Network Own Aura", tip = "Alias of netown aura", callback = function(on)
+			S.toggles.aura_netown = on; setAura("netown", on)
 		end })
 		makeToggle(sc, { order = n(), id = "autoRespawnPad", title = _Vzd({102,154,153,148,69,120,149,134,156,147,69,117,134,145,145,138,153,69,148,147,69,119,138,152,149,134,156,147}), callback = function(on)
 			if S.conns.respawnPal then pcall(function() S.conns.respawnPal:Disconnect() end) end
@@ -14658,11 +14807,11 @@ _TAB_BUILDERS["auto"] = function(sc, n)
 		end })
 		S.toggles.autoRejoin = (getgenv and type(getgenv) == "function" and getgenv().VOIDZ_ANTIKICK and getgenv().VOIDZ_ANTIKICK.enabled) == true
 		makeToggle(sc, {
-			order = n(), id = "autoRejoin", title = _Vzd({102,154,153,148,69,119,138,143,148,142,147,69,142,139,69,112,142,136,144,138,137}),
+			order = n(), id = "autoRejoin", title = "Auto Rejoin if Kicked",
 			tip = _Vzd({120,134,146,138,69,134,152,69,102,147,153,142,69,183,69,102,147,153,142,82,112,142,136,144,69,77,136,148,147,152,148,145,138,69,80,69,119,148,135,145,148,157,69,144,142,136,144,69,122,110,69,152,136,134,147,78}),
 			callback = function(on) setAntiKick(on) end,
 		})
-		makeToggle(sc, { order = n(), id = "autoClaim", title = _Vzd({102,154,153,148,69,104,145,134,142,146,69,117,145,148,153}), tip = _Vzd({104,145,142,136,144,69,149,145,148,153,69,152,142,140,147,152,69,84,69,136,145,134,142,146,69,137,138,153,138,136,153,148,151,152,69,147,138,134,151,135,158}), callback = function(on)
+		makeToggle(sc, { order = n(), id = "autoClaim", title = _Vzd({102,154,153,148,69,104,145,134,142,146,69,117,145,148,153}), tip = "Click plot signs / claim detectors nearby", callback = function(on)
 			stopLoop("autoClaim")
 			if on then startLoop("autoClaim", 0.8, function()
 				local me = hrp(); if not me then return end
@@ -14680,9 +14829,9 @@ _TAB_BUILDERS["auto"] = function(sc, n)
 			end) end
 		end })
 		makeToggle(sc, {
-			order = n(), id = "autoSpin", title = "Auto-Spin Coins",
-			tip = "When all slot lights are Neon: TP on each wheel Handle + SNO (~1s each)",
-			desc = _Vzd({156,148,151,144,152,149,134,136,138,83,120,145,148,153,152,69,220,69,152,134,155,138,152,84,151,138,153,154,151,147,152,69,149,148,152,142,153,142,148,147,69,220,69,163,90,152,69,135,138,153,156,138,138,147,69,151,148,154,147,137,152}),
+			order = n(), id = "autoSpin", title = _Vzd({102,154,153,148,82,120,149,142,147,69,104,148,142,147,152}),
+			tip = _Vzd({124,141,138,147,69,134,145,145,69,152,145,148,153,69,145,142,140,141,153,152,69,134,151,138,69,115,138,148,147,95,69,121,117,69,148,147,69,138,134,136,141,69,156,141,138,138,145,69,109,134,147,137,145,138,69,80,69,120,115,116,69,77,163,86,152,69,138,134,136,141,78}),
+			desc = "workspace.Slots · saves/returns position · ~5s between rounds",
 			callback = function(on)
 				setAutoSpinCoins(on)
 			end,
@@ -14690,12 +14839,12 @@ _TAB_BUILDERS["auto"] = function(sc, n)
 		makeButton(sc, {
 			order = n(),
 			title = _Vzd({120,149,142,147,69,104,148,142,147,152,69,116,147,136,138,69,115,148,156}),
-			tip = "One full pass now (ignores Neon wait)",
+			tip = _Vzd({116,147,138,69,139,154,145,145,69,149,134,152,152,69,147,148,156,69,77,142,140,147,148,151,138,152,69,115,138,148,147,69,156,134,142,153,78}),
 			callback = function()
 				task.spawn(function()
 					local handles = scanSlotMachines()
 					if #handles == 0 then
-						notify(HUB_NAME, "No SlotHandle.Handle found", 2)
+						notify(HUB_NAME, _Vzd({115,148,69,120,145,148,153,109,134,147,137,145,138,83,109,134,147,137,145,138,69,139,148,154,147,137}), 2)
 						return
 					end
 					notify(HUB_NAME, _Vzd({120,149,142,147,147,142,147,140,69}) .. #handles .. "…", 1.5)
@@ -14736,16 +14885,16 @@ _TAB_BUILDERS["auto"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = _Vzd({134,154,153,148,121,142,146,138,119,138,152,138,153}), title = "Auto Time-Reset",
-			tip = "Click time-reset / clock UI nearby to keep plot time",
+			order = n(), id = "autoTimeReset", title = _Vzd({102,154,153,148,69,121,142,146,138,82,119,138,152,138,153}),
+			tip = _Vzd({104,145,142,136,144,69,153,142,146,138,82,151,138,152,138,153,69,84,69,136,145,148,136,144,69,122,110,69,147,138,134,151,135,158,69,153,148,69,144,138,138,149,69,149,145,148,153,69,153,142,146,138}),
 			callback = function(on)
 				stopLoop("autoTime")
-				if on then startLoop("autoTime", 2, function()
+				if on then startLoop(_Vzd({134,154,153,148,121,142,146,138}), 2, function()
 					local me = hrp(); if not me then return end
 					for _, d in ipairs(workspace:GetDescendants()) do
 						if d:IsA("ClickDetector") and d.Parent and d.Parent:IsA("BasePart") then
 							local n = tostring(d.Parent.Name):lower()
-							if (n:find("time") or n:find("reset") or n:find("clock") or n:find(_Vzd({149,151,138,152,138,151,155,138})))
+							if (n:find("time") or n:find(_Vzd({151,138,152,138,153})) or n:find("clock") or n:find(_Vzd({149,151,138,152,138,151,155,138})))
 								and (d.Parent.Position - me.Position).Magnitude < 50 then
 								pcall(function() fireclickdetector(d) end)
 							end
@@ -14754,7 +14903,7 @@ _TAB_BUILDERS["auto"] = function(sc, n)
 					for _, d in ipairs(workspace:GetDescendants()) do
 						if d:IsA("ProximityPrompt") then
 							local n = (d.ActionText .. " " .. d.ObjectText):lower()
-							if n:find("time") or n:find("reset") then
+							if n:find("time") or n:find(_Vzd({151,138,152,138,153})) then
 								pcall(function() fireproximityprompt(d) end)
 							end
 						end
@@ -14776,32 +14925,32 @@ _TAB_BUILDERS["auto"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "blobDestroyServer", title = "Destroy Server (Blobman)",
+			order = n(), id = "blobDestroyServer", title = _Vzd({105,138,152,153,151,148,158,69,120,138,151,155,138,151,69,77,103,145,148,135,146,134,147,78}),
 			tip = "Same as Server tab · sit Blobman · CreatureGrab all",
 			callback = function(on)
 				if on then setMassToggle("destroySrv", true, destroyServerLoop) else stopMass("destroySrv") end
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "autoLagServer", title = _Vzd({113,134,140,69,120,138,151,155,138,151}),
-			tip = "Same as Server tab · CreateGrabLine intensity spam",
+			order = n(), id = "autoLagServer", title = "Lag Server",
+			tip = _Vzd({120,134,146,138,69,134,152,69,120,138,151,155,138,151,69,153,134,135,69,220,69,104,151,138,134,153,138,108,151,134,135,113,142,147,138,69,142,147,153,138,147,152,142,153,158,69,152,149,134,146}),
 			callback = function(on)
 				if on then setMassToggle("lagSrv", true, lagServerLoop) else stopMass("lagSrv") end
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = _Vzd({134,154,153,148,105,138,152,153,151,148,158,109,158,135,151,142,137}), title = "Destroy Hybrid (no Blobman)",
+			order = n(), id = "autoDestroyHybrid", title = _Vzd({105,138,152,153,151,148,158,69,109,158,135,151,142,137,69,77,147,148,69,103,145,148,135,146,134,147,78}),
 			tip = _Vzd({113,134,140,69,80,69,144,142,145,145,84,139,145,142,147,140,84,153,148,158,152,69,156,141,148,145,138,69,152,138,151,155,138,151}),
 			callback = function(on)
-				if on then setMassToggle("destroyHyb", true, destroyServerHybridLoop) else stopMass("destroyHyb") end
+				if on then setMassToggle("destroyHyb", true, destroyServerHybridLoop) else stopMass(_Vzd({137,138,152,153,151,148,158,109,158,135})) end
 			end,
 		})
 end
 _TAB_BUILDERS["console"] = function(sc, n)
 		section(sc, "SURVIVAL", n())
 		makeToggle(sc, {
-			order = n(), id = "antiKill", title = "Anti-Kill (Water / Acid)",
-			tip = _Vzd({121,117,69,153,148,69,152,134,139,138,69,141,148,154,152,138,69,153,141,138,69,142,147,152,153,134,147,153,69,158,148,154,69,153,148,154,136,141,69,156,134,153,138,151,69,148,151,69,134,136,142,137}),
+			order = n(), id = "antiKill", title = _Vzd({102,147,153,142,82,112,142,145,145,69,77,124,134,153,138,151,69,84,69,102,136,142,137,78}),
+			tip = "TP to safe house the instant you touch water or acid",
 			callback = function(on)
 				S.toggles.antiKill = on
 				if on then
@@ -14837,15 +14986,15 @@ _TAB_BUILDERS["console"] = function(sc, n)
 							end
 						end
 					end)
-					notify(HUB_NAME, "Anti-kill ON", 1.5)
+					notify(HUB_NAME, _Vzd({102,147,153,142,82,144,142,145,145,69,116,115}), 1.5)
 				else
-					stopLoop("antiKillWater")
+					stopLoop(_Vzd({134,147,153,142,112,142,145,145,124,134,153,138,151}))
 				end
 			end,
 		})
 		makeButton(sc, {
 			order = n(), title = _Vzd({121,117,69,121,148,69,120,134,139,138,69,117,145,134,136,138,69,115,148,156}),
-			tip = _Vzd({110,147,152,153,134,147,153,145,158,69,153,138,145,138,149,148,151,153,69,153,148,69,134,69,151,134,147,137,148,146,69,141,148,154,152,138}),
+			tip = "Instantly teleport to a random house",
 			callback = function()
 				local free, owned = collectHouseSpots()
 				local pool = #free > 0 and free or owned
@@ -14857,15 +15006,15 @@ _TAB_BUILDERS["console"] = function(sc, n)
 							r.AssemblyLinearVelocity = Vector3.zero
 							r.CFrame = pick.cf
 						end)
-						notify(HUB_NAME, _Vzd({120,134,139,138,69,121,117,69,220,69}) .. pick.name, 1.5)
+						notify(HUB_NAME, "Safe TP · " .. pick.name, 1.5)
 					end
 				else
-					notify(HUB_NAME, "No houses found", 2)
+					notify(HUB_NAME, _Vzd({115,148,69,141,148,154,152,138,152,69,139,148,154,147,137}), 2)
 				end
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "invincible", title = _Vzd({110,147,155,142,147,136,142,135,145,138,69,77,113,148,136,144,69,110,147,69,109,148,154,152,138,78}),
+			order = n(), id = "invincible", title = "Invincible (Lock In House)",
 			tip = "Force yourself inside a house. Can't walk out or be forced out. Toggle OFF to leave.",
 			callback = function(on)
 				S.toggles.invincible = on
@@ -14886,7 +15035,7 @@ _TAB_BUILDERS["console"] = function(sc, n)
 							r.CFrame = pick.cf
 						end)
 					end
-					startLoop("invincible", 0.05, function()
+					startLoop(_Vzd({142,147,155,142,147,136,142,135,145,138}), 0.05, function()
 						if not S.toggles.invincible then return end
 						local r = hrp()
 						local h = hum()
@@ -14921,8 +15070,8 @@ _TAB_BUILDERS["console"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = _Vzd({152,149,134,146,121,117}), title = "Spam TP (Anti-Kill)",
-			tip = _Vzd({121,138,145,138,149,148,151,153,69,134,151,148,154,147,137,69,153,141,138,69,146,134,149,69,151,134,147,137,148,146,145,158,69,134,153,69,145,142,140,141,153,69,152,149,138,138,137,83,69,104,134,147,76,153,69,135,138,69,153,134,151,140,138,153,138,137,69,148,151,69,145,148,136,144,138,137,69,148,147,83}),
+			order = n(), id = "spamTP", title = _Vzd({120,149,134,146,69,121,117,69,77,102,147,153,142,82,112,142,145,145,78}),
+			tip = "Teleport around the map randomly at light speed. Can't be targeted or locked on.",
 			callback = function(on)
 				S.toggles.spamTP = on
 				if on then
@@ -14939,7 +15088,7 @@ _TAB_BUILDERS["console"] = function(sc, n)
 						CFrame.new(296, -4, 494),
 						CFrame.new(-516, -6, -162),
 					}
-					startLoop(_Vzd({152,149,134,146,121,117}), 0.06, function()
+					startLoop("spamTP", 0.06, function()
 						if not S.toggles.spamTP then return end
 						local r = hrp()
 						if not r then return end
@@ -14951,9 +15100,9 @@ _TAB_BUILDERS["console"] = function(sc, n)
 							r.CFrame = spot
 						end)
 					end)
-					notify(HUB_NAME, _Vzd({120,149,134,146,69,121,117,69,116,115,69,220,69,145,142,140,141,153,69,152,149,138,138,137}), 1.5)
+					notify(HUB_NAME, "Spam TP ON · light speed", 1.5)
 				else
-					stopLoop("spamTP")
+					stopLoop(_Vzd({152,149,134,146,121,117}))
 					notify(HUB_NAME, _Vzd({120,149,134,146,69,121,117,69,116,107,107}), 1)
 				end
 			end,
@@ -14961,8 +15110,8 @@ _TAB_BUILDERS["console"] = function(sc, n)
 
 		section(sc, "ANTI-KICK", n())
 		makeToggle(sc, {
-			order = n(), id = "antiKickMisc", title = "Anti-Kick (Rejoin)",
-			tip = "If kicked: instantly rejoin the same server",
+			order = n(), id = _Vzd({134,147,153,142,112,142,136,144,114,142,152,136}), title = "Anti-Kick (Rejoin)",
+			tip = _Vzd({110,139,69,144,142,136,144,138,137,95,69,142,147,152,153,134,147,153,145,158,69,151,138,143,148,142,147,69,153,141,138,69,152,134,146,138,69,152,138,151,155,138,151}),
 			callback = function(on)
 				AK.enabled = on
 				S.toggles.antiKick = on
@@ -14970,13 +15119,13 @@ _TAB_BUILDERS["console"] = function(sc, n)
 					AK.readyAt = os.clock() + 12
 					notify(HUB_NAME, "Anti-kick ON · 12s grace", 2)
 				else
-					notify(HUB_NAME, "Anti-kick OFF", 1)
+					notify(HUB_NAME, _Vzd({102,147,153,142,82,144,142,136,144,69,116,107,107}), 1)
 				end
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "antiAFK", title = "Anti-AFK",
-			tip = "Prevents idle kick by simulating input",
+			order = n(), id = "antiAFK", title = _Vzd({102,147,153,142,82,102,107,112}),
+			tip = _Vzd({117,151,138,155,138,147,153,152,69,142,137,145,138,69,144,142,136,144,69,135,158,69,152,142,146,154,145,134,153,142,147,140,69,142,147,149,154,153}),
 			callback = function(on)
 				S.toggles.antiAFK = on
 				if on then
@@ -14994,8 +15143,8 @@ _TAB_BUILDERS["console"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "antiLag", title = "Anti-Lag",
-			tip = _Vzd({105,142,152,134,135,145,138,69,104,141,134,151,134,136,153,138,151,102,147,137,103,138,134,146,114,148,155,138,69,145,148,136,134,145,69,152,136,151,142,149,153,69,153,148,69,151,138,137,154,136,138,69,145,134,140}),
+			order = n(), id = _Vzd({134,147,153,142,113,134,140}), title = "Anti-Lag",
+			tip = "Disable CharacterAndBeamMove local script to reduce lag",
 			callback = function(on)
 				S.toggles.antiLag = on
 				pcall(function()
@@ -15005,18 +15154,18 @@ _TAB_BUILDERS["console"] = function(sc, n)
 			end,
 		})
 
-		section(sc, _Vzd({114,116,123,106,114,106,115,121}), n())
+		section(sc, "MOVEMENT", n())
 		makeToggle(sc, {
 			order = n(), id = "noclip", title = "Noclip",
-			tip = _Vzd({104,134,147,104,148,145,145,142,137,138,69,139,134,145,152,138,69,138,155,138,151,158,69,139,151,134,146,138,69,57,69,156,134,145,144,69,153,141,151,148,154,140,141,69,156,134,145,145,152}),
+			tip = "CanCollide false every frame — walk through walls",
 			callback = function() end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "speed", title = "WalkSpeed Override",
-			tip = "Re-applies every frame (FTAP resets speed)",
+			order = n(), id = "speed", title = _Vzd({124,134,145,144,120,149,138,138,137,69,116,155,138,151,151,142,137,138}),
+			tip = _Vzd({119,138,82,134,149,149,145,142,138,152,69,138,155,138,151,158,69,139,151,134,146,138,69,77,107,121,102,117,69,151,138,152,138,153,152,69,152,149,138,138,137,78}),
 			callback = function() end,
 		})
-		makeSlider(sc, { order = n(), title = "WalkSpeed", min = 16, max = 300, default = 50, stateKey = "walkSpeed" })
+		makeSlider(sc, { order = n(), title = _Vzd({124,134,145,144,120,149,138,138,137}), min = 16, max = 300, default = 50, stateKey = "walkSpeed" })
 		makeToggle(sc, {
 			order = n(), id = "speedCFrame", title = _Vzd({104,107,151,134,146,138,69,120,149,138,138,137,69,103,148,148,152,153}),
 			tip = _Vzd({106,157,153,151,134,69,104,107,151,134,146,138,69,149,154,152,141,69,57,69,139,134,152,153,138,151,69,153,141,134,147,69,156,134,145,144,69,152,149,138,138,137}),
@@ -15024,8 +15173,8 @@ _TAB_BUILDERS["console"] = function(sc, n)
 		})
 		makeSlider(sc, { order = n(), title = "CFrame Mult", min = 1, max = 8, default = 2, stateKey = "speedMult" })
 		makeToggle(sc, {
-			order = n(), id = "infjump", title = "Infinite Jump",
-			tip = "JumpRequest → force Jump while ON",
+			order = n(), id = "infjump", title = _Vzd({110,147,139,142,147,142,153,138,69,111,154,146,149}),
+			tip = _Vzd({111,154,146,149,119,138,150,154,138,152,153,69,183,69,139,148,151,136,138,69,111,154,146,149,69,156,141,142,145,138,69,116,115}),
 			callback = function(on)
 				S.toggles.infjump = on
 				if S.conns.infJump then pcall(function() S.conns.infJump:Disconnect() end) S.conns.infJump = nil end
@@ -15044,7 +15193,7 @@ _TAB_BUILDERS["console"] = function(sc, n)
 		})
 		makeSlider(sc, { order = n(), title = _Vzd({111,154,146,149,69,117,148,156,138,151}), min = 50, max = 500, default = 80, stateKey = "jumpPower" })
 		makeButton(sc, {
-			order = n(), title = _Vzd({119,138,152,138,153,69,114,148,155,138,146,138,147,153}), danger = true,
+			order = n(), title = "Reset Movement", danger = true,
 			callback = function()
 				S.toggles.speed = false; S.toggles.fly = false; S.toggles.noclip = false
 				S.toggles.infjump = false; S.toggles.jump = false; S.toggles.speedCFrame = false
@@ -15057,7 +15206,7 @@ _TAB_BUILDERS["console"] = function(sc, n)
 		makeButton(sc, { order = n(), title = "Rejoin", callback = function()
 			pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LP) end)
 		end })
-		makeButton(sc, { order = n(), title = _Vzd({104,148,149,158,69,111,148,135,110,137}), callback = function()
+		makeButton(sc, { order = n(), title = "Copy JobId", callback = function()
 			if setclipboard then setclipboard(game.JobId) end; notify(HUB_NAME, "Copied", 1)
 		end })
 		makeButton(sc, { order = n(), title = _Vzd({119,138,152,138,153,69,136,141,134,151,134,136,153,138,151}), callback = function() local h = hum(); if h then h.Health = 0 end end })
@@ -15074,7 +15223,7 @@ _TAB_BUILDERS["console"] = function(sc, n)
 			notify(HUB_NAME, _Vzd({113,148,148,149,152,69,152,153,148,149,149,138,137}), 1.2)
 		end })
 
-		section(sc, _Vzd({104,116,114,114,102,115,105,69,104,116,115,120,116,113,106}), n())
+		section(sc, "COMMAND CONSOLE", n())
 		local outBox = Instance.new("ScrollingFrame")
 		outBox.LayoutOrder = n()
 		outBox.Size = UDim2.new(1, -6, 0, 150)
@@ -15117,12 +15266,12 @@ _TAB_BUILDERS["console"] = function(sc, n)
 			end
 		end
 		S.consPrint = consPrint
-		consPrint("VOIDZ console · type help", C.accent2)
+		consPrint(_Vzd({123,116,110,105,127,69,136,148,147,152,148,145,138,69,220,69,153,158,149,138,69,141,138,145,149}), C.accent2)
 		consPrint(_Vzd({120,136,134,147,69,183,69,145,142,152,153,152,69,148,147,145,158,69,149,145,134,158,138,151,69,147,134,146,138,152,69,153,141,134,153,69,145,148,148,144,69,139,145,134,140,140,138,137,83}), C.muted)
 
-		makeInput(sc, { order = n(), id = "consoleInput", placeholder = _Vzd({136,146,137,69,220,69,141,138,145,149,69,161,69,139,145,142,147,140,69,147,134,146,138,69,161,69,152,136,134,147}) })
+		makeInput(sc, { order = n(), id = _Vzd({136,148,147,152,148,145,138,110,147,149,154,153}), placeholder = "cmd · help | fling name | scan" })
 		makeButton(sc, {
-			order = n(), title = _Vzd({119,154,147,69,104,148,146,146,134,147,137}),
+			order = n(), title = "Run Command",
 			callback = function()
 				local box = S.consoleInput
 				local line = box and box.Text or ""
@@ -15132,11 +15281,11 @@ _TAB_BUILDERS["console"] = function(sc, n)
 			end,
 		})
 		makeButton(sc, {
-			order = n(), title = "Scan Players (exploit signs)",
+			order = n(), title = _Vzd({120,136,134,147,69,117,145,134,158,138,151,152,69,77,138,157,149,145,148,142,153,69,152,142,140,147,152,78}),
 			callback = function() runConsoleCommand("scan") end,
 		})
 		makeButton(sc, {
-			order = n(), title = _Vzd({104,145,138,134,151,69,104,148,147,152,148,145,138}),
+			order = n(), title = "Clear Console",
 			callback = function()
 				if S.consoleOut then
 					for _, ch in ipairs(S.consoleOut:GetChildren()) do
@@ -15196,15 +15345,15 @@ _TAB_BUILDERS["control"] = function(sc, n)
 		})
 		makeButton(sc, {
 			order = n(),
-			title = "Control selected",
+			title = _Vzd({104,148,147,153,151,148,145,69,152,138,145,138,136,153,138,137}),
 			callback = function() controlSelectedPlayer() end,
 		})
 		if S.toggles.controlBindC == nil then S.toggles.controlBindC = false end
 		makeToggle(sc, {
 			order = n(),
 			id = "controlBindC",
-			title = _Vzd({98,69,220,69,145,148,148,144,69,136,148,147,153,151,148,145}),
-			tip = _Vzd({119,134,158,69,139,151,148,146,69,141,138,134,137,69,134,145,148,147,140,69,136,134,146,138,151,134,83,69,116,147,69,135,158,69,137,138,139,134,154,145,153,83}),
+			title = "= · look control",
+			tip = "Ray from head along camera. On by default.",
 			callback = function(on)
 				installControlKeyC(on)
 			end,
@@ -15216,7 +15365,7 @@ _TAB_BUILDERS["control"] = function(sc, n)
 		})
 		makeButton(sc, {
 			order = n(),
-			title = _Vzd({104,148,147,153,151,148,145,69,147,138,134,151,138,152,153}),
+			title = "Control nearest",
 			callback = function()
 				local p = nearestControlPlayer(1e9)
 				if not p or not p.Character then
@@ -15242,11 +15391,11 @@ _TAB_BUILDERS["control"] = function(sc, n)
 			callback = function() stopControl() end,
 		})
 end
-_TAB_BUILDERS["trans"] = function(sc, n)
+_TAB_BUILDERS[_Vzd({153,151,134,147,152})] = function(sc, n)
 		section(sc, _Vzd({104,109,102,121,69,121,119,102,115,120,113,102,121,116,119}), n())
 		local TRAN_LANGS = {
 			English = "en", Spanish = "es", French = "fr", German = "de",
-			Portuguese = "pt", Japanese = "ja", Korean = "ko", Chinese = "zh-CN",
+			Portuguese = "pt", Japanese = "ja", Korean = "ko", Chinese = _Vzd({159,141,82,104,115}),
 			Russian = "ru", Arabic = "ar", Italian = "it", Hindi = "hi",
 		}
 		local function detectLang(text)
@@ -15282,20 +15431,20 @@ _TAB_BUILDERS["trans"] = function(sc, n)
 			return false
 		end
 		makeToggle(sc, {
-			order = n(), id = "autoTranslate", title = _Vzd({102,154,153,148,69,121,151,134,147,152,145,134,153,138,69,104,141,134,153}),
+			order = n(), id = "autoTranslate", title = "Auto Translate Chat",
 			tip = _Vzd({105,138,153,138,136,153,152,69,147,148,147,82,106,147,140,145,142,152,141,69,146,138,152,152,134,140,138,152,69,134,147,137,69,152,141,148,156,152,69,106,147,140,145,142,152,141,69,153,151,134,147,152,145,134,153,142,148,147}),
 			callback = function(on)
 				S.toggles.autoTranslate = on
-				notify(HUB_NAME, "Auto-translate " .. (on and "ON" or "OFF"), 1.5)
+				notify(HUB_NAME, _Vzd({102,154,153,148,82,153,151,134,147,152,145,134,153,138,69}) .. (on and "ON" or "OFF"), 1.5)
 			end,
 		})
 		makeDropdown(sc, {
 			order = n(), title = _Vzd({121,151,134,147,152,145,134,153,138,69,121,148}),
-			options = { "English", "Spanish", "French", "German", "Portuguese", "Japanese", "Korean", _Vzd({104,141,142,147,138,152,138}), "Russian", "Arabic", _Vzd({110,153,134,145,142,134,147}), "Hindi" },
+			options = { "English", "Spanish", "French", "German", "Portuguese", "Japanese", "Korean", "Chinese", "Russian", "Arabic", _Vzd({110,153,134,145,142,134,147}), "Hindi" },
 			default = S.transLang or "English",
 			callback = function(v) S.transLang = v end,
 		})
-		section(sc, _Vzd({104,109,102,121,69,113,116,108,120}), n())
+		section(sc, "CHAT LOGS", n())
 		local chatLogHost = Instance.new("Frame")
 		chatLogHost.LayoutOrder = n()
 		chatLogHost.Size = UDim2.new(1, -6, 0, 200)
@@ -15369,7 +15518,7 @@ _TAB_BUILDERS["trans"] = function(sc, n)
 						if ch:IsA("TextLabel") then ch:Destroy() end
 					end
 				end
-				notify(HUB_NAME, _Vzd({104,141,134,153,69,145,148,140,69,136,145,138,134,151,138,137}), 1)
+				notify(HUB_NAME, "Chat log cleared", 1)
 			end,
 		})
 end
@@ -15391,7 +15540,7 @@ _TAB_BUILDERS["sounds"] = function(sc, n)
 		pad(sndNote, 8, 8, 8, 8)
 
 		local SOUND_TRIGGERS = {
-			{ label = "Hello",     word = "Hello" },
+			{ label = _Vzd({109,138,145,145,148}),     word = "Hello" },
 			{ label = "Hi",        word = "Hi" },
 			{ label = "Hey",       word = "Hey" },
 			{ label = "Oi",        word = "Oi" },
@@ -15405,11 +15554,11 @@ _TAB_BUILDERS["sounds"] = function(sc, n)
 			{ label = "OwO",       word = "OwO" },
 			{ label = ":)",        word = ":)" },
 			{ label = ":D",        word = ":D" },
-			{ label = _Vzd({109,148,148,151,134,158}),    word = "Hooray" },
+			{ label = "Hooray",    word = "Hooray" },
 			{ label = "Yay",       word = "Yay" },
 			{ label = "Weee",      word = "Weee" },
 			{ label = "Fun",       word = "Fun" },
-			{ label = "Mountain",  word = "Mountain" },
+			{ label = "Mountain",  word = _Vzd({114,148,154,147,153,134,142,147}) },
 			{ label = "Yodel",     word = "Yodel" },
 			{ label = "Yodeling",  word = "Yodeling" },
 			{ label = "Sing",      word = "Sing" },
@@ -15457,7 +15606,7 @@ _TAB_BUILDERS["sounds"] = function(sc, n)
 
 		makeButton(sc, {
 			order = n(),
-			title = _Vzd({117,145,134,158,69,120,148,154,147,137}),
+			title = "Play Sound",
 			callback = function()
 				local word = getSelectedWord()
 				voidzChat(word)
@@ -15469,7 +15618,7 @@ _TAB_BUILDERS["sounds"] = function(sc, n)
 			order = n(),
 			id = "spamSounds",
 			title = "Spam Sound Loop",
-			tip = _Vzd({112,138,138,149,152,69,152,138,147,137,142,147,140,69,153,141,138,69,153,151,142,140,140,138,151,69,156,148,151,137,69,142,147,69,136,141,134,153}),
+			tip = "Keeps sending the trigger word in chat",
 			callback = function(on)
 				S.toggles.spamSounds = on
 				if on then
@@ -15488,7 +15637,7 @@ _TAB_BUILDERS["sounds"] = function(sc, n)
 		makeSlider(sc, {
 			order = n(),
 			id = "spamSoundSpeed",
-			title = "Spam Speed (sec)",
+			title = _Vzd({120,149,134,146,69,120,149,138,138,137,69,77,152,138,136,78}),
 			min = 0.5,
 			max = 5,
 			default = S.sliderVal and S.sliderVal.spamSoundSpeed or 1.5,
@@ -15517,7 +15666,7 @@ _TAB_BUILDERS["sounds"] = function(sc, n)
 		end
 end
 _TAB_BUILDERS["fun"] = function(sc, n)
-		section(sc, _Vzd({104,116,115,121,119,116,113,69,117,113,102,126,106,119}), n())
+		section(sc, "CONTROL PLAYER", n())
 		local ctrlNote = Instance.new("TextLabel")
 		ctrlNote.LayoutOrder = n()
 		ctrlNote.Size = UDim2.new(1, -6, 0, 36)
@@ -15528,7 +15677,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		ctrlNote.TextColor3 = C.muted
 		ctrlNote.TextXAlignment = Enum.TextXAlignment.Left
 		ctrlNote.TextWrapped = true
-		ctrlNote.Text = " Look at them + = key · WASD drives them · = again to drop"
+		ctrlNote.Text = _Vzd({69,113,148,148,144,69,134,153,69,153,141,138,146,69,80,69,98,69,144,138,158,69,220,69,124,102,120,105,69,137,151,142,155,138,152,69,153,141,138,146,69,220,69,98,69,134,140,134,142,147,69,153,148,69,137,151,148,149})
 		ctrlNote.Parent = sc
 		corner(ctrlNote, 8)
 		pad(ctrlNote, 8, 8, 8, 8)
@@ -15540,7 +15689,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 
 		makeButton(sc, {
 			order = n(),
-			title = "Refresh Players",
+			title = _Vzd({119,138,139,151,138,152,141,69,117,145,134,158,138,151,152}),
 			callback = function()
 				if S._funControlSearchRefresh then S._funControlSearchRefresh() end
 				local nPl = #playerLabels()
@@ -15549,7 +15698,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		})
 		makeButton(sc, {
 			order = n(),
-			title = "Control Selected",
+			title = _Vzd({104,148,147,153,151,148,145,69,120,138,145,138,136,153,138,137}),
 			callback = function() controlSelectedPlayer() end,
 		})
 		if S.toggles.controlBindC == nil then S.toggles.controlBindC = false end
@@ -15564,7 +15713,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		})
 		makeButton(sc, {
 			order = n(),
-			title = "Control Look Target",
+			title = _Vzd({104,148,147,153,151,148,145,69,113,148,148,144,69,121,134,151,140,138,153}),
 			callback = function() controlBindLook() end,
 		})
 		makeButton(sc, {
@@ -15590,13 +15739,13 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		})
 		makeButton(sc, {
 			order = n(),
-			title = "Stop Control",
+			title = _Vzd({120,153,148,149,69,104,148,147,153,151,148,145}),
 			danger = true,
 			callback = function() stopControl() end,
 		})
 
-		section(sc, _Vzd({109,116,113,105,69,220,69,106,102,121,69,84,69,110,115,120,121,119,122,114,106,115,121,120}), n())
-		local holdNote = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
+		section(sc, "HOLD · EAT / INSTRUMENTS", n())
+		local holdNote = Instance.new("TextLabel")
 		holdNote.LayoutOrder = n()
 		holdNote.Size = UDim2.new(1, -6, 0, 36)
 		holdNote.BackgroundColor3 = C.card
@@ -15612,7 +15761,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		corner(holdNote, 8)
 		pad(holdNote, 6, 6, 6, 6)
 		local HOLD_ITEMS = {
-			"FoodBanana", "FoodBread",
+			_Vzd({107,148,148,137,103,134,147,134,147,134}), "FoodBread",
 			"InstrumentDrumSnare", "InstrumentGuitar", "InstrumentPiano",
 		}
 		makeDropdown(sc, {
@@ -15625,7 +15774,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 
 		local function doHoldAndUse(itemName)
 			local me = hrp()
-			if not me then notify(HUB_NAME, _Vzd({115,148,69,136,141,134,151,134,136,153,138,151}), 1.5) return false end
+			if not me then notify(HUB_NAME, "No character", 1.5) return false end
 			local char = LP.Character
 			if not char then return false end
 
@@ -15655,15 +15804,15 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 
 			if not model then notify(HUB_NAME, _Vzd({107,134,142,145,138,137,69,153,148,69,152,149,134,156,147,69}) .. itemName, 1.5) return false end
 
-			local holdPart = model:FindFirstChild(_Vzd({109,148,145,137,117,134,151,153}))
+			local holdPart = model:FindFirstChild("HoldPart")
 			if not holdPart then
 				holdPart = model:WaitForChild("HoldPart", 3)
 			end
-			if not holdPart then notify(HUB_NAME, _Vzd({115,148,69,109,148,145,137,117,134,151,153,69,148,147,69}) .. itemName, 1.5) return false end
+			if not holdPart then notify(HUB_NAME, "No HoldPart on " .. itemName, 1.5) return false end
 
 			local holdRF = holdPart:FindFirstChild("HoldItemRemoteFunction")
 			if not holdRF then
-				holdRF = holdPart:WaitForChild("HoldItemRemoteFunction", 3)
+				holdRF = holdPart:WaitForChild(_Vzd({109,148,145,137,110,153,138,146,119,138,146,148,153,138,107,154,147,136,153,142,148,147}), 3)
 			end
 			local rigid = holdPart:FindFirstChild("RigidConstraint")
 
@@ -15691,7 +15840,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 				end
 			end
 
-			if not isHeld then notify(HUB_NAME, "Failed to hold " .. itemName, 1.5) return false end
+			if not isHeld then notify(HUB_NAME, _Vzd({107,134,142,145,138,137,69,153,148,69,141,148,145,137,69}) .. itemName, 1.5) return false end
 
 			local eatingSound = holdPart:FindFirstChild("EatingSound")
 			local canUse = true
@@ -15713,18 +15862,18 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 
 		makeButton(sc, {
 			order = n(),
-			title = "Hold + Use Item",
-			tip = _Vzd({120,149,134,156,147,69,183,69,109,148,145,137,69,183,69,122,152,138,69,153,141,138,69,152,138,145,138,136,153,138,137,69,142,153,138,146,69,77,139,154,145,145,69,152,153,134,153,138,69,136,141,138,136,144,78}),
+			title = _Vzd({109,148,145,137,69,80,69,122,152,138,69,110,153,138,146}),
+			tip = "Spawn → Hold → Use the selected item (full state check)",
 			callback = function()
 				local item = S.holdItem or "FoodBanana"
 				local ok = doHoldAndUse(item)
-				if ok then notify(HUB_NAME, _Vzd({122,152,138,137,69}) .. item, 1) end
+				if ok then notify(HUB_NAME, "Used " .. item, 1) end
 			end,
 		})
 		makeButton(sc, {
 			order = n(),
 			title = "Eat All Food",
-			tip = "Spawns FoodBanana + FoodBread, holds each, eats them",
+			tip = _Vzd({120,149,134,156,147,152,69,107,148,148,137,103,134,147,134,147,134,69,80,69,107,148,148,137,103,151,138,134,137,81,69,141,148,145,137,152,69,138,134,136,141,81,69,138,134,153,152,69,153,141,138,146}),
 			callback = function()
 				local foods = { "FoodBanana", "FoodBread" }
 				for _, food in ipairs(foods) do
@@ -15739,7 +15888,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			title = _Vzd({122,152,138,69,102,145,145,69,110,147,152,153,151,154,146,138,147,153,152}),
 			tip = _Vzd({120,149,134,156,147,152,69,138,134,136,141,69,142,147,152,153,151,154,146,138,147,153,81,69,141,148,145,137,152,69,142,153,81,69,149,145,134,158,152,69,142,153}),
 			callback = function()
-				local insts = { _Vzd({110,147,152,153,151,154,146,138,147,153,105,151,154,146,120,147,134,151,138}), "InstrumentGuitar", "InstrumentPiano" }
+				local insts = { "InstrumentDrumSnare", "InstrumentGuitar", "InstrumentPiano" }
 				for _, inst in ipairs(insts) do
 					local ok = doHoldAndUse(inst)
 					if ok then task.wait(1) end
@@ -15749,7 +15898,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		})
 
 		section(sc, "SPRAY PAINT", n())
-		local paintNote = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
+		local paintNote = Instance.new("TextLabel")
 		paintNote.LayoutOrder = n()
 		paintNote.Size = UDim2.new(1, -6, 0, 36)
 		paintNote.BackgroundColor3 = C.card
@@ -15767,7 +15916,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		makeButton(sc, {
 			order = n(),
 			title = _Vzd({120,149,151,134,158,69,117,134,142,147,153,69,121,134,151,140,138,153}),
-			tip = "Spawn SprayCanWD, firetouchinterest on target",
+			tip = _Vzd({120,149,134,156,147,69,120,149,151,134,158,104,134,147,124,105,81,69,139,142,151,138,153,148,154,136,141,142,147,153,138,151,138,152,153,69,148,147,69,153,134,151,140,138,153}),
 			callback = function()
 				local p = S.selected
 				if not p or not validP(p) or not p.Character then
@@ -15777,7 +15926,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 				if not me then return end
 				local r = rootOf(p)
 				if not r then return end
-				pcall(function() if FTAP.BuyToy then FTAP.BuyToy:InvokeServer(_Vzd({120,149,151,134,158,104,134,147,124,105})) end end)
+				pcall(function() if FTAP.BuyToy then FTAP.BuyToy:InvokeServer("SprayCanWD") end end)
 				task.wait(0.3)
 				pcall(function()
 					if FTAP.SpawnToy then
@@ -15790,7 +15939,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 					local can = myFolder and myFolder:FindFirstChild("SprayCanWD")
 					if not can then can = workspace:FindFirstChild("SprayCanWD", true) end
 					if can then
-						local sticky = can:FindFirstChild(_Vzd({120,153,142,136,144,158,119,138,146,148,155,138,151,117,134,151,153}))
+						local sticky = can:FindFirstChild("StickyRemoverPart")
 						if sticky then
 							if firetouchinterest then
 								firetouchinterest(sticky, r, 0)
@@ -15813,7 +15962,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 				S.toggles.loopPaint = on
 				if on then
 					task.spawn(function()
-						notify(HUB_NAME, "Loop paint ON", 1.5)
+						notify(HUB_NAME, _Vzd({113,148,148,149,69,149,134,142,147,153,69,116,115}), 1.5)
 						while S.toggles.loopPaint do
 							local p = S.selected
 							if p and validP(p) and p.Character then
@@ -15824,7 +15973,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 									task.wait(0.2)
 									pcall(function()
 										if FTAP.SpawnToy then
-											FTAP.SpawnToy:InvokeServer(_Vzd({120,149,151,134,158,104,134,147,124,105}), me.CFrame * CFrame.new(0, 3, -3), Vector3.zero)
+											FTAP.SpawnToy:InvokeServer("SprayCanWD", me.CFrame * CFrame.new(0, 3, -3), Vector3.zero)
 										end
 									end)
 									task.wait(0.5)
@@ -15853,7 +16002,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
-		section(sc, _Vzd({102,122,121,116,69,103,119,106,102,112,69,117,113,116,121}), n())
+		section(sc, "AUTO BREAK PLOT", n())
 		local breakNote = Instance.new("TextLabel")
 		breakNote.LayoutOrder = n()
 		breakNote.Size = UDim2.new(1, -6, 0, 36)
@@ -15871,17 +16020,17 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		pad(breakNote, 6, 6, 6, 6)
 		makeSlider(sc, {
 			order = n(), title = _Vzd({103,151,138,134,144,69,119,134,153,138,69,77,152,138,136,78}), min = 0.3, max = 3, default = 0.8, step = 0.1,
-			stateKey = _Vzd({135,151,138,134,144,119,134,153,138}),
-			tip = _Vzd({120,138,136,148,147,137,152,69,135,138,153,156,138,138,147,69,138,134,136,141,69,135,148,146,135,69,137,151,148,149}),
+			stateKey = "breakRate",
+			tip = "Seconds between each bomb drop",
 		})
 		makeToggle(sc, {
-			order = n(), id = "autoBreakPlot", title = _Vzd({102,154,153,148,69,103,151,138,134,144,69,117,145,148,153}),
+			order = n(), id = _Vzd({134,154,153,148,103,151,138,134,144,117,145,148,153}), title = "Auto Break Plot",
 			tip = _Vzd({105,151,148,149,69,146,142,152,152,142,145,138,152,84,135,148,146,135,152,69,148,147,69,152,138,145,138,136,153,138,137,69,149,145,134,158,138,151,76,152,69,149,145,148,153,69,134,151,138,134,69,220,69,145,148,148,149,152}),
 			callback = function(on)
 				S.toggles.autoBreakPlot = on
 				if on then
 					task.spawn(function()
-						notify(HUB_NAME, "Break Plot ON", 1.5)
+						notify(HUB_NAME, _Vzd({103,151,138,134,144,69,117,145,148,153,69,116,115}), 1.5)
 						while S.toggles.autoBreakPlot do
 							local p = S.selected
 							if p and validP(p) and p.Character then
@@ -15898,7 +16047,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 									end)
 									task.wait(0.2)
 									pcall(function()
-										local be = ReplicatedStorage:FindFirstChild("BombEvents")
+										local be = ReplicatedStorage:FindFirstChild(_Vzd({103,148,146,135,106,155,138,147,153,152}))
 										if be and be:FindFirstChild("BombExplode") then
 											for _, obj in ipairs(workspace:GetDescendants()) do
 												if obj.Name == "BombMissile" or obj.Name == "Missile" then
@@ -15914,7 +16063,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 							local rate = tonumber(S.breakRate) or 0.8
 							task.wait(rate)
 						end
-						notify(HUB_NAME, "Break Plot OFF", 1)
+						notify(HUB_NAME, _Vzd({103,151,138,134,144,69,117,145,148,153,69,116,107,107}), 1)
 					end)
 				end
 			end,
@@ -15953,30 +16102,30 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
-		local SPARK_SHAPES = { "Sphere", "Ring", "Spiral", "Cone", "Cylinder", "Plane" }
+		local SPARK_SHAPES = { "Sphere", "Ring", "Spiral", "Cone", _Vzd({104,158,145,142,147,137,138,151}), "Plane" }
 		S.sparkShape = S.sparkShape or "Sphere"
 		makeDropdown(sc, {
 			order = n(),
-			title = _Vzd({120,141,134,149,138,69,84,69,117,134,153,153,138,151,147}),
+			title = "Shape / Pattern",
 			options = SPARK_SHAPES,
 			default = S.sparkShape,
 			callback = function(v) S.sparkShape = v end,
 		})
 
-		local SPARK_TOYS = { "Firework", "Balloon", "Snowball", "BombBalloon", "CandyCorn", "WaterBomb", "Pumpkin", "Present" }
-		S.sparkToyName = S.sparkToyName or "Firework"
+		local SPARK_TOYS = { "Firework", "Balloon", "Snowball", "BombBalloon", "CandyCorn", "WaterBomb", _Vzd({117,154,146,149,144,142,147}), "Present" }
+		S.sparkToyName = S.sparkToyName or _Vzd({107,142,151,138,156,148,151,144})
 		makeDropdown(sc, {
 			order = n(),
 			title = "Toy to Spawn",
 			options = SPARK_TOYS,
 			default = S.sparkToyName,
-			tip = _Vzd({124,141,142,136,141,69,153,148,158,69,153,148,69,152,149,134,156,147,69,134,153,69,138,134,136,141,69,152,149,134,151,144,145,138,69,149,148,152,142,153,142,148,147}),
+			tip = "Which toy to spawn at each sparkle position",
 			callback = function(v) S.sparkToyName = v end,
 		})
 
 		makeSlider(sc, {
 			order = n(), title = _Vzd({117,134,151,153,142,136,145,138,69,102,146,148,154,147,153}), min = 5, max = 100, default = S.sparkAmount or 30, step = 5,
-			tip = "Number of toys to spawn in the burst",
+			tip = _Vzd({115,154,146,135,138,151,69,148,139,69,153,148,158,152,69,153,148,69,152,149,134,156,147,69,142,147,69,153,141,138,69,135,154,151,152,153}),
 			callback = function(v) S.sparkAmount = v end,
 		})
 		makeSlider(sc, {
@@ -16045,12 +16194,12 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 
 		makeButton(sc, {
 			order = n(),
-			title = "Create Sparkler Burst",
-			tip = "Spawn actual sparkler toys around target (server-sided)",
+			title = _Vzd({104,151,138,134,153,138,69,120,149,134,151,144,145,138,151,69,103,154,151,152,153}),
+			tip = _Vzd({120,149,134,156,147,69,134,136,153,154,134,145,69,152,149,134,151,144,145,138,151,69,153,148,158,152,69,134,151,148,154,147,137,69,153,134,151,140,138,153,69,77,152,138,151,155,138,151,82,152,142,137,138,137,78}),
 			callback = function()
 				local p = S.sparkTarget
 				if not p or not validP(p) or not p.Character then
-					notify(HUB_NAME, _Vzd({117,142,136,144,69,134,69,149,145,134,158,138,151,69,139,142,151,152,153}), 1.2)
+					notify(HUB_NAME, "Pick a player first", 1.2)
 					return
 				end
 				local r = rootOf(p)
@@ -16080,7 +16229,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 						if myFolder then
 							for _, model in ipairs(myFolder:GetChildren()) do
 								if model.Name == toyName then
-									local pp = model.PrimaryPart or model:FindFirstChildWhichIsA(_Vzd({103,134,152,138,117,134,151,153}), true)
+									local pp = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart", true)
 									if pp and (pp.Position - cf.Position).Magnitude < 20 then
 										sno(pp, cf.Position)
 										pcall(function()
@@ -16101,7 +16250,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		})
 		makeToggle(sc, {
 			order = n(), id = "sparklerLoop", title = _Vzd({120,149,134,151,144,145,138,151,69,113,148,148,149}),
-			tip = _Vzd({104,148,147,153,142,147,154,148,154,152,145,158,69,152,149,134,156,147,69,152,149,134,151,144,145,138,151,69,153,148,158,152,69,134,151,148,154,147,137,69,153,134,151,140,138,153}),
+			tip = "Continuously spawn sparkler toys around target",
 			callback = function(on)
 				S.toggles.sparklerLoop = on
 				if on then
@@ -16114,7 +16263,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 									local amount = math.min(S.sparkAmount or 30, 8)
 									local height = S.sparkHeight or 3
 									local toyName = S.sparkToyName or "Firework"
-									local positions = calcSparkPositions(S.sparkShape or "Sphere", amount, 4)
+									local positions = calcSparkPositions(S.sparkShape or _Vzd({120,149,141,138,151,138}), amount, 4)
 									for _, pos in ipairs(positions) do
 										if not S.toggles.sparklerLoop then break end
 										local me = hrp()
@@ -16172,13 +16321,13 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		makeButton(sc, {
 			order = n(),
 			title = _Vzd({120,149,134,156,147,69,124,142,147,140,152}),
-			tip = _Vzd({120,149,134,156,147,69,152,138,151,155,138,151,82,152,142,137,138,137,69,156,142,147,140,152,69,139,151,148,146,69,149,134,145,145,138,153,152,69,77,155,142,152,142,135,145,138,69,153,148,69,134,145,145,78}),
+			tip = "Spawn server-sided wings from pallets (visible to all)",
 			callback = function()
 				if S.formBuilding then notify(HUB_NAME, _Vzd({102,145,151,138,134,137,158,69,135,154,142,145,137,142,147,140,69,139,148,151,146,83,83,83}), 1.5) return end
 				clearFormWear(true)
 				local offsets = formWingsOffsets()
 				spawnFormOffsets("PalletLightBrown", offsets, nil, {
-					label = _Vzd({124,142,147,140,152}),
+					label = "Wings",
 					keep = true,
 					silent = true,
 				})
@@ -16187,7 +16336,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		})
 		makeButton(sc, {
 			order = n(),
-			title = "Remove Wings",
+			title = _Vzd({119,138,146,148,155,138,69,124,142,147,140,152}),
 			danger = true,
 			tip = "Destroy your wing pallets",
 			callback = function()
@@ -16197,7 +16346,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
-		section(sc, _Vzd({107,116,119,104,106,69,102,115,110,114,102,121,110,116,115,120}), n())
+		section(sc, "FORCE ANIMATIONS", n())
 		local animNote = Instance.new("TextLabel")
 		animNote.LayoutOrder = n()
 		animNote.Size = UDim2.new(1, -6, 0, 36)
@@ -16208,22 +16357,22 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		animNote.TextColor3 = C.muted
 		animNote.TextWrapped = true
 		animNote.TextXAlignment = Enum.TextXAlignment.Left
-		animNote.Text = _Vzd({69,107,148,151,136,138,69,134,147,142,146,134,153,142,148,147,152,69,148,147,69,134,69,152,138,145,138,136,153,138,137,69,149,145,134,158,138,151,83,69,117,142,136,144,69,134,147,142,146,134,153,142,148,147,69,80,69,153,134,151,140,138,153,81,69,141,142,153,69,117,145,134,158,83})
+		animNote.Text = " Force animations on a selected player. Pick animation + target, hit Play."
 		animNote.Parent = sc
 		corner(animNote, 8)
 		pad(animNote, 8, 8, 8, 8)
 
 		local ANIMS = {
 			{ label = "Typing",        id = "Typing" },
-			{ label = _Vzd({107,145,134,142,145}),         id = "Flail" },
+			{ label = "Flail",         id = "Flail" },
 			{ label = "Wave",          asset = "rbxassetid://180436334" },
-			{ label = _Vzd({113,134,154,140,141}),         asset = "rbxassetid://180436148" },
+			{ label = "Laugh",         asset = "rbxassetid://180436148" },
 			{ label = "Cheer",         asset = "rbxassetid://180436060" },
 			{ label = "Dance",         asset = "rbxassetid://180435792" },
-			{ label = _Vzd({105,134,147,136,138,87}),        asset = "rbxassetid://180435792" },
-			{ label = _Vzd({105,134,147,136,138,88}),        asset = "rbxassetid://180435792" },
+			{ label = "Dance2",        asset = "rbxassetid://180435792" },
+			{ label = "Dance3",        asset = "rbxassetid://180435792" },
 			{ label = "Gesture",       asset = "rbxassetid://180435571" },
-			{ label = _Vzd({117,148,142,147,153}),         asset = "rbxassetid://180435571" },
+			{ label = "Point",         asset = "rbxassetid://180435571" },
 			{ label = "Rank",          asset = "rbxassetid://180435571" },
 			{ label = "Salute",        asset = "rbxassetid://180435571" },
 			{ label = "Sit",           asset = "rbxassetid://2506281703" },
@@ -16272,7 +16421,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 
 		makeButton(sc, {
 			order = n(),
-			title = "Play Animation",
+			title = _Vzd({117,145,134,158,69,102,147,142,146,134,153,142,148,147}),
 			callback = function()
 				local p = S.animTarget
 				if not p or not validP(p) or not p.Character then
@@ -16294,7 +16443,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 					track:Play()
 					notify(HUB_NAME, _Vzd({117,145,134,158,142,147,140,69}) .. (S.selectedAnim or "anim") .. " on " .. p.Name, 1)
 				else
-					notify(HUB_NAME, "Failed To Load Animation", 1.2)
+					notify(HUB_NAME, _Vzd({107,134,142,145,138,137,69,121,148,69,113,148,134,137,69,102,147,142,146,134,153,142,148,147}), 1.2)
 				end
 			end,
 		})
@@ -16311,7 +16460,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 						track:Stop()
 					end
 				end
-				notify(HUB_NAME, _Vzd({102,147,142,146,134,153,142,148,147,152,69,120,153,148,149,149,138,137}), 1)
+				notify(HUB_NAME, "Animations Stopped", 1)
 			end,
 		})
 
@@ -16319,7 +16468,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		makeToggle(sc, {
 			order = n(),
 			id = "spinTarget",
-			title = "Spin Target",
+			title = _Vzd({120,149,142,147,69,121,134,151,140,138,153}),
 			tip = _Vzd({114,134,144,138,152,69,152,138,145,138,136,153,138,137,69,149,145,134,158,138,151,69,152,149,142,147,69,142,147,69,136,142,151,136,145,138,152}),
 			callback = function(on)
 				S.toggles.spinTarget = on
@@ -16342,7 +16491,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		makeToggle(sc, {
 			order = n(),
 			id = "spamJump",
-			title = _Vzd({120,149,134,146,69,111,154,146,149,69,121,134,151,140,138,153}),
+			title = "Spam Jump Target",
 			tip = _Vzd({114,134,144,138,152,69,152,138,145,138,136,153,138,137,69,149,145,134,158,138,151,69,143,154,146,149,69,148,155,138,151,69,134,147,137,69,148,155,138,151}),
 			callback = function(on)
 				S.toggles.spamJump = on
@@ -16351,7 +16500,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 						while S.toggles.spamJump do
 							local p = S.selected or S.animTarget
 							if p and validP(p) and p.Character then
-								local hum = p.Character:FindFirstChildOfClass("Humanoid")
+								local hum = p.Character:FindFirstChildOfClass(_Vzd({109,154,146,134,147,148,142,137}))
 								if hum then
 									pcall(function() hum:ChangeState(Enum.HumanoidStateType.Jumping) end)
 								end
@@ -16407,8 +16556,8 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		corner(limbNote, 8)
 		pad(limbNote, 6, 6, 6, 6)
 
-		local LIMB_JOINTS = { _Vzd({119,142,140,141,153,69,120,141,148,154,145,137,138,151}), "Left Shoulder", _Vzd({119,142,140,141,153,69,109,142,149}), "Left Hip", "Neck", "RootJoint" }
-		local LIMB_PARTS = { _Vzd({119,142,140,141,153,69,102,151,146}), "Left Arm", _Vzd({119,142,140,141,153,69,113,138,140}), _Vzd({113,138,139,153,69,113,138,140}), "Head", "Torso" }
+		local LIMB_JOINTS = { "Right Shoulder", _Vzd({113,138,139,153,69,120,141,148,154,145,137,138,151}), "Right Hip", "Left Hip", "Neck", "RootJoint" }
+		local LIMB_PARTS = { _Vzd({119,142,140,141,153,69,102,151,146}), _Vzd({113,138,139,153,69,102,151,146}), "Right Leg", _Vzd({113,138,139,153,69,113,138,140}), "Head", "Torso" }
 
 		local function breakLimbs(character, flingPower)
 			if not character then return end
@@ -16467,7 +16616,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 
 			task.wait(0.1)
 			local weld = Instance.new("WeldConstraint")
-			weld.Name = "VOIDZ_StolenLimb"
+			weld.Name = _Vzd({123,116,110,105,127,132,120,153,148,145,138,147,113,142,146,135})
 			weld.Part0 = myRoot
 			weld.Part1 = limb
 			weld.Parent = limb
@@ -16477,10 +16626,10 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		end
 
 		local STEAL_LIMBS = {
-			{ label = _Vzd({113,138,139,153,69,102,151,146}),  part = "Left Arm" },
-			{ label = "Right Arm", part = _Vzd({119,142,140,141,153,69,102,151,146}) },
+			{ label = _Vzd({113,138,139,153,69,102,151,146}),  part = _Vzd({113,138,139,153,69,102,151,146}) },
+			{ label = _Vzd({119,142,140,141,153,69,102,151,146}), part = _Vzd({119,142,140,141,153,69,102,151,146}) },
 			{ label = _Vzd({113,138,139,153,69,113,138,140}),  part = _Vzd({113,138,139,153,69,113,138,140}) },
-			{ label = "Right Leg", part = "Right Leg" },
+			{ label = "Right Leg", part = _Vzd({119,142,140,141,153,69,113,138,140}) },
 			{ label = "Head",      part = "Head" },
 		}
 
@@ -16510,11 +16659,11 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		makeButton(sc, {
 			order = n(),
 			title = _Vzd({119,138,146,148,155,138,69,114,158,69,113,142,146,135,152,69,128,122,130}),
-			tip = "Break joints on YOUR character + fling limbs away",
+			tip = _Vzd({103,151,138,134,144,69,143,148,142,147,153,152,69,148,147,69,126,116,122,119,69,136,141,134,151,134,136,153,138,151,69,80,69,139,145,142,147,140,69,145,142,146,135,152,69,134,156,134,158}),
 			danger = true,
 			callback = function()
 				local char = LP.Character
-				if not char then notify(HUB_NAME, "No character", 1) return end
+				if not char then notify(HUB_NAME, _Vzd({115,148,69,136,141,134,151,134,136,153,138,151}), 1) return end
 				breakLimbs(char, 1500)
 				notify(HUB_NAME, "Limbs ripped off", 1)
 			end,
@@ -16522,11 +16671,11 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		makeButton(sc, {
 			order = n(),
 			title = _Vzd({119,142,149,69,113,142,146,135,152,69,116,139,139,69,121,134,151,140,138,153}),
-			tip = "SNO + break joints + fling limbs on selected player",
+			tip = _Vzd({120,115,116,69,80,69,135,151,138,134,144,69,143,148,142,147,153,152,69,80,69,139,145,142,147,140,69,145,142,146,135,152,69,148,147,69,152,138,145,138,136,153,138,137,69,149,145,134,158,138,151}),
 			callback = function()
 				local p = S.selected
 				if not p or not validP(p) or not p.Character then
-					notify(HUB_NAME, _Vzd({117,142,136,144,69,134,69,149,145,134,158,138,151,69,139,142,151,152,153}), 1.2) return
+					notify(HUB_NAME, "Pick a player first", 1.2) return
 				end
 				visitForSNO(p, 10)
 				pcall(function() breakLimbs(p.Character, 2000) end)
@@ -16534,8 +16683,8 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 			end,
 		})
 
-		section(sc, _Vzd({120,121,106,102,113,69,103,116,105,126,69,117,102,119,121,120}), n())
-		local stealNote = Instance.new("TextLabel")
+		section(sc, "STEAL BODY PARTS", n())
+		local stealNote = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
 		stealNote.LayoutOrder = n()
 		stealNote.Size = UDim2.new(1, -6, 0, 36)
 		stealNote.BackgroundColor3 = C.card
@@ -16554,41 +16703,41 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		for _, entry in ipairs(STEAL_LIMBS) do
 			makeButton(sc, {
 				order = n(),
-				title = _Vzd({120,153,138,134,145,69}) .. entry.label,
-				tip = _Vzd({105,138,153,134,136,141,69}) .. entry.label .. " from target + attach to you",
+				title = "Steal " .. entry.label,
+				tip = "Detach " .. entry.label .. _Vzd({69,139,151,148,146,69,153,134,151,140,138,153,69,80,69,134,153,153,134,136,141,69,153,148,69,158,148,154}),
 				callback = function()
 					local p = S.selected
 					if not p or not validP(p) or not p.Character then
-						notify(HUB_NAME, _Vzd({117,142,136,144,69,134,69,149,145,134,158,138,151,69,139,142,151,152,153}), 1.2) return
+						notify(HUB_NAME, "Pick a player first", 1.2) return
 					end
 					local myChar = LP.Character
 					if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then
-						notify(HUB_NAME, "You need a character", 1) return
+						notify(HUB_NAME, _Vzd({126,148,154,69,147,138,138,137,69,134,69,136,141,134,151,134,136,153,138,151}), 1) return
 					end
 					visitForSNO(p, 10)
 					task.wait(0.08)
 					local ok = stealSingleLimb(p, entry.part)
 					if ok then
-						notify(HUB_NAME, _Vzd({120,153,148,145,138,69}) .. entry.label .. _Vzd({69,139,151,148,146,69}) .. playerLabel(p), 1.2)
+						notify(HUB_NAME, "Stole " .. entry.label .. " from " .. playerLabel(p), 1.2)
 					else
-						notify(HUB_NAME, "Failed to steal " .. entry.label, 1.5)
+						notify(HUB_NAME, _Vzd({107,134,142,145,138,137,69,153,148,69,152,153,138,134,145,69}) .. entry.label, 1.5)
 					end
 				end,
 			})
 		end
 		makeButton(sc, {
 			order = n(),
-			title = _Vzd({120,153,138,134,145,69,102,113,113,69,113,142,146,135,152}),
-			tip = "Detach every limb from target + attach all to you",
+			title = "Steal ALL Limbs",
+			tip = _Vzd({105,138,153,134,136,141,69,138,155,138,151,158,69,145,142,146,135,69,139,151,148,146,69,153,134,151,140,138,153,69,80,69,134,153,153,134,136,141,69,134,145,145,69,153,148,69,158,148,154}),
 			danger = true,
 			callback = function()
 				local p = S.selected
 				if not p or not validP(p) or not p.Character then
-					notify(HUB_NAME, "Pick a player first", 1.2) return
+					notify(HUB_NAME, _Vzd({117,142,136,144,69,134,69,149,145,134,158,138,151,69,139,142,151,152,153}), 1.2) return
 				end
 				local myChar = LP.Character
 				if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then
-					notify(HUB_NAME, _Vzd({126,148,154,69,147,138,138,137,69,134,69,136,141,134,151,134,136,153,138,151}), 1) return
+					notify(HUB_NAME, "You need a character", 1) return
 				end
 				visitForSNO(p, 10)
 				task.wait(0.08)
@@ -16605,22 +16754,22 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		makeButton(sc, {
 			order = n(),
 			title = "Return Stolen Limbs",
-			tip = _Vzd({119,138,146,148,155,138,69,134,145,145,69,152,153,148,145,138,147,69,149,134,151,153,152,69,139,151,148,146,69,158,148,154,151,69,135,148,137,158,69,80,69,139,145,142,147,140,69,134,156,134,158}),
+			tip = "Remove all stolen parts from your body + fling away",
 			danger = true,
 			callback = function()
 				local n = returnStolenLimbs()
-				notify(HUB_NAME, "Returned " .. n .. _Vzd({69,152,153,148,145,138,147,69,145,142,146,135}) .. (n == 1 and "" or "s"), 1.2)
+				notify(HUB_NAME, "Returned " .. n .. " stolen limb" .. (n == 1 and "" or "s"), 1.2)
 			end,
 		})
 		makeToggle(sc, {
 			order = n(),
 			id = "keepStolenAttached",
-			title = _Vzd({112,138,138,149,69,120,153,148,145,138,147,69,102,153,153,134,136,141,138,137}),
+			title = "Keep Stolen Attached",
 			tip = _Vzd({113,148,148,149,95,69,151,138,82,156,138,145,137,69,152,153,148,145,138,147,69,145,142,146,135,152,69,153,148,69,158,148,154,151,69,135,148,137,158,69,156,141,142,145,138,69,146,148,155,142,147,140}),
 			callback = function(on)
 				S.toggles.keepStolenAttached = on
 				if on then
-					startLoop(_Vzd({144,138,138,149,120,153,148,145,138,147}), 0.15, function()
+					startLoop("keepStolen", 0.15, function()
 						local myRoot = hrp()
 						if not myRoot then return end
 						for _, info in ipairs(stolenParts) do
@@ -16639,7 +16788,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 								if not hasWeld then
 									sno(part)
 									createBringBody(part, myRoot.CFrame * CFrame.new(0, 2, -5))
-									local w = Instance.new(_Vzd({124,138,145,137,104,148,147,152,153,151,134,142,147,153}))
+									local w = Instance.new("WeldConstraint")
 									w.Name = "VOIDZ_StolenLimb"
 									w.Part0 = myRoot
 									w.Part1 = part
@@ -16648,17 +16797,17 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 							end
 						end
 					end)
-					notify(HUB_NAME, _Vzd({120,153,148,145,138,147,69,145,142,146,135,152,69,139,148,145,145,148,156,69,158,148,154}), 1)
+					notify(HUB_NAME, "Stolen limbs follow you", 1)
 				else
-					stopLoop(_Vzd({144,138,138,149,120,153,148,145,138,147}))
+					stopLoop("keepStolen")
 					notify(HUB_NAME, "Stolen limbs stay in place", 1)
 				end
 			end,
 		})
 		makeToggle(sc, {
 			order = n(),
-			id = _Vzd({145,142,146,135,102,154,151,134}),
-			title = "Limb Steal Aura",
+			id = "limbAura",
+			title = _Vzd({113,142,146,135,69,120,153,138,134,145,69,102,154,151,134}),
 			tip = _Vzd({114,134,149,82,156,142,137,138,95,69,153,138,145,138,149,148,151,153,69,153,148,69,138,134,136,141,69,149,145,134,158,138,151,69,134,147,137,69,151,142,149,69,153,141,138,142,151,69,145,142,146,135,152,69,148,139,139}),
 			callback = function(on)
 				S.toggles.limbAura = on
@@ -16688,7 +16837,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 					end)
 					notify(HUB_NAME, _Vzd({113,142,146,135,69,120,153,138,134,145,69,102,154,151,134,69,116,115}), 1.5)
 				else
-					stopLoop("limbAura")
+					stopLoop(_Vzd({145,142,146,135,102,154,151,134}))
 					notify(HUB_NAME, _Vzd({113,142,146,135,69,120,153,138,134,145,69,102,154,151,134,69,116,107,107}), 1)
 				end
 			end,
@@ -16697,7 +16846,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		section(sc, "QUICK SERVER ACTIONS", n())
 		makeButton(sc, {
 			order = n(),
-			title = _Vzd({113,134,140,69,120,138,151,155,138,151,69,77,120,148,139,153,78}),
+			title = "Lag Server (Soft)",
 			tip = _Vzd({116,147,138,82,152,141,148,153,69,152,149,134,146,69,104,151,138,134,153,138,108,151,134,135,113,142,147,138,69,148,147,69,138,155,138,151,158,148,147,138}),
 			callback = function()
 				for _, p in ipairs(Players:GetPlayers()) do
@@ -16708,12 +16857,12 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 						end
 					end
 				end
-				notify(HUB_NAME, "Soft lag fired", 1)
+				notify(HUB_NAME, _Vzd({120,148,139,153,69,145,134,140,69,139,142,151,138,137}), 1)
 			end,
 		})
 		makeButton(sc, {
 			order = n(),
-			title = _Vzd({105,138,152,153,151,148,158,69,102,145,145,69,113,142,147,138,152}),
+			title = "Destroy All Lines",
 			callback = function()
 				for _, p in ipairs(Players:GetPlayers()) do
 					if p ~= LP and validP(p) and p.Character then
@@ -16723,12 +16872,12 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 						end
 					end
 				end
-				notify(HUB_NAME, "All lines destroyed", 1)
+				notify(HUB_NAME, _Vzd({102,145,145,69,145,142,147,138,152,69,137,138,152,153,151,148,158,138,137}), 1)
 			end,
 		})
 		makeButton(sc, {
 			order = n(),
-			title = _Vzd({119,134,140,137,148,145,145,69,106,155,138,151,158,148,147,138}),
+			title = "Ragdoll Everyone",
 			callback = function()
 				for _, p in ipairs(Players:GetPlayers()) do
 					if p ~= LP and validP(p) and p.Character then
@@ -16738,13 +16887,13 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 						end
 					end
 				end
-				notify(HUB_NAME, "Everyone ragdolled", 1)
+				notify(HUB_NAME, _Vzd({106,155,138,151,158,148,147,138,69,151,134,140,137,148,145,145,138,137}), 1)
 			end,
 		})
 		makeButton(sc, {
 			order = n(),
-			title = "Rip Limbs Off Everyone",
-			tip = _Vzd({120,115,116,69,80,69,135,151,138,134,144,69,134,145,145,69,114,148,153,148,151,91,105,69,143,148,142,147,153,152,69,80,69,139,145,142,147,140,69,145,142,146,135,152,69,148,147,69,138,155,138,151,158,69,149,145,134,158,138,151}),
+			title = _Vzd({119,142,149,69,113,142,146,135,152,69,116,139,139,69,106,155,138,151,158,148,147,138}),
+			tip = "SNO + break all Motor6D joints + fling limbs on every player",
 			danger = true,
 			callback = function()
 				local me = hrp()
@@ -16765,7 +16914,7 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 								for _, d in ipairs(p.Character:GetDescendants()) do
 									if d:IsA("Motor6D") then pcall(function() d:Destroy() end) end
 								end
-								for _, partName in ipairs({_Vzd({119,142,140,141,153,69,102,151,146}),"Left Arm","Right Leg",_Vzd({113,138,139,153,69,113,138,140}),"Head"}) do
+								for _, partName in ipairs({"Right Arm","Left Arm",_Vzd({119,142,140,141,153,69,113,138,140}),_Vzd({113,138,139,153,69,113,138,140}),"Head"}) do
 									local part = p.Character:FindFirstChild(partName)
 									if part and part:IsA("BasePart") then
 										pcall(function()
@@ -16780,12 +16929,12 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 					end
 				end
 				pcall(function() me.CFrame = homeCF end)
-				notify(HUB_NAME, _Vzd({106,155,138,151,158,148,147,138,76,152,69,145,142,146,135,152,69,151,142,149,149,138,137,69,148,139,139}), 1)
+				notify(HUB_NAME, "Everyone's limbs ripped off", 1)
 			end,
 		})
 
-section(sc, _Vzd({121,119,102,110,115,69,104,116,115,121,119,116,113}), n())
-local trainNote = Instance.new("TextLabel")
+section(sc, "TRAIN CONTROL", n())
+local trainNote = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
 trainNote.LayoutOrder = n()
 trainNote.Size = UDim2.new(1, -6, 0, 48)
 trainNote.BackgroundColor3 = C.card
@@ -16804,19 +16953,19 @@ pad(trainNote, 6, 6, 6, 6)
 S.trainSpeed = S.trainSpeed or 120
 makeSlider(sc, {
 	order = n(),
-	title = _Vzd({121,151,134,142,147,69,120,149,138,138,137}),
+	title = "Train Speed",
 	min = 20,
 	max = 300,
 	default = 120,
 	step = 5,
 	stateKey = "trainSpeed",
-	tip = "BodyVelocity speed while driving",
+	tip = _Vzd({103,148,137,158,123,138,145,148,136,142,153,158,69,152,149,138,138,137,69,156,141,142,145,138,69,137,151,142,155,142,147,140}),
 })
 
 makeButton(sc, {
 	order = n(),
 	title = "Drive Train",
-	tip = "TP/find train seat, own it, sit, WASD drive",
+	tip = _Vzd({121,117,84,139,142,147,137,69,153,151,134,142,147,69,152,138,134,153,81,69,148,156,147,69,142,153,81,69,152,142,153,81,69,124,102,120,105,69,137,151,142,155,138}),
 	callback = function()
 		task.spawn(startTrainDrive)
 	end,
@@ -16825,12 +16974,12 @@ makeButton(sc, {
 makeButton(sc, {
 	order = n(),
 	title = "TP Secret Train Cave",
-	tip = "Teleport to the map train area then use Drive Train",
+	tip = _Vzd({121,138,145,138,149,148,151,153,69,153,148,69,153,141,138,69,146,134,149,69,153,151,134,142,147,69,134,151,138,134,69,153,141,138,147,69,154,152,138,69,105,151,142,155,138,69,121,151,134,142,147}),
 	callback = function()
 		local me = hrp()
-		if not me then notify(HUB_NAME, "No character", 1.5); return end
+		if not me then notify(HUB_NAME, _Vzd({115,148,69,136,141,134,151,134,136,153,138,151}), 1.5); return end
 		pcall(function() me.CFrame = CFrame.new(TRAIN_CAVE_POS + Vector3.new(0, 6, 0)) end)
-		notify(HUB_NAME, _Vzd({121,151,134,142,147,69,136,134,155,138,69,220,69,149,151,138,152,152,69,105,151,142,155,138,69,121,151,134,142,147}), 1.5)
+		notify(HUB_NAME, "Train cave · press Drive Train", 1.5)
 	end,
 })
 
@@ -16875,13 +17024,13 @@ makeDropdown(sc, {
 
 makeSlider(sc, {
 	order = n(),
-	title = "Grow Size (studs)",
+	title = _Vzd({108,151,148,156,69,120,142,159,138,69,77,152,153,154,137,152,78}),
 	min = 4,
 	max = 25,
 	default = 15,
 	step = 1,
 	stateKey = "ballSize",
-	tip = _Vzd({120,138,151,155,138,151,69,140,151,148,156,152,69,156,141,142,145,138,69,151,148,145,145,142,147,140,69,148,147,69,152,147,148,156,69,220,69,152,153,148,149,69,156,141,138,147,69,120,142,159,138,69,99,98,69,153,141,142,152}),
+	tip = "Server grows while rolling on snow · stop when Size >= this",
 })
 
 makeSlider(sc, {
@@ -16897,19 +17046,19 @@ makeSlider(sc, {
 
 makeSlider(sc, {
 	order = n(),
-	title = _Vzd({107,145,142,147,140,69,117,148,156,138,151}),
+	title = "Fling Power",
 	min = 500,
 	max = 50000,
 	default = 5000,
 	step = 500,
 	stateKey = "ballFlingPower",
-	tip = "Velocity applied to each grown ball",
+	tip = _Vzd({123,138,145,148,136,142,153,158,69,134,149,149,145,142,138,137,69,153,148,69,138,134,136,141,69,140,151,148,156,147,69,135,134,145,145}),
 })
 
 makeButton(sc, {
 	order = n(),
-	title = "Start Farm Snowballs",
-	tip = _Vzd({120,138,151,142,134,145,69,152,149,134,156,147,69,103,134,145,145,120,147,148,156,135,134,145,145,69,80,69,151,148,145,145,82,140,151,148,156,69,154,147,153,142,145,69,136,148,154,147,153,69,151,138,134,136,141,138,137}),
+	title = _Vzd({120,153,134,151,153,69,107,134,151,146,69,120,147,148,156,135,134,145,145,152}),
+	tip = "Serial spawn BallSnowball + roll-grow until count reached",
 	callback = function()
 		task.spawn(startSnowFarm)
 	end,
@@ -16917,7 +17066,7 @@ makeButton(sc, {
 
 makeButton(sc, {
 	order = n(),
-	title = _Vzd({120,153,148,149,69,107,134,151,146}),
+	title = "Stop Farm",
 	callback = function()
 		stopSnowFarm(false)
 	end,
@@ -16925,7 +17074,7 @@ makeButton(sc, {
 
 makeButton(sc, {
 	order = n(),
-	title = "Make & Fling at Target",
+	title = _Vzd({114,134,144,138,69,75,69,107,145,142,147,140,69,134,153,69,121,134,151,140,138,153}),
 	danger = true,
 	tip = _Vzd({107,134,151,146,69,153,141,138,147,69,139,145,142,147,140,69,140,151,148,156,147,69,135,134,145,145,152,69,134,153,69,152,138,145,138,136,153,138,137,69,149,145,134,158,138,151}),
 	callback = function()
@@ -16935,19 +17084,19 @@ makeButton(sc, {
 
 makeButton(sc, {
 	order = n(),
-	title = "Fling Grown at Target",
+	title = _Vzd({107,145,142,147,140,69,108,151,148,156,147,69,134,153,69,121,134,151,140,138,153}),
 	danger = true,
-	tip = _Vzd({107,145,142,147,140,69,134,145,151,138,134,137,158,82,140,151,148,156,147,69,152,147,148,156,135,134,145,145,152,69,134,153,69,152,138,145,138,136,153,138,137,69,149,145,134,158,138,151}),
+	tip = "Fling already-grown snowballs at selected player",
 	callback = function()
 		local p = S.selected
-		if not p or not validP(p) then notify(HUB_NAME, _Vzd({120,138,145,138,136,153,69,134,69,153,134,151,140,138,153}), 1.5); return end
+		if not p or not validP(p) then notify(HUB_NAME, "Select a target", 1.5); return end
 		task.spawn(function() flingGrownSnowballsAt(p) end)
 	end,
 })
 
 makeButton(sc, {
 	order = n(),
-	title = "Explode Grown Snowballs",
+	title = _Vzd({106,157,149,145,148,137,138,69,108,151,148,156,147,69,120,147,148,156,135,134,145,145,152}),
 	danger = true,
 	tip = _Vzd({103,148,146,135,106,157,149,145,148,137,138,69,134,145,145,69,140,151,148,156,147,69,152,147,148,156,135,134,145,145,152}),
 	callback = function()
@@ -16957,7 +17106,7 @@ makeButton(sc, {
 
 end
 _TAB_BUILDERS["settings"] = function(sc, n)
-		section(sc, "THEMES", n())
+		section(sc, _Vzd({121,109,106,114,106,120}), n())
 		makeDropdown(sc, {
 			order = n(), title = _Vzd({104,148,145,148,151,69,121,141,138,146,138}),
 			options = { "Purple", "Red", "White", "Black", "Green", "Blue" },
@@ -16975,12 +17124,12 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			callback = function(v)
 				S.device = v
 				S.toggles.mobileUI = (v == "Mobile")
-				notify(HUB_NAME, "Device → " .. v, 1)
+				notify(HUB_NAME, _Vzd({105,138,155,142,136,138,69,183,69}) .. v, 1)
 			end,
 		})
 		section(sc, "UI", n())
 		makeSlider(sc, {
-			order = n(), title = _Vzd({109,154,135,69,120,136,134,145,138}), min = 60, max = 120, default = 100,
+			order = n(), title = "Hub Scale", min = 60, max = 120, default = 100,
 			tip = "UI size percentage (100 = default)",
 			callback = function(v)
 				S.hubScale = v
@@ -16991,29 +17140,29 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "unlockMouse", title = _Vzd({122,147,145,148,136,144,69,114,148,154,152,138}),
-			tip = "Lets you click the game while the hub is open (PC only)",
+			order = n(), id = _Vzd({154,147,145,148,136,144,114,148,154,152,138}), title = _Vzd({122,147,145,148,136,144,69,114,148,154,152,138}),
+			tip = _Vzd({113,138,153,152,69,158,148,154,69,136,145,142,136,144,69,153,141,138,69,140,134,146,138,69,156,141,142,145,138,69,153,141,138,69,141,154,135,69,142,152,69,148,149,138,147,69,77,117,104,69,148,147,145,158,78}),
 			callback = function(on)
 				S.toggles.unlockMouse = on == true
 				notify(HUB_NAME, _Vzd({122,147,145,148,136,144,69,114,148,154,152,138,69}) .. (on and "ON" or "OFF"), 1)
 			end,
 		})
-		section(sc, "WHITELIST", n())
+		section(sc, _Vzd({124,109,110,121,106,113,110,120,121}), n())
 		makeToggle(sc, {
 			order = n(), id = "wlFriends", title = _Vzd({124,141,142,153,138,145,142,152,153,69,107,151,142,138,147,137,152}),
-			tip = "Skip friends in auras / mass loops",
+			tip = _Vzd({120,144,142,149,69,139,151,142,138,147,137,152,69,142,147,69,134,154,151,134,152,69,84,69,146,134,152,152,69,145,148,148,149,152}),
 			callback = function(on) S.toggles.wlFriends = on end,
 		})
 		makeButton(sc, {
-			order = n(), title = _Vzd({102,137,137,69,120,138,145,138,136,153,138,137,69,117,145,134,158,138,151}),
-			tip = _Vzd({102,137,137,69,136,154,151,151,138,147,153,69,149,145,134,158,138,151,69,137,151,148,149,137,148,156,147,69,152,138,145,138,136,153,142,148,147,69,153,148,69,156,141,142,153,138,145,142,152,153}),
+			order = n(), title = "Add Selected Player",
+			tip = "Add current player dropdown selection to whitelist",
 			callback = function()
 				if S.selected then
 					S.whitelist[S.selected.Name] = true
-					notify(HUB_NAME, "Whitelisted " .. S.selected.Name, 1)
+					notify(HUB_NAME, _Vzd({124,141,142,153,138,145,142,152,153,138,137,69}) .. S.selected.Name, 1)
 					if S._wlRefresh then pcall(S._wlRefresh) end
 				else
-					notify(HUB_NAME, "No player selected", 1)
+					notify(HUB_NAME, _Vzd({115,148,69,149,145,134,158,138,151,69,152,138,145,138,136,153,138,137}), 1)
 				end
 			end,
 		})
@@ -17022,7 +17171,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			callback = function()
 				if S.selected then
 					S.whitelist[S.selected.Name] = nil
-					notify(HUB_NAME, "Removed " .. S.selected.Name, 1)
+					notify(HUB_NAME, _Vzd({119,138,146,148,155,138,137,69}) .. S.selected.Name, 1)
 					if S._wlRefresh then pcall(S._wlRefresh) end
 				else
 					notify(HUB_NAME, "No player selected", 1)
@@ -17045,7 +17194,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 		wlLabel.TextSize = 10
 		wlLabel.TextColor3 = C.muted
 		wlLabel.TextXAlignment = Enum.TextXAlignment.Left
-		wlLabel.Text = _Vzd({124,141,142,153,138,145,142,152,153,138,137,69,117,145,134,158,138,151,152})
+		wlLabel.Text = "Whitelisted Players"
 		wlLabel.Parent = sc
 		local wlBox = Instance.new("Frame")
 		wlBox.LayoutOrder = n()
@@ -17055,7 +17204,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 		wlBox.Parent = sc
 		corner(wlBox, 8)
 		stroke(wlBox, C.strokeSoft, 1)
-		local wlSc = Instance.new(_Vzd({120,136,151,148,145,145,142,147,140,107,151,134,146,138}))
+		local wlSc = Instance.new("ScrollingFrame")
 		wlSc.Size = UDim2.fromScale(1, 1)
 		wlSc.BackgroundTransparency = 1
 		wlSc.ScrollBarThickness = 3
@@ -17069,7 +17218,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 		pad(wlSc, 4, 4, 4, 4)
 		local function refreshWL()
 			for _, ch in ipairs(wlSc:GetChildren()) do
-				if ch:IsA("Frame") then ch:Destroy() end
+				if ch:IsA(_Vzd({107,151,134,146,138})) then ch:Destroy() end
 			end
 			local hasAny = false
 			for name in pairs(S.whitelist) do
@@ -17114,18 +17263,18 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 				empty.Font = Enum.Font.Gotham
 				empty.TextSize = 11
 				empty.TextColor3 = C.muted
-				empty.Text = _Vzd({115,148,69,149,145,134,158,138,151,152,69,156,141,142,153,138,145,142,152,153,138,137})
+				empty.Text = "No players whitelisted"
 				empty.Parent = wlSc
 			end
 		end
 		S._wlRefresh = refreshWL
 		refreshWL()
-		section(sc, _Vzd({105,102,115,108,106,119,69,127,116,115,106}), n())
+		section(sc, "DANGER ZONE", n())
 		makeButton(sc, {
-			order = n(), title = "Unload Script", danger = true,
+			order = n(), title = _Vzd({122,147,145,148,134,137,69,120,136,151,142,149,153}), danger = true,
 			tip = "Completely unload everything — UI, loops, connections, all of it",
 			callback = function()
-				notify(HUB_NAME, _Vzd({122,147,145,148,134,137,142,147,140,75}), 2)
+				notify(HUB_NAME, "Unloading…", 2)
 				task.delay(0.5, function()
 					pcall(function() unload() end)
 				end)
@@ -17133,7 +17282,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 		})
 		section(sc, _Vzd({112,106,126,103,110,115,105,69,121,116,108,108,113,106,120}), n())
 		makeToggle(sc, {
-			order = n(), id = "kb_toggleUI", title = _Vzd({121,148,140,140,145,138,69,109,154,135,69,128,119,142,140,141,153,120,141,142,139,153,130}),
+			order = n(), id = _Vzd({144,135,132,153,148,140,140,145,138,122,110}), title = _Vzd({121,148,140,140,145,138,69,109,154,135,69,128,119,142,140,141,153,120,141,142,139,153,130}),
 			tip = _Vzd({119,142,140,141,153,120,141,142,139,153,69,153,148,69,148,149,138,147,84,136,145,148,152,138,69,141,154,135}),
 			callback = function(on) S.toggles.kb_toggleUI = on end,
 		})
@@ -17142,7 +17291,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			callback = function(on) S.toggles.kb_fly = on end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "kb_noclip", title = _Vzd({115,148,136,145,142,149,69,128,115,130}),
+			order = n(), id = _Vzd({144,135,132,147,148,136,145,142,149}), title = _Vzd({115,148,136,145,142,149,69,128,115,130}),
 			callback = function(on) S.toggles.kb_noclip = on end,
 		})
 		makeToggle(sc, {
@@ -17154,19 +17303,19 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			callback = function(on) S.toggles.kb_pallet = on end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "kb_flingAura", title = _Vzd({107,145,142,147,140,69,102,154,151,134,69,128,107,130}),
+			order = n(), id = "kb_flingAura", title = "Fling Aura [F]",
 			callback = function(on) S.toggles.kb_flingAura = on end,
 		})
 		makeToggle(sc, {
-			order = n(), id = _Vzd({144,135,132,147,138,153,148,156,147}), title = "Net Owner Aura [G]",
+			order = n(), id = _Vzd({144,135,132,147,138,153,148,156,147}), title = _Vzd({115,138,153,69,116,156,147,138,151,69,102,154,151,134,69,128,108,130}),
 			callback = function(on) S.toggles.kb_netown = on end,
 		})
 		makeToggle(sc, {
-			order = n(), id = _Vzd({144,135,132,134,147,153,142,108,151,134,135}), title = _Vzd({102,147,153,142,82,108,151,134,135,69,128,109,130}),
+			order = n(), id = "kb_antiGrab", title = _Vzd({102,147,153,142,82,108,151,134,135,69,128,109,130}),
 			callback = function(on) S.toggles.kb_antiGrab = on end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "kb_flingNear", title = "Fling Near [T]",
+			order = n(), id = "kb_flingNear", title = _Vzd({107,145,142,147,140,69,115,138,134,151,69,128,121,130}),
 			callback = function(on) S.toggles.kb_flingNear = on end,
 		})
 		makeToggle(sc, {
@@ -17174,7 +17323,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			callback = function(on) S.toggles.kb_stomp = on end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "kb_orbit", title = _Vzd({116,151,135,142,153,69,102,154,151,134,69,128,116,130}),
+			order = n(), id = _Vzd({144,135,132,148,151,135,142,153}), title = _Vzd({116,151,135,142,153,69,102,154,151,134,69,128,116,130}),
 			callback = function(on) S.toggles.kb_orbit = on end,
 		})
 		makeToggle(sc, {
@@ -17183,7 +17332,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 		})
 		section(sc, _Vzd({108,113,116,103,102,113,69,117,116,124,106,119,120}), n())
 		makeSlider(sc, {
-			order = n(), title = "Fling Power", min = 400, max = 20000, default = S.flingPower or 8000, step = 100,
+			order = n(), title = _Vzd({107,145,142,147,140,69,117,148,156,138,151}), min = 400, max = 20000, default = S.flingPower or 8000, step = 100,
 			stateKey = "flingPower",
 		})
 		makeSlider(sc, {
@@ -17191,17 +17340,17 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			callback = function(v) S.strengthMult = v end,
 		})
 		makeSlider(sc, {
-			order = n(), title = "Aura Range", min = 10, max = 200, default = S.auraRange or 50,
+			order = n(), title = _Vzd({102,154,151,134,69,119,134,147,140,138}), min = 10, max = 200, default = S.auraRange or 50,
 			stateKey = "auraRange",
 		})
 		makeSlider(sc, {
-			order = n(), title = _Vzd({113,134,140,69,110,147,153,138,147,152,142,153,158}), min = 1, max = 500, default = S.lagIntensity or 150,
+			order = n(), title = "Lag Intensity", min = 1, max = 500, default = S.lagIntensity or 150,
 			tip = "CreateGrabLine spam rate (lag server loops)",
 			stateKey = "lagIntensity",
 		})
-		section(sc, _Vzd({106,125,117,116,119,121,69,84,69,110,114,117,116,119,121}), n())
+		section(sc, "EXPORT / IMPORT", n())
 		makeButton(sc, {
-			order = n(), title = "Export Config",
+			order = n(), title = _Vzd({106,157,149,148,151,153,69,104,148,147,139,142,140}),
 			tip = _Vzd({104,148,149,158,69,136,154,151,151,138,147,153,69,152,138,153,153,142,147,140,152,69,153,148,69,136,145,142,149,135,148,134,151,137,69,134,152,69,111,120,116,115}),
 			callback = function()
 				local ok, json = pcall(function()
@@ -17222,34 +17371,34 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 				end)
 				if ok and json then
 					if setclipboard then setclipboard(json) end
-					notify(HUB_NAME, "Config copied to clipboard", 2)
+					notify(HUB_NAME, _Vzd({104,148,147,139,142,140,69,136,148,149,142,138,137,69,153,148,69,136,145,142,149,135,148,134,151,137}), 2)
 				else
-					notify(HUB_NAME, "Export failed", 2)
+					notify(HUB_NAME, _Vzd({106,157,149,148,151,153,69,139,134,142,145,138,137}), 2)
 				end
 			end,
 		})
 		makeInput(sc, {
-			order = n(), id = _Vzd({142,146,149,148,151,153,103,148,157}), placeholder = "Paste config JSON here...",
+			order = n(), id = "importBox", placeholder = _Vzd({117,134,152,153,138,69,136,148,147,139,142,140,69,111,120,116,115,69,141,138,151,138,83,83,83}),
 		})
 		makeButton(sc, {
-			order = n(), title = "Import Config",
+			order = n(), title = _Vzd({110,146,149,148,151,153,69,104,148,147,139,142,140}),
 			callback = function()
 				local box = S.importBox
 				local txt = box and box.Text
 				if not txt or txt == "" then
-					notify(HUB_NAME, _Vzd({117,134,152,153,138,69,111,120,116,115,69,139,142,151,152,153}), 1)
+					notify(HUB_NAME, "Paste JSON first", 1)
 					return
 				end
 				local ok, data = pcall(function()
 					return game.HttpService:JSONDecode(txt)
 				end)
-				if ok and type(data) == _Vzd({153,134,135,145,138}) then
+				if ok and type(data) == "table" then
 					for k, v in pairs(data) do
 						if k == "theme" and type(v) == "string" then
 							S.theme = v; applyTheme(v)
-						elseif k == "device" and type(v) == "string" then
+						elseif k == "device" and type(v) == _Vzd({152,153,151,142,147,140}) then
 							S.device = v
-						elseif type(v) == _Vzd({147,154,146,135,138,151}) then
+						elseif type(v) == "number" then
 							S[k] = v
 						end
 					end
@@ -17261,8 +17410,8 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 		})
 		section(sc, "AUTO MODE", n())
 		makeToggle(sc, {
-			order = n(), id = _Vzd({134,154,153,148,114,148,137,138}), title = _Vzd({102,154,153,148,69,114,148,137,138,69,77,103,106,121,102,78}),
-			tip = "Automatically enables the best options for whatever situation you're in",
+			order = n(), id = "autoMode", title = "Auto Mode (BETA)",
+			tip = _Vzd({102,154,153,148,146,134,153,142,136,134,145,145,158,69,138,147,134,135,145,138,152,69,153,141,138,69,135,138,152,153,69,148,149,153,142,148,147,152,69,139,148,151,69,156,141,134,153,138,155,138,151,69,152,142,153,154,134,153,142,148,147,69,158,148,154,76,151,138,69,142,147}),
 			callback = function(on)
 				S.toggles.autoMode = on
 				if on then
@@ -17328,7 +17477,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 		})
 		section(sc, "RESET", n())
 		makeButton(sc, {
-			order = n(), title = _Vzd({119,138,152,138,153,69,102,145,145,69,120,138,153,153,142,147,140,152}),
+			order = n(), title = "Reset All Settings",
 			danger = true,
 			callback = function()
 				S.flingPower = 8000; S.auraRange = 50; S.walkSpeed = 50
@@ -17371,7 +17520,7 @@ local function switchTab(id)
 			if ts then tween(ts, { Color = C.accent, Transparency = 0.15 }, 0.2) end
 			if bg then tween(bg, { Color = C.accent, Transparency = 0.1, Thickness = 1.5 }, 0.2) end
 		else
-			btn:SetAttribute(_Vzd({134,136,153,142,155,138,121,134,135}), nil)
+			btn:SetAttribute("activeTab", nil)
 			btn.BackgroundColor3 = C.bg
 			btn.BackgroundTransparency = 0.35
 			if lab then lab.TextColor3 = C.muted end
@@ -17498,7 +17647,7 @@ local function keyNameToEnum(name)
 end
 
 local function installKeybindHandler()
-	bind(_Vzd({144,138,158,135,142,147,137,152}), UserInputService.InputBegan:Connect(function(input, gp)
+	bind("keybinds", UserInputService.InputBegan:Connect(function(input, gp)
 		if gp then return end
 		if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
 		local code = input.KeyCode
@@ -17512,17 +17661,17 @@ local function installKeybindHandler()
 		end
 		if S.toggles.kb_flingAura and pressed(S.keybinds and S.keybinds.aura_fling or "F") then
 			S.toggles.aura_fling = not S.toggles.aura_fling
-			setAura("fling", S.toggles.aura_fling == true)
-			notify(HUB_NAME, "Fling aura " .. (S.toggles.aura_fling and "ON" or "OFF"), 1)
+			setAura(_Vzd({139,145,142,147,140}), S.toggles.aura_fling == true)
+			notify(HUB_NAME, _Vzd({107,145,142,147,140,69,134,154,151,134,69}) .. (S.toggles.aura_fling and "ON" or "OFF"), 1)
 		elseif S.toggles.kb_netown and pressed(S.keybinds and S.keybinds.aura_netown or "G") then
 			S.toggles.aura_netown = not S.toggles.aura_netown
-			setAura(_Vzd({147,138,153,148,156,147}), S.toggles.aura_netown == true)
-			notify(HUB_NAME, _Vzd({115,138,153,69,148,156,147,69}) .. (S.toggles.aura_netown and "ON" or "OFF"), 1)
+			setAura("netown", S.toggles.aura_netown == true)
+			notify(HUB_NAME, "Net own " .. (S.toggles.aura_netown and "ON" or "OFF"), 1)
 		elseif S.toggles.kb_antiGrab and pressed(S.keybinds and S.keybinds.antiGrab or "H") then
 			S.toggles.antiGrab = not S.toggles.antiGrab
 			stopLoop("antiGrab")
-			if S.toggles.antiGrab then startLoop("antiGrab", 0.1, antiGrabTick) end
-			notify(HUB_NAME, "Anti-grab " .. (S.toggles.antiGrab and "ON" or "OFF"), 1)
+			if S.toggles.antiGrab then startLoop(_Vzd({134,147,153,142,108,151,134,135}), 0.1, antiGrabTick) end
+			notify(HUB_NAME, _Vzd({102,147,153,142,82,140,151,134,135,69}) .. (S.toggles.antiGrab and "ON" or "OFF"), 1)
 		elseif S.toggles.kb_fly and pressed(S.keybinds and S.keybinds.fly or "V") then
 			S.toggles.fly = not S.toggles.fly
 			setFly(S.toggles.fly == true)
@@ -17535,7 +17684,7 @@ local function installKeybindHandler()
 			if S.toggles.palletQ or S.toggles.kb_pallet then
 				if not FTAP.SpawnToy then pcall(resolveFTAP) end
 				if FTAP.SpawnToy then
-					spawnToy("PalletLightBrown", { sync = true })
+					spawnToy(_Vzd({117,134,145,145,138,153,113,142,140,141,153,103,151,148,156,147}), { sync = true })
 				else
 					spawnToy("PalletLightBrown")
 				end
@@ -17561,7 +17710,7 @@ local function installKeybindHandler()
 		elseif pressed("U") then
 			local char = LP.Character
 			if char then
-				local LIMB_PARTS = { "Right Arm", "Left Arm", _Vzd({119,142,140,141,153,69,113,138,140}), _Vzd({113,138,139,153,69,113,138,140}), "Head" }
+				local LIMB_PARTS = { "Right Arm", "Left Arm", "Right Leg", "Left Leg", "Head" }
 				local r = char:FindFirstChild("HumanoidRootPart")
 				for _, d in ipairs(char:GetDescendants()) do
 					if d:IsA("Motor6D") then pcall(function() d:Destroy() end) end
@@ -17576,7 +17725,7 @@ local function installKeybindHandler()
 						end)
 					end
 				end
-				notify(HUB_NAME, "Limbs ripped off", 1)
+				notify(HUB_NAME, _Vzd({113,142,146,135,152,69,151,142,149,149,138,137,69,148,139,139}), 1)
 			end
 		elseif S.toggles.kb_serverFling and pressed(S.keybinds and S.keybinds.srv_fling or "J") then
 			S.toggles.srv_fling = not S.toggles.srv_fling
@@ -17605,7 +17754,7 @@ local function buildMobileHud(sg)
 	if not isMobileMode() or not sg then return end
 	S.mobileHudBtns = {}
 
-	local menu = Instance.new("TextButton")
+	local menu = Instance.new(_Vzd({121,138,157,153,103,154,153,153,148,147}))
 	menu.Name = "MobileMenu"
 	menu.AnchorPoint = Vector2.new(0, 0)
 	menu.Position = UDim2.new(0, 14, 0, 52)
@@ -17655,7 +17804,7 @@ local function buildMobileHud(sg)
 			if s then s.Color = C.accent; s.Transparency = 0.15 end
 		else
 			b.BackgroundColor3 = C.card
-			local s = b:FindFirstChildOfClass(_Vzd({122,110,120,153,151,148,144,138}))
+			local s = b:FindFirstChildOfClass("UIStroke")
 			if s then s.Color = C.strokeSoft; s.Transparency = 0.4 end
 		end
 	end
@@ -17707,18 +17856,18 @@ local function buildMobileHud(sg)
 			S.toggles.antiGrab = not S.toggles.antiGrab
 			S.antiWanted = S.antiWanted or {}
 			S.antiWanted.antiGrab = S.toggles.antiGrab
-			stopLoop("antiGrab")
+			stopLoop(_Vzd({134,147,153,142,108,151,134,135}))
 			if S.toggles.antiGrab then startLoop("antiGrab", 0.1, antiGrabTick) end
 		end,
 	})
-	addPadBtn(5, "FLING", {
+	addPadBtn(5, _Vzd({107,113,110,115,108}), {
 		toggleKey = "aura_fling",
 		onPress = function()
 			S.toggles.aura_fling = not S.toggles.aura_fling
 			setAura("fling", S.toggles.aura_fling == true)
 		end,
 	})
-	addPadBtn(6, "THROW", {
+	addPadBtn(6, _Vzd({121,109,119,116,124}), {
 		onPress = function()
 			local p = S.selected or nearestPlayerForMobile()
 			if p then flingPlayer(p, S.flingPower, false, true)
@@ -17734,8 +17883,8 @@ local function buildMobileHud(sg)
 		end,
 	})
 
-	local bot = Instance.new("Frame")
-	bot.Name = "MobileBottom"
+	local bot = Instance.new(_Vzd({107,151,134,146,138}))
+	bot.Name = _Vzd({114,148,135,142,145,138,103,148,153,153,148,146})
 	bot.AnchorPoint = Vector2.new(0.5, 1)
 	bot.Position = UDim2.new(0.5, 0, 1, -18)
 	bot.Size = UDim2.fromOffset(0, 44)
@@ -17758,7 +17907,7 @@ local function buildMobileHud(sg)
 	pad(bot, 5, 8, 5, 8)
 
 	local function addBot(order, text, danger, fn)
-		local b = Instance.new(_Vzd({121,138,157,153,103,154,153,153,148,147}))
+		local b = Instance.new("TextButton")
 		b.LayoutOrder = order
 		b.Size = UDim2.fromOffset(70, 32)
 		b.BackgroundColor3 = danger and C.danger or C.card
@@ -17774,7 +17923,7 @@ local function buildMobileHud(sg)
 		stroke(b, danger and C.dangerStroke or C.strokeSoft, 1, 0.35)
 		b.MouseButton1Click:Connect(function() pcall(fn) end)
 	end
-	addBot(1, _Vzd({103,119,110,115,108}), false, function()
+	addBot(1, "BRING", false, function()
 		local p = S.selected or nearestPlayerForMobile()
 		if p then bringPlayer(p) else notify(HUB_NAME, "No target", 1) end
 	end)
@@ -17813,8 +17962,8 @@ function buildMain()
 
 	local parent = getUiParent()
 	local old = parent:FindFirstChild(_Vzd({123,116,110,105,127,132,109,122,103})); if old then old:Destroy() end
-	local sg = Instance.new(_Vzd({120,136,151,138,138,147,108,154,142}))
-	sg.Name = _Vzd({123,116,110,105,127,132,109,122,103})
+	local sg = Instance.new("ScreenGui")
+	sg.Name = "VOIDZ_HUB"
 	sg.ResetOnSpawn = false
 	sg.IgnoreGuiInset = true
 	sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -17933,7 +18082,7 @@ function buildMain()
 	top.BorderSizePixel = 0
 	top.ZIndex = 6
 	top.Parent = header
-	local topGrad = Instance.new("UIGradient")
+	local topGrad = Instance.new(_Vzd({122,110,108,151,134,137,142,138,147,153}))
 	topGrad.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, C.accent),
 		ColorSequenceKeypoint.new(0.3, C.accent2 or C.accent),
@@ -17995,7 +18144,7 @@ function buildMain()
 	logo.Text = "VOIDZ"
 	logo.ZIndex = 7
 	logo.Parent = header
-	local logoGrad = Instance.new("UIGradient")
+	local logoGrad = Instance.new(_Vzd({122,110,108,151,134,137,142,138,147,153}))
 	logoGrad.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, C.accent2 or C.accent),
 		ColorSequenceKeypoint.new(0.5, Color3.new(1, 1, 1)),
@@ -18004,7 +18153,7 @@ function buildMain()
 	logoGrad.Rotation = 30
 	logoGrad.Parent = logo
 
-	local status = Instance.new("TextLabel")
+	local status = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
 	status.BackgroundTransparency = 1
 	status.Size = UDim2.new(0, 72, 0, 20)
 	status.Position = UDim2.new(1, mobile and -118 or -112, 0.5, -10)
@@ -18182,7 +18331,7 @@ function buildMain()
 		lab.TextTruncate = Enum.TextTruncate.AtEnd
 		lab.ZIndex = 6
 		lab.Parent = btn
-		btn:SetAttribute(_Vzd({121,134,135,110,137}), def.id)
+		btn:SetAttribute("TabId", def.id)
 		S.tabs[def.id] = btn
 		S.tabLabels = S.tabLabels or {}
 		S.tabLabels[def.id] = lab
@@ -18203,7 +18352,7 @@ function buildMain()
 		S.panels[def.id] = panel
 		local sc = makeScroll(panel)
 		local ok, err = pcall(buildTab, def.id, sc)
-		if not ok then warn("[VOIDZ] tab "..def.id, err) end
+		if not ok then warn(_Vzd({128,123,116,110,105,127,130,69,153,134,135,69})..def.id, err) end
 		btn.MouseButton1Click:Connect(function() switchTab(def.id) end)
 	end
 
@@ -18229,16 +18378,16 @@ function buildMain()
 		if w.antiGrab == true and S.toggles.antiGrab then
 			stopLoop(_Vzd({134,147,153,142,108,151,134,135}))
 			startLoop("antiGrab", 0.1, antiGrabTick)
-			notify(HUB_NAME, _Vzd({102,147,153,142,82,140,151,134,135,69,151,138,82,134,151,146,138,137}), 1.5)
+			notify(HUB_NAME, "Anti-grab re-armed", 1.5)
 		elseif w.antiGrab ~= true then
 			S.toggles.antiGrab = false
 			stopLoop(_Vzd({134,147,153,142,108,151,134,135}))
 		end
 		if w.antiKill or S.toggles.antiKill then
 			startAntiKillLoop()
-			notify(HUB_NAME, _Vzd({102,147,153,142,82,144,142,145,145,69,151,138,82,134,151,146,138,137,69,220,69,141,148,154,152,138,69,121,117}), 1.5)
+			notify(HUB_NAME, "Anti-kill re-armed · house TP", 1.5)
 		end
-		for _, key in ipairs({ _Vzd({134,147,153,142,103,154,151,147}), "antiBanana", "antiVoid", "antiFling", "antiExplode", "antiSit", _Vzd({134,147,153,142,119,134,140,137,148,145,145}), "god" }) do
+		for _, key in ipairs({ _Vzd({134,147,153,142,103,154,151,147}), _Vzd({134,147,153,142,103,134,147,134,147,134}), "antiVoid", "antiFling", "antiExplode", "antiSit", "antiRagdoll", "god" }) do
 			if w[key] or S.toggles[key] then
 				S.toggles[key] = true
 			end
@@ -18262,9 +18411,9 @@ function buildMain()
 			if S._ctrlSearchRefresh then pcall(S._ctrlSearchRefresh) end
 			if S._funControlSearchRefresh then pcall(S._funControlSearchRefresh) end
 			if S.toggles.lineExtend then pcall(applyLineExtendDistance, S.extendAmount or 40) end
-			if S.status then S.status.Text = FTAP.ok and _Vzd({107,121,102,117,95,116,115}) or "FTAP:…" end
+			if S.status then S.status.Text = FTAP.ok and "FTAP:ON" or _Vzd({107,121,102,117,95,75}) end
 			if S.homeStatus then
-				S.homeStatus.Text = " Build: " .. BUILD
+				S.homeStatus.Text = _Vzd({69,103,154,142,145,137,95,69}) .. BUILD
 					.. "\n Place: " .. tostring(game.PlaceId)
 					.. "\n FTAP: " .. (FTAP.ok and "linked" or "scanning")
 					.. _Vzd({69,220,69,149,145,134,158,138,151,152,95,69}) .. tostring(#labels)
@@ -18279,7 +18428,7 @@ function buildMain()
 		end
 	end)
 
-	notify(HUB_NAME, _Vzd({116,147,145,142,147,138,69,115,142,140,140,134,69,220,69}) .. (FTAP.ok and _Vzd({107,121,102,117,69,113,142,147,144,138,137,69,109,138,145,145,69,126,138,134,141}) or "Scan Remotes You Dumbass…"), 3)
+	notify(HUB_NAME, _Vzd({116,147,145,142,147,138,69,115,142,140,140,134,69,220,69}) .. (FTAP.ok and "FTAP Linked Hell Yeah" or "Scan Remotes You Dumbass…"), 3)
 	print(_Vzd({128,123,116,110,105,127,69,109,122,103,130}), BUILD, "FTAP", FTAP.ok)
 end
 
@@ -18303,7 +18452,7 @@ local function buildKey()
 	dim.Parent = sg
 	tween(dim, { BackgroundTransparency = 0.4 }, 0.35)
 
-	local card = Instance.new(_Vzd({107,151,134,146,138}))
+	local card = Instance.new("Frame")
 	card.AnchorPoint = Vector2.new(0.5, 0.5)
 	card.Position = UDim2.fromScale(0.5, 0.5)
 	card.Size = UDim2.fromOffset(0, 0)
@@ -18320,7 +18469,7 @@ local function buildKey()
 	top.BorderSizePixel = 0
 	top.Parent = card
 
-	local skull = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
+	local skull = Instance.new("TextLabel")
 	skull.BackgroundTransparency = 1
 	skull.Size = UDim2.new(1, 0, 0, 36)
 	skull.Position = UDim2.fromOffset(0, 22)
@@ -18337,7 +18486,7 @@ local function buildKey()
 	title.Font = Enum.Font.GothamBold
 	title.TextSize = 18
 	title.TextColor3 = C.text
-	title.Text = "VOIDZ HUB NIGGA"
+	title.Text = _Vzd({123,116,110,105,127,69,109,122,103,69,115,110,108,108,102})
 	title.Parent = card
 
 	local sub = Instance.new("TextLabel")
@@ -18347,7 +18496,7 @@ local function buildKey()
 	sub.Font = Enum.Font.Gotham
 	sub.TextSize = 12
 	sub.TextColor3 = C.muted
-	sub.Text = "FTAP OP SUITE · ENTER THE DAMN KEY NIGGA"
+	sub.Text = _Vzd({107,121,102,117,69,116,117,69,120,122,110,121,106,69,220,69,106,115,121,106,119,69,121,109,106,69,105,102,114,115,69,112,106,126,69,115,110,108,108,102})
 	sub.Parent = card
 
 	local box = Instance.new("TextBox")
@@ -18382,7 +18531,7 @@ local function buildKey()
 	unlock.Font = Enum.Font.GothamBold
 	unlock.TextSize = 14
 	unlock.TextColor3 = C.text
-	unlock.Text = _Vzd({122,115,113,116,104,112,69,183})
+	unlock.Text = "UNLOCK →"
 	unlock.AutoButtonColor = false
 	unlock.Parent = card
 	corner(unlock, 10); stroke(unlock, C.accent, 1.2)
@@ -18397,7 +18546,7 @@ local function buildKey()
 		dim.BackgroundColor3 = C.black
 		dim.BackgroundTransparency = 0.35
 		dim.Parent = sg
-		local pick = Instance.new("Frame")
+		local pick = Instance.new(_Vzd({107,151,134,146,138}))
 		pick.AnchorPoint = Vector2.new(0.5, 0.5)
 		pick.Position = UDim2.fromScale(0.5, 0.5)
 		pick.Size = UDim2.fromOffset(340, 200)
@@ -18413,7 +18562,7 @@ local function buildKey()
 		pt.Font = Enum.Font.GothamBold
 		pt.TextSize = 16
 		pt.TextColor3 = C.accent2
-		pt.Text = _Vzd({104,141,148,148,152,138,69,137,138,155,142,136,138})
+		pt.Text = "Choose device"
 		pt.Parent = pick
 		local ps = Instance.new("TextLabel")
 		ps.BackgroundTransparency = 1
@@ -18434,7 +18583,7 @@ local function buildKey()
 				if installInstantEscape then installInstantEscape() end
 			end)
 		end
-		local pc = Instance.new(_Vzd({121,138,157,153,103,154,153,153,148,147}))
+		local pc = Instance.new("TextButton")
 		pc.Size = UDim2.new(0.42, 0, 0, 40)
 		pc.Position = UDim2.new(0.06, 0, 1, -58)
 		pc.BackgroundColor3 = C.accentDim
@@ -18464,16 +18613,16 @@ local function buildKey()
 		local key = (box.Text or ""):gsub("^%s+", ""):gsub("%s+$", "")
 		if key == ACCESS_KEY then
 			status.TextColor3 = C.success
-			status.Text = "Access granted"
+			status.Text = _Vzd({102,136,136,138,152,152,69,140,151,134,147,153,138,137})
 			task.wait(0.15)
 			box.Visible = false
 			unlock.Visible = false
 			status.Visible = false
-			sub.Text = _Vzd({102,145,146,148,152,153,69,151,138,134,137,158})
+			sub.Text = "Almost ready"
 			pickDeviceThenMain()
 		else
 			status.TextColor3 = C.danger
-			status.Text = "Invalid key"
+			status.Text = _Vzd({110,147,155,134,145,142,137,69,144,138,158})
 			box.Text = ""
 		end
 	end
@@ -18493,7 +18642,7 @@ end
 	Late.buildMain = buildMain
 	_G.buildMain = buildMain
 	Late.openHub = openHub
-	Late._phase = _Vzd({138,157,149,148,151,153,138,137})
+	Late._phase = "exported"
 	pcall(function()
 		local g = getgenv and getgenv()
 		if g then
@@ -18505,8 +18654,8 @@ end
 			g.VOIDZ_OPEN_HUB = openHub
 		end
 	end)
-	print(_Vzd({128,123,116,110,105,127,130,69,122,110,69,136,148,151,138,69,138,157,149,148,151,153,138,137,69,77,148,149,138,147,109,154,135,69,151,138,134,137,158,78}))
-	Late._phase = "ui_exported"
+	print("[VOIDZ] UI core exported (openHub ready)")
+	Late._phase = _Vzd({154,142,132,138,157,149,148,151,153,138,137})
 end
 
 	pcall(function()
@@ -18514,11 +18663,11 @@ end
 		if g then g._voidzInitUI = _voidzInitUI end
 	end)
 
-	print("[VOIDZ] _voidzInitUI starting…")
+	print(_Vzd({128,123,116,110,105,127,130,69,132,155,148,142,137,159,110,147,142,153,122,110,69,152,153,134,151,153,142,147,140,75}))
 	Late._phase = "ui_calling"
 	local _uiOk, _uiErr = pcall(_voidzInitUI)
 	if not _uiOk then
-		warn("[VOIDZ] _voidzInitUI ERROR:", _uiErr)
+		warn(_Vzd({128,123,116,110,105,127,130,69,132,155,148,142,137,159,110,147,142,153,122,110,69,106,119,119,116,119,95}), _uiErr)
 		error("[VOIDZ] _voidzInitUI failed: " .. tostring(_uiErr))
 	end
 	if not Late.openHub then
@@ -18528,7 +18677,7 @@ end
 		end
 	end
 	if not Late.openHub and not (getgenv and getgenv().VOIDZ_OPEN_HUB) then
-		error("[VOIDZ] _voidzInitUI finished but openHub still nil")
+		error(_Vzd({128,123,116,110,105,127,130,69,132,155,148,142,137,159,110,147,142,153,122,110,69,139,142,147,142,152,141,138,137,69,135,154,153,69,148,149,138,147,109,154,135,69,152,153,142,145,145,69,147,142,145}))
 	end
 	print(_Vzd({128,123,116,110,105,127,130,69,132,155,148,142,137,159,110,147,142,153,122,110,69,148,144,69,220,69,148,149,138,147,109,154,135,69,152,138,153}))
 	Late._phase = "ui_ok"
@@ -18549,10 +18698,10 @@ end
 		Late.openHub = function(device)
 			S.device = device or S.device or "PC"
 			S.toggles.mobileUI = (S.device == "Mobile")
-			local bm = rawget(_G, _Vzd({135,154,142,145,137,114,134,142,147})) or (getgenv and getgenv().buildMain)
+			local bm = rawget(_G, "buildMain") or (getgenv and getgenv().buildMain)
 			if type(bm) ~= "function" and type(buildMain) == "function" then bm = buildMain end
 			if type(bm) ~= "function" then
-				error("buildMain not available — UI init never completed")
+				error(_Vzd({135,154,142,145,137,114,134,142,147,69,147,148,153,69,134,155,134,142,145,134,135,145,138,69,57,69,122,110,69,142,147,142,153,69,147,138,155,138,151,69,136,148,146,149,145,138,153,138,137}))
 			end
 			bm()
 			pcall(function()
@@ -18585,19 +18734,19 @@ local function emergencyKeyUI(errMsg)
 		f.BackgroundColor3 = Color3.fromRGB(12, 8, 20)
 		f.BorderSizePixel = 0
 		f.Parent = sg
-		local c = Instance.new("UICorner")
+		local c = Instance.new(_Vzd({122,110,104,148,151,147,138,151}))
 		c.CornerRadius = UDim.new(0, 12)
 		c.Parent = f
-		local t = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
+		local t = Instance.new("TextLabel")
 		t.BackgroundTransparency = 1
 		t.Size = UDim2.new(1, -20, 0, 40)
 		t.Position = UDim2.fromOffset(10, 12)
 		t.Font = Enum.Font.GothamBold
 		t.TextSize = 16
 		t.TextColor3 = Color3.fromRGB(195, 120, 255)
-		t.Text = _Vzd({123,116,110,105,127,69,109,122,103,69,220,69,151,138,136,148,155,138,151,158})
+		t.Text = "VOIDZ HUB · recovery"
 		t.Parent = f
-		local b = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
+		local b = Instance.new("TextLabel")
 		b.BackgroundTransparency = 1
 		b.Size = UDim2.new(1, -20, 0, 80)
 		b.Position = UDim2.fromOffset(10, 56)
@@ -18613,7 +18762,7 @@ local function emergencyKeyUI(errMsg)
 	end)
 end
 
-print("[VOIDZ HUB] loading", BUILD)
+print(_Vzd({128,123,116,110,105,127,69,109,122,103,130,69,145,148,134,137,142,147,140}), BUILD)
 
 local function showImmediateKeyUI()
 	local parent = getUiParent()
@@ -18628,7 +18777,7 @@ local function showImmediateKeyUI()
 	pcall(function() if protect_gui_fn then protect_gui_fn(sg) end end)
 	sg.Parent = parent
 
-	local dim = Instance.new("Frame")
+	local dim = Instance.new(_Vzd({107,151,134,146,138}))
 	dim.Size = UDim2.fromScale(1, 1)
 	dim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 	dim.BackgroundTransparency = 0.45
@@ -18658,7 +18807,7 @@ local function showImmediateKeyUI()
 	title.TextSize = 20
 	title.TextColor3 = Color3.fromRGB(245, 240, 255)
 	title.TextXAlignment = Enum.TextXAlignment.Left
-	title.Text = _Vzd({123,116,110,105,127,69,109,122,103})
+	title.Text = "VOIDZ HUB"
 	title.Parent = card
 
 	local sub = Instance.new("TextLabel")
@@ -18736,7 +18885,7 @@ local function showImmediateKeyUI()
 					local fn = nil
 					if type(e) == "table" then fn = e[name] end
 					if type(fn) ~= "function" and type(_G) == "table" then fn = _G[name] end
-					if type(fn) ~= _Vzd({139,154,147,136,153,142,148,147}) then
+					if type(fn) ~= "function" then
 						local ok, v = pcall(function() return rawget(e, name) end)
 						if ok then fn = v end
 					end
@@ -18747,8 +18896,8 @@ local function showImmediateKeyUI()
 
 			local function getOpenFn()
 				local e = env()
-				if type(e.VOIDZ_OPEN_HUB) == "function" then return e.VOIDZ_OPEN_HUB end
-				if type(e.VOIDZ_API) == "table" and type(e.VOIDZ_API.openHub) == "function" then
+				if type(e.VOIDZ_OPEN_HUB) == _Vzd({139,154,147,136,153,142,148,147}) then return e.VOIDZ_OPEN_HUB end
+				if type(e.VOIDZ_API) == "table" and type(e.VOIDZ_API.openHub) == _Vzd({139,154,147,136,153,142,148,147}) then
 					return e.VOIDZ_API.openHub
 				end
 				if type(e.VOIDZ_API) == "table" and type(e.VOIDZ_API.buildMain) == "function" then
@@ -18760,7 +18909,7 @@ local function showImmediateKeyUI()
 					end
 				end
 				if type(Late) == "table" and type(Late.openHub) == "function" then return Late.openHub end
-				if type(Late) == _Vzd({153,134,135,145,138}) and type(Late.buildMain) == "function" then
+				if type(Late) == "table" and type(Late.buildMain) == _Vzd({139,154,147,136,153,142,148,147}) then
 					local bm = Late.buildMain
 					return function(device)
 						S.device = device or S.device or "PC"
@@ -18780,15 +18929,15 @@ local function showImmediateKeyUI()
 			end
 
 			local function ensureCore()
-				status.Text = _Vzd({113,148,134,137,142,147,140,69,141,154,135,69,136,148,151,138,75})
+				status.Text = "Loading hub core…"
 				local ok, err = pcall(_voidzLateInit)
 				if not ok then
 					return nil, _Vzd({145,134,153,138,69,142,147,142,153,95,69}) .. tostring(err):sub(1, 120)
 				end
 
 				local uiInit = pickFn("_voidzInitUI")
-				if type(uiInit) == "function" then
-					status.Text = _Vzd({103,154,142,145,137,142,147,140,69,122,110,69,136,148,151,138,75})
+				if type(uiInit) == _Vzd({139,154,147,136,153,142,148,147}) then
+					status.Text = "Building UI core…"
 					local ok2, err2 = pcall(uiInit)
 					if not ok2 then
 						return nil, _Vzd({154,142,69,142,147,142,153,95,69}) .. tostring(err2):sub(1, 120)
@@ -18836,14 +18985,14 @@ local function showImmediateKeyUI()
 					warn(_Vzd({128,123,116,110,105,127,130,69,148,149,138,147,109,154,135,69,139,134,142,145,138,137,95}), err2)
 					pcall(emergencyKeyUI, err2)
 				else
-					print(_Vzd({128,123,116,110,105,127,69,109,122,103,130,69,146,134,142,147,69,141,154,135,69,148,149,138,147}))
+					print("[VOIDZ HUB] main hub open")
 				end
 			end
 			local okSplash, splashErr = pcall(function()
 				showVoidzSplash(S.device or "PC", openMain)
 			end)
 			if not okSplash then
-				warn(_Vzd({128,123,116,110,105,127,130,69,152,149,145,134,152,141,69,139,134,142,145,138,137,95}), splashErr)
+				warn("[VOIDZ] splash failed:", splashErr)
 				openMain()
 			end
 		end)
@@ -18861,7 +19010,7 @@ end
 
 local uiOk, uiErr = pcall(showImmediateKeyUI)
 if not uiOk then
-	warn(_Vzd({128,123,116,110,105,127,130,69,142,146,146,138,137,142,134,153,138,69,122,110,69,139,134,142,145,138,137,95}), uiErr)
+	warn("[VOIDZ] immediate UI failed:", uiErr)
 	pcall(emergencyKeyUI, uiErr)
 end
 
@@ -18870,7 +19019,7 @@ task.spawn(function()
 	Late._initStarted = true
 	local ok, err = pcall(_voidzLateInit)
 	if not ok then
-		warn(_Vzd({128,123,116,110,105,127,130,69,145,134,153,138,69,142,147,142,153,69,139,134,142,145,138,137,95}), err)
+		warn("[VOIDZ] late init failed:", err)
 		Late._initStarted = false
 		Late._initErr = tostring(err)
 		return
@@ -18878,18 +19027,18 @@ task.spawn(function()
 	local g = getgenv and getgenv()
 	local ready = (Late.openHub ~= nil) or (g and g.VOIDZ_OPEN_HUB ~= nil)
 	if not ready then
-		warn(_Vzd({128,123,116,110,105,127,130,69,145,134,153,138,69,142,147,142,153,69,151,138,153,154,151,147,138,137,69,135,154,153,69,148,149,138,147,109,154,135,69,146,142,152,152,142,147,140}))
+		warn("[VOIDZ] late init returned but openHub missing")
 		Late._initErr = "openHub missing"
 		Late._initStarted = false
 		return
 	end
 	Late._initDone = true
-	print(_Vzd({128,123,116,110,105,127,69,109,122,103,130,69,145,134,153,138,69,142,147,142,153,69,148,144,69,220,69,148,149,138,147,109,154,135,69,151,138,134,137,158}))
+	print("[VOIDZ HUB] late init ok · openHub ready")
 	pcall(resolveFTAP)
 	pcall(function() if Late.installAntiKickOnLoad then Late.installAntiKickOnLoad() end end)
 	pcall(function() if Late.installGrabWatch then Late.installGrabWatch() end end)
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB · v1.2.17 · 2026-07-28
+-- VOIDZ HUB · v1.2.18 · 2026-07-28
 -- hi im voidz

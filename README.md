@@ -1,6 +1,6 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.17` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.18` · Access Key: `VOIDZHUB`
 
 A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more. Press **RightShift** to toggle the hub.
 
@@ -17,12 +17,10 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hu
 
 ---
 
-## Recent (1.2.17)
+## Recent (1.2.18)
 
-- **Key** — `VOIDZHUB` (was TESTRUN).
-- **Snowball farm** — Blitz-style: park on snow mountain, serial `BallSnowball`, SNO SoundPart, BodyPosition roll L/R on snow so the **server** grows size; then fling/explode.
-- **Train control** — Streams Secret Train Cave first, broader seat search (not name-only), multi-retry, SNO chassis + BodyVelocity/Gyro drive (works even if sit is flaky).
-- **Public source** — Partial string/function obstruction on GitHub so casual copy-steal is harder.
+- **Gucci / Anti-Grab** — No more freeze on grab. Breaks welds/lines, reclaim self, force free walk (CFrame + BodyVelocity) while held so grabs barely affect you.
+- **1.2.17** — Key `VOIDZHUB`, Blitz snow farm, train cave stream/drive, partial public obfuscation.
 
 ---
 

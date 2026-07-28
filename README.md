@@ -1,6 +1,6 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.14` · Access Key: `TESTRUN`
+Build: `2026-07-28-1.2.15` · Access Key: `TESTRUN`
 
 A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more. Press **RightShift** to toggle the hub.
 
@@ -17,11 +17,10 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hu
 
 ---
 
-## Recent (1.2.14)
+## Recent (1.2.15)
 
-- **Train control** — Finds map train (Secret Train Cave), SNO + sit, WASD drive, H horn, optional cave TP. Turn off Anti Train seat if it unsits you.
-- **Auto snowball maker** — Serial `BallSnowball` spawn, roll-grow on snow farm, fling grown balls at target or explode with BombExplode. Grow size = server size studs (not fake client scale).
-- Boot: immediate key UI + late-init hub unlock; serial toy queue (`CanSpawnToy`).
+- **Boot splash** — Animated gradient intro after unlock (cyan → violet → pink wash, floating orbs, grid, scan beam, shimmer load bar). Click to skip. Wired into the immediate key path so it actually plays again.
+- **1.2.14** — Train control (map train SNO/sit/drive), BallSnowball farm/fling/explode, serial toy spawn.
 
 ---
 

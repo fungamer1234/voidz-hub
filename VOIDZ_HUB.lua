@@ -31,7 +31,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = "TESTRUN"
 local HUB_NAME = "VOIDZ HUB"
-local BUILD = "2026-07-28-1.2.14"
+local BUILD = "2026-07-28-1.2.15"
 local GuiService = game:GetService("GuiService")
 
 -- 6 themes (Purple = classic VOIDZ)
@@ -496,6 +496,362 @@ function getUiParent()
 	local ok2 = pcall(function() local t=Instance.new("Folder"); t.Parent=CoreGui; t:Destroy() end)
 	if ok2 then return CoreGui end
 	return LP:WaitForChild("PlayerGui")
+end
+
+------------------------------------------------------------------------
+-- Animated gradient splash (boot + post-key). Not a flat purple box.
+------------------------------------------------------------------------
+function showVoidzSplash(device, onDone)
+	device = device or S.device or "PC"
+	local isMobile = device == "Mobile"
+	local parent = getUiParent()
+	local old = parent:FindFirstChild("VOIDZ_SPLASH")
+	if old then pcall(function() old:Destroy() end) end
+
+	local colDeep = Color3.fromRGB(4, 2, 12)
+	local colMid = Color3.fromRGB(28, 8, 55)
+	local colViolet = Color3.fromRGB(120, 40, 255)
+	local colPink = Color3.fromRGB(255, 70, 180)
+	local colCyan = Color3.fromRGB(80, 220, 255)
+	local colSoft = Color3.fromRGB(210, 190, 255)
+
+	local splash = Instance.new("ScreenGui")
+	splash.Name = "VOIDZ_SPLASH"
+	splash.ResetOnSpawn = false
+	splash.IgnoreGuiInset = true
+	splash.DisplayOrder = 2147483646
+	splash.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	pcall(function() if protect_gui_fn then protect_gui_fn(splash) end end)
+	splash.Parent = parent
+
+	local root = Instance.new("Frame")
+	root.Size = UDim2.fromScale(1, 1)
+	root.BackgroundColor3 = colDeep
+	root.BorderSizePixel = 0
+	root.BackgroundTransparency = 1
+	root.ClipsDescendants = true
+	root.Parent = splash
+	tween(root, { BackgroundTransparency = 0 }, 0.28)
+
+	-- animated multi-stop gradient wash
+	local wash = Instance.new("Frame")
+	wash.Size = UDim2.fromScale(1.4, 1.4)
+	wash.AnchorPoint = Vector2.new(0.5, 0.5)
+	wash.Position = UDim2.fromScale(0.5, 0.5)
+	wash.BackgroundColor3 = Color3.new(1, 1, 1)
+	wash.BorderSizePixel = 0
+	wash.BackgroundTransparency = 0.15
+	wash.Parent = root
+	local washG = Instance.new("UIGradient")
+	washG.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, colDeep),
+		ColorSequenceKeypoint.new(0.28, colMid),
+		ColorSequenceKeypoint.new(0.52, colViolet),
+		ColorSequenceKeypoint.new(0.74, colPink),
+		ColorSequenceKeypoint.new(1, colCyan),
+	})
+	washG.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.15),
+		NumberSequenceKeypoint.new(0.45, 0.35),
+		NumberSequenceKeypoint.new(1, 0.55),
+	})
+	washG.Rotation = 25
+	washG.Parent = wash
+
+	-- soft floating orbs
+	local function makeOrb(scale, c1, c2, pos, drift)
+		local orb = Instance.new("Frame")
+		orb.AnchorPoint = Vector2.new(0.5, 0.5)
+		orb.Position = pos
+		orb.Size = UDim2.fromScale(scale, scale)
+		orb.BackgroundColor3 = Color3.new(1, 1, 1)
+		orb.BorderSizePixel = 0
+		orb.BackgroundTransparency = 0.35
+		orb.ZIndex = 2
+		orb.Parent = root
+		local c = Instance.new("UICorner")
+		c.CornerRadius = UDim.new(1, 0)
+		c.Parent = orb
+		local g = Instance.new("UIGradient")
+		g.Color = ColorSequence.new(c1, c2)
+		g.Rotation = 90
+		g.Parent = orb
+		task.spawn(function()
+			local t0 = os.clock()
+			while splash.Parent and orb.Parent do
+				local t = os.clock() - t0
+				local ox = math.sin(t * drift) * 0.04
+				local oy = math.cos(t * drift * 0.85) * 0.035
+				orb.Position = UDim2.new(pos.X.Scale + ox, 0, pos.Y.Scale + oy, 0)
+				orb.BackgroundTransparency = 0.28 + math.sin(t * 1.4) * 0.12
+				task.wait()
+			end
+		end)
+		return orb
+	end
+	makeOrb(isMobile and 0.55 or 0.42, colViolet, colPink, UDim2.fromScale(0.22, 0.28), 0.55)
+	makeOrb(isMobile and 0.48 or 0.38, colCyan, colViolet, UDim2.fromScale(0.78, 0.62), 0.42)
+	makeOrb(isMobile and 0.35 or 0.28, colPink, colCyan, UDim2.fromScale(0.55, 0.18), 0.7)
+
+	-- perspective grid (diagonal lines)
+	local grid = Instance.new("Frame")
+	grid.Size = UDim2.fromScale(1, 1)
+	grid.BackgroundTransparency = 1
+	grid.ZIndex = 3
+	grid.Parent = root
+	for i = 0, 14 do
+		local v = Instance.new("Frame")
+		v.BackgroundColor3 = colSoft
+		v.BackgroundTransparency = 0.88
+		v.BorderSizePixel = 0
+		v.Size = UDim2.new(0, 1, 1.2, 0)
+		v.Position = UDim2.new(i / 14, 0, -0.1, 0)
+		v.Rotation = 12
+		v.ZIndex = 3
+		v.Parent = grid
+	end
+	for i = 0, 10 do
+		local h = Instance.new("Frame")
+		h.BackgroundColor3 = colSoft
+		h.BackgroundTransparency = 0.9
+		h.BorderSizePixel = 0
+		h.Size = UDim2.new(1.2, 0, 0, 1)
+		h.Position = UDim2.new(-0.1, 0, i / 10, 0)
+		h.Rotation = -6
+		h.ZIndex = 3
+		h.Parent = grid
+	end
+
+	-- scan beam
+	local beam = Instance.new("Frame")
+	beam.Size = UDim2.new(0.35, 0, 1.4, 0)
+	beam.Position = UDim2.new(-0.4, 0, -0.2, 0)
+	beam.BackgroundColor3 = Color3.new(1, 1, 1)
+	beam.BorderSizePixel = 0
+	beam.BackgroundTransparency = 0.55
+	beam.ZIndex = 4
+	beam.Rotation = 18
+	beam.Parent = root
+	local beamG = Instance.new("UIGradient")
+	beamG.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, colCyan),
+		ColorSequenceKeypoint.new(0.5, colPink),
+		ColorSequenceKeypoint.new(1, colViolet),
+	})
+	beamG.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(0.5, 0.45),
+		NumberSequenceKeypoint.new(1, 1),
+	})
+	beamG.Rotation = 90
+	beamG.Parent = beam
+
+	-- center stack
+	local center = Instance.new("Frame")
+	center.AnchorPoint = Vector2.new(0.5, 0.5)
+	center.Position = UDim2.fromScale(0.5, 0.46)
+	center.Size = UDim2.new(0.9, 0, 0, isMobile and 200 or 220)
+	center.BackgroundTransparency = 1
+	center.ZIndex = 10
+	center.Parent = root
+
+	-- glow plate behind title
+	local glow = Instance.new("Frame")
+	glow.AnchorPoint = Vector2.new(0.5, 0.5)
+	glow.Position = UDim2.fromScale(0.5, 0.38)
+	glow.Size = UDim2.fromOffset(isMobile and 260 or 340, isMobile and 90 or 110)
+	glow.BackgroundColor3 = Color3.new(1, 1, 1)
+	glow.BorderSizePixel = 0
+	glow.BackgroundTransparency = 0.72
+	glow.ZIndex = 10
+	glow.Parent = center
+	local glowC = Instance.new("UICorner")
+	glowC.CornerRadius = UDim.new(1, 0)
+	glowC.Parent = glow
+	local glowGrad = Instance.new("UIGradient")
+	glowGrad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, colCyan),
+		ColorSequenceKeypoint.new(0.5, colViolet),
+		ColorSequenceKeypoint.new(1, colPink),
+	})
+	glowGrad.Parent = glow
+
+	local brand = Instance.new("TextLabel")
+	brand.BackgroundTransparency = 1
+	brand.AnchorPoint = Vector2.new(0.5, 0.5)
+	brand.Position = UDim2.fromScale(0.5, 0.36)
+	brand.Size = UDim2.new(1, 0, 0, isMobile and 58 or 70)
+	brand.Font = Enum.Font.GothamBlack
+	brand.TextSize = isMobile and 48 or 62
+	brand.TextColor3 = Color3.new(1, 1, 1)
+	brand.Text = "VOIDZ"
+	brand.TextTransparency = 1
+	brand.ZIndex = 12
+	brand.Parent = center
+	local brandGrad = Instance.new("UIGradient")
+	brandGrad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, colCyan),
+		ColorSequenceKeypoint.new(0.35, colSoft),
+		ColorSequenceKeypoint.new(0.65, colPink),
+		ColorSequenceKeypoint.new(1, colViolet),
+	})
+	brandGrad.Rotation = 0
+	brandGrad.Parent = brand
+
+	local sub = Instance.new("TextLabel")
+	sub.BackgroundTransparency = 1
+	sub.AnchorPoint = Vector2.new(0.5, 0)
+	sub.Position = UDim2.fromScale(0.5, 0.55)
+	sub.Size = UDim2.new(0.9, 0, 0, 24)
+	sub.Font = Enum.Font.GothamBold
+	sub.TextSize = isMobile and 13 or 15
+	sub.TextColor3 = colSoft
+	sub.Text = isMobile and "MOBILE  ·  TOUCH OPS  ·  ONLINE" or "PC  ·  FULL CONTROL  ·  ONLINE"
+	sub.TextTransparency = 1
+	sub.ZIndex = 12
+	sub.Parent = center
+
+	local barBg = Instance.new("Frame")
+	barBg.AnchorPoint = Vector2.new(0.5, 0)
+	barBg.Position = UDim2.fromScale(0.5, 0.72)
+	barBg.Size = UDim2.fromOffset(isMobile and 200 or 260, 6)
+	barBg.BackgroundColor3 = Color3.fromRGB(20, 12, 36)
+	barBg.BorderSizePixel = 0
+	barBg.BackgroundTransparency = 0.2
+	barBg.ZIndex = 12
+	barBg.Parent = center
+	local barC = Instance.new("UICorner")
+	barC.CornerRadius = UDim.new(1, 0)
+	barC.Parent = barBg
+	local barFill = Instance.new("Frame")
+	barFill.Size = UDim2.new(0, 0, 1, 0)
+	barFill.BackgroundColor3 = Color3.new(1, 1, 1)
+	barFill.BorderSizePixel = 0
+	barFill.ZIndex = 13
+	barFill.Parent = barBg
+	local barFillC = Instance.new("UICorner")
+	barFillC.CornerRadius = UDim.new(1, 0)
+	barFillC.Parent = barFill
+	local barGrad = Instance.new("UIGradient")
+	barGrad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, colCyan),
+		ColorSequenceKeypoint.new(0.5, colPink),
+		ColorSequenceKeypoint.new(1, colViolet),
+	})
+	barGrad.Parent = barFill
+
+	local tag = Instance.new("TextLabel")
+	tag.BackgroundTransparency = 1
+	tag.AnchorPoint = Vector2.new(0.5, 0)
+	tag.Position = UDim2.fromScale(0.5, 0.82)
+	tag.Size = UDim2.new(0.9, 0, 0, 18)
+	tag.Font = Enum.Font.Code
+	tag.TextSize = 11
+	tag.TextColor3 = Color3.fromRGB(160, 140, 200)
+	tag.Text = "BOOT  " .. BUILD
+	tag.TextTransparency = 1
+	tag.ZIndex = 12
+	tag.Parent = center
+
+	-- corner accents
+	local function cornerMark(ax, ay, flipX, flipY)
+		local m = Instance.new("Frame")
+		m.AnchorPoint = Vector2.new(ax, ay)
+		m.Position = UDim2.fromScale(ax == 0 and 0.04 or 0.96, ay == 0 and 0.06 or 0.94)
+		m.Size = UDim2.fromOffset(28, 28)
+		m.BackgroundTransparency = 1
+		m.ZIndex = 8
+		m.Parent = root
+		local a = Instance.new("Frame")
+		a.Size = UDim2.new(1, 0, 0, 2)
+		a.Position = UDim2.new(0, 0, flipY and 1 or 0, flipY and -2 or 0)
+		a.BackgroundColor3 = colCyan
+		a.BorderSizePixel = 0
+		a.BackgroundTransparency = 0.15
+		a.Parent = m
+		local b = Instance.new("Frame")
+		b.Size = UDim2.new(0, 2, 1, 0)
+		b.Position = UDim2.new(flipX and 1 or 0, flipX and -2 or 0, 0, 0)
+		b.BackgroundColor3 = colPink
+		b.BorderSizePixel = 0
+		b.BackgroundTransparency = 0.15
+		b.Parent = m
+	end
+	cornerMark(0, 0, false, false)
+	cornerMark(1, 0, true, false)
+	cornerMark(0, 1, false, true)
+	cornerMark(1, 1, true, true)
+
+	-- spark particles
+	task.spawn(function()
+		for _ = 1, (isMobile and 10 or 16) do
+			if not splash.Parent then break end
+			local s = Instance.new("Frame")
+			s.AnchorPoint = Vector2.new(0.5, 0.5)
+			s.Size = UDim2.fromOffset(math.random(2, 5), math.random(2, 5))
+			s.Position = UDim2.fromScale(math.random(), math.random())
+			s.BackgroundColor3 = ({ colCyan, colPink, colViolet, colSoft })[math.random(1, 4)]
+			s.BorderSizePixel = 0
+			s.BackgroundTransparency = 0.2
+			s.ZIndex = 6
+			s.Parent = root
+			local sc = Instance.new("UICorner")
+			sc.CornerRadius = UDim.new(1, 0)
+			sc.Parent = s
+			tween(s, {
+				Position = UDim2.fromScale(s.Position.X.Scale + (math.random() - 0.5) * 0.15, s.Position.Y.Scale - 0.25),
+				BackgroundTransparency = 1,
+			}, 1.6 + math.random() * 0.8)
+			task.delay(2.2, function() pcall(function() s:Destroy() end) end)
+			task.wait(0.08)
+		end
+	end)
+
+	-- animate in
+	tween(brand, { TextTransparency = 0 }, 0.5)
+	tween(sub, { TextTransparency = 0 }, 0.55)
+	tween(tag, { TextTransparency = 0 }, 0.6)
+	tween(barFill, { Size = UDim2.new(1, 0, 1, 0) }, isMobile and 1.8 or 2.1, Enum.EasingStyle.Quad)
+	tween(beam, { Position = UDim2.new(1.1, 0, -0.2, 0) }, 2.0, Enum.EasingStyle.Sine)
+
+	local conn
+	conn = RunService.RenderStepped:Connect(function()
+		if not splash.Parent then
+			if conn then conn:Disconnect() end
+			return
+		end
+		local t = os.clock()
+		washG.Rotation = (t * 28) % 360
+		brandGrad.Rotation = math.sin(t * 1.2) * 18
+		glowGrad.Rotation = (t * 40) % 360
+		glow.BackgroundTransparency = 0.62 + math.sin(t * 2.2) * 0.1
+		barGrad.Offset = Vector2.new((t * 0.35) % 1 - 0.5, 0)
+	end)
+
+	local done = false
+	local function finish()
+		if done then return end
+		done = true
+		if conn then pcall(function() conn:Disconnect() end) end
+		tween(root, { BackgroundTransparency = 1 }, 0.4)
+		tween(brand, { TextTransparency = 1 }, 0.32)
+		tween(sub, { TextTransparency = 1 }, 0.32)
+		tween(wash, { BackgroundTransparency = 1 }, 0.35)
+		task.delay(0.42, function()
+			pcall(function() splash:Destroy() end)
+			if onDone then pcall(onDone) end
+		end)
+	end
+
+	task.delay(isMobile and 2.15 or 2.45, finish)
+	local skip = Instance.new("TextButton")
+	skip.Size = UDim2.fromScale(1, 1)
+	skip.BackgroundTransparency = 1
+	skip.Text = ""
+	skip.ZIndex = 50
+	skip.Parent = root
+	skip.MouseButton1Click:Connect(finish)
+	return splash
 end
 
 function char() return LP.Character end
@@ -18633,179 +18989,8 @@ local function buildKey()
 	corner(unlock, 10); stroke(unlock, C.accent, 1.2)
 
 	local function showDeviceSplash(device, onDone)
-		-- Full-screen themed splash (PC vs Mobile layouts differ)
-		local parent = getUiParent()
-		local old = parent:FindFirstChild("VOIDZ_SPLASH")
-		if old then old:Destroy() end
-		local splash = Instance.new("ScreenGui")
-		splash.Name = "VOIDZ_SPLASH"
-		splash.ResetOnSpawn = false
-		splash.IgnoreGuiInset = true
-		splash.DisplayOrder = 999
-		splash.Parent = parent
-
-		local isMobile = device == "Mobile"
-		local bg = Instance.new("Frame")
-		bg.Size = UDim2.fromScale(1, 1)
-		bg.BackgroundColor3 = C.bg
-		bg.BorderSizePixel = 0
-		bg.BackgroundTransparency = 1
-		bg.Parent = splash
-		tween(bg, { BackgroundTransparency = 0 }, 0.35)
-
-		-- accent wash
-		local wash = Instance.new("Frame")
-		wash.Size = UDim2.fromScale(1, 1)
-		wash.BackgroundColor3 = C.accent
-		wash.BackgroundTransparency = 0.88
-		wash.BorderSizePixel = 0
-		wash.Parent = bg
-		grad(wash, C.accentDim, C.bg, isMobile and 180 or 35)
-
-		-- cinematic bars (PC) or soft vignette ring (Mobile)
-		if not isMobile then
-			for _, side in ipairs({ "top", "bot" }) do
-				local bar = Instance.new("Frame")
-				bar.Size = UDim2.new(1, 0, 0, 52)
-				bar.Position = side == "top" and UDim2.new(0, 0, 0, 0) or UDim2.new(0, 0, 1, -52)
-				bar.BackgroundColor3 = C.black
-				bar.BorderSizePixel = 0
-				bar.BackgroundTransparency = 0.15
-				bar.Parent = bg
-				local line = Instance.new("Frame")
-				line.Size = UDim2.new(1, 0, 0, 2)
-				line.Position = side == "top" and UDim2.new(0, 0, 1, -2) or UDim2.new(0, 0, 0, 0)
-				line.BackgroundColor3 = C.accent
-				line.BorderSizePixel = 0
-				line.Parent = bar
-			end
-			for _, x in ipairs({ 0, 1 }) do
-				local rail = Instance.new("Frame")
-				rail.AnchorPoint = Vector2.new(x, 0.5)
-				rail.Position = UDim2.fromScale(x, 0.5)
-				rail.Size = UDim2.new(0, 3, 0.42, 0)
-				rail.BackgroundColor3 = C.accent
-				rail.BackgroundTransparency = 0.25
-				rail.BorderSizePixel = 0
-				rail.Parent = bg
-			end
-		else
-			local ring = Instance.new("Frame")
-			ring.AnchorPoint = Vector2.new(0.5, 0.5)
-			ring.Position = UDim2.fromScale(0.5, 0.48)
-			ring.Size = UDim2.fromOffset(280, 280)
-			ring.BackgroundTransparency = 1
-			ring.Parent = bg
-			local rs = Instance.new("UIStroke")
-			rs.Color = C.accent
-			rs.Thickness = 2.5
-			rs.Transparency = 0.35
-			rs.Parent = ring
-			corner(ring, 140)
-			local ring2 = ring:Clone()
-			ring2.Size = UDim2.fromOffset(220, 220)
-			ring2.Parent = bg
-			local rs2 = ring2:FindFirstChildOfClass("UIStroke")
-			if rs2 then
-				rs2.Thickness = 1.5
-				rs2.Transparency = 0.55
-			end
-		end
-
-		local brand = Instance.new("TextLabel")
-		brand.BackgroundTransparency = 1
-		brand.AnchorPoint = Vector2.new(0.5, 0.5)
-		brand.Position = UDim2.fromScale(0.5, isMobile and 0.40 or 0.42)
-		brand.Size = UDim2.new(0.9, 0, 0, isMobile and 56 or 64)
-		brand.Font = Enum.Font.GothamBlack
-		brand.TextSize = isMobile and 42 or 52
-		brand.TextColor3 = C.accent2
-		brand.Text = "VOIDZ"
-		brand.TextTransparency = 1
-		brand.Parent = bg
-		tween(brand, { TextTransparency = 0 }, 0.45)
-
-		local sub = Instance.new("TextLabel")
-		sub.BackgroundTransparency = 1
-		sub.AnchorPoint = Vector2.new(0.5, 0)
-		sub.Position = UDim2.new(0.5, 0, isMobile and 0.48 or 0.50, 0)
-		sub.Size = UDim2.new(0.85, 0, 0, 28)
-		sub.Font = Enum.Font.GothamBold
-		sub.TextSize = isMobile and 14 or 16
-		sub.TextColor3 = C.text
-		sub.Text = isMobile and "MOBILE · TOUCH OPS" or "PC · FULL CONTROL"
-		sub.TextTransparency = 1
-		sub.Parent = bg
-		tween(sub, { TextTransparency = 0 }, 0.5)
-
-		local tag = Instance.new("TextLabel")
-		tag.BackgroundTransparency = 1
-		tag.AnchorPoint = Vector2.new(0.5, 0)
-		tag.Position = UDim2.new(0.5, 0, isMobile and 0.54 or 0.56, 0)
-		tag.Size = UDim2.new(0.8, 0, 0, 20)
-		tag.Font = Enum.Font.Gotham
-		tag.TextSize = 12
-		tag.TextColor3 = C.muted
-		tag.Text = (S.theme or "Purple") .. " theme · FTAP suite · " .. BUILD
-		tag.TextTransparency = 1
-		tag.Parent = bg
-		tween(tag, { TextTransparency = 0 }, 0.55)
-
-		local slash = Instance.new("Frame")
-		slash.AnchorPoint = Vector2.new(0.5, 0.5)
-		slash.Position = UDim2.fromScale(0.5, isMobile and 0.47 or 0.49)
-		slash.Size = UDim2.fromOffset(0, 3)
-		slash.BackgroundColor3 = C.accent
-		slash.BorderSizePixel = 0
-		slash.Parent = bg
-		tween(slash, { Size = UDim2.fromOffset(isMobile and 120 or 180, 3) }, 0.55, Enum.EasingStyle.Quint)
-
-		if isMobile then
-			local chip = Instance.new("TextLabel")
-			chip.AnchorPoint = Vector2.new(0.5, 1)
-			chip.Position = UDim2.new(0.5, 0, 1, -48)
-			chip.Size = UDim2.fromOffset(200, 32)
-			chip.BackgroundColor3 = C.accentDim
-			chip.BorderSizePixel = 0
-			chip.Font = Enum.Font.GothamBold
-			chip.TextSize = 12
-			chip.TextColor3 = C.text
-			chip.Text = "TAP READY"
-			chip.Parent = bg
-			corner(chip, 16)
-			stroke(chip, C.accent, 1.5)
-		else
-			local keys = Instance.new("TextLabel")
-			keys.BackgroundTransparency = 1
-			keys.AnchorPoint = Vector2.new(0.5, 1)
-			keys.Position = UDim2.new(0.5, 0, 1, -64)
-			keys.Size = UDim2.new(0.7, 0, 0, 18)
-			keys.Font = Enum.Font.Code
-			keys.TextSize = 12
-			keys.TextColor3 = C.accent2
-			keys.Text = "WASD · Q PALLET · TAB TOY · SPACE ESCAPE"
-			keys.Parent = bg
-		end
-
-		local done = false
-		local function finish()
-			if done then return end
-			done = true
-			tween(bg, { BackgroundTransparency = 1 }, 0.35)
-			tween(brand, { TextTransparency = 1 }, 0.3)
-			task.delay(0.38, function()
-				pcall(function() splash:Destroy() end)
-				if onDone then onDone() end
-			end)
-		end
-		task.delay(isMobile and 2.1 or 2.4, finish)
-		local skip = Instance.new("TextButton")
-		skip.Size = UDim2.fromScale(1, 1)
-		skip.BackgroundTransparency = 1
-		skip.Text = ""
-		skip.ZIndex = 50
-		skip.Parent = bg
-		skip.MouseButton1Click:Connect(finish)
+		-- gradient animated splash (shared with boot unlock path)
+		showVoidzSplash(device, onDone)
 	end
 
 	local function pickDeviceThenMain()
@@ -19257,18 +19442,29 @@ local function showImmediateKeyUI()
 			end
 
 			status.TextColor3 = Color3.fromRGB(110, 255, 175)
-			status.Text = "Building hub…"
+			status.Text = "Access granted · splash…"
 			pcall(function() sg:Destroy() end)
-			local ok2, err2 = pcall(function()
-				openFn(S.device or "PC")
+			local opened = false
+			local function openMain()
+				if opened then return end
+				opened = true
+				local ok2, err2 = pcall(function()
+					openFn(S.device or "PC")
+				end)
+				if not ok2 then
+					warn("[VOIDZ] openHub failed:", err2)
+					pcall(emergencyKeyUI, err2)
+				else
+					print("[VOIDZ HUB] main hub open")
+				end
+			end
+			-- cool gradient splash, then hub (click to skip)
+			local okSplash, splashErr = pcall(function()
+				showVoidzSplash(S.device or "PC", openMain)
 			end)
-			if not ok2 then
-				warn("[VOIDZ] openHub failed:", err2)
-				status.TextColor3 = Color3.fromRGB(255, 140, 170)
-				status.Text = "Open fail: " .. tostring(err2):sub(1, 60)
-				pcall(emergencyKeyUI, err2)
-			else
-				print("[VOIDZ HUB] main hub open")
+			if not okSplash then
+				warn("[VOIDZ] splash failed:", splashErr)
+				openMain()
 			end
 		end)
 	end
@@ -19317,4 +19513,4 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB · v1.2.14 · 2026-07-28
+-- VOIDZ HUB · v1.2.15 · 2026-07-28

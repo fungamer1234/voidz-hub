@@ -18418,6 +18418,7 @@ end
 		getgenv().VOIDZ_UNLOAD = unload
 	end
 end
+end
 _voidzLateInit()
 
 print("[VOIDZ HUB] loading", BUILD)

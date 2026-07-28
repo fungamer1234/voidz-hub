@@ -1,6 +1,10 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.35` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.36` · Access Key: `VOIDZHUB`
+
+## Recent (1.2.36)
+
+- **Mouse** — Cursor unlocks as soon as hub opens (Modal + last-priority force). No more spamming Toys tab to free the mouse.
 
 ## Recent (1.2.35)
 

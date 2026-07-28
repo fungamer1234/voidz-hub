@@ -31,7 +31,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = "TESTRUN"
 local HUB_NAME = "VOIDZ HUB"
-local BUILD = "2026-07-28-1.2.1"
+local BUILD = "2026-07-28-1.2.14"
 local GuiService = game:GetService("GuiService")
 
 -- 6 themes (Purple = classic VOIDZ)
@@ -4000,8 +4000,11 @@ end
 -- REGISTER LIMIT FIX: late systems live in nested function (Luau max 200 locals/scope)
 -- Main chunk was exceeding 200 locals (setAntiKick allocation failed).
 ------------------------------------------------------------------------
-local Late = {}
+Late = {}
 function _voidzLateInit()
+Late = Late or {}
+Late._phase = "entered"
+print("[VOIDZ] late init entered")
 -- Aura engine (revamped): parallel targets, live range/power, unique effects
 local orbitAngles = {} -- player -> angle
 local buriedPartState = setmetatable({}, { __mode = "k" })
@@ -6887,6 +6890,605 @@ function countMyToys(filterName)
 		if not filterName or ch.Name == filterName then n += 1 end
 	end
 	return n
+end
+
+------------------------------------------------------------------------
+-- Train control (map train cave + optional spawn + SNO + WASD drive)
+------------------------------------------------------------------------
+S.trainSpeed = S.trainSpeed or 120
+S._trainDriveConn = nil
+S._trainHornConn = nil
+S._trainSnoConn = nil
+S._trainSeat = nil
+S.trainDriving = false
+
+local TRAIN_CAVE_POS = Vector3.new(500, 62, -307)
+
+function stopTrainDrive(quiet)
+	S.trainDriving = false
+	if S._trainDriveConn then pcall(function() S._trainDriveConn:Disconnect() end); S._trainDriveConn = nil end
+	if S._trainHornConn then pcall(function() S._trainHornConn:Disconnect() end); S._trainHornConn = nil end
+	if S._trainSnoConn then pcall(function() S._trainSnoConn:Disconnect() end); S._trainSnoConn = nil end
+	local seat = S._trainSeat
+	if seat and seat.Parent then
+		for _, ch in ipairs(seat:GetChildren()) do
+			if ch.Name == "TrainDriveBV" or ch.Name == "TrainDriveBG" then
+				pcall(function() ch:Destroy() end)
+			end
+		end
+	end
+	for _, obj in ipairs(workspace:GetDescendants()) do
+		if obj.Name == "TrainDriveBV" or obj.Name == "TrainDriveBG" then
+			pcall(function() obj:Destroy() end)
+		end
+	end
+	S._trainSeat = nil
+	if not quiet then notify(HUB_NAME, "Train stopped", 1) end
+end
+
+function findTrainSeatNear(pos, maxDist)
+	maxDist = maxDist or 220
+	local best, bestD = nil, maxDist
+	for _, d in ipairs(workspace:GetDescendants()) do
+		if d:IsA("VehicleSeat") or d:IsA("Seat") then
+			local path = d:GetFullName():lower()
+			local isTrain = path:find("train", 1, true) ~= nil
+				or (d.Parent and tostring(d.Parent.Name):lower():find("train", 1, true))
+			if isTrain or (pos and (d.Position - pos).Magnitude < 80) then
+				local dist = pos and (d.Position - pos).Magnitude or 0
+				if dist < bestD then
+					bestD = dist
+					best = d
+				end
+			end
+		end
+	end
+	return best
+end
+
+function findAnyTrainSeat()
+	-- 1) Secret train cave
+	local cave = findTrainSeatNear(TRAIN_CAVE_POS, 250)
+	if cave then return cave end
+	-- 2) My spawned toys named Train*
+	local folder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
+	if folder then
+		for _, ch in ipairs(folder:GetChildren()) do
+			local n = tostring(ch.Name):lower()
+			if n:find("train", 1, true) then
+				for _, d in ipairs(ch:GetDescendants()) do
+					if d:IsA("VehicleSeat") then return d end
+				end
+				for _, d in ipairs(ch:GetDescendants()) do
+					if d:IsA("Seat") then return d end
+				end
+			end
+		end
+	end
+	-- 3) Workspace models with "train" in name
+	for _, obj in ipairs(workspace:GetDescendants()) do
+		if obj:IsA("Model") and tostring(obj.Name):lower():find("train", 1, true) then
+			for _, d in ipairs(obj:GetDescendants()) do
+				if d:IsA("VehicleSeat") then return d end
+			end
+			for _, d in ipairs(obj:GetDescendants()) do
+				if d:IsA("Seat") then return d end
+			end
+		end
+	end
+	return findTrainSeatNear(hrp() and hrp().Position or TRAIN_CAVE_POS, 400)
+end
+
+function ownTrainModel(seat)
+	if not seat then return end
+	local root = seat
+	local model = seat:FindFirstAncestorOfClass("Model")
+	local origin = seat.Position
+	local me = hrp()
+	if me then origin = me.Position end
+	for _ = 1, 8 do
+		sno(seat, origin)
+		if model then
+			for _, d in ipairs(model:GetDescendants()) do
+				if d:IsA("BasePart") then sno(d, origin) end
+			end
+		else
+			for _, d in ipairs(seat.Parent and seat.Parent:GetDescendants() or {}) do
+				if d:IsA("BasePart") then sno(d, origin) end
+			end
+		end
+		RunService.Heartbeat:Wait()
+	end
+end
+
+function sitTrainSeat(seat)
+	local h = hum()
+	local me = hrp()
+	if not h or not me or not seat then return false end
+	-- get close first (SNO range ~30)
+	pcall(function()
+		me.CFrame = seat.CFrame * CFrame.new(0, 3.2, 0)
+	end)
+	task.wait(0.08)
+	ownTrainModel(seat)
+	pcall(function() seat:Sit(h) end)
+	task.wait(0.12)
+	if h.SeatPart ~= seat then
+		pcall(function()
+			me.CFrame = seat.CFrame * CFrame.new(0, 1.5, 0)
+			h.Sit = true
+		end)
+		task.wait(0.1)
+	end
+	if h.SeatPart ~= seat then
+		local prompt = seat:FindFirstChildOfClass("ProximityPrompt")
+			or seat:FindFirstChild("ProximityPrompt", true)
+		if prompt then
+			pcall(function()
+				if fireproximityprompt then
+					fireproximityprompt(prompt)
+				end
+			end)
+			task.wait(0.2)
+		end
+	end
+	return h.SeatPart == seat or h.Sit == true
+end
+
+function startTrainDrive()
+	stopTrainDrive(true)
+	resolveFTAP()
+	local me = hrp()
+	if not me then
+		notify(HUB_NAME, "No character", 1.5)
+		return false
+	end
+	-- soft-disable anti seat toggles so we can sit
+	local prevAntiBlob = S.toggles.antiBlobman
+	local prevAntiTrain = S.toggles.antiTrain
+	S.toggles.antiBlobman = false
+	S.toggles.antiTrain = false
+
+	notify(HUB_NAME, "Finding train…", 1.2)
+	local seat = findAnyTrainSeat()
+	if not seat then
+		-- try toy spawn names (map train is primary; spawn is best-effort)
+		for _, name in ipairs({ "Train", "ToyTrain", "SteamTrain" }) do
+			spawnToyNow(name, { silent = true, gap = 0.12, dist = 12, y = 0 })
+			task.wait(0.35)
+			seat = findAnyTrainSeat()
+			if seat then break end
+		end
+	end
+	if not seat then
+		-- teleport to cave and search again
+		pcall(function() me.CFrame = CFrame.new(TRAIN_CAVE_POS + Vector3.new(0, 6, 0)) end)
+		task.wait(0.4)
+		seat = findAnyTrainSeat()
+	end
+	if not seat then
+		S.toggles.antiBlobman = prevAntiBlob
+		S.toggles.antiTrain = prevAntiTrain
+		notify(HUB_NAME, "No train seat found · try Secret Train Cave teleport", 2.5)
+		return false
+	end
+
+	local home = me.CFrame
+	if (me.Position - seat.Position).Magnitude > 40 then
+		pcall(function() me.CFrame = seat.CFrame * CFrame.new(0, 4, 0) end)
+		task.wait(0.15)
+	end
+
+	if not sitTrainSeat(seat) then
+		-- one more force sit attempt
+		sitTrainSeat(seat)
+	end
+	task.wait(0.15)
+	ownTrainModel(seat)
+
+	local drivePart = seat
+	local bv = seat:FindFirstChild("TrainDriveBV")
+	if not bv then
+		bv = Instance.new("BodyVelocity")
+		bv.Name = "TrainDriveBV"
+		bv.MaxForce = Vector3.new(1e9, 0, 1e9)
+		bv.Velocity = Vector3.zero
+		bv.Parent = seat
+	end
+	local bg = seat:FindFirstChild("TrainDriveBG")
+	if not bg then
+		bg = Instance.new("BodyGyro")
+		bg.Name = "TrainDriveBG"
+		bg.MaxTorque = Vector3.new(0, 1e9, 0)
+		bg.P = 50000
+		bg.D = 5000
+		bg.CFrame = seat.CFrame
+		bg.Parent = seat
+	end
+
+	S._trainSeat = seat
+	S.trainDriving = true
+
+	local hornSound = nil
+	local model = seat:FindFirstAncestorOfClass("Model")
+	if model then
+		hornSound = model:FindFirstChild("HornSound", true)
+			or model:FindFirstChild("Horn", true)
+			or model:FindFirstChildWhichIsA("Sound", true)
+	end
+
+	S._trainSnoConn = RunService.Heartbeat:Connect(function()
+		if not S.trainDriving or not seat.Parent then return end
+		pcall(function()
+			sno(seat, seat.Position)
+			if model then
+				local primary = model.PrimaryPart or seat
+				if primary and primary:IsA("BasePart") then sno(primary, seat.Position) end
+			end
+		end)
+	end)
+
+	S._trainDriveConn = RunService.Heartbeat:Connect(function()
+		if not S.trainDriving then return end
+		if not seat or not seat.Parent then
+			stopTrainDrive(true)
+			return
+		end
+		local h = hum()
+		if h and h.Sit == false and h.SeatPart == nil then
+			-- try re-sit once every few frames is expensive; soft stop
+			stopTrainDrive(true)
+			notify(HUB_NAME, "Left train seat · drive stopped", 1.5)
+			return
+		end
+		if not bv or not bv.Parent then return end
+		local cam = workspace.CurrentCamera
+		local dir = Vector3.zero
+		if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + cam.CFrame.LookVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - cam.CFrame.LookVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir = dir - cam.CFrame.RightVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + cam.CFrame.RightVector end
+		local speed = S.trainSpeed or 120
+		if dir.Magnitude > 0.05 then
+			dir = Vector3.new(dir.X, 0, dir.Z)
+			if dir.Magnitude > 0.05 then
+				dir = dir.Unit * speed
+				bv.MaxForce = Vector3.new(1e9, 0, 1e9)
+				bv.Velocity = dir
+				if bg and bg.Parent then
+					bg.CFrame = CFrame.new(seat.Position, seat.Position + Vector3.new(dir.X, 0, dir.Z))
+				end
+				if seat:IsA("VehicleSeat") then
+					pcall(function()
+						seat.Throttle = 1
+						seat.Steer = 0
+					end)
+				end
+			end
+		else
+			bv.Velocity = Vector3.zero
+			if seat:IsA("VehicleSeat") then
+				pcall(function()
+					seat.Throttle = 0
+					seat.Steer = 0
+				end)
+			end
+		end
+	end)
+
+	S._trainHornConn = UserInputService.InputBegan:Connect(function(input, gp)
+		if gp or not S.trainDriving then return end
+		if input.KeyCode == Enum.KeyCode.H and hornSound then
+			pcall(function() hornSound:Play() end)
+		end
+	end)
+
+	notify(HUB_NAME, "Train ready · WASD drive · H horn · Stop Train to exit", 3)
+	return true
+end
+
+------------------------------------------------------------------------
+-- Snowball farm (BallSnowball · serial spawn · SNO · roll-grow · fling/explode)
+------------------------------------------------------------------------
+S.ballType = S.ballType or "Snowball"
+S.ballSize = S.ballSize or 12
+S.ballCount = S.ballCount or 10
+S.ballFlingPower = S.ballFlingPower or 5000
+S._snowFarmOn = false
+S._snowFarmConn = nil
+S._snowGrown = S._snowGrown or {} -- [SoundPart] = true
+S._snowFarmCF = CFrame.new(-410, 228.394, 510)
+S._sandFarmCF = CFrame.new(-410, 228.394, 510) -- same peak; sand material patches nearby
+
+function getMyToyFolder()
+	return workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
+end
+
+function snowSoundOf(model)
+	if not model then return nil end
+	return model:FindFirstChild("SoundPart")
+		or model:FindFirstChild("SoundPart", true)
+		or model:FindFirstChildWhichIsA("BasePart", true)
+end
+
+function stopSnowFarm(quiet)
+	S._snowFarmOn = false
+	if S._snowFarmConn then
+		pcall(function() S._snowFarmConn:Disconnect() end)
+		S._snowFarmConn = nil
+	end
+	if not quiet then notify(HUB_NAME, "Snowball farm OFF", 1.2) end
+end
+
+function countGrownSnowballs()
+	local n = 0
+	for part, _ in pairs(S._snowGrown) do
+		if part and part.Parent and part:IsDescendantOf(workspace) then
+			n += 1
+		else
+			S._snowGrown[part] = nil
+		end
+	end
+	return n
+end
+
+function ownSnowPart(part)
+	if not part or not part:IsA("BasePart") then return false end
+	local me = hrp()
+	if not me then return false end
+	local home = me.CFrame
+	for _ = 1, 8 do
+		if (me.Position - part.Position).Magnitude > 28 then
+			pcall(function() me.CFrame = CFrame.new(part.Position + Vector3.new(0, -8, 0)) end)
+		end
+		sno(part, me.Position)
+		RunService.Heartbeat:Wait()
+		local ok = false
+		pcall(function()
+			ok = part:GetNetworkOwner() == LP
+		end)
+		if ok then break end
+	end
+	pcall(function() me.CFrame = home end)
+	return true
+end
+
+function attachSnowFarmBP(sound)
+	if not sound then return nil end
+	local bp = sound:FindFirstChild("FarmSnowball")
+	if bp and bp:IsA("BodyPosition") then return bp end
+	bp = Instance.new("BodyPosition")
+	bp.Name = "FarmSnowball"
+	bp.MaxForce = Vector3.new(12500, 12500, 12500)
+	bp.P = 10000
+	bp.D = 1000
+	bp.Position = sound.Position
+	bp.Parent = sound
+	return bp
+end
+
+function farmSnowballLoop(model)
+	local farmCF = (S.ballType == "Sandball") and S._sandFarmCF or S._snowFarmCF
+	while S._snowFarmOn and model and model.Parent do
+		local sound = snowSoundOf(model)
+		if not sound then
+			task.wait(0.2)
+		else
+			ownSnowPart(sound)
+			local bp = attachSnowFarmBP(sound)
+			if not bp then
+				task.wait(0.2)
+			else
+				local maxSz = S.ballSize or 12
+				local grown = sound.Size.X >= maxSz and sound.Size.Y >= maxSz and sound.Size.Z >= maxSz
+				if grown then
+					S._snowGrown[sound] = true
+					-- park grown balls high so they stop rolling
+					bp.Position = Vector3.new(math.random(-8000, 8000), 10000, math.random(-8000, 8000))
+				else
+					local half = sound.Size.X / 2 - 0.65
+					local base = farmCF.Position + Vector3.new(0, math.max(half, 1), 0)
+					bp.Position = base + Vector3.new(25, 0, 0)
+					task.wait(0.45)
+					if not S._snowFarmOn then break end
+					bp.Position = base + Vector3.new(-25, 0, 0)
+					task.wait(0.45)
+					if not S._snowFarmOn then break end
+					bp.Position = base
+				end
+			end
+		end
+		task.wait(0.05)
+	end
+end
+
+function startSnowFarm()
+	if S._snowFarmOn then return end
+	resolveFTAP()
+	if not FTAP.SpawnToy then
+		notify(HUB_NAME, "No SpawnToy remote", 2)
+		return
+	end
+	S._snowFarmOn = true
+	S._snowGrown = {}
+	local want = math.clamp(tonumber(S.ballCount) or 10, 1, 50)
+	local farmCF = (S.ballType == "Sandball") and S._sandFarmCF or S._snowFarmCF
+	notify(HUB_NAME, "Farming BallSnowball x" .. want .. " (grow to " .. tostring(S.ballSize or 12) .. ")…", 2.5)
+
+	local folder = getMyToyFolder()
+	if folder then
+		S._snowFarmConn = folder.ChildAdded:Connect(function(ch)
+			if not S._snowFarmOn then return end
+			if ch.Name == "BallSnowball" then
+				task.spawn(function()
+					task.wait(0.05)
+					farmSnowballLoop(ch)
+				end)
+			end
+		end)
+		for _, ch in ipairs(folder:GetChildren()) do
+			if ch.Name == "BallSnowball" then
+				task.spawn(function() farmSnowballLoop(ch) end)
+			end
+		end
+	end
+
+	task.spawn(function()
+		if FTAP.BuyToy then pcall(function() FTAP.BuyToy:InvokeServer("BallSnowball") end) end
+		while S._snowFarmOn do
+			local have = countMyToys("BallSnowball")
+			local grown = countGrownSnowballs()
+			if grown >= want then
+				stopSnowFarm(true)
+				notify(HUB_NAME, "Grown " .. grown .. " snowballs · fling or explode", 2.5)
+				break
+			end
+			if have < want then
+				spawnToyNow("BallSnowball", {
+					cf = farmCF * CFrame.new(math.random(-6, 6), 2, math.random(-6, 6)),
+					skipBuy = true,
+					silent = true,
+					gap = 0.1,
+				})
+			end
+			-- ensure farm loops on existing
+			folder = getMyToyFolder()
+			if folder and not S._snowFarmConn then
+				S._snowFarmConn = folder.ChildAdded:Connect(function(ch)
+					if ch.Name == "BallSnowball" and S._snowFarmOn then
+						task.spawn(function() farmSnowballLoop(ch) end)
+					end
+				end)
+			end
+			task.wait(0.15)
+		end
+	end)
+end
+
+function flingGrownSnowballsAt(targetPlayer)
+	local r = targetPlayer and rootOf(targetPlayer)
+	if not r then
+		notify(HUB_NAME, "Select a target", 1.5)
+		return 0
+	end
+	local power = S.ballFlingPower or 5000
+	local n = 0
+	local me = hrp()
+	local home = me and me.CFrame
+	for sound, _ in pairs(S._snowGrown) do
+		if sound and sound.Parent and sound:IsDescendantOf(workspace) then
+			local model = sound.Parent
+			task.spawn(function()
+				ownSnowPart(sound)
+				local bp = sound:FindFirstChild("FarmSnowball")
+				if bp then pcall(function() bp:Destroy() end) end
+				local dir = (r.Position - sound.Position)
+				if dir.Magnitude < 0.2 then dir = Vector3.new(0, 0, -1) else dir = dir.Unit end
+				for _ = 1, 10 do
+					sno(sound, r.Position)
+					pcall(function()
+						sound.AssemblyLinearVelocity = dir * power + Vector3.new(0, power * 0.08, 0)
+						local bv = sound:FindFirstChild("VOIDZ_SnowFling")
+						if not bv then
+							bv = Instance.new("BodyVelocity")
+							bv.Name = "VOIDZ_SnowFling"
+							bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
+							bv.Parent = sound
+						end
+						bv.Velocity = dir * power + Vector3.new(0, power * 0.08, 0)
+					end)
+					RunService.Heartbeat:Wait()
+				end
+				task.delay(4, function()
+					pcall(function()
+						if model and model.Parent and FTAP.DestroyToy then
+							FTAP.DestroyToy:FireServer(model)
+						end
+					end)
+				end)
+			end)
+			S._snowGrown[sound] = nil
+			n += 1
+		else
+			S._snowGrown[sound] = nil
+		end
+	end
+	if home and me then pcall(function() me.CFrame = home end) end
+	notify(HUB_NAME, "Flung " .. n .. " snowballs at " .. (targetPlayer and targetPlayer.Name or "?"), 1.8)
+	return n
+end
+
+function explodeGrownSnowballs()
+	if not FTAP.BombExplode then resolveFTAP() end
+	local n = 0
+	local me = hrp()
+	local pos = me and me.Position or Vector3.zero
+	for sound, _ in pairs(S._snowGrown) do
+		if sound and sound.Parent and sound:IsDescendantOf(workspace) then
+			local model = sound:FindFirstAncestorOfClass("Model") or sound.Parent
+			ownSnowPart(sound)
+			if FTAP.BombExplode then
+				pcall(function()
+					FTAP.BombExplode:FireServer({
+						Radius = 17.5,
+						TimeLength = 0.1,
+						Hitbox = sound,
+						ExplodesByFire = true,
+						MaxForcePerStudSquared = -100,
+						DestroysModel = true,
+						Model = model,
+						ExplodesByPointy = false,
+						ImpactSpeed = 100,
+						PositionPart = me or sound,
+					}, pos)
+				end)
+			end
+			S._snowGrown[sound] = nil
+			n += 1
+		else
+			S._snowGrown[sound] = nil
+		end
+	end
+	notify(HUB_NAME, "Exploded " .. n .. " snowballs", 1.5)
+	return n
+end
+
+function makeAndFlingSnowballsNow()
+	-- one-shot: farm to size quickly then fling at selected
+	local p = S.selected
+	if not p or not validP(p) or not p.Character then
+		notify(HUB_NAME, "Select a target", 1.5)
+		return
+	end
+	local want = math.clamp(tonumber(S.ballCount) or 10, 1, 50)
+	S.ballCount = want
+	stopSnowFarm(true)
+	S._snowGrown = {}
+	startSnowFarm()
+	task.spawn(function()
+		local t0 = os.clock()
+		while S._snowFarmOn and (os.clock() - t0) < 90 do
+			task.wait(0.4)
+		end
+		-- if still farming but some grown, fling what we have; else wait a bit more
+		if countGrownSnowballs() == 0 then
+			task.wait(2)
+		end
+		stopSnowFarm(true)
+		if countGrownSnowballs() == 0 then
+			-- fallback: fling whatever BallSnowballs we own even if not fully grown
+			local folder = getMyToyFolder()
+			if folder then
+				for _, ch in ipairs(folder:GetChildren()) do
+					if ch.Name == "BallSnowball" then
+						local s = snowSoundOf(ch)
+						if s then S._snowGrown[s] = true end
+					end
+				end
+			end
+		end
+		flingGrownSnowballsAt(p)
+	end)
 end
 
 ------------------------------------------------------------------------
@@ -10646,7 +11248,9 @@ if getgenv and type(getgenv) == "function" then getgenv().VOIDZ_UNLOAD = unload 
 
 ------------------------------------------------------------------------
 -- UI nested scope (Luau max 200 locals per function — UI was pushing past limit)
-local function _voidzInitUI()
+-- global so unlock can re-call if late-init end-scoping skips the internal call
+function _voidzInitUI()
+Late._phase = "ui_start"
 -- UI helpers (tooltips, settings drawers, dropdowns)
 local function showTip(text)
 	if not S.tipFrame then return end
@@ -11449,6 +12053,19 @@ local function makePlayerSearchList(sc, opts, orderFn)
 		end
 		updateMultiBar()
 	end
+
+	if searchInput then
+		searchInput:GetPropertyChangedSignal("Text"):Connect(function()
+			refresh()
+		end)
+	end
+	task.defer(refresh)
+	return {
+		refresh = refresh,
+		updateMultiBar = updateMultiBar,
+		list = listSc,
+	}
+end -- makePlayerSearchList
 
 local function makeAuraBlock(parent, order, meta)
 	local id = meta.id
@@ -16371,12 +16988,12 @@ _TAB_BUILDERS["fun"] = function(sc, n)
 		})
 
 -- ════════════════════════════════════════════════════════════════
--- BLOODyv2 TRAIN CONTROL
+-- TRAIN CONTROL
 -- ═══════════════════════════════════════════════════════════════
-section(sc, "TRAIN CONTROL (BLOODYv2 STYLE)", n())
+section(sc, "TRAIN CONTROL", n())
 local trainNote = Instance.new("TextLabel")
 trainNote.LayoutOrder = n()
-trainNote.Size = UDim2.new(1, -6, 0, 40)
+trainNote.Size = UDim2.new(1, -6, 0, 48)
 trainNote.BackgroundColor3 = C.card
 trainNote.BorderSizePixel = 0
 trainNote.Font = Enum.Font.Gotham
@@ -16385,7 +17002,7 @@ trainNote.TextColor3 = C.muted
 trainNote.TextXAlignment = Enum.TextXAlignment.Left
 trainNote.TextYAlignment = Enum.TextYAlignment.Top
 trainNote.TextWrapped = true
-trainNote.Text = " Spawns train, seats you, WASD drives · Horn on H · Speed slider · Auto-repair"
+trainNote.Text = " Finds map train (Secret Train Cave) · SNO + sit · WASD drive · H horn · Turn OFF Anti Train seat if it kicks you out"
 trainNote.Parent = sc
 corner(trainNote, 8)
 pad(trainNote, 6, 6, 6, 6)
@@ -16399,103 +17016,27 @@ makeSlider(sc, {
 	default = 120,
 	step = 5,
 	stateKey = "trainSpeed",
-	tip = "BodyVelocity speed for train driving",
+	tip = "BodyVelocity speed while driving",
 })
 
 makeButton(sc, {
 	order = n(),
-	title = "Spawn & Drive Train",
-	tip = "Spawns Train model, seats you in driver seat, WASD to drive, H for horn",
+	title = "Drive Train",
+	tip = "TP/find train seat, own it, sit, WASD drive",
+	callback = function()
+		task.spawn(startTrainDrive)
+	end,
+})
+
+makeButton(sc, {
+	order = n(),
+	title = "TP Secret Train Cave",
+	tip = "Teleport to the map train area then use Drive Train",
 	callback = function()
 		local me = hrp()
 		if not me then notify(HUB_NAME, "No character", 1.5); return end
-		
-		-- Spawn train
-		if FTAP.BuyToy then pcall(function() FTAP.BuyToy:InvokeServer("Train") end) end
-		task.wait(0.3)
-		if FTAP.SpawnToy then
-			pcall(function()
-				FTAP.SpawnToy:InvokeServer("Train", me.CFrame * CFrame.new(0, 0, -10), Vector3.zero)
-			end)
-		end
-		task.wait(0.5)
-		
-		-- Find train and seat
-		local train = nil
-		for _, obj in ipairs(workspace:GetDescendants()) do
-			if obj.Name == "Train" and obj:IsA("Model") then
-				train = obj
-				break
-			end
-		end
-		if not train then notify(HUB_NAME, "Train not found", 1.5); return end
-		
-		-- Find driver seat
-		local seat = nil
-		for _, d in ipairs(train:GetDescendants()) do
-			if d:IsA("VehicleSeat") and (d.Name:lower():find("drive") or d.Name:lower():find("driver")) then
-				seat = d
-				break
-			elseif d:IsA("VehicleSeat") then
-				seat = d
-			end
-		end
-		if not seat then notify(HUB_NAME, "No driver seat found", 1.5); return end
-		
-		-- Sit
-		local h = hum()
-		if h then pcall(function() seat:Sit(h) end) end
-		task.wait(0.2)
-		
-		-- Setup driving
-		local bv = Instance.new("BodyVelocity")
-		bv.Name = "TrainDriveBV"
-		bv.MaxForce = Vector3.new(math.huge, 0, math.huge)
-		bv.Velocity = Vector3.zero
-		bv.Parent = seat
-		
-		local bg = Instance.new("BodyGyro")
-		bg.Name = "TrainDriveBG"
-		bg.MaxTorque = Vector3.new(0, math.huge, 0)
-		bg.P = 50000
-		bg.D = 5000
-		bg.CFrame = seat.CFrame
-		bg.Parent = seat
-		
-		-- Horn sound
-		local hornSound = train:FindFirstChild("HornSound", true) or train:FindFirstChild("Horn", true)
-		
-		-- Driving loop
-		local driving = true
-		S._trainDriveConn = RunService.Heartbeat:Connect(function()
-			if not driving or not seat or not seat.Parent then driving = false; return end
-			if h and h.Sit == false then driving = false; return end
-			
-			local cam = workspace.CurrentCamera
-			local dir = Vector3.zero
-			if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + cam.CFrame.LookVector end
-			if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - cam.CFrame.LookVector end
-			if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir = dir - cam.CFrame.RightVector end
-			if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + cam.CFrame.RightVector end
-			
-			if dir.Magnitude > 0 then
-				dir = dir.Unit * (S.trainSpeed or 120)
-				bv.Velocity = Vector3.new(dir.X, 0, dir.Z)
-				bg.CFrame = CFrame.new(seat.Position, seat.Position + Vector3.new(dir.X, 0, dir.Z))
-			else
-				bv.Velocity = Vector3.zero
-			end
-		end)
-		
-		-- Horn on H
-		S._trainHornConn = UserInputService.InputBegan:Connect(function(input, gp)
-			if gp then return end
-			if input.KeyCode == Enum.KeyCode.H and hornSound then
-				pcall(function() hornSound:Play() end)
-			end
-		end)
-		
-		notify(HUB_NAME, "Train spawned · WASD to drive · H = Horn", 3)
+		pcall(function() me.CFrame = CFrame.new(TRAIN_CAVE_POS + Vector3.new(0, 6, 0)) end)
+		notify(HUB_NAME, "Train cave · press Drive Train", 1.5)
 	end,
 })
 
@@ -16504,25 +17045,17 @@ makeButton(sc, {
 	title = "Stop Train",
 	danger = true,
 	callback = function()
-		if S._trainDriveConn then S._trainDriveConn:Disconnect(); S._trainDriveConn = nil end
-		if S._trainHornConn then S._trainHornConn:Disconnect(); S._trainHornConn = nil end
-		-- Clean up train parts
-		for _, obj in ipairs(workspace:GetDescendants()) do
-			if obj.Name == "TrainDriveBV" or obj.Name == "TrainDriveBG" then
-				pcall(function() obj:Destroy() end)
-			end
-		end
-		notify(HUB_NAME, "Train stopped", 1)
+		stopTrainDrive(false)
 	end,
 })
 
 -- ════════════════════════════════════════════════════════════════
--- AUTO SNOWBALL / SANDBALL MAKER (blitzbr style)
+-- AUTO SNOWBALL MAKER
 -- ═══════════════════════════════════════════════════════════════
-section(sc, "AUTO SNOWBALL / SANDBALL MAKER", n())
+section(sc, "AUTO SNOWBALL MAKER", n())
 local ballNote = Instance.new("TextLabel")
 ballNote.LayoutOrder = n()
-ballNote.Size = UDim2.new(1, -6, 0, 40)
+ballNote.Size = UDim2.new(1, -6, 0, 48)
 ballNote.BackgroundColor3 = C.card
 ballNote.BorderSizePixel = 0
 ballNote.Font = Enum.Font.Gotham
@@ -16531,13 +17064,13 @@ ballNote.TextColor3 = C.muted
 ballNote.TextXAlignment = Enum.TextXAlignment.Left
 ballNote.TextYAlignment = Enum.TextYAlignment.Top
 ballNote.TextWrapped = true
-ballNote.Text = " Blitzbr-style: Spawns balls, resizes them, flings at target · Size = scale · Count = how many"
+ballNote.Text = " Spawns BallSnowball (serial) · rolls on snow to grow · then fling at target or explode · Size = grow target studs"
 ballNote.Parent = sc
 corner(ballNote, 8)
 pad(ballNote, 6, 6, 6, 6)
 
 S.ballType = S.ballType or "Snowball"
-S.ballSize = S.ballSize or 3
+S.ballSize = S.ballSize or 12
 S.ballCount = S.ballCount or 10
 S.ballFlingPower = S.ballFlingPower or 5000
 
@@ -16551,13 +17084,13 @@ makeDropdown(sc, {
 
 makeSlider(sc, {
 	order = n(),
-	title = "Ball Size (scale)",
-	min = 1,
-	max = 20,
-	default = 3,
+	title = "Grow Size (studs)",
+	min = 4,
+	max = 25,
+	default = 12,
 	step = 1,
 	stateKey = "ballSize",
-	tip = "Scale multiplier for ball model",
+	tip = "Server grows ball while rolling · stop when Size >= this",
 })
 
 makeSlider(sc, {
@@ -16568,7 +17101,7 @@ makeSlider(sc, {
 	default = 10,
 	step = 1,
 	stateKey = "ballCount",
-	tip = "How many balls to spawn and fling",
+	tip = "How many BallSnowball to farm",
 })
 
 makeSlider(sc, {
@@ -16579,97 +17112,55 @@ makeSlider(sc, {
 	default = 5000,
 	step = 500,
 	stateKey = "ballFlingPower",
-	tip = "Velocity applied to each ball",
+	tip = "Velocity applied to each grown ball",
 })
 
 makeButton(sc, {
 	order = n(),
-	title = "Make & Fling Balls at Target",
+	title = "Start Farm Snowballs",
+	tip = "Serial spawn BallSnowball + roll-grow until count reached",
+	callback = function()
+		task.spawn(startSnowFarm)
+	end,
+})
+
+makeButton(sc, {
+	order = n(),
+	title = "Stop Farm",
+	callback = function()
+		stopSnowFarm(false)
+	end,
+})
+
+makeButton(sc, {
+	order = n(),
+	title = "Make & Fling at Target",
 	danger = true,
-	tip = "Spawns balls, resizes them, flings at selected player",
+	tip = "Farm then fling grown balls at selected player",
+	callback = function()
+		task.spawn(makeAndFlingSnowballsNow)
+	end,
+})
+
+makeButton(sc, {
+	order = n(),
+	title = "Fling Grown at Target",
+	danger = true,
+	tip = "Fling already-grown snowballs at selected player",
 	callback = function()
 		local p = S.selected
-		if not p or not validP(p) or not p.Character then
-			notify(HUB_NAME, "Select a target", 1.5); return
-		end
-		local r = rootOf(p)
-		if not r then notify(HUB_NAME, "No target root", 1.5); return end
-		
-		local me = hrp()
-		if not me then notify(HUB_NAME, "No character", 1.5); return end
-		
-		local ballName = S.ballType == "Sandball" and "BallSand" or "Snowball"
-		local size = S.ballSize or 3
-		local count = S.ballCount or 10
-		local power = S.ballFlingPower or 5000
-		
-		notify(HUB_NAME, "Spawning " .. count .. " " .. ballName .. "s (size " .. size .. "x)...", 2)
-		
-		-- Buy and spawn all balls
-		for i = 1, count do
-			if FTAP.BuyToy then pcall(function() FTAP.BuyToy:InvokeServer(ballName) end) end
-			task.wait(0.05)
-			if FTAP.SpawnToy then
-				pcall(function()
-					FTAP.SpawnToy:InvokeServer(ballName, me.CFrame * CFrame.new(0, 2 + i * 0.5, -4), Vector3.zero)
-				end)
-			end
-			task.wait(0.03)
-		end
-		
-		task.wait(0.5)
-		
-		-- Find and resize all balls, then fling
-		local myFolder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
-		local balls = {}
-		if myFolder then
-			for _, obj in ipairs(myFolder:GetChildren()) do
-				if obj.Name == ballName then
-					table.insert(balls, obj)
-				end
-			end
-		end
-		
-		for _, ball in ipairs(balls) do
-			-- Resize ball
-			local scale = size
-			for _, d in ipairs(ball:GetDescendants()) do
-				if d:IsA("BasePart") then
-					d.Size = d.Size * scale
-				elseif d:IsA("SpecialMesh") then
-					d.Scale = d.Scale * scale
-				end
-			end
-			
-			-- Fling at target
-			task.spawn(function()
-				local bp = ball:FindFirstChild("BallBodyPosition") or ball:FindFirstChild("BodyPosition")
-				local bv = ball:FindFirstChild("BallBodyVelocity") or ball:FindFirstChild("BodyVelocity")
-				
-				-- Own it first
-				for _, d in ipairs(ball:GetDescendants()) do
-					if d:IsA("BasePart") then pcall(function() sno(d, r.Position) end) end
-				end
-				task.wait(0.1)
-				
-				-- Apply velocity toward target
-				local dir = (r.Position - ball:GetPivot().Position).Unit
-				if dir.Magnitude < 0.1 then dir = Vector3.new(0, 0, -1) end
-				
-				pcall(function()
-					for _, d in ipairs(ball:GetDescendants()) do
-						if d:IsA("BasePart") then
-							d.AssemblyLinearVelocity = dir * power
-						end
-					end
-				end)
-				
-				-- Clean up after
-				task.delay(5, function() pcall(function() ball:Destroy() end) end)
-			end)
-		end
-		
-		notify(HUB_NAME, "Flung " .. #balls .. " " .. ballName .. "s at " .. p.Name, 1.5)
+		if not p or not validP(p) then notify(HUB_NAME, "Select a target", 1.5); return end
+		task.spawn(function() flingGrownSnowballsAt(p) end)
+	end,
+})
+
+makeButton(sc, {
+	order = n(),
+	title = "Explode Grown Snowballs",
+	danger = true,
+	tip = "BombExplode all grown snowballs",
+	callback = function()
+		task.spawn(explodeGrownSnowballs)
 	end,
 })
 
@@ -17530,8 +18021,8 @@ local function buildMobileHud(sg)
 end
 
 ------------------------------------------------------------------------
--- Main window
-local function buildMain()
+-- Main window (global so key unlock can find it)
+function buildMain()
 	resolveFTAP()
 	-- defaults before UI build so toggles render ON correctly
 	S.toggles.unlockMouse = false
@@ -18044,6 +18535,9 @@ local function buildKey()
 	sg.Name = "VOIDZ_KEY"
 	sg.ResetOnSpawn = false
 	sg.IgnoreGuiInset = true
+	sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	sg.DisplayOrder = 2147483647
+	pcall(function() if protect_gui_fn then protect_gui_fn(sg) end end)
 	sg.Parent = parent
 	S.gui = sg
 
@@ -18404,28 +18898,423 @@ local function buildKey()
 	box.FocusLost:Connect(function(e) if e then task.spawn(try) end end)
 end
 
+	-- register entry points for boot (locals stay inside this UI scope)
+	local function openHub(device)
+		S.device = device or S.device or "PC"
+		S.toggles.mobileUI = (S.device == "Mobile")
+		buildMain()
+		pcall(function()
+			if installInstantEscape then installInstantEscape() end
+		end)
+	end
 	Late.buildKey = buildKey
-end 
+	Late.buildMain = buildMain
+	_G.buildMain = buildMain
+	Late.openHub = openHub
+	Late._phase = "exported"
+	-- also park on getgenv so unlock can find it even if Late table is weird
+	pcall(function()
+		local g = getgenv and getgenv()
+		if g then
+			g.VOIDZ_API = {
+				openHub = openHub,
+				buildMain = buildMain,
+				buildKey = buildKey,
+			}
+			g.VOIDZ_OPEN_HUB = openHub
+		end
+	end)
+	print("[VOIDZ] UI core exported (openHub ready)")
+	Late._phase = "ui_exported"
+end -- _voidzInitUI
 
-	_voidzInitUI()
+	-- Keep a handle even if scoping is weird
+	pcall(function()
+		local g = getgenv and getgenv()
+		if g then g._voidzInitUI = _voidzInitUI end
+	end)
 
-	-- export boot-critical entry points to outer scope
+	-- MUST run: creates Late.openHub / VOIDZ_OPEN_HUB
+	print("[VOIDZ] _voidzInitUI starting…")
+	Late._phase = "ui_calling"
+	local _uiOk, _uiErr = pcall(_voidzInitUI)
+	if not _uiOk then
+		warn("[VOIDZ] _voidzInitUI ERROR:", _uiErr)
+		error("[VOIDZ] _voidzInitUI failed: " .. tostring(_uiErr))
+	end
+	if not Late.openHub then
+		-- one more try via getgenv handle
+		local g = getgenv and getgenv()
+		if g and type(g._voidzInitUI) == "function" then
+			pcall(g._voidzInitUI)
+		end
+	end
+	if not Late.openHub and not (getgenv and getgenv().VOIDZ_OPEN_HUB) then
+		error("[VOIDZ] _voidzInitUI finished but openHub still nil")
+	end
+	print("[VOIDZ] _voidzInitUI ok · openHub set")
+	Late._phase = "ui_ok"
+
+	-- export boot-critical entry points onto Late
 	Late.installAntiKickOnLoad = installAntiKickOnLoad
 	Late.installGrabWatch = installGrabWatch
 	Late.installAntis = installAntis
 	Late.unload = unload
-	if getgenv then
+	Late._initDone = true
+	if getgenv and type(getgenv) == "function" then
 		getgenv().VOIDZ_UNLOAD = unload
+		getgenv().VOIDZ_LATE = Late
+		if Late.openHub then getgenv().VOIDZ_OPEN_HUB = Late.openHub end
 	end
-end
-end
-_voidzLateInit()
 
+	-- last-chance openHub if UI export path was skipped by scoping
+	if type(Late.openHub) ~= "function" then
+		warn("[VOIDZ] openHub missing at late-init tail — installing emergency opener")
+		Late.openHub = function(device)
+			S.device = device or S.device or "PC"
+			S.toggles.mobileUI = (S.device == "Mobile")
+			local bm = rawget(_G, "buildMain") or (getgenv and getgenv().buildMain)
+			if type(bm) ~= "function" and type(buildMain) == "function" then bm = buildMain end
+			if type(bm) ~= "function" then
+				error("buildMain not available — UI init never completed")
+			end
+			bm()
+			pcall(function()
+				if installInstantEscape then installInstantEscape() end
+			end)
+		end
+		pcall(function()
+			if getgenv then getgenv().VOIDZ_OPEN_HUB = Late.openHub end
+		end)
+	end
+	print("[VOIDZ] late init tail done · openHub=", type(Late.openHub))
+end -- function _voidzLateInit (line 4004)
+
+------------------------------------------------------------------------
+-- Emergency key UI if main path dies (always show something)
+------------------------------------------------------------------------
+local function emergencyKeyUI(errMsg)
+	pcall(function()
+		local parent = getUiParent()
+		local old = parent:FindFirstChild("VOIDZ_KEY")
+		if old then old:Destroy() end
+		local sg = Instance.new("ScreenGui")
+		sg.Name = "VOIDZ_KEY"
+		sg.ResetOnSpawn = false
+		sg.IgnoreGuiInset = true
+		sg.DisplayOrder = 2147483647
+		pcall(function() if protect_gui_fn then protect_gui_fn(sg) end end)
+		sg.Parent = parent
+		local f = Instance.new("Frame")
+		f.AnchorPoint = Vector2.new(0.5, 0.5)
+		f.Position = UDim2.fromScale(0.5, 0.5)
+		f.Size = UDim2.fromOffset(360, 160)
+		f.BackgroundColor3 = Color3.fromRGB(12, 8, 20)
+		f.BorderSizePixel = 0
+		f.Parent = sg
+		local c = Instance.new("UICorner")
+		c.CornerRadius = UDim.new(0, 12)
+		c.Parent = f
+		local t = Instance.new("TextLabel")
+		t.BackgroundTransparency = 1
+		t.Size = UDim2.new(1, -20, 0, 40)
+		t.Position = UDim2.fromOffset(10, 12)
+		t.Font = Enum.Font.GothamBold
+		t.TextSize = 16
+		t.TextColor3 = Color3.fromRGB(195, 120, 255)
+		t.Text = "VOIDZ HUB · recovery"
+		t.Parent = f
+		local b = Instance.new("TextLabel")
+		b.BackgroundTransparency = 1
+		b.Size = UDim2.new(1, -20, 0, 80)
+		b.Position = UDim2.fromOffset(10, 56)
+		b.Font = Enum.Font.Gotham
+		b.TextSize = 12
+		b.TextColor3 = Color3.fromRGB(245, 240, 255)
+		b.TextWrapped = true
+		b.TextXAlignment = Enum.TextXAlignment.Left
+		b.TextYAlignment = Enum.TextYAlignment.Top
+		b.Text = "Main UI failed to open.\n" .. tostring(errMsg or "unknown"):sub(1, 160) .. "\nF9 for full error."
+		b.Parent = f
+		warn("[VOIDZ] emergency UI:", errMsg)
+	end)
+end
+
+------------------------------------------------------------------------
+-- Boot (UI first, then systems — never leave the user with a blank screen)
+------------------------------------------------------------------------
 print("[VOIDZ HUB] loading", BUILD)
-task.spawn(resolveFTAP)
-task.spawn(Late.installAntiKickOnLoad)
-task.spawn(Late.installGrabWatch)
-task.spawn(Late.installAntis)
-Late.buildKey()
 
--- hello everyone this is voidz enjoy the script v1.2.1
+-- 1) Always show a key card immediately (does not depend on late init)
+local function showImmediateKeyUI()
+	local parent = getUiParent()
+	local old = parent:FindFirstChild("VOIDZ_KEY")
+	if old then pcall(function() old:Destroy() end) end
+	local sg = Instance.new("ScreenGui")
+	sg.Name = "VOIDZ_KEY"
+	sg.ResetOnSpawn = false
+	sg.IgnoreGuiInset = true
+	sg.DisplayOrder = 2147483647
+	sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	pcall(function() if protect_gui_fn then protect_gui_fn(sg) end end)
+	sg.Parent = parent
+
+	local dim = Instance.new("Frame")
+	dim.Size = UDim2.fromScale(1, 1)
+	dim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	dim.BackgroundTransparency = 0.45
+	dim.BorderSizePixel = 0
+	dim.Parent = sg
+
+	local card = Instance.new("Frame")
+	card.AnchorPoint = Vector2.new(0.5, 0.5)
+	card.Position = UDim2.fromScale(0.5, 0.5)
+	card.Size = UDim2.fromOffset(380, 260)
+	card.BackgroundColor3 = Color3.fromRGB(12, 8, 20)
+	card.BorderSizePixel = 0
+	card.Parent = sg
+	local cc = Instance.new("UICorner")
+	cc.CornerRadius = UDim.new(0, 16)
+	cc.Parent = card
+	local st = Instance.new("UIStroke")
+	st.Color = Color3.fromRGB(155, 70, 255)
+	st.Thickness = 1.8
+	st.Parent = card
+
+	local title = Instance.new("TextLabel")
+	title.BackgroundTransparency = 1
+	title.Size = UDim2.new(1, -24, 0, 28)
+	title.Position = UDim2.fromOffset(12, 16)
+	title.Font = Enum.Font.GothamBlack
+	title.TextSize = 20
+	title.TextColor3 = Color3.fromRGB(245, 240, 255)
+	title.TextXAlignment = Enum.TextXAlignment.Left
+	title.Text = "VOIDZ HUB"
+	title.Parent = card
+
+	local sub = Instance.new("TextLabel")
+	sub.BackgroundTransparency = 1
+	sub.Size = UDim2.new(1, -24, 0, 20)
+	sub.Position = UDim2.fromOffset(12, 48)
+	sub.Font = Enum.Font.Gotham
+	sub.TextSize = 12
+	sub.TextColor3 = Color3.fromRGB(145, 125, 175)
+	sub.TextXAlignment = Enum.TextXAlignment.Left
+	sub.Text = "Enter key · TESTRUN"
+	sub.Parent = card
+
+	local box = Instance.new("TextBox")
+	box.Size = UDim2.new(1, -24, 0, 40)
+	box.Position = UDim2.fromOffset(12, 90)
+	box.BackgroundColor3 = Color3.fromRGB(18, 12, 30)
+	box.BorderSizePixel = 0
+	box.Font = Enum.Font.Gotham
+	box.TextSize = 14
+	box.TextColor3 = Color3.fromRGB(245, 240, 255)
+	box.PlaceholderText = "Access key"
+	box.Text = ""
+	box.ClearTextOnFocus = false
+	box.Parent = card
+	local bc = Instance.new("UICorner")
+	bc.CornerRadius = UDim.new(0, 10)
+	bc.Parent = box
+
+	local status = Instance.new("TextLabel")
+	status.BackgroundTransparency = 1
+	status.Size = UDim2.new(1, -24, 0, 18)
+	status.Position = UDim2.fromOffset(12, 138)
+	status.Font = Enum.Font.Gotham
+	status.TextSize = 12
+	status.TextColor3 = Color3.fromRGB(145, 125, 175)
+	status.TextXAlignment = Enum.TextXAlignment.Left
+	status.Text = "Loading systems…"
+	status.Parent = card
+
+	local unlock = Instance.new("TextButton")
+	unlock.Size = UDim2.new(1, -24, 0, 42)
+	unlock.Position = UDim2.fromOffset(12, 170)
+	unlock.BackgroundColor3 = Color3.fromRGB(90, 40, 165)
+	unlock.BorderSizePixel = 0
+	unlock.Font = Enum.Font.GothamBold
+	unlock.TextSize = 14
+	unlock.TextColor3 = Color3.fromRGB(245, 240, 255)
+	unlock.Text = "Unlock"
+	unlock.AutoButtonColor = true
+	unlock.Parent = card
+	local uc = Instance.new("UICorner")
+	uc.CornerRadius = UDim.new(0, 10)
+	uc.Parent = unlock
+
+	local function tryUnlock()
+		local key = (box.Text or ""):gsub("^%s+", ""):gsub("%s+$", "")
+		if key ~= ACCESS_KEY then
+			status.TextColor3 = Color3.fromRGB(255, 140, 170)
+			status.Text = "Invalid key"
+			return
+		end
+		status.TextColor3 = Color3.fromRGB(110, 255, 175)
+		status.Text = "Access granted · loading hub…"
+		task.spawn(function()
+			local function env()
+				local g = (getgenv and type(getgenv) == "function" and getgenv()) or nil
+				return g or _G
+			end
+
+			local function pickFn(...)
+				local e = env()
+				for i = 1, select("#", ...) do
+					local name = select(i, ...)
+					local fn = nil
+					if type(e) == "table" then fn = e[name] end
+					if type(fn) ~= "function" and type(_G) == "table" then fn = _G[name] end
+					if type(fn) ~= "function" then
+						local ok, v = pcall(function() return rawget(e, name) end)
+						if ok then fn = v end
+					end
+					if type(fn) == "function" then return fn end
+				end
+				return nil
+			end
+
+			local function getOpenFn()
+				local e = env()
+				if type(e.VOIDZ_OPEN_HUB) == "function" then return e.VOIDZ_OPEN_HUB end
+				if type(e.VOIDZ_API) == "table" and type(e.VOIDZ_API.openHub) == "function" then
+					return e.VOIDZ_API.openHub
+				end
+				if type(e.VOIDZ_API) == "table" and type(e.VOIDZ_API.buildMain) == "function" then
+					local bm = e.VOIDZ_API.buildMain
+					return function(device)
+						S.device = device or S.device or "PC"
+						S.toggles.mobileUI = (S.device == "Mobile")
+						bm()
+					end
+				end
+				if type(Late) == "table" and type(Late.openHub) == "function" then return Late.openHub end
+				if type(Late) == "table" and type(Late.buildMain) == "function" then
+					local bm = Late.buildMain
+					return function(device)
+						S.device = device or S.device or "PC"
+						S.toggles.mobileUI = (S.device == "Mobile")
+						bm()
+					end
+				end
+				local bm = pickFn("buildMain")
+				if bm then
+					return function(device)
+						S.device = device or S.device or "PC"
+						S.toggles.mobileUI = (S.device == "Mobile")
+						bm()
+					end
+				end
+				return nil
+			end
+
+			local function ensureCore()
+				status.Text = "Loading hub core…"
+				-- always run late init (defines globals + UI)
+				local ok, err = pcall(_voidzLateInit)
+				if not ok then
+					return nil, "late init: " .. tostring(err):sub(1, 120)
+				end
+
+				-- force UI init even if late init skipped the call (end-scoping bugs)
+				local uiInit = pickFn("_voidzInitUI")
+				if type(uiInit) == "function" then
+					status.Text = "Building UI core…"
+					local ok2, err2 = pcall(uiInit)
+					if not ok2 then
+						return nil, "ui init: " .. tostring(err2):sub(1, 120)
+					end
+				end
+
+				local openFn = getOpenFn()
+				if openFn then
+					Late._initDone = true
+					return openFn, nil
+				end
+
+				-- last ditch: if buildMain exists now, wrap it
+				local bm = pickFn("buildMain")
+				if bm then
+					Late._initDone = true
+					return function(device)
+						S.device = device or S.device or "PC"
+						S.toggles.mobileUI = (S.device == "Mobile")
+						bm()
+					end, nil
+				end
+
+				return nil, "no openHub/buildMain (uiInit=" .. tostring(type(uiInit)) .. ")"
+			end
+
+			local openFn, err = ensureCore()
+			if not openFn then
+				status.TextColor3 = Color3.fromRGB(255, 140, 170)
+				status.Text = "Core fail: " .. tostring(err or "?"):gsub("%s+", " "):sub(1, 70)
+				warn("[VOIDZ] ensureCore failed:", err)
+				return
+			end
+
+			status.TextColor3 = Color3.fromRGB(110, 255, 175)
+			status.Text = "Building hub…"
+			pcall(function() sg:Destroy() end)
+			local ok2, err2 = pcall(function()
+				openFn(S.device or "PC")
+			end)
+			if not ok2 then
+				warn("[VOIDZ] openHub failed:", err2)
+				status.TextColor3 = Color3.fromRGB(255, 140, 170)
+				status.Text = "Open fail: " .. tostring(err2):sub(1, 60)
+				pcall(emergencyKeyUI, err2)
+			else
+				print("[VOIDZ HUB] main hub open")
+			end
+		end)
+	end
+
+	unlock.MouseButton1Click:Connect(function() task.spawn(tryUnlock) end)
+	box.FocusLost:Connect(function(enter)
+		if enter then task.spawn(tryUnlock) end
+	end)
+
+	S.gui = sg
+	print("[VOIDZ HUB] key UI forced open")
+	return sg
+end
+
+-- show key UI first so the screen is never blank
+local uiOk, uiErr = pcall(showImmediateKeyUI)
+if not uiOk then
+	warn("[VOIDZ] immediate UI failed:", uiErr)
+	pcall(emergencyKeyUI, uiErr)
+end
+
+-- warm systems in background (safe)
+task.spawn(function()
+	if Late._initDone then return end
+	Late._initStarted = true
+	local ok, err = pcall(_voidzLateInit)
+	if not ok then
+		warn("[VOIDZ] late init failed:", err)
+		Late._initStarted = false
+		Late._initErr = tostring(err)
+		return
+	end
+	local g = getgenv and getgenv()
+	local ready = (Late.openHub ~= nil) or (g and g.VOIDZ_OPEN_HUB ~= nil)
+	if not ready then
+		warn("[VOIDZ] late init returned but openHub missing")
+		Late._initErr = "openHub missing"
+		Late._initStarted = false
+		return
+	end
+	Late._initDone = true
+	print("[VOIDZ HUB] late init ok · openHub ready")
+	pcall(resolveFTAP)
+	pcall(function() if Late.installAntiKickOnLoad then Late.installAntiKickOnLoad() end end)
+	pcall(function() if Late.installGrabWatch then Late.installGrabWatch() end end)
+	pcall(function() if Late.installAntis then Late.installAntis() end end)
+end)
+
+-- VOIDZ HUB · v1.2.14 · 2026-07-28

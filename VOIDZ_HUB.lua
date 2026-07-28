@@ -49,7 +49,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,92,89})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,92,90})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -21570,6 +21570,12 @@ function buildMain()
 	S.toggles.freeCamMass = false
 	S.toggles.kb_toggleUI = true
 	S.antiWanted = S.antiWanted or {}
+	-- keep anti-voice on after key unlock (already installed at script load)
+	pcall(function()
+		if S.toggles.antiVoiceBan ~= false then
+			installAntiVoiceBan(true)
+		end
+	end)
 	if S.device ~= "Mobile" and UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
 		S.device = "Mobile"
 		S.toggles.mobileUI = true
@@ -22897,6 +22903,6 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.74 | 2026-07-28
+-- VOIDZ HUB | v1.2.75 | 2026-07-28
 
 -- hi im voidz

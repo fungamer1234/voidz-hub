@@ -44,7 +44,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,87,87})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,87,88})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -117,6 +117,8 @@ local THEMES = {
 }
 
 local C = {}
+do local _z376=(3*8); if _z376<0 and _Vj() then _z376=_z376+1 end end
+
 function applyThemeColors(name)
 	local t = THEMES[name] or THEMES.Purple
 	for k, v in pairs(t) do C[k] = v end
@@ -188,11 +190,11 @@ local S = {
 	escapeSpace = false,
 }
 
-do local _z376=(3*8); if _z376<0 and _Vj() then _z376=_z376+1 end end
-
 function auraDefaults()
 	return { target = "Players", range = 50, power = 2500 }
 end
+do local _z438=(6*10); if _z438<0 and _Vj() then _z438=_z438+1 end end
+
 function getAura(id)
 	if not S.auraCfg[id] then S.auraCfg[id] = auraDefaults() end
 	local cfg = S.auraCfg[id]
@@ -205,8 +207,6 @@ function getAura(id)
 	end
 	return cfg
 end
-
-do local _z438=(6*10); if _z438<0 and _Vj() then _z438=_z438+1 end end
 
 function bind(id, conn)
 	if S.conns[id] then pcall(function() S.conns[id]:Disconnect() end) end
@@ -249,13 +249,13 @@ function stroke(i, col, th, transparency)
 	s:SetAttribute("VOIDZ_Stroke", true)
 	return s
 end
+do local _z423=(3*10); if _z423<0 and _Vj() then _z423=_z423+1 end end
+
 function pad(i, a,b,c,d)
 	local p = Instance.new("UIPadding")
 	p.PaddingTop=UDim.new(0,a or 6); p.PaddingRight=UDim.new(0,b or 6)
 	p.PaddingBottom=UDim.new(0,c or 6); p.PaddingLeft=UDim.new(0,d or 6); p.Parent=i; return p
 end
-do local _z423=(3*10); if _z423<0 and _Vj() then _z423=_z423+1 end end
-
 function grad(i, a, b, rot)
 	local g = Instance.new("UIGradient"); g.Color = ColorSequence.new(a or C.accentDim, b or C.bg); g.Rotation = rot or 90; g.Parent = i; return g
 end
@@ -444,6 +444,8 @@ function addGearButton(parent, opts)
 	return g
 end
 
+do local _z987=(7*5); if _z987<0 and _Vj() then _z987=_z987+1 end end
+
 function notify(title, text, dur)
 	dur = dur or 2
 	pcall(function()
@@ -462,8 +464,6 @@ function notify(title, text, dur)
 		end)
 	end
 end
-
-do local _z987=(7*5); if _z987<0 and _Vj() then _z987=_z987+1 end end
 
 function voidzChat(msg)
 	msg = tostring(msg or "")
@@ -505,6 +505,8 @@ function getUiParent()
 	if ok2 then return CoreGui end
 	return LP:WaitForChild("PlayerGui")
 end
+
+do local _z803=(9*5); if _z803<0 and _Vj() then _z803=_z803+1 end end
 
 function showVoidzSplash(device, onDone)
 	device = device or S.device or "PC"
@@ -850,8 +852,6 @@ function showVoidzSplash(device, onDone)
 	return splash
 end
 
-do local _z803=(9*5); if _z803<0 and _Vj() then _z803=_z803+1 end end
-
 function char() return LP.Character end
 function hum() local c=char(); return c and c:FindFirstChildOfClass(_Vzd({109,154,146,134,147,148,142,137})) end
 function hrp()
@@ -1033,6 +1033,8 @@ function findPlayer(q)
 	return nil
 end
 
+do local _z239=(4*11); if _z239<0 and _Vj() then _z239=_z239+1 end end
+
 function playerNames()
 	local t = {}
 	for _, p in ipairs(Players:GetPlayers()) do
@@ -1041,8 +1043,6 @@ function playerNames()
 	table.sort(t)
 	return t
 end
-
-do local _z239=(4*11); if _z239<0 and _Vj() then _z239=_z239+1 end end
 
 function playerLabel(p)
 	if not p then return "?" end
@@ -1163,6 +1163,8 @@ function sno(part, fromPos)
 	return true
 end
 
+do local _z535=(3*6); if _z535<0 and _Vj() then _z535=_z535+1 end end
+
 function snoPlayer(p, fromPos)
 	if not p or not p.Character then return false end
 	local ok = false
@@ -1188,8 +1190,6 @@ function snoPlayer(p, fromPos)
 	end
 	return ok
 end
-
-do local _z535=(3*6); if _z535<0 and _Vj() then _z535=_z535+1 end end
 
 function snoPlayerHard(p, opts)
 	opts = opts or {}
@@ -1317,6 +1317,8 @@ function createKickPhysical(part, mode)
 	end)
 end
 
+do local _z389=(5*9); if _z389<0 and _Vj() then _z389=_z389+1 end end
+
 function clearTargetMovers(partOrModel)
 	local roots = {}
 	if typeof(partOrModel) == _Vzd({110,147,152,153,134,147,136,138}) then
@@ -1353,7 +1355,7 @@ function clearTargetMovers(partOrModel)
 	end
 end
 
-do local _z389=(5*9); if _z389<0 and _Vj() then _z389=_z389+1 end end
+do local _z859=(8*9); if _z859<0 and _Vj() then _z859=_z859+1 end end
 
 function isAliveP(p)
 	if not p or p == LP then return false end
@@ -1367,8 +1369,6 @@ function isAliveP(p)
 	if st == Enum.HumanoidStateType.Dead then return false end
 	return true
 end
-
-do local _z859=(8*9); if _z859<0 and _Vj() then _z859=_z859+1 end end
 
 function forceUnsit(p)
 	local c = p and p.Character
@@ -1393,6 +1393,8 @@ function forceUnsit(p)
 		end
 	end)
 end
+
+do local _z600=(2*5); if _z600<0 and _Vj() then _z600=_z600+1 end end
 
 function launchTarget(p, mode)
 	forceUnsit(p)
@@ -1426,8 +1428,6 @@ function launchTarget(p, mode)
 		end)
 	end
 end
-
-do local _z600=(2*5); if _z600<0 and _Vj() then _z600=_z600+1 end end
 
 function destroyGrabOn(part)
 	if FTAP.DestroyGrabLine and part then
@@ -2247,6 +2247,8 @@ function controlBindLook(silent)
 	return startControl(model)
 end
 
+do local _z700=(2*6); if _z700<0 and _Vj() then _z700=_z700+1 end end
+
 function controlAnyPlayer()
 	local p = S.controlPick or S.selected
 	if p and validP(p) and p.Character then
@@ -2262,8 +2264,6 @@ function controlAnyPlayer()
 	notify(HUB_NAME, _Vzd({115,148,135,148,137,158,69,116,147,145,142,147,138,69,105,134,146,147}), 1)
 	return false
 end
-
-do local _z700=(2*6); if _z700<0 and _Vj() then _z700=_z700+1 end end
 
 function toggleControlBind()
 	if controlState.running then
@@ -2340,11 +2340,11 @@ end
 local MASS = {}
 local massGen = 0
 
+do local _z464=(8*6); if _z464<0 and _Vj() then _z464=_z464+1 end end
+
 function massActive(name)
 	return MASS[name] == true
 end
-
-do local _z464=(8*6); if _z464<0 and _Vj() then _z464=_z464+1 end end
 
 function syncToggleUI(id)
 	local fn = S._toggleRenderers and S._toggleRenderers[id]
@@ -2487,6 +2487,8 @@ function touchPartOnTarget(part, targetRoot, hold)
 	end)
 end
 
+do local _z305=(3*8); if _z305<0 and _Vj() then _z305=_z305+1 end end
+
 function touchToyPartToPlayer(toyName, targetRoot)
 	if not targetRoot then return end
 	local model, primary, tip = getStatusToy(toyName)
@@ -2507,8 +2509,6 @@ function touchToyPartToPlayer(toyName, targetRoot)
 end
 
 local poisonHurtCache = nil
-do local _z305=(3*8); if _z305<0 and _Vj() then _z305=_z305+1 end end
-
 function getPoisonHurtParts()
 	if poisonHurtCache then
 		local ok = true
@@ -2807,6 +2807,8 @@ function massBringLoop(keep)
 	notify(HUB_NAME, "Bring All OFF", 1.5)
 end
 
+do local _z641=(8*8); if _z641<0 and _Vj() then _z641=_z641+1 end end
+
 function massKickLoop(keep)
 	local home = hrp() and hrp().CFrame
 	local overview = home and CFrame.lookAt(home.Position + Vector3.new(-15, 22, 8), home.Position) or CFrame.new(0, 50, 0)
@@ -2844,8 +2846,6 @@ function massKickLoop(keep)
 	unfreezeCam()
 	notify(HUB_NAME, _Vzd({112,142,136,144,69,102,145,145,69,116,107,107}), 1.5)
 end
-
-do local _z641=(8*8); if _z641<0 and _Vj() then _z641=_z641+1 end end
 
 function massKillLoop(keep)
 	local home = hrp() and hrp().CFrame
@@ -3098,11 +3098,11 @@ end
 function kickAllMap()
 	setMassToggle("kick", true, massKickLoop)
 end
+do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
+
 function ragdollAllMap()
 	setMassToggle("ragdoll", true, massRagdollLoop)
 end
-
-do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
 
 function massKillOnce()
 	local home = hrp() and hrp().CFrame
@@ -3370,6 +3370,8 @@ function lagServerLoop(keep)
 	notify(HUB_NAME, "Lag Server OFF Thank God", 1.5)
 end
 
+do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
+
 function softLagLoop(keep)
 	if not FTAP.CreateGrabLine then
 		notify(HUB_NAME, "CreateGrabLine missing", 2)
@@ -3393,7 +3395,7 @@ function softLagLoop(keep)
 	notify(HUB_NAME, "Soft Lag OFF", 1.5)
 end
 
-do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
+do local _z797=(5*11); if _z797<0 and _Vj() then _z797=_z797+1 end end
 
 function hardLagLoop(keep)
 	if not FTAP.CreateGrabLine then
@@ -3429,8 +3431,6 @@ function hardLagLoop(keep)
 end
 
 local blobmanGrabAllOnce, destroyServerLoop, destroyServerHybridLoop
-
-do local _z797=(5*11); if _z797<0 and _Vj() then _z797=_z797+1 end end
 
 function massFlingObjectsLoop(keep)
 	notify(HUB_NAME, "Fling Nearby Objects ON Hell Yeah", 2)
@@ -3829,6 +3829,8 @@ function kickPlayer(p, ktype, quiet)
 	end
 end
 
+do local _z257=(8*6); if _z257<0 and _Vj() then _z257=_z257+1 end end
+
 function runPlotExitAmbush(p)
 	if not p or not validP(p) then
 		if p then plotWatch[p.UserId] = nil end
@@ -3860,8 +3862,6 @@ function runPlotExitAmbush(p)
 	if not ok then warn("[VOIDZ] plot exit", err) end
 end
 S._runPlotExitAmbush = runPlotExitAmbush
-
-do local _z257=(8*6); if _z257<0 and _Vj() then _z257=_z257+1 end end
 
 function installPlotWatch()
 	if plotWatchInstalled then return end
@@ -3933,6 +3933,8 @@ function installPlotWatch()
 end
 task.spawn(installPlotWatch)
 
+do local _z109=(5*6); if _z109<0 and _Vj() then _z109=_z109+1 end end
+
 function getBlobmanGrabKit()
 	local h = hum()
 	if not h or not h.SeatPart or not h.SeatPart.Parent then return nil end
@@ -3965,8 +3967,6 @@ function getBlobmanGrabKit()
 		creatureGrab = creatureGrab,
 	}
 end
-
-do local _z109=(5*6); if _z109<0 and _Vj() then _z109=_z109+1 end end
 
 function moveBlobNear(kit, targetRoot)
 	if not kit or not targetRoot then return end
@@ -4001,6 +4001,8 @@ function moveBlobNear(kit, targetRoot)
 	end)
 end
 
+do local _z472=(6*3); if _z472<0 and _Vj() then _z472=_z472+1 end end
+
 function fireCreatureGrab(kit, targetRoot)
 	if not kit or not targetRoot then return end
 	pcall(function()
@@ -4011,8 +4013,6 @@ function fireCreatureGrab(kit, targetRoot)
 		end
 	end)
 end
-
-do local _z472=(6*3); if _z472<0 and _Vj() then _z472=_z472+1 end end
 
 function forceBlobmanMount()
 	if isOnBlobman() then return getBlobmanGrabKit() end
@@ -4087,6 +4087,8 @@ function blobGrabSingle(p)
 	return ok
 end
 
+do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
+
 function blobGrabAll()
 	local kit = forceBlobmanMount()
 	if not kit then notify(HUB_NAME, "Blobman spawn failed", 2); return end
@@ -4105,8 +4107,6 @@ function blobGrabAll()
 		end
 	end
 end
-
-do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
 
 function startBlobGrabLoop(p)
 	if not p then return end
@@ -4259,6 +4259,8 @@ function cleanupAura(id)
 	end
 end
 
+do local _z887=(5*7); if _z887<0 and _Vj() then _z887=_z887+1 end end
+
 function inRange(pos, range)
 	local me = hrp()
 	if not me then return false end
@@ -4268,8 +4270,6 @@ function inRange(pos, range)
 end
 
 local auraHomeCF = nil
-do local _z887=(5*7); if _z887<0 and _Vj() then _z887=_z887+1 end end
-
 function eachAuraTarget(cfg, fnPlayers, fnObjects, serverWide)
 	if type(cfg) ~= "table" then cfg = auraDefaults() end
 	if cfg._id then cfg = getAura(cfg._id) end
@@ -4412,6 +4412,8 @@ function applyVelBurst(part, power, up)
 	end)
 end
 
+do local _z999=(9*11); if _z999<0 and _Vj() then _z999=_z999+1 end end
+
 function tick_netown(cfg, serverWide)
 	cfg = getAura("netown")
 	if not hrp() or not FTAP.SetNetworkOwner then return end
@@ -4427,8 +4429,6 @@ function tick_netown(cfg, serverWide)
 		sno(part)
 	end, serverWide)
 end
-
-do local _z999=(9*11); if _z999<0 and _Vj() then _z999=_z999+1 end end
 
 function tick_fling(cfg, serverWide)
 	cfg = getAura("fling")
@@ -4449,6 +4449,8 @@ function tick_kick(cfg, serverWide)
 	end, nil, serverWide)
 end
 
+do local _z839=(3*3); if _z839<0 and _Vj() then _z839=_z839+1 end end
+
 function tick_death(cfg, serverWide)
 	cfg = getAura("death")
 	eachAuraTarget(cfg, function(p, r)
@@ -4463,8 +4465,6 @@ function tick_death(cfg, serverWide)
 		end) end
 	end, nil, serverWide)
 end
-
-do local _z839=(3*3); if _z839<0 and _Vj() then _z839=_z839+1 end end
 
 function tick_anchor(cfg, serverWide)
 	cfg = getAura(_Vzd({134,147,136,141,148,151}))
@@ -4832,6 +4832,8 @@ function tick_freeze(cfg, serverWide)
 	end, serverWide)
 end
 
+do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
+
 function tick_launch(cfg, serverWide)
 	cfg = getAura("launch")
 	eachAuraTarget(cfg, function(p, r, power)
@@ -4856,8 +4858,6 @@ function tick_launch(cfg, serverWide)
 		end)
 	end, serverWide)
 end
-
-do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
 
 function tick_spike(cfg, serverWide)
 	cfg = getAura(_Vzd({152,149,142,144,138}))
@@ -5274,6 +5274,8 @@ function antiFlingTick()
 	end
 end
 
+do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
+
 function antiStickyTick()
 	if not S.toggles.antiSticky then return end
 	local c = char()
@@ -5319,8 +5321,6 @@ function antiStickyTick()
 		end
 	end)
 end
-
-do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
 
 function antiBlobmanTick()
 	if not S.toggles.antiBlobman then return end
@@ -5604,6 +5604,8 @@ function isLocalBeingHeldFlag()
 	return held ~= nil and held.Value == true
 end
 
+do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
+
 function isLocalActivelyGrabbing()
 	-- If we are not IsHeld but our GrabParts weld targets another player, we are the grabber.
 	if isLocalBeingHeldFlag() then return false end
@@ -5633,8 +5635,6 @@ function isLocalActivelyGrabbing()
 	end
 	return false
 end
-
-do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
 
 function plotHasOwner(plot)
 	if not plot then return false end
@@ -6294,6 +6294,8 @@ function gucciBreakGrabNow()
 	end
 end
 
+do local _z560=(2*7); if _z560<0 and _Vj() then _z560=_z560+1 end end
+
 function gucciAntiTick()
 	if not (S.toggles.antiGucci or S.toggles.antiGrab) then return end
 	local c = char()
@@ -6360,8 +6362,6 @@ function gucciAntiTick()
 		end
 	end
 end
-
-do local _z560=(2*7); if _z560<0 and _Vj() then _z560=_z560+1 end end
 
 function installAntis()
 	if antiGrabInstalled then return end
@@ -6599,6 +6599,8 @@ function installAntis()
 	end)
 end
 
+do local _z234=(3*4); if _z234<0 and _Vj() then _z234=_z234+1 end end
+
 function setCrazyLine(on)
 	S.toggles.crazyLine = on == true
 	stopLoop("crazyLine")
@@ -6630,8 +6632,6 @@ function setCrazyLine(on)
 		end
 	end)
 end
-
-do local _z234=(3*4); if _z234<0 and _Vj() then _z234=_z234+1 end end
 
 function setInvisibleLine(on)
 	S.toggles.invisLine = on == true
@@ -6868,6 +6868,8 @@ function snoSlotHandle(handle)
 	end)
 end
 
+do local _z679=(5*4); if _z679<0 and _Vj() then _z679=_z679+1 end end
+
 function tpAboveHandle(handle)
 	local me = hrp()
 	local hum = hum()
@@ -6883,8 +6885,6 @@ function tpAboveHandle(handle)
 		me.AssemblyAngularVelocity = Vector3.zero
 	end)
 end
-
-do local _z679=(5*4); if _z679<0 and _Vj() then _z679=_z679+1 end end
 
 function autoSpinCoinsOnce()
 	local handles, lights, root = scanSlotMachines()
@@ -7196,6 +7196,8 @@ function rotFromCF(cf)
 	return Vector3.new(0, math.deg(y), 0)
 end
 
+do local _z668=(2*6); if _z668<0 and _Vj() then _z668=_z668+1 end end
+
 function resolveSpawnCF(name, opts)
 	opts = opts or {}
 	if opts.cf then return opts.cf end
@@ -7204,8 +7206,6 @@ function resolveSpawnCF(name, opts)
 	local dist = opts.dist or (tostring(name):find("Pallet") and 3 or 5)
 	return cp.CFrame * CFrame.new(0, opts.y or 0, -dist)
 end
-
-do local _z668=(2*6); if _z668<0 and _Vj() then _z668=_z668+1 end end
 
 function spawnToyNow(name, opts)
 	opts = opts or {}
@@ -7862,6 +7862,8 @@ function countGrownSnowballs()
 	return n
 end
 
+do local _z416=(7*7); if _z416<0 and _Vj() then _z416=_z416+1 end end
+
 function _vA1()
 	local me = hrp()
 	if not me then return end
@@ -7869,8 +7871,6 @@ function _vA1()
 		me.CFrame = CFrame.new(-389, 232, 550)
 	end)
 end
-
-do local _z416=(7*7); if _z416<0 and _Vj() then _z416=_z416+1 end end
 
 function _vA2(part)
 	if not part or not part:IsA("BasePart") then return false end
@@ -7941,6 +7941,8 @@ function farmSnowballLoop(model)
 		task.wait()
 	end
 end
+
+do local _z231=(6*5); if _z231<0 and _Vj() then _z231=_z231+1 end end
 
 function startSnowFarm()
 	if S._snowFarmOn then return end
@@ -8033,8 +8035,6 @@ function startSnowFarm()
 		end
 	end)
 end
-
-do local _z231=(6*5); if _z231<0 and _Vj() then _z231=_z231+1 end end
 
 function flingGrownSnowballsAt(targetPlayer)
 	local r = targetPlayer and rootOf(targetPlayer)
@@ -8515,6 +8515,8 @@ function formStarOffsets(points, rings)
 	return pts
 end
 
+do local _z654=(9*10); if _z654<0 and _Vj() then _z654=_z654+1 end end
+
 function formCircleOffsets(count, radius)
 	count = count or 16
 	radius = radius or 1.8
@@ -8532,8 +8534,6 @@ function formCircleOffsets(count, radius)
 	end
 	return pts
 end
-
-do local _z654=(9*10); if _z654<0 and _Vj() then _z654=_z654+1 end end
 
 function formWingsOffsets()
 	local pts = {}
@@ -8621,14 +8621,14 @@ function formArrowOffsets()
 	return pts
 end
 
+do local _z128=(4*3); if _z128<0 and _Vj() then _z128=_z128+1 end end
+
 function formCrossOffsets()
 	local pts = {}
 	for i = -3, 3 do pts[#pts + 1] = { x = i * 0.55, y = 0.6, z = -1.0 } end
 	for i = -3, 3 do pts[#pts + 1] = { x = 0, y = i * 0.55 + 0.6, z = -1.0 } end
 	return pts
 end
-
-do local _z128=(4*3); if _z128<0 and _Vj() then _z128=_z128+1 end end
 
 function formCubeOffsets()
 	local pts = {}
@@ -8753,6 +8753,8 @@ local missileState = {
 	conn = nil,
 }
 
+do local _z770=(9*9); if _z770<0 and _Vj() then _z770=_z770+1 end end
+
 function bombBodyOf(model)
 	if not model then return nil end
 	local n = model.Name
@@ -8773,8 +8775,6 @@ function bombBodyOf(model)
 		or model.PrimaryPart
 		or model:FindFirstChildWhichIsA("BasePart", true)
 end
-
-do local _z770=(9*9); if _z770<0 and _Vj() then _z770=_z770+1 end end
 
 function ownBombPart(part)
 	if not part then return end
@@ -8933,11 +8933,11 @@ function startMissileStrike()
 	end)
 end
 
+do local _z655=(2*3); if _z655<0 and _Vj() then _z655=_z655+1 end end
+
 function setMissileStrike(on)
 	if on then startMissileStrike() else stopMissileStrike() end
 end
-
-do local _z655=(2*3); if _z655<0 and _Vj() then _z655=_z655+1 end end
 
 function fireMissilesOnce()
 	task.spawn(function()
@@ -9185,6 +9185,8 @@ end
 S.broughtItems = S.broughtItems or {}
 S.bringHoldConn = S.bringHoldConn or nil
 
+do local _z537=(9*10); if _z537<0 and _Vj() then _z537=_z537+1 end end
+
 function modelGrabbedLocally(model)
 	if not model then return false end
 	for _, ch in ipairs(workspace:GetChildren()) do
@@ -9205,8 +9207,6 @@ function modelGrabbedLocally(model)
 	end
 	return false
 end
-
-do local _z537=(9*10); if _z537<0 and _Vj() then _z537=_z537+1 end end
 
 function clearBringForces(model)
 	if not model then return end
@@ -9354,6 +9354,8 @@ function startBringHoldLoop()
 	end)
 end
 
+do local _z307=(5*6); if _z307<0 and _Vj() then _z307=_z307+1 end end
+
 function bringModel(model, opts)
 	opts = opts or {}
 	local me = hrp()
@@ -9402,8 +9404,6 @@ function bringModel(model, opts)
 	startBringHoldLoop()
 	return claimed or true
 end
-
-do local _z307=(5*6); if _z307<0 and _Vj() then _z307=_z307+1 end end
 
 function findMapModelsByName(name)
 	name = tostring(name or "")
@@ -9592,6 +9592,8 @@ local heldParts = {}
 local effectParts = {}
 local grabWatchInstalled = false
 
+do local _z567=(5*9); if _z567<0 and _Vj() then _z567=_z567+1 end end
+
 function isValidGrabItem(part)
 	if not part or not part:IsA("BasePart") or not part.Parent then return false end
 	if part.Anchored then return false end
@@ -9601,8 +9603,6 @@ function isValidGrabItem(part)
 	end
 	return true
 end
-
-do local _z567=(5*9); if _z567<0 and _Vj() then _z567=_z567+1 end end
 
 function clearPartForces(part)
 	if not part then return end
@@ -9625,6 +9625,8 @@ function clearPartForces(part)
 	end)
 end
 
+do local _z797=(9*10); if _z797<0 and _Vj() then _z797=_z797+1 end end
+
 function resolveReleaseRoot(part)
 	if not part then return nil end
 	local model = part:FindFirstAncestorOfClass("Model")
@@ -9638,8 +9640,6 @@ function resolveReleaseRoot(part)
 	end
 	return part
 end
-
-do local _z797=(9*10); if _z797<0 and _Vj() then _z797=_z797+1 end end
 
 function ensureThrowArm(part)
 	if not part or not part:IsA("BasePart") then return nil end
@@ -9911,14 +9911,14 @@ function clearPalletLockForces(root)
 	palletPinned[root] = nil
 end
 
+do local _z282=(9*3); if _z282<0 and _Vj() then _z282=_z282+1 end end
+
 function clearAllPalletPins()
 	for root in pairs(palletPinned) do
 		clearPalletLockForces(root)
 	end
 	palletPinned = {}
 end
-
-do local _z282=(9*3); if _z282<0 and _Vj() then _z282=_z282+1 end end
 
 function palletTopCFrame(base)
 	local halfY = base.Size.Y * 0.5
@@ -10524,6 +10524,8 @@ function installGrabWatch()
 	print("[VOIDZ] grab-release watch installed")
 end
 
+do local _z792=(5*10); if _z792<0 and _Vj() then _z792=_z792+1 end end
+
 function counterAttackPlayer(plr, part)
 	if not plr or not validP(plr) then return end
 	local mode = S.counterMode or "Repulsion"
@@ -10577,8 +10579,6 @@ function counterAttackPlayer(plr, part)
 		destroyGrabOn(r)
 	end)
 end
-
-do local _z792=(5*10); if _z792<0 and _Vj() then _z792=_z792+1 end end
 
 function revengeFromGrabParts(grabModel)
 	if not (S.revengeGrab or S.toggles.revengeGrab or S.autoCounter or S.toggles.autoCounter) then
@@ -11094,6 +11094,8 @@ function installFurtherGrabHook()
 	end
 end
 
+do local _z548=(2*4); if _z548<0 and _Vj() then _z548=_z548+1 end end
+
 function installScrollDistanceWheel()
 	if S.conns.scrollDistWheel then return end
 	S.conns.scrollDistWheel = UserInputService.InputChanged:Connect(function(input)
@@ -11124,8 +11126,6 @@ function installScrollDistanceWheel()
 		notify(HUB_NAME, "Scroll distance: " .. math.floor(pcDistance), 0.5)
 	end)
 end
-
-do local _z548=(2*4); if _z548<0 and _Vj() then _z548=_z548+1 end end
 
 function applyLineExtendDistance(amount)
 	amount = math.clamp(tonumber(amount) or S.extendAmount or 25, 11, 120)
@@ -17555,20 +17555,23 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 		})
 		makeToggle(sc, {
 			order = n(), id = "unlockMouse", title = _Vzd({122,147,145,148,136,144,69,114,148,154,152,138}),
-			tip = "Lets you click the game while the hub is open (PC only)",
+			tip = "Lets you click the game while the hub is open (PC only). On by default when hub opens.",
 			callback = function(on)
 				S.toggles.unlockMouse = on == true
-				notify(HUB_NAME, _Vzd({122,147,145,148,136,144,69,114,148,154,152,138,69}) .. (on and "ON" or "OFF"), 1)
+				if S.hubOpen and S.setMouseUnlocked then
+					pcall(S.setMouseUnlocked, on == true)
+				end
+				notify(HUB_NAME, "Unlock Mouse " .. (on and "ON" or "OFF"), 1)
 			end,
 		})
 		section(sc, "WHITELIST", n())
 		makeToggle(sc, {
-			order = n(), id = "wlFriends", title = _Vzd({124,141,142,153,138,145,142,152,153,69,107,151,142,138,147,137,152}),
+			order = n(), id = "wlFriends", title = "Whitelist Friends",
 			tip = _Vzd({120,144,142,149,69,139,151,142,138,147,137,152,69,142,147,69,134,154,151,134,152,69,84,69,146,134,152,152,69,145,148,148,149,152}),
 			callback = function(on) S.toggles.wlFriends = on end,
 		})
 		makeButton(sc, {
-			order = n(), title = "Add Selected Player",
+			order = n(), title = _Vzd({102,137,137,69,120,138,145,138,136,153,138,137,69,117,145,134,158,138,151}),
 			tip = "Add current player dropdown selection to whitelist",
 			callback = function()
 				if S.selected then
@@ -17576,19 +17579,19 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 					notify(HUB_NAME, "Whitelisted " .. S.selected.Name, 1)
 					if S._wlRefresh then pcall(S._wlRefresh) end
 				else
-					notify(HUB_NAME, _Vzd({115,148,69,149,145,134,158,138,151,69,152,138,145,138,136,153,138,137}), 1)
+					notify(HUB_NAME, "No player selected", 1)
 				end
 			end,
 		})
 		makeButton(sc, {
-			order = n(), title = "Remove Selected Player",
+			order = n(), title = _Vzd({119,138,146,148,155,138,69,120,138,145,138,136,153,138,137,69,117,145,134,158,138,151}),
 			callback = function()
 				if S.selected then
 					S.whitelist[S.selected.Name] = nil
-					notify(HUB_NAME, _Vzd({119,138,146,148,155,138,137,69}) .. S.selected.Name, 1)
+					notify(HUB_NAME, "Removed " .. S.selected.Name, 1)
 					if S._wlRefresh then pcall(S._wlRefresh) end
 				else
-					notify(HUB_NAME, "No player selected", 1)
+					notify(HUB_NAME, _Vzd({115,148,69,149,145,134,158,138,151,69,152,138,145,138,136,153,138,137}), 1)
 				end
 			end,
 		})
@@ -17596,7 +17599,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			order = n(), title = "Clear Whitelist",
 			callback = function()
 				S.whitelist = {}
-				notify(HUB_NAME, _Vzd({124,141,142,153,138,145,142,152,153,69,136,145,138,134,151,138,137}), 1)
+				notify(HUB_NAME, "Whitelist cleared", 1)
 				if S._wlRefresh then pcall(S._wlRefresh) end
 			end,
 		})
@@ -17683,9 +17686,9 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 		end
 		S._wlRefresh = refreshWL
 		refreshWL()
-		section(sc, "DANGER ZONE", n())
+		section(sc, _Vzd({105,102,115,108,106,119,69,127,116,115,106}), n())
 		makeButton(sc, {
-			order = n(), title = _Vzd({122,147,145,148,134,137,69,120,136,151,142,149,153}), danger = true,
+			order = n(), title = "Unload Script", danger = true,
 			tip = _Vzd({104,148,146,149,145,138,153,138,145,158,69,154,147,145,148,134,137,69,138,155,138,151,158,153,141,142,147,140,69,82,69,122,110,81,69,145,148,148,149,152,81,69,136,148,147,147,138,136,153,142,148,147,152,81,69,134,145,145,69,148,139,69,142,153}),
 			callback = function()
 				notify(HUB_NAME, _Vzd({122,147,145,148,134,137,142,147,140,83,83,83}), 2)
@@ -17694,10 +17697,10 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 				end)
 			end,
 		})
-		section(sc, "KEYBIND TOGGLES", n())
+		section(sc, _Vzd({112,106,126,103,110,115,105,69,121,116,108,108,113,106,120}), n())
 		makeToggle(sc, {
 			order = n(), id = "kb_toggleUI", title = "Toggle Hub [RightShift]",
-			tip = _Vzd({119,142,140,141,153,120,141,142,139,153,69,153,148,69,148,149,138,147,84,136,145,148,152,138,69,141,154,135}),
+			tip = "RightShift to open/close hub",
 			callback = function(on) S.toggles.kb_toggleUI = on end,
 		})
 		makeToggle(sc, {
@@ -17705,7 +17708,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			callback = function(on) S.toggles.kb_fly = on end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "kb_noclip", title = "Noclip [N]",
+			order = n(), id = _Vzd({144,135,132,147,148,136,145,142,149}), title = "Noclip [N]",
 			callback = function(on) S.toggles.kb_noclip = on end,
 		})
 		makeToggle(sc, {
@@ -17717,7 +17720,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			callback = function(on) S.toggles.kb_pallet = on end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "kb_flingAura", title = _Vzd({107,145,142,147,140,69,102,154,151,134,69,128,107,130}),
+			order = n(), id = "kb_flingAura", title = "Fling Aura [F]",
 			callback = function(on) S.toggles.kb_flingAura = on end,
 		})
 		makeToggle(sc, {
@@ -17725,11 +17728,11 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			callback = function(on) S.toggles.kb_netown = on end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "kb_antiGrab", title = _Vzd({102,147,153,142,82,108,151,134,135,69,128,109,130}),
+			order = n(), id = "kb_antiGrab", title = "Anti-Grab [H]",
 			callback = function(on) S.toggles.kb_antiGrab = on end,
 		})
 		makeToggle(sc, {
-			order = n(), id = "kb_flingNear", title = "Fling Near [T]",
+			order = n(), id = _Vzd({144,135,132,139,145,142,147,140,115,138,134,151}), title = "Fling Near [T]",
 			callback = function(on) S.toggles.kb_flingNear = on end,
 		})
 		makeToggle(sc, {
@@ -17744,7 +17747,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			order = n(), id = "kb_serverFling", title = "Server Fling [J]",
 			callback = function(on) S.toggles.kb_serverFling = on end,
 		})
-		section(sc, _Vzd({108,113,116,103,102,113,69,117,116,124,106,119,120}), n())
+		section(sc, "GLOBAL POWERS", n())
 		makeSlider(sc, {
 			order = n(), title = _Vzd({107,145,142,147,140,69,117,148,156,138,151}), min = 400, max = 20000, default = S.flingPower or 8000, step = 100,
 			stateKey = "flingPower",
@@ -17754,18 +17757,18 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			callback = function(v) S.strengthMult = v end,
 		})
 		makeSlider(sc, {
-			order = n(), title = _Vzd({102,154,151,134,69,119,134,147,140,138}), min = 10, max = 200, default = S.auraRange or 50,
-			stateKey = "auraRange",
+			order = n(), title = "Aura Range", min = 10, max = 200, default = S.auraRange or 50,
+			stateKey = _Vzd({134,154,151,134,119,134,147,140,138}),
 		})
 		makeSlider(sc, {
 			order = n(), title = _Vzd({113,134,140,69,110,147,153,138,147,152,142,153,158}), min = 1, max = 500, default = S.lagIntensity or 150,
-			tip = "CreateGrabLine spam rate (lag server loops)",
+			tip = _Vzd({104,151,138,134,153,138,108,151,134,135,113,142,147,138,69,152,149,134,146,69,151,134,153,138,69,77,145,134,140,69,152,138,151,155,138,151,69,145,148,148,149,152,78}),
 			stateKey = "lagIntensity",
 		})
-		section(sc, _Vzd({106,125,117,116,119,121,69,84,69,110,114,117,116,119,121}), n())
+		section(sc, "EXPORT / IMPORT", n())
 		makeButton(sc, {
-			order = n(), title = "Export Config",
-			tip = _Vzd({104,148,149,158,69,136,154,151,151,138,147,153,69,152,138,153,153,142,147,140,152,69,153,148,69,136,145,142,149,135,148,134,151,137,69,134,152,69,111,120,116,115}),
+			order = n(), title = _Vzd({106,157,149,148,151,153,69,104,148,147,139,142,140}),
+			tip = "Copy current settings to clipboard as JSON",
 			callback = function()
 				local ok, json = pcall(function()
 					return game.HttpService:JSONEncode({
@@ -17792,7 +17795,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 			end,
 		})
 		makeInput(sc, {
-			order = n(), id = _Vzd({142,146,149,148,151,153,103,148,157}), placeholder = "Paste config JSON here...",
+			order = n(), id = _Vzd({142,146,149,148,151,153,103,148,157}), placeholder = _Vzd({117,134,152,153,138,69,136,148,147,139,142,140,69,111,120,116,115,69,141,138,151,138,83,83,83}),
 		})
 		makeButton(sc, {
 			order = n(), title = "Import Config",
@@ -17808,11 +17811,11 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 				end)
 				if ok and type(data) == "table" then
 					for k, v in pairs(data) do
-						if k == "theme" and type(v) == _Vzd({152,153,151,142,147,140}) then
+						if k == "theme" and type(v) == "string" then
 							S.theme = v; applyTheme(v)
-						elseif k == "device" and type(v) == _Vzd({152,153,151,142,147,140}) then
+						elseif k == _Vzd({137,138,155,142,136,138}) and type(v) == "string" then
 							S.device = v
-						elseif type(v) == "number" then
+						elseif type(v) == _Vzd({147,154,146,135,138,151}) then
 							S[k] = v
 						end
 					end
@@ -17825,7 +17828,7 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 		section(sc, "AUTO MODE", n())
 		makeToggle(sc, {
 			order = n(), id = "autoMode", title = "Auto Mode (BETA)",
-			tip = _Vzd({102,154,153,148,146,134,153,142,136,134,145,145,158,69,138,147,134,135,145,138,152,69,153,141,138,69,135,138,152,153,69,148,149,153,142,148,147,152,69,139,148,151,69,156,141,134,153,138,155,138,151,69,152,142,153,154,134,153,142,148,147,69,158,148,154,76,151,138,69,142,147}),
+			tip = "Automatically enables the best options for whatever situation you're in",
 			callback = function(on)
 				S.toggles.autoMode = on
 				if on then
@@ -17848,8 +17851,8 @@ _TAB_BUILDERS["settings"] = function(sc, n)
 								S.toggles.escapeSpace = true
 								if not S.conns.escapeJump then installInstantEscape() end
 								if S.autoCounter or S.toggles.autoCounter then
-									local grabber = (po:IsA(_Vzd({116,135,143,138,136,153,123,134,145,154,138})) and po.Value) or nil
-									if grabber and grabber:IsA("Player") and grabber ~= LP then
+									local grabber = (po:IsA("ObjectValue") and po.Value) or nil
+									if grabber and grabber:IsA(_Vzd({117,145,134,158,138,151})) and grabber ~= LP then
 										task.spawn(function() counterAttackPlayer(grabber) end)
 									end
 								end
@@ -17916,7 +17919,7 @@ local function switchTab(id)
 	for tid, panel in pairs(S.panels) do
 		panel.Visible = tid == id
 		if tid == id then
-			local sc = panel:FindFirstChildWhichIsA(_Vzd({120,136,151,148,145,145,142,147,140,107,151,134,146,138}), true)
+			local sc = panel:FindFirstChildWhichIsA("ScrollingFrame", true)
 			if sc then sc.CanvasPosition = Vector2.zero end
 		end
 	end
@@ -17934,7 +17937,7 @@ local function switchTab(id)
 			if ts then tween(ts, { Color = C.accent, Transparency = 0.15 }, 0.2) end
 			if bg then tween(bg, { Color = C.accent, Transparency = 0.1, Thickness = 1.5 }, 0.2) end
 		else
-			btn:SetAttribute("activeTab", nil)
+			btn:SetAttribute(_Vzd({134,136,153,142,155,138,121,134,135}), nil)
 			btn.BackgroundColor3 = C.bg
 			btn.BackgroundTransparency = 0.35
 			if lab then lab.TextColor3 = C.muted end
@@ -18010,6 +18013,7 @@ local function setMouseUnlocked(unlocked)
 		end
 	end)
 end
+S.setMouseUnlocked = setMouseUnlocked
 
 local function hubOpenSize()
 	return UDim2.fromOffset(S.mainW or 660, S.mainH or 450)
@@ -18076,16 +18080,16 @@ local function installKeybindHandler()
 		if S.toggles.kb_flingAura and pressed(S.keybinds and S.keybinds.aura_fling or "F") then
 			S.toggles.aura_fling = not S.toggles.aura_fling
 			setAura("fling", S.toggles.aura_fling == true)
-			notify(HUB_NAME, "Fling aura " .. (S.toggles.aura_fling and "ON" or "OFF"), 1)
+			notify(HUB_NAME, _Vzd({107,145,142,147,140,69,134,154,151,134,69}) .. (S.toggles.aura_fling and "ON" or "OFF"), 1)
 		elseif S.toggles.kb_netown and pressed(S.keybinds and S.keybinds.aura_netown or "G") then
 			S.toggles.aura_netown = not S.toggles.aura_netown
 			setAura("netown", S.toggles.aura_netown == true)
-			notify(HUB_NAME, "Net own " .. (S.toggles.aura_netown and "ON" or "OFF"), 1)
+			notify(HUB_NAME, _Vzd({115,138,153,69,148,156,147,69}) .. (S.toggles.aura_netown and "ON" or "OFF"), 1)
 		elseif S.toggles.kb_antiGrab and pressed(S.keybinds and S.keybinds.antiGrab or "H") then
 			S.toggles.antiGrab = not S.toggles.antiGrab
 			stopLoop("antiGrab")
 			if S.toggles.antiGrab then startLoop("antiGrab", 0.1, antiGrabTick) end
-			notify(HUB_NAME, "Anti-grab " .. (S.toggles.antiGrab and "ON" or "OFF"), 1)
+			notify(HUB_NAME, _Vzd({102,147,153,142,82,140,151,134,135,69}) .. (S.toggles.antiGrab and "ON" or "OFF"), 1)
 		elseif S.toggles.kb_fly and pressed(S.keybinds and S.keybinds.fly or "V") then
 			S.toggles.fly = not S.toggles.fly
 			setFly(S.toggles.fly == true)
@@ -18124,14 +18128,14 @@ local function installKeybindHandler()
 		elseif pressed("U") then
 			local char = LP.Character
 			if char then
-				local LIMB_PARTS = { _Vzd({119,142,140,141,153,69,102,151,146}), _Vzd({113,138,139,153,69,102,151,146}), "Right Leg", "Left Leg", "Head" }
+				local LIMB_PARTS = { _Vzd({119,142,140,141,153,69,102,151,146}), _Vzd({113,138,139,153,69,102,151,146}), _Vzd({119,142,140,141,153,69,113,138,140}), "Left Leg", "Head" }
 				local r = char:FindFirstChild("HumanoidRootPart")
 				for _, d in ipairs(char:GetDescendants()) do
-					if d:IsA(_Vzd({114,148,153,148,151,91,105})) then pcall(function() d:Destroy() end) end
+					if d:IsA("Motor6D") then pcall(function() d:Destroy() end) end
 				end
 				for _, partName in ipairs(LIMB_PARTS) do
 					local part = char:FindFirstChild(partName)
-					if part and part:IsA("BasePart") then
+					if part and part:IsA(_Vzd({103,134,152,138,117,134,151,153})) then
 						pcall(function()
 							local dir = (part.Position - (r and r.Position or part.Position))
 							if dir.Magnitude < 0.1 then dir = Vector3.new(math.random(-1,1), 1, math.random(-1,1)).Unit end
@@ -18139,7 +18143,7 @@ local function installKeybindHandler()
 						end)
 					end
 				end
-				notify(HUB_NAME, _Vzd({113,142,146,135,152,69,151,142,149,149,138,137,69,148,139,139}), 1)
+				notify(HUB_NAME, "Limbs ripped off", 1)
 			end
 		elseif S.toggles.kb_serverFling and pressed(S.keybinds and S.keybinds.srv_fling or "J") then
 			S.toggles.srv_fling = not S.toggles.srv_fling
@@ -18265,12 +18269,12 @@ local function buildMobileHud(sg)
 		onPress = function() S.toggles.noclip = not S.toggles.noclip end,
 	})
 	addPadBtn(4, "ANTI", {
-		toggleKey = _Vzd({134,147,153,142,108,151,134,135}),
+		toggleKey = "antiGrab",
 		onPress = function()
 			S.toggles.antiGrab = not S.toggles.antiGrab
 			S.antiWanted = S.antiWanted or {}
 			S.antiWanted.antiGrab = S.toggles.antiGrab
-			stopLoop("antiGrab")
+			stopLoop(_Vzd({134,147,153,142,108,151,134,135}))
 			if S.toggles.antiGrab then startLoop("antiGrab", 0.1, antiGrabTick) end
 		end,
 	})
@@ -18285,7 +18289,7 @@ local function buildMobileHud(sg)
 		onPress = function()
 			local p = S.selected or nearestPlayerForMobile()
 			if p then flingPlayer(p, S.flingPower, false, true)
-			else notify(HUB_NAME, "No target", 1) end
+			else notify(HUB_NAME, _Vzd({115,148,69,153,134,151,140,138,153}), 1) end
 		end,
 	})
 	addPadBtn(7, "KILL", {
@@ -18297,8 +18301,8 @@ local function buildMobileHud(sg)
 		end,
 	})
 
-	local bot = Instance.new(_Vzd({107,151,134,146,138}))
-	bot.Name = "MobileBottom"
+	local bot = Instance.new("Frame")
+	bot.Name = _Vzd({114,148,135,142,145,138,103,148,153,153,148,146})
 	bot.AnchorPoint = Vector2.new(0.5, 1)
 	bot.Position = UDim2.new(0.5, 0, 1, -18)
 	bot.Size = UDim2.fromOffset(0, 44)
@@ -18311,7 +18315,7 @@ local function buildMobileHud(sg)
 	corner(bot, 12)
 	stroke(bot, C.strokeSoft, 1.1, 0.3)
 	S.mobileBot = bot
-	local botLay = Instance.new(_Vzd({122,110,113,142,152,153,113,134,158,148,154,153}))
+	local botLay = Instance.new("UIListLayout")
 	botLay.FillDirection = Enum.FillDirection.Horizontal
 	botLay.Padding = UDim.new(0, 6)
 	botLay.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -18321,7 +18325,7 @@ local function buildMobileHud(sg)
 	pad(bot, 5, 8, 5, 8)
 
 	local function addBot(order, text, danger, fn)
-		local b = Instance.new("TextButton")
+		local b = Instance.new(_Vzd({121,138,157,153,103,154,153,153,148,147}))
 		b.LayoutOrder = order
 		b.Size = UDim2.fromOffset(70, 32)
 		b.BackgroundColor3 = danger and C.danger or C.card
@@ -18339,7 +18343,7 @@ local function buildMobileHud(sg)
 	end
 	addBot(1, "BRING", false, function()
 		local p = S.selected or nearestPlayerForMobile()
-		if p then bringPlayer(p) else notify(HUB_NAME, "No target", 1) end
+		if p then bringPlayer(p) else notify(HUB_NAME, _Vzd({115,148,69,153,134,151,140,138,153}), 1) end
 	end)
 	addBot(2, "ESCAPE", false, function()
 		if freeFromGrabInstant then freeFromGrabInstant()
@@ -18364,7 +18368,7 @@ end
 
 function buildMain()
 	resolveFTAP()
-	S.toggles.unlockMouse = false
+	S.toggles.unlockMouse = true
 	S.toggles.freeCamMass = false
 	S.toggles.kb_toggleUI = true
 	S.antiWanted = S.antiWanted or {}
@@ -18395,7 +18399,7 @@ function buildMain()
 		S.mainW, S.mainH = 680, 460
 	end
 
-	local toast = Instance.new(_Vzd({107,151,134,146,138}))
+	local toast = Instance.new("Frame")
 	toast.AnchorPoint = Vector2.new(1, 0)
 	toast.Position = UDim2.new(1, -16, 0, mobile and 96 or 18)
 	toast.Size = UDim2.fromOffset(mobile and 260 or 240, 50)
@@ -18406,7 +18410,7 @@ function buildMain()
 	toast.Parent = sg
 	corner(toast, 12)
 	stroke(toast, C.accent, 1.1, 0.35)
-	local tt = Instance.new("TextLabel")
+	local tt = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
 	tt.BackgroundTransparency = 1
 	tt.Size = UDim2.new(1, -16, 0, 16)
 	tt.Position = UDim2.fromOffset(12, 7)
@@ -18756,7 +18760,7 @@ function buildMain()
 		S.tabBadgeGlows = S.tabBadgeGlows or {}
 		S.tabBadgeGlows[def.id] = badgeGlow
 
-		local panel = Instance.new(_Vzd({107,151,134,146,138}))
+		local panel = Instance.new("Frame")
 		panel.Name = def.id
 		panel.Size = UDim2.fromScale(1, 1)
 		panel.BackgroundTransparency = 1
@@ -18785,6 +18789,9 @@ function buildMain()
 	end
 
 	S.hubOpen = true
+	-- Unlock mouse whenever the hub is shown (default on)
+	S.toggles.unlockMouse = true
+	pcall(setMouseUnlocked, true)
 
 	LP.CharacterAdded:Connect(function()
 		task.wait(0.8)
@@ -18795,13 +18802,13 @@ function buildMain()
 			notify(HUB_NAME, _Vzd({102,147,153,142,82,140,151,134,135,69,151,138,82,134,151,146,138,137}), 1.5)
 		elseif w.antiGrab ~= true then
 			S.toggles.antiGrab = false
-			stopLoop("antiGrab")
+			stopLoop(_Vzd({134,147,153,142,108,151,134,135}))
 		end
 		if w.antiKill or S.toggles.antiKill then
 			startAntiKillLoop()
 			notify(HUB_NAME, "Anti-kill re-armed | house TP", 1.5)
 		end
-		for _, key in ipairs({ _Vzd({134,147,153,142,103,154,151,147}), "antiBanana", "antiVoid", "antiFling", "antiExplode", _Vzd({134,147,153,142,120,142,153}), "antiRagdoll", "god" }) do
+		for _, key in ipairs({ "antiBurn", _Vzd({134,147,153,142,103,134,147,134,147,134}), "antiVoid", "antiFling", "antiExplode", "antiSit", _Vzd({134,147,153,142,119,134,140,137,148,145,145}), "god" }) do
 			if w[key] or S.toggles[key] then
 				S.toggles[key] = true
 			end
@@ -18825,12 +18832,12 @@ function buildMain()
 			if S._ctrlSearchRefresh then pcall(S._ctrlSearchRefresh) end
 			if S._funControlSearchRefresh then pcall(S._funControlSearchRefresh) end
 			if S.toggles.lineExtend then pcall(applyLineExtendDistance, S.extendAmount or 40) end
-			if S.status then S.status.Text = FTAP.ok and "FTAP:ON" or _Vzd({107,121,102,117,95,83,83,83}) end
+			if S.status then S.status.Text = FTAP.ok and "FTAP:ON" or "FTAP:..." end
 			if S.homeStatus then
-				S.homeStatus.Text = " Build: " .. BUILD
+				S.homeStatus.Text = _Vzd({69,103,154,142,145,137,95,69}) .. BUILD
 					.. "\n Place: " .. tostring(game.PlaceId)
 					.. "\n FTAP: " .. (FTAP.ok and "linked" or "scanning")
-					.. " | players: " .. tostring(#labels)
+					.. _Vzd({69,161,69,149,145,134,158,138,151,152,95,69}) .. tostring(#labels)
 			end
 		end
 	end)
@@ -18842,7 +18849,7 @@ function buildMain()
 		end
 	end)
 
-	notify(HUB_NAME, "Online Nigga | " .. (FTAP.ok and _Vzd({107,121,102,117,69,113,142,147,144,138,137,69,109,138,145,145,69,126,138,134,141}) or "Scan Remotes You Dumbass..."), 3)
+	notify(HUB_NAME, "Online Nigga | " .. (FTAP.ok and "FTAP Linked Hell Yeah" or _Vzd({120,136,134,147,69,119,138,146,148,153,138,152,69,126,148,154,69,105,154,146,135,134,152,152,83,83,83})), 3)
 	print("[VOIDZ HUB]", BUILD, "FTAP", FTAP.ok)
 end
 
@@ -18927,17 +18934,17 @@ local function buildKey()
 	box.Parent = card
 	corner(box, 10); stroke(box, C.strokeSoft, 1)
 
-	local status = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
+	local status = Instance.new("TextLabel")
 	status.BackgroundTransparency = 1
 	status.Size = UDim2.new(1, -40, 0, 14)
 	status.Position = UDim2.fromOffset(20, 180)
 	status.Font = Enum.Font.Gotham
 	status.TextSize = 11
 	status.TextColor3 = C.muted
-	status.Text = "Key: VOIDZHUB"
+	status.Text = _Vzd({112,138,158,95,69,123,116,110,105,127,109,122,103})
 	status.Parent = card
 
-	local unlock = Instance.new(_Vzd({121,138,157,153,103,154,153,153,148,147}))
+	local unlock = Instance.new("TextButton")
 	unlock.Size = UDim2.new(1, -56, 0, 40)
 	unlock.Position = UDim2.fromOffset(28, 208)
 	unlock.BackgroundColor3 = C.accentDim
@@ -18945,7 +18952,7 @@ local function buildKey()
 	unlock.Font = Enum.Font.GothamBold
 	unlock.TextSize = 14
 	unlock.TextColor3 = C.text
-	unlock.Text = "UNLOCK ->"
+	unlock.Text = _Vzd({122,115,113,116,104,112,69,82,99})
 	unlock.AutoButtonColor = false
 	unlock.Parent = card
 	corner(unlock, 10); stroke(unlock, C.accent, 1.2)
@@ -18978,7 +18985,7 @@ local function buildKey()
 		pt.TextColor3 = C.accent2
 		pt.Text = "Choose device"
 		pt.Parent = pick
-		local ps = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
+		local ps = Instance.new("TextLabel")
 		ps.BackgroundTransparency = 1
 		ps.Size = UDim2.new(1, -20, 0, 36)
 		ps.Position = UDim2.fromOffset(10, 48)
@@ -18997,7 +19004,7 @@ local function buildKey()
 				if installInstantEscape then installInstantEscape() end
 			end)
 		end
-		local pc = Instance.new("TextButton")
+		local pc = Instance.new(_Vzd({121,138,157,153,103,154,153,153,148,147}))
 		pc.Size = UDim2.new(0.42, 0, 0, 40)
 		pc.Position = UDim2.new(0.06, 0, 1, -58)
 		pc.BackgroundColor3 = C.accentDim
@@ -19036,7 +19043,7 @@ local function buildKey()
 			pickDeviceThenMain()
 		else
 			status.TextColor3 = C.danger
-			status.Text = _Vzd({110,147,155,134,145,142,137,69,144,138,158})
+			status.Text = "Invalid key"
 			box.Text = ""
 		end
 	end
@@ -19056,7 +19063,7 @@ end
 	Late.buildMain = buildMain
 	_G.buildMain = buildMain
 	Late.openHub = openHub
-	Late._phase = "exported"
+	Late._phase = _Vzd({138,157,149,148,151,153,138,137})
 	pcall(function()
 		local g = getgenv and getgenv()
 		if g then
@@ -19068,7 +19075,7 @@ end
 			g.VOIDZ_OPEN_HUB = openHub
 		end
 	end)
-	print(_Vzd({128,123,116,110,105,127,130,69,122,110,69,136,148,151,138,69,138,157,149,148,151,153,138,137,69,77,148,149,138,147,109,154,135,69,151,138,134,137,158,78}))
+	print("[VOIDZ] UI core exported (openHub ready)")
 	Late._phase = "ui_exported"
 end
 
@@ -19077,21 +19084,21 @@ end
 		if g then g._voidzInitUI = _voidzInitUI end
 	end)
 
-	print("[VOIDZ] _voidzInitUI starting...")
+	print(_Vzd({128,123,116,110,105,127,130,69,132,155,148,142,137,159,110,147,142,153,122,110,69,152,153,134,151,153,142,147,140,83,83,83}))
 	Late._phase = "ui_calling"
 	local _uiOk, _uiErr = pcall(_voidzInitUI)
 	if not _uiOk then
-		warn(_Vzd({128,123,116,110,105,127,130,69,132,155,148,142,137,159,110,147,142,153,122,110,69,106,119,119,116,119,95}), _uiErr)
+		warn("[VOIDZ] _voidzInitUI ERROR:", _uiErr)
 		error(_Vzd({128,123,116,110,105,127,130,69,132,155,148,142,137,159,110,147,142,153,122,110,69,139,134,142,145,138,137,95,69}) .. tostring(_uiErr))
 	end
 	if not Late.openHub then
 		local g = getgenv and getgenv()
-		if g and type(g._voidzInitUI) == _Vzd({139,154,147,136,153,142,148,147}) then
+		if g and type(g._voidzInitUI) == "function" then
 			pcall(g._voidzInitUI)
 		end
 	end
 	if not Late.openHub and not (getgenv and getgenv().VOIDZ_OPEN_HUB) then
-		error("[VOIDZ] _voidzInitUI finished but openHub still nil")
+		error(_Vzd({128,123,116,110,105,127,130,69,132,155,148,142,137,159,110,147,142,153,122,110,69,139,142,147,142,152,141,138,137,69,135,154,153,69,148,149,138,147,109,154,135,69,152,153,142,145,145,69,147,142,145}))
 	end
 	print("[VOIDZ] _voidzInitUI ok | openHub set")
 	Late._phase = "ui_ok"
@@ -19115,7 +19122,7 @@ end
 			local bm = rawget(_G, "buildMain") or (getgenv and getgenv().buildMain)
 			if type(bm) ~= "function" and type(buildMain) == "function" then bm = buildMain end
 			if type(bm) ~= "function" then
-				error(_Vzd({135,154,142,145,137,114,134,142,147,69,147,148,153,69,134,155,134,142,145,134,135,145,138,69,82,69,122,110,69,142,147,142,153,69,147,138,155,138,151,69,136,148,146,149,145,138,153,138,137}))
+				error("buildMain not available - UI init never completed")
 			end
 			bm()
 			pcall(function()
@@ -19170,19 +19177,19 @@ local function emergencyKeyUI(errMsg)
 		b.TextWrapped = true
 		b.TextXAlignment = Enum.TextXAlignment.Left
 		b.TextYAlignment = Enum.TextYAlignment.Top
-		b.Text = "Main UI failed to open.\n" .. tostring(errMsg or "unknown"):sub(1, 160) .. "\nF9 for full error."
+		b.Text = "Main UI failed to open.\n" .. tostring(errMsg or _Vzd({154,147,144,147,148,156,147})):sub(1, 160) .. "\nF9 for full error."
 		b.Parent = f
-		warn(_Vzd({128,123,116,110,105,127,130,69,138,146,138,151,140,138,147,136,158,69,122,110,95}), errMsg)
+		warn("[VOIDZ] emergency UI:", errMsg)
 	end)
 end
 
-print("[VOIDZ HUB] loading", BUILD)
+print(_Vzd({128,123,116,110,105,127,69,109,122,103,130,69,145,148,134,137,142,147,140}), BUILD)
 
 local function showImmediateKeyUI()
 	local parent = getUiParent()
 	local old = parent:FindFirstChild("VOIDZ_KEY")
 	if old then pcall(function() old:Destroy() end) end
-	local sg = Instance.new(_Vzd({120,136,151,138,138,147,108,154,142}))
+	local sg = Instance.new("ScreenGui")
 	sg.Name = "VOIDZ_KEY"
 	sg.ResetOnSpawn = false
 	sg.IgnoreGuiInset = true
@@ -19191,21 +19198,21 @@ local function showImmediateKeyUI()
 	pcall(function() if protect_gui_fn then protect_gui_fn(sg) end end)
 	sg.Parent = parent
 
-	local dim = Instance.new("Frame")
+	local dim = Instance.new(_Vzd({107,151,134,146,138}))
 	dim.Size = UDim2.fromScale(1, 1)
 	dim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 	dim.BackgroundTransparency = 0.45
 	dim.BorderSizePixel = 0
 	dim.Parent = sg
 
-	local card = Instance.new(_Vzd({107,151,134,146,138}))
+	local card = Instance.new("Frame")
 	card.AnchorPoint = Vector2.new(0.5, 0.5)
 	card.Position = UDim2.fromScale(0.5, 0.5)
 	card.Size = UDim2.fromOffset(380, 260)
 	card.BackgroundColor3 = Color3.fromRGB(12, 8, 20)
 	card.BorderSizePixel = 0
 	card.Parent = sg
-	local cc = Instance.new("UICorner")
+	local cc = Instance.new(_Vzd({122,110,104,148,151,147,138,151}))
 	cc.CornerRadius = UDim.new(0, 16)
 	cc.Parent = card
 	local st = Instance.new("UIStroke")
@@ -19232,7 +19239,7 @@ local function showImmediateKeyUI()
 	sub.TextSize = 12
 	sub.TextColor3 = Color3.fromRGB(145, 125, 175)
 	sub.TextXAlignment = Enum.TextXAlignment.Left
-	sub.Text = "Enter key | VOIDZHUB"
+	sub.Text = _Vzd({106,147,153,138,151,69,144,138,158,69,161,69,123,116,110,105,127,109,122,103})
 	sub.Parent = card
 
 	local box = Instance.new("TextBox")
@@ -19259,7 +19266,7 @@ local function showImmediateKeyUI()
 	status.TextSize = 12
 	status.TextColor3 = Color3.fromRGB(145, 125, 175)
 	status.TextXAlignment = Enum.TextXAlignment.Left
-	status.Text = "Loading systems..."
+	status.Text = _Vzd({113,148,134,137,142,147,140,69,152,158,152,153,138,146,152,83,83,83})
 	status.Parent = card
 
 	local unlock = Instance.new("TextButton")
@@ -19273,7 +19280,7 @@ local function showImmediateKeyUI()
 	unlock.Text = "Unlock"
 	unlock.AutoButtonColor = true
 	unlock.Parent = card
-	local uc = Instance.new(_Vzd({122,110,104,148,151,147,138,151}))
+	local uc = Instance.new("UICorner")
 	uc.CornerRadius = UDim.new(0, 10)
 	uc.Parent = unlock
 
@@ -19281,7 +19288,7 @@ local function showImmediateKeyUI()
 		local key = (box.Text or ""):gsub("^%s+", ""):gsub("%s+$", "")
 		if key ~= ACCESS_KEY then
 			status.TextColor3 = Color3.fromRGB(255, 140, 170)
-			status.Text = "Invalid key"
+			status.Text = _Vzd({110,147,155,134,145,142,137,69,144,138,158})
 			return
 		end
 		status.TextColor3 = Color3.fromRGB(110, 255, 175)
@@ -19297,8 +19304,8 @@ local function showImmediateKeyUI()
 				for i = 1, select("#", ...) do
 					local name = select(i, ...)
 					local fn = nil
-					if type(e) == _Vzd({153,134,135,145,138}) then fn = e[name] end
-					if type(fn) ~= "function" and type(_G) == "table" then fn = _G[name] end
+					if type(e) == "table" then fn = e[name] end
+					if type(fn) ~= _Vzd({139,154,147,136,153,142,148,147}) and type(_G) == "table" then fn = _G[name] end
 					if type(fn) ~= "function" then
 						local ok, v = pcall(function() return rawget(e, name) end)
 						if ok then fn = v end
@@ -19314,7 +19321,7 @@ local function showImmediateKeyUI()
 				if type(e.VOIDZ_API) == "table" and type(e.VOIDZ_API.openHub) == "function" then
 					return e.VOIDZ_API.openHub
 				end
-				if type(e.VOIDZ_API) == _Vzd({153,134,135,145,138}) and type(e.VOIDZ_API.buildMain) == "function" then
+				if type(e.VOIDZ_API) == "table" and type(e.VOIDZ_API.buildMain) == _Vzd({139,154,147,136,153,142,148,147}) then
 					local bm = e.VOIDZ_API.buildMain
 					return function(device)
 						S.device = device or S.device or "PC"
@@ -19322,8 +19329,8 @@ local function showImmediateKeyUI()
 						bm()
 					end
 				end
-				if type(Late) == "table" and type(Late.openHub) == _Vzd({139,154,147,136,153,142,148,147}) then return Late.openHub end
-				if type(Late) == _Vzd({153,134,135,145,138}) and type(Late.buildMain) == "function" then
+				if type(Late) == "table" and type(Late.openHub) == "function" then return Late.openHub end
+				if type(Late) == _Vzd({153,134,135,145,138}) and type(Late.buildMain) == _Vzd({139,154,147,136,153,142,148,147}) then
 					local bm = Late.buildMain
 					return function(device)
 						S.device = device or S.device or "PC"
@@ -19349,12 +19356,12 @@ local function showImmediateKeyUI()
 					return nil, "late init: " .. tostring(err):sub(1, 120)
 				end
 
-				local uiInit = pickFn(_Vzd({132,155,148,142,137,159,110,147,142,153,122,110}))
-				if type(uiInit) == "function" then
+				local uiInit = pickFn("_voidzInitUI")
+				if type(uiInit) == _Vzd({139,154,147,136,153,142,148,147}) then
 					status.Text = "Building UI core..."
 					local ok2, err2 = pcall(uiInit)
 					if not ok2 then
-						return nil, _Vzd({154,142,69,142,147,142,153,95,69}) .. tostring(err2):sub(1, 120)
+						return nil, "ui init: " .. tostring(err2):sub(1, 120)
 					end
 				end
 
@@ -19381,7 +19388,7 @@ local function showImmediateKeyUI()
 			if not openFn then
 				status.TextColor3 = Color3.fromRGB(255, 140, 170)
 				status.Text = "Core fail: " .. tostring(err or "?"):gsub("%s+", " "):sub(1, 70)
-				warn(_Vzd({128,123,116,110,105,127,130,69,138,147,152,154,151,138,104,148,151,138,69,139,134,142,145,138,137,95}), err)
+				warn("[VOIDZ] ensureCore failed:", err)
 				return
 			end
 
@@ -19396,7 +19403,7 @@ local function showImmediateKeyUI()
 					openFn(S.device or "PC")
 				end)
 				if not ok2 then
-					warn("[VOIDZ] openHub failed:", err2)
+					warn(_Vzd({128,123,116,110,105,127,130,69,148,149,138,147,109,154,135,69,139,134,142,145,138,137,95}), err2)
 					pcall(emergencyKeyUI, err2)
 				else
 					print("[VOIDZ HUB] main hub open")
@@ -19418,13 +19425,13 @@ local function showImmediateKeyUI()
 	end)
 
 	S.gui = sg
-	print(_Vzd({128,123,116,110,105,127,69,109,122,103,130,69,144,138,158,69,122,110,69,139,148,151,136,138,137,69,148,149,138,147}))
+	print("[VOIDZ HUB] key UI forced open")
 	return sg
 end
 
 local uiOk, uiErr = pcall(showImmediateKeyUI)
 if not uiOk then
-	warn("[VOIDZ] immediate UI failed:", uiErr)
+	warn(_Vzd({128,123,116,110,105,127,130,69,142,146,146,138,137,142,134,153,138,69,122,110,69,139,134,142,145,138,137,95}), uiErr)
 	pcall(emergencyKeyUI, uiErr)
 end
 
@@ -19441,8 +19448,8 @@ task.spawn(function()
 	local g = getgenv and getgenv()
 	local ready = (Late.openHub ~= nil) or (g and g.VOIDZ_OPEN_HUB ~= nil)
 	if not ready then
-		warn(_Vzd({128,123,116,110,105,127,130,69,145,134,153,138,69,142,147,142,153,69,151,138,153,154,151,147,138,137,69,135,154,153,69,148,149,138,147,109,154,135,69,146,142,152,152,142,147,140}))
-		Late._initErr = "openHub missing"
+		warn("[VOIDZ] late init returned but openHub missing")
+		Late._initErr = _Vzd({148,149,138,147,109,154,135,69,146,142,152,152,142,147,140})
 		Late._initStarted = false
 		return
 	end
@@ -19454,6 +19461,6 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.22 | 2026-07-28
+-- VOIDZ HUB | v1.2.23 | 2026-07-28
 
 -- hi im voidz

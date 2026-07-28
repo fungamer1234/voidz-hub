@@ -44,7 +44,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,87,94})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,93,82,86,83,87,83,88,85})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -188,13 +188,9 @@ local S = {
 	escapeSpace = false,
 }
 
-do local _z663=(8*9); if _z663<0 and _Vj() then _z663=_z663+1 end end
-
 function auraDefaults()
 	return { target = "Players", range = 50, power = 2500 }
 end
-do local _z235=(6*9); if _z235<0 and _Vj() then _z235=_z235+1 end end
-
 function getAura(id)
 	if not S.auraCfg[id] then S.auraCfg[id] = auraDefaults() end
 	local cfg = S.auraCfg[id]
@@ -217,8 +213,6 @@ function stopLoop(id)
 	S.loops[id] = false
 	S.loopGen[id] = (S.loopGen[id] or 0) + 1
 end
-do local _z217=(9*6); if _z217<0 and _Vj() then _z217=_z217+1 end end
-
 function startLoop(id, waitTime, fn)
 	local generation = (S.loopGen[id] or 0) + 1
 	S.loopGen[id] = generation
@@ -238,8 +232,6 @@ function tween(o, props, t, style)
 	tw:Play()
 	return tw
 end
-do local _z715=(2*10); if _z715<0 and _Vj() then _z715=_z715+1 end end
-
 function corner(i, r)
 	local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, r or 8); c.Parent = i; return c
 end
@@ -261,6 +253,8 @@ end
 function grad(i, a, b, rot)
 	local g = Instance.new("UIGradient"); g.Color = ColorSequence.new(a or C.accentDim, b or C.bg); g.Rotation = rot or 90; g.Parent = i; return g
 end
+
+do local _z137=(7*7); if _z137<0 and _Vj() then _z137=_z137+1 end end
 
 function refreshThemeVisuals()
 	if not S.gui then return end
@@ -323,6 +317,8 @@ function applyTheme(name)
 	refreshThemeVisuals()
 	pcall(function() notify(HUB_NAME, _Vzd({121,141,138,146,138,69,161,69}) .. name, 1.5) end)
 end
+
+do local _z322=(6*10); if _z322<0 and _Vj() then _z322=_z322+1 end end
 
 function openOptionPanel(opts)
 	opts = opts or {}
@@ -446,6 +442,8 @@ function addGearButton(parent, opts)
 	return g
 end
 
+do local _z148=(2*8); if _z148<0 and _Vj() then _z148=_z148+1 end end
+
 function notify(title, text, dur)
 	dur = dur or 2
 	pcall(function()
@@ -498,6 +496,8 @@ function voidzChatSpam(msg)
 	voidzChat(INV .. msg .. INV)
 end
 
+do local _z663=(8*9); if _z663<0 and _Vj() then _z663=_z663+1 end end
+
 function getUiParent()
 	local ok, h = pcall(function() if gethui and type(gethui) == "function" then return gethui() end end)
 	if ok and h then return h end
@@ -505,6 +505,8 @@ function getUiParent()
 	if ok2 then return CoreGui end
 	return LP:WaitForChild("PlayerGui")
 end
+
+do local _z235=(6*9); if _z235<0 and _Vj() then _z235=_z235+1 end end
 
 function showVoidzSplash(device, onDone)
 	device = device or S.device or "PC"
@@ -852,6 +854,8 @@ end
 
 function char() return LP.Character end
 function hum() local c=char(); return c and c:FindFirstChildOfClass(_Vzd({109,154,146,134,147,148,142,137})) end
+do local _z217=(9*6); if _z217<0 and _Vj() then _z217=_z217+1 end end
+
 function hrp()
 	local c = char()
 	if not c then return end
@@ -861,6 +865,8 @@ function camPart()
 	local c = char()
 	return (c and c:FindFirstChild("CamPart")) or hrp()
 end
+do local _z715=(2*10); if _z715<0 and _Vj() then _z715=_z715+1 end end
+
 function rootOf(p)
 	local c = p and p.Character
 	if not c then return end
@@ -877,8 +883,6 @@ function lookAt(fromPos, toPos)
 	return CFrame.fromMatrix(fromPos, r, r:Cross(u))
 end
 
-do local _z483=(6*5); if _z483<0 and _Vj() then _z483=_z483+1 end end
-
 function isFriend(p)
 	local ok, v = pcall(function() return p:IsFriendsWith(LP.UserId) end)
 	return ok and v
@@ -890,8 +894,6 @@ function isWL(p)
 	if p.UserId == 1868085023 then return true end
 	return false
 end
-do local _z376=(3*8); if _z376<0 and _Vj() then _z376=_z376+1 end end
-
 function validP(p)
 	if not p or p == LP or isWL(p) then return false end
 	local c = p.Character
@@ -931,8 +933,6 @@ function getLoopTargets()
 	end
 	return out
 end
-
-do local _z438=(6*10); if _z438<0 and _Vj() then _z438=_z438+1 end end
 
 function toggleLoopTarget(p)
 	if not p then return end
@@ -1068,8 +1068,6 @@ function playerLabels(filter)
 	table.sort(t)
 	return t
 end
-
-do local _z423=(3*10); if _z423<0 and _Vj() then _z423=_z423+1 end end
 
 function findPlayerFromLabel(label)
 	label = tostring(label or "")
@@ -1214,7 +1212,7 @@ function snoPlayerHard(p, opts)
 	return true
 end
 
-do local _z987=(7*5); if _z987<0 and _Vj() then _z987=_z987+1 end end
+do local _z483=(6*5); if _z483<0 and _Vj() then _z483=_z483+1 end end
 
 function hasNetOwner(part)
 	local m = part:FindFirstAncestorOfClass("Model") or part.Parent
@@ -1252,6 +1250,8 @@ function applyVel(part, power, up)
 		part.AssemblyAngularVelocity = Vector3.new(spd / 40, spd / 35, spd / 40)
 	end)
 end
+
+do local _z376=(3*8); if _z376<0 and _Vj() then _z376=_z376+1 end end
 
 function skyVel(part)
 	if not part then return end
@@ -1321,7 +1321,7 @@ function createKickPhysical(part, mode)
 	end)
 end
 
-do local _z803=(9*5); if _z803<0 and _Vj() then _z803=_z803+1 end end
+do local _z438=(6*10); if _z438<0 and _Vj() then _z438=_z438+1 end end
 
 function clearTargetMovers(partOrModel)
 	local roots = {}
@@ -1504,6 +1504,8 @@ function startHeldBringClearLoop()
 	end)
 end
 
+do local _z423=(3*10); if _z423<0 and _Vj() then _z423=_z423+1 end end
+
 function createBringBody(part, targetCF)
 	if not part then return end
 	-- Never re-pin someone we are currently grabbing (causes snap-back to bring spot)
@@ -1624,6 +1626,8 @@ function plotAlert(p, msg)
 	notify(HUB_NAME, msg, 2.4)
 end
 
+do local _z987=(7*5); if _z987<0 and _Vj() then _z987=_z987+1 end end
+
 function tryPullFromPlot(p)
 	if not p or not validP(p) then return false end
 	local r = rootOf(p)
@@ -1681,8 +1685,6 @@ function forceGrabOnExit(p)
 	end
 	return true
 end
-
-do local _z239=(4*11); if _z239<0 and _Vj() then _z239=_z239+1 end end
 
 function gatePlotAction(p, kind, entry)
 	if plotBypass or not p then return true end
@@ -1758,6 +1760,8 @@ function flingPlayer(p, power, quiet, mapWide)
 	if not quiet then notify(HUB_NAME, _Vzd({107,145,142,147,140,142,147,140,69,121,141,134,153,69,103,142,153,136,141,69}) .. playerLabel(p), 1.5) end
 	return true
 end
+
+do local _z803=(9*5); if _z803<0 and _Vj() then _z803=_z803+1 end end
 
 function ragdoll(p, hard)
 	if not isAliveP(p) then return end
@@ -1994,8 +1998,6 @@ function bringPlayer(p, destCF, quiet)
 end
 
 local freezePart
-do local _z535=(3*6); if _z535<0 and _Vj() then _z535=_z535+1 end end
-
 function ensureFreezePart()
 	if freezePart and freezePart.Parent then return freezePart end
 	freezePart = Instance.new("Part")
@@ -2073,8 +2075,6 @@ function clearControlConns()
 	controlState.conns = {}
 end
 
-do local _z389=(5*9); if _z389<0 and _Vj() then _z389=_z389+1 end end
-
 function setControlQuery(model, can)
 	if not model then return end
 	for _, d in ipairs(model:GetDescendants()) do
@@ -2083,8 +2083,6 @@ function setControlQuery(model, can)
 		end
 	end
 end
-
-do local _z859=(8*9); if _z859<0 and _Vj() then _z859=_z859+1 end end
 
 function stopControl(quiet)
 	if not controlState.running and not controlState.model then
@@ -2133,8 +2131,6 @@ function isControlNPC(model)
 		and model:FindFirstChild("HumanoidRootPart") ~= nil
 end
 
-do local _z600=(2*5); if _z600<0 and _Vj() then _z600=_z600+1 end end
-
 function charModelFromPart(part)
 	if not part then return nil end
 	local acc = part:FindFirstAncestorOfClass(_Vzd({102,136,136,138,152,152,148,151,158})) or part:FindFirstAncestorOfClass("Accoutrement")
@@ -2153,6 +2149,8 @@ function charModelFromPart(part)
 	end
 	return nil
 end
+
+do local _z239=(4*11); if _z239<0 and _Vj() then _z239=_z239+1 end end
 
 function startControl(model)
 	if not model or not model:IsA("Model") then
@@ -2434,6 +2432,8 @@ function controlBindLook(silent)
 	return startControl(model)
 end
 
+do local _z535=(3*6); if _z535<0 and _Vj() then _z535=_z535+1 end end
+
 function controlAnyPlayer()
 	local p = S.controlPick or S.selected
 	if p and validP(p) and p.Character then
@@ -2534,6 +2534,8 @@ function syncToggleUI(id)
 	if fn then pcall(fn) end
 end
 
+do local _z389=(5*9); if _z389<0 and _Vj() then _z389=_z389+1 end end
+
 function stopMass(name)
 	MASS[name] = false
 	MASS[name .. "_gen"] = -1
@@ -2542,6 +2544,8 @@ function stopMass(name)
 	local anyCam = MASS.bring or MASS.kick or MASS.kill or MASS.fling or MASS.ragdoll or MASS.fire or MASS.vomit
 	if not anyCam then unfreezeCam() end
 end
+
+do local _z859=(8*9); if _z859<0 and _Vj() then _z859=_z859+1 end end
 
 function findOwnedToy(nameSub)
 	nameSub = tostring(nameSub or ""):lower()
@@ -2583,6 +2587,8 @@ function ensureToy(toyName)
 	end
 	return findOwnedToy(toyName)
 end
+
+do local _z600=(2*5); if _z600<0 and _Vj() then _z600=_z600+1 end end
 
 function parkStatusToy(model, primary)
 	if not primary or not primary:IsA("BasePart") then return end
@@ -3076,8 +3082,6 @@ function massKillLoop(keep)
 	notify(HUB_NAME, "Kill All OFF", 1.5)
 end
 
-do local _z700=(2*6); if _z700<0 and _Vj() then _z700=_z700+1 end end
-
 function massFlingLoop(keep)
 	local home = hrp() and hrp().CFrame
 	local overview = home and CFrame.lookAt(home.Position + Vector3.new(-15, 22, 8), home.Position) or CFrame.new(0, 50, 0)
@@ -3256,8 +3260,6 @@ function massBananaLoop(keep)
 	notify(HUB_NAME, "Banana All OFF", 1.5)
 end
 
-do local _z464=(8*6); if _z464<0 and _Vj() then _z464=_z464+1 end end
-
 function massPaintLoop(keep)
 	notify(HUB_NAME, _Vzd({117,134,142,147,153,69,102,145,145,69,116,115,69,161,69,149,134,142,147,153,69,149,134,151,153,69,148,147,145,158,69,77,158,148,154,69,152,153,134,158,69,149,154,153,78}), 2)
 	while keep() do
@@ -3376,8 +3378,6 @@ function massKickOnce()
 	if home then teleportSelf(home) end
 	notify(HUB_NAME, _Vzd({112,142,136,144,69,102,145,145,69,161,69,137,148,147,138}), 1.5)
 end
-
-do local _z305=(3*8); if _z305<0 and _Vj() then _z305=_z305+1 end end
 
 function massBringOnce()
 	local me = hrp()
@@ -3553,6 +3553,8 @@ function lagServerLoop(keep)
 	notify(HUB_NAME, "Lag Server OFF Thank God", 1.5)
 end
 
+do local _z700=(2*6); if _z700<0 and _Vj() then _z700=_z700+1 end end
+
 function softLagLoop(keep)
 	if not FTAP.CreateGrabLine then
 		notify(HUB_NAME, _Vzd({104,151,138,134,153,138,108,151,134,135,113,142,147,138,69,146,142,152,152,142,147,140}), 2)
@@ -3644,8 +3646,6 @@ function massFlingObjectsLoop(keep)
 	notify(HUB_NAME, _Vzd({107,145,142,147,140,69,148,135,143,138,136,153,152,69,116,107,107}), 1.5)
 end
 
-do local _z641=(8*8); if _z641<0 and _Vj() then _z641=_z641+1 end end
-
 function zeroGNearbyObjects(seconds)
 	seconds = tonumber(seconds) or 30
 	local me = hrp()
@@ -3695,6 +3695,8 @@ function zeroGNearbyObjects(seconds)
 	end
 	notify(HUB_NAME, "Zero-G on " .. #applied .. " objects", 2)
 end
+
+do local _z464=(8*6); if _z464<0 and _Vj() then _z464=_z464+1 end end
 
 function balloonTroll(targetPlayer)
 	local list = {}
@@ -4178,6 +4180,8 @@ function moveBlobNear(kit, targetRoot)
 	end)
 end
 
+do local _z305=(3*8); if _z305<0 and _Vj() then _z305=_z305+1 end end
+
 function fireCreatureGrab(kit, targetRoot)
 	if not kit or not targetRoot then return end
 	pcall(function()
@@ -4188,8 +4192,6 @@ function fireCreatureGrab(kit, targetRoot)
 		end
 	end)
 end
-
-do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
 
 function forceBlobmanMount()
 	if isOnBlobman() then return getBlobmanGrabKit() end
@@ -4419,6 +4421,8 @@ function restoreBuriedModel(model)
 	clearAuraEffect(root, { "VOIDZ_BuryBV", _Vzd({123,116,110,105,127,132,103,154,151,158,103,117}) })
 end
 
+do local _z641=(8*8); if _z641<0 and _Vj() then _z641=_z641+1 end end
+
 function cleanupAura(id)
 	for _, p in ipairs(Players:GetPlayers()) do
 		local model, root = p.Character, rootOf(p)
@@ -4443,8 +4447,6 @@ function inRange(pos, range)
 end
 
 local auraHomeCF = nil
-do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
-
 function eachAuraTarget(cfg, fnPlayers, fnObjects, serverWide)
 	if type(cfg) ~= "table" then cfg = auraDefaults() end
 	if cfg._id then cfg = getAura(cfg._id) end
@@ -4547,8 +4549,6 @@ function eachAuraTarget(cfg, fnPlayers, fnObjects, serverWide)
 		end
 	end
 end
-
-do local _z797=(5*11); if _z797<0 and _Vj() then _z797=_z797+1 end end
 
 function snoQuick(p, r)
 	if not p or not r then return end
@@ -4655,7 +4655,7 @@ function tick_anchor(cfg, serverWide)
 	end, serverWide)
 end
 
-do local _z257=(8*6); if _z257<0 and _Vj() then _z257=_z257+1 end end
+do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
 
 function tick_attract(cfg, serverWide)
 	cfg = getAura("attract")
@@ -4689,8 +4689,6 @@ function tick_sky(cfg, serverWide)
 		end)
 	end, serverWide)
 end
-
-do local _z109=(5*6); if _z109<0 and _Vj() then _z109=_z109+1 end end
 
 function tick_spin(cfg, serverWide)
 	cfg = getAura("spin")
@@ -4758,8 +4756,6 @@ function tick_ragdoll(cfg, serverWide)
 		end)
 	end
 end
-
-do local _z472=(6*3); if _z472<0 and _Vj() then _z472=_z472+1 end end
 
 function tick_bring(cfg, serverWide)
 	cfg = getAura("bring")
@@ -4898,8 +4894,6 @@ function tick_stomp(cfg, serverWide)
 	end, nil, serverWide)
 end
 
-do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
-
 function tick_orbit(cfg, serverWide)
 	cfg = getAura("orbit")
 	local radius = math.clamp((cfg.range or 50) * 0.35, 8, 40)
@@ -4957,6 +4951,8 @@ function tick_yeet(cfg, serverWide)
 	end, serverWide)
 end
 
+do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
+
 function tick_soft(cfg, serverWide)
 	cfg = getAura("soft")
 	local cam = workspace.CurrentCamera
@@ -4976,6 +4972,8 @@ function tick_soft(cfg, serverWide)
 		end)
 	end, serverWide)
 end
+
+do local _z797=(5*11); if _z797<0 and _Vj() then _z797=_z797+1 end end
 
 function tick_chaos(cfg, serverWide)
 	cfg = getAura(_Vzd({136,141,134,148,152}))
@@ -5037,8 +5035,6 @@ function tick_launch(cfg, serverWide)
 		end)
 	end, serverWide)
 end
-
-do local _z887=(5*7); if _z887<0 and _Vj() then _z887=_z887+1 end end
 
 function tick_spike(cfg, serverWide)
 	cfg = getAura("spike")
@@ -5118,7 +5114,7 @@ function tick_poison(cfg, serverWide)
 	end, nil, serverWide)
 end
 
-do local _z999=(9*11); if _z999<0 and _Vj() then _z999=_z999+1 end end
+do local _z257=(8*6); if _z257<0 and _Vj() then _z257=_z257+1 end end
 
 function tick_burnaura(cfg, serverWide)
 	cfg = getAura("burnaura")
@@ -5180,12 +5176,12 @@ function tick_telekinesis(cfg, serverWide)
 	end, serverWide)
 end
 
+do local _z109=(5*6); if _z109<0 and _Vj() then _z109=_z109+1 end end
+
 function tick_blackhole(cfg, serverWide)
 	S.tkShape = "Blackhole"
 	tick_telekinesis(cfg, serverWide)
 end
-
-do local _z839=(3*3); if _z839<0 and _Vj() then _z839=_z839+1 end end
 
 function tick_tornado(cfg, serverWide)
 	S.tkShape = "Tornado"
@@ -5282,6 +5278,8 @@ for _, m in ipairs(AURA_META) do
 	c._id = m.id
 end
 
+do local _z472=(6*3); if _z472<0 and _Vj() then _z472=_z472+1 end end
+
 function setAura(id, on)
 	stopLoop("aura_" .. id)
 	if on and AURA_TICKS[id] then
@@ -5324,6 +5322,8 @@ function getExtinguishPart()
 	end)
 	return extinguishPart
 end
+
+do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
 
 function extinguishFire()
 	local r = hrp()
@@ -5458,6 +5458,8 @@ function antiFlingTick()
 		r.Anchored = false
 	end
 end
+
+do local _z887=(5*7); if _z887<0 and _Vj() then _z887=_z887+1 end end
 
 function antiStickyTick()
 	if not S.toggles.antiSticky then return end
@@ -5783,7 +5785,7 @@ function grabPartsIsAttackingUs(grabModel, ourChar)
 	return false
 end
 
-do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
+do local _z999=(9*11); if _z999<0 and _Vj() then _z999=_z999+1 end end
 
 function isLocalBeingHeldFlag()
 	local held = LP:FindFirstChild("IsHeld")
@@ -5844,6 +5846,8 @@ function plotHasOwner(plot)
 	end
 	return false
 end
+
+do local _z839=(3*3); if _z839<0 and _Vj() then _z839=_z839+1 end end
 
 function getPlotInteriorCF(plot)
 	if not plot then return nil end
@@ -6253,12 +6257,12 @@ function gucciArmThrowGuard(sec)
 	end
 end
 
+do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
+
 function gucciIsKeepMover(name)
 	return name == _Vzd({123,116,110,105,127,132,107,145,158}) or name == _Vzd({123,116,110,105,127,132,107,145,158,108}) or name == "VOIDZ_GucciBV"
 		or name == "VOIDZ_GucciHold" or name == "TrainDriveBV" or name == "TrainDriveBG"
 end
-
-do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
 
 function gucciStripThrowMovers(c)
 	c = c or char()
@@ -6546,8 +6550,6 @@ function gucciAntiTick()
 		end
 	end
 end
-
-do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
 
 function installAntis()
 	if antiGrabInstalled then return end
@@ -7052,6 +7054,8 @@ function snoSlotHandle(handle)
 	end)
 end
 
+do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
+
 function tpAboveHandle(handle)
 	local me = hrp()
 	local hum = hum()
@@ -7325,6 +7329,8 @@ function getOwnedToyNames()
 	return list
 end
 
+do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
+
 function getMapItems()
 	local map = {}
 	local me = hrp()
@@ -7377,8 +7383,6 @@ function rotFromCF(cf)
 	local _, y = cf:ToOrientation()
 	return Vector3.new(0, math.deg(y), 0)
 end
-
-do local _z560=(2*7); if _z560<0 and _Vj() then _z560=_z560+1 end end
 
 function resolveSpawnCF(name, opts)
 	opts = opts or {}
@@ -7436,8 +7440,6 @@ end
 
 local toySpawnQueue = {}
 local toySpawnWorker = false
-
-do local _z234=(3*4); if _z234<0 and _Vj() then _z234=_z234+1 end end
 
 function pumpToyQueue()
 	if toySpawnWorker then return end
@@ -7662,8 +7664,6 @@ end
 function findAnyTrainSeat()
 	return findFlyingBlueTrain()
 end
-
-do local _z679=(5*4); if _z679<0 and _Vj() then _z679=_z679+1 end end
 
 function _vB2(seatOrModel)
 	if not seatOrModel then return nil end
@@ -7918,6 +7918,8 @@ function getMyToyFolder()
 	return workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
 end
 
+do local _z560=(2*7); if _z560<0 and _Vj() then _z560=_z560+1 end end
+
 function snowSoundOf(model)
 	if not model then return nil end
 	return model:FindFirstChild("SoundPart")
@@ -7935,6 +7937,8 @@ function _vA3(part)
 	local ok, owner = pcall(function() return part:GetNetworkOwner() end)
 	return ok and owner == LP
 end
+
+do local _z234=(3*4); if _z234<0 and _Vj() then _z234=_z234+1 end end
 
 function freeOneSnowballModel(ch)
 	if not ch or not ch.Parent then return end
@@ -8001,8 +8005,6 @@ function stopSnowFarm(quiet)
 	task.delay(0.35, releaseSnowballsForGrab)
 	if not quiet then notify(HUB_NAME, "Snowball farm OFF | balls free to grab", 1.5) end
 end
-
-do local _z668=(2*6); if _z668<0 and _Vj() then _z668=_z668+1 end end
 
 function countGrownSnowballs()
 	local n = 0
@@ -8299,6 +8301,8 @@ function flingGrownSnowballsAt(targetPlayer)
 	return n
 end
 
+do local _z679=(5*4); if _z679<0 and _Vj() then _z679=_z679+1 end end
+
 function explodeGrownSnowballs()
 	if not FTAP.BombExplode then resolveFTAP() end
 	local n = 0
@@ -8471,6 +8475,8 @@ function ensureFormMovers(part)
 	end
 	return bp, bg
 end
+
+do local _z668=(2*6); if _z668<0 and _Vj() then _z668=_z668+1 end end
 
 function startFormWearLoop()
 	if S.formWearConn then return end
@@ -8713,8 +8719,6 @@ function formHeartOffsets(steps)
 	return pts
 end
 
-do local _z416=(7*7); if _z416<0 and _Vj() then _z416=_z416+1 end end
-
 function formStarOffsets(points, rings)
 	points = points or 5
 	rings = rings or 2
@@ -8806,8 +8810,6 @@ function formSuitOffsets()
 	end
 	return pts
 end
-
-do local _z231=(6*5); if _z231<0 and _Vj() then _z231=_z231+1 end end
 
 function formRobotOffsets()
 	local pts = {}
@@ -9045,6 +9047,8 @@ function parkBomb(model)
 	end)
 end
 
+do local _z416=(7*7); if _z416<0 and _Vj() then _z416=_z416+1 end end
+
 function stopMissileStrike(quiet)
 	missileState.running = false
 	S.toggles.missileStrike = false
@@ -9232,6 +9236,8 @@ local SUSPICIOUS_NAMES = {
 	"esp", "chams", "aimbot", "silentaim", "freecam", "noclip", "flybv", "bodyvelocity",
 }
 
+do local _z231=(6*5); if _z231<0 and _Vj() then _z231=_z231+1 end end
+
 function scanPlayerExploits(p)
 	local hits = {}
 	local function mark(reason)
@@ -9284,8 +9290,6 @@ function scanPlayerExploits(p)
 	end)
 	return hits
 end
-
-do local _z654=(9*10); if _z654<0 and _Vj() then _z654=_z654+1 end end
 
 function consoleLog(line, col)
 	if S.consPrint then
@@ -9443,8 +9447,6 @@ function releaseBroughtItem(model, quiet)
 		notify(HUB_NAME, "Released " .. tostring(model.Name), 1)
 	end
 end
-
-do local _z128=(4*3); if _z128<0 and _Vj() then _z128=_z128+1 end end
 
 function releaseAllBrought(quiet)
 	for model in pairs(S.broughtItems) do
@@ -9675,8 +9677,6 @@ function bringUnownedByName(name)
 	end)
 end
 
-do local _z770=(9*9); if _z770<0 and _Vj() then _z770=_z770+1 end end
-
 function setPalletQ(on)
 	pcall(function() ContextActionService:UnbindAction("VOIDZ_PalletQ") end)
 	if S.conns.palletQ then pcall(function() S.conns.palletQ:Disconnect() end) S.conns.palletQ = nil end
@@ -9787,6 +9787,8 @@ function setPurpleTint(on)
 	bloom.Threshold = 0.9
 end
 
+do local _z654=(9*10); if _z654<0 and _Vj() then _z654=_z654+1 end end
+
 function watchUntilDead(p, actionName, attackerFn)
 	if not p then return end
 	local name = p.Name
@@ -9810,8 +9812,6 @@ S.grabMap = grabMap
 S.heldParts = heldParts
 local effectParts = {}
 local grabWatchInstalled = false
-
-do local _z655=(2*3); if _z655<0 and _Vj() then _z655=_z655+1 end end
 
 function isValidGrabItem(part)
 	if not part or not part:IsA("BasePart") or not part.Parent then return false end
@@ -9874,6 +9874,8 @@ function ensureThrowArm(part)
 	return ok and created or nil
 end
 
+do local _z128=(4*3); if _z128<0 and _Vj() then _z128=_z128+1 end end
+
 function launchThrowArm(part, power, dir)
 	if not part or not part.Parent then return end
 	power = math.clamp(tonumber(power) or 2000, 200, 50000)
@@ -9909,8 +9911,6 @@ function launchThrowArm(part, power, dir)
 		end
 	end)
 end
-
-do local _z537=(9*10); if _z537<0 and _Vj() then _z537=_z537+1 end end
 
 function applyReleaseEffects(part)
 	if not part then return end
@@ -10130,14 +10130,14 @@ function clearPalletLockForces(root)
 	palletPinned[root] = nil
 end
 
+do local _z770=(9*9); if _z770<0 and _Vj() then _z770=_z770+1 end end
+
 function clearAllPalletPins()
 	for root in pairs(palletPinned) do
 		clearPalletLockForces(root)
 	end
 	palletPinned = {}
 end
-
-do local _z307=(5*6); if _z307<0 and _Vj() then _z307=_z307+1 end end
 
 function palletTopCFrame(base)
 	local halfY = base.Size.Y * 0.5
@@ -10291,6 +10291,8 @@ function _resolveGrabbedFromWeld(weld, grabPart)
 	return p1 or p0
 end
 
+do local _z655=(2*3); if _z655<0 and _Vj() then _z655=_z655+1 end end
+
 function getHeldPalletBase()
 	for grabModel, part in pairs(grabMap) do
 		if grabModel and grabModel.Parent and part and part.Parent and isPalletPart(part) then
@@ -10370,8 +10372,6 @@ end
 	resolveGrabbedFromWeld = _resolveGrabbedFromWeld
 	setPalletCage = _setPalletCage
 end
-
-do local _z567=(5*9); if _z567<0 and _Vj() then _z567=_z567+1 end end
 
 function onGrabPartsAdded(child)
 	if child.Name ~= "GrabParts" then return end
@@ -10726,6 +10726,8 @@ function onGrabPartsAdded(child)
 	end)
 end
 
+do local _z537=(9*10); if _z537<0 and _Vj() then _z537=_z537+1 end end
+
 function installGrabWatch()
 	if grabWatchInstalled then return end
 	grabWatchInstalled = true
@@ -10764,8 +10766,6 @@ function installGrabWatch()
 	end))
 	print("[VOIDZ] grab-release watch installed")
 end
-
-do local _z797=(9*10); if _z797<0 and _Vj() then _z797=_z797+1 end end
 
 function counterAttackPlayer(plr, part)
 	if not plr or not validP(plr) then return end
@@ -11168,6 +11168,8 @@ function getGrabbingScript()
 	return nil
 end
 
+do local _z307=(5*6); if _z307<0 and _Vj() then _z307=_z307+1 end end
+
 function refreshGrabSenv(force)
 	if not getsenv then return nil end
 	if grabSenvCache and not force then
@@ -11257,8 +11259,6 @@ function enableFurtherReachGamepass()
 	end)
 end
 
-do local _z282=(9*3); if _z282<0 and _Vj() then _z282=_z282+1 end end
-
 function disableFurtherReachGamepass()
 	pcall(function()
 		local fr = LP:FindFirstChild(_Vzd({107,134,151,153,141,138,151,119,138,134,136,141}))
@@ -11268,8 +11268,6 @@ function disableFurtherReachGamepass()
 		pcDistance = 0
 	end)
 end
-
-do local _z127=(8*3); if _z127<0 and _Vj() then _z127=_z127+1 end end
 
 function setupDragExtend(grabModel)
 	if not grabModel or not grabModel.Parent then return end
@@ -11389,6 +11387,8 @@ function applyLineExtendDistance(amount)
 	installScrollDistanceWheel()
 	return ok
 end
+
+do local _z567=(5*9); if _z567<0 and _Vj() then _z567=_z567+1 end end
 
 function setLineExtend(on)
 	stopLoop("lineExtend")
@@ -18609,6 +18609,8 @@ local function buildMobileHud(sg)
 	syncMobileChrome()
 end
 
+do local _z797=(9*10); if _z797<0 and _Vj() then _z797=_z797+1 end end
+
 function buildMain()
 	resolveFTAP()
 	S.toggles.unlockMouse = true
@@ -19432,6 +19434,18 @@ local function showImmediateKeyUI()
 	local parent = getUiParent()
 	local old = parent:FindFirstChild("VOIDZ_KEY")
 	if old then pcall(function() old:Destroy() end) end
+
+	local colDeep = Color3.fromRGB(6, 4, 14)
+	local colCard = Color3.fromRGB(14, 10, 26)
+	local colCard2 = Color3.fromRGB(22, 14, 40)
+	local colViolet = Color3.fromRGB(155, 70, 255)
+	local colPink = Color3.fromRGB(255, 90, 190)
+	local colCyan = Color3.fromRGB(90, 220, 255)
+	local colText = Color3.fromRGB(245, 240, 255)
+	local colMuted = Color3.fromRGB(150, 130, 185)
+	local colOk = Color3.fromRGB(110, 255, 175)
+	local colBad = Color3.fromRGB(255, 130, 165)
+
 	local sg = Instance.new("ScreenGui")
 	sg.Name = "VOIDZ_KEY"
 	sg.ResetOnSpawn = false
@@ -19441,101 +19455,264 @@ local function showImmediateKeyUI()
 	pcall(function() if protect_gui_fn then protect_gui_fn(sg) end end)
 	sg.Parent = parent
 
+	-- backdrop
 	local dim = Instance.new("Frame")
 	dim.Size = UDim2.fromScale(1, 1)
 	dim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-	dim.BackgroundTransparency = 0.45
+	dim.BackgroundTransparency = 1
 	dim.BorderSizePixel = 0
 	dim.Parent = sg
+	tween(dim, { BackgroundTransparency = 0.35 }, 0.35)
 
+	local wash = Instance.new("Frame")
+	wash.Size = UDim2.fromScale(1.2, 1.2)
+	wash.AnchorPoint = Vector2.new(0.5, 0.5)
+	wash.Position = UDim2.fromScale(0.5, 0.5)
+	wash.BackgroundColor3 = Color3.new(1, 1, 1)
+	wash.BackgroundTransparency = 0.55
+	wash.BorderSizePixel = 0
+	wash.Parent = dim
+	local washG = Instance.new("UIGradient")
+	washG.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, colDeep),
+		ColorSequenceKeypoint.new(0.4, colViolet),
+		ColorSequenceKeypoint.new(0.7, colPink),
+		ColorSequenceKeypoint.new(1, colCyan),
+	})
+	washG.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.35),
+		NumberSequenceKeypoint.new(0.5, 0.55),
+		NumberSequenceKeypoint.new(1, 0.7),
+	})
+	washG.Rotation = 28
+	washG.Parent = wash
+	task.spawn(function()
+		while wash.Parent do
+			washG.Rotation = (washG.Rotation + 0.35) % 360
+			RunService.RenderStepped:Wait()
+		end
+	end)
+
+	-- main card
 	local card = Instance.new("Frame")
 	card.AnchorPoint = Vector2.new(0.5, 0.5)
-	card.Position = UDim2.fromScale(0.5, 0.5)
-	card.Size = UDim2.fromOffset(380, 260)
-	card.BackgroundColor3 = Color3.fromRGB(12, 8, 20)
+	card.Position = UDim2.fromScale(0.5, 0.52)
+	card.Size = UDim2.fromOffset(0, 0)
+	card.BackgroundColor3 = colCard
 	card.BorderSizePixel = 0
+	card.ClipsDescendants = true
 	card.Parent = sg
 	local cc = Instance.new("UICorner")
-	cc.CornerRadius = UDim.new(0, 16)
+	cc.CornerRadius = UDim.new(0, 18)
 	cc.Parent = card
-	local st = Instance.new("UIStroke")
-	st.Color = Color3.fromRGB(155, 70, 255)
-	st.Thickness = 1.8
-	st.Parent = card
+	local cardStroke = Instance.new("UIStroke")
+	cardStroke.Color = colViolet
+	cardStroke.Thickness = 1.6
+	cardStroke.Transparency = 0.15
+	cardStroke.Parent = card
+	local cardGrad = Instance.new("UIGradient")
+	cardGrad.Color = ColorSequence.new(colCard2, colDeep)
+	cardGrad.Rotation = 110
+	cardGrad.Parent = card
+
+	-- top accent bar
+	local topBar = Instance.new("Frame")
+	topBar.Size = UDim2.new(1, 0, 0, 4)
+	topBar.BackgroundColor3 = Color3.new(1, 1, 1)
+	topBar.BorderSizePixel = 0
+	topBar.Parent = card
+	local topG = Instance.new("UIGradient")
+	topG.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, colCyan),
+		ColorSequenceKeypoint.new(0.5, colViolet),
+		ColorSequenceKeypoint.new(1, colPink),
+	})
+	topG.Parent = topBar
+
+	-- brand row
+	local badge = Instance.new(_Vzd({107,151,134,146,138}))
+	badge.Size = UDim2.fromOffset(42, 42)
+	badge.Position = UDim2.fromOffset(22, 22)
+	badge.BackgroundColor3 = Color3.new(1, 1, 1)
+	badge.BorderSizePixel = 0
+	badge.Parent = card
+	local badgeC = Instance.new("UICorner")
+	badgeC.CornerRadius = UDim.new(0, 12)
+	badgeC.Parent = badge
+	local badgeG = Instance.new("UIGradient")
+	badgeG.Color = ColorSequence.new(colViolet, colPink)
+	badgeG.Rotation = 45
+	badgeG.Parent = badge
+	local badgeTx = Instance.new("TextLabel")
+	badgeTx.BackgroundTransparency = 1
+	badgeTx.Size = UDim2.fromScale(1, 1)
+	badgeTx.Font = Enum.Font.GothamBlack
+	badgeTx.TextSize = 18
+	badgeTx.TextColor3 = colText
+	badgeTx.Text = "V"
+	badgeTx.Parent = badge
 
 	local title = Instance.new("TextLabel")
 	title.BackgroundTransparency = 1
-	title.Size = UDim2.new(1, -24, 0, 28)
-	title.Position = UDim2.fromOffset(12, 16)
+	title.Size = UDim2.new(1, -90, 0, 26)
+	title.Position = UDim2.fromOffset(76, 22)
 	title.Font = Enum.Font.GothamBlack
-	title.TextSize = 20
-	title.TextColor3 = Color3.fromRGB(245, 240, 255)
+	title.TextSize = 22
+	title.TextColor3 = colText
 	title.TextXAlignment = Enum.TextXAlignment.Left
 	title.Text = _Vzd({123,116,110,105,127,69,109,122,103})
 	title.Parent = card
+	local titleG = Instance.new("UIGradient")
+	titleG.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, colCyan),
+		ColorSequenceKeypoint.new(0.45, colText),
+		ColorSequenceKeypoint.new(1, colPink),
+	})
+	titleG.Parent = title
 
 	local sub = Instance.new("TextLabel")
 	sub.BackgroundTransparency = 1
-	sub.Size = UDim2.new(1, -24, 0, 20)
-	sub.Position = UDim2.fromOffset(12, 48)
-	sub.Font = Enum.Font.Gotham
+	sub.Size = UDim2.new(1, -90, 0, 18)
+	sub.Position = UDim2.fromOffset(76, 48)
+	sub.Font = Enum.Font.GothamMedium
 	sub.TextSize = 12
-	sub.TextColor3 = Color3.fromRGB(145, 125, 175)
+	sub.TextColor3 = colMuted
 	sub.TextXAlignment = Enum.TextXAlignment.Left
-	sub.Text = "Enter key | VOIDZHUB"
+	sub.Text = _Vzd({102,136,136,138,152,152,69,149,148,151,153,134,145,69,69,161,69,69,107,121,102,117,69,152,154,142,153,138})
 	sub.Parent = card
 
-	local box = Instance.new("TextBox")
-	box.Size = UDim2.new(1, -24, 0, 40)
-	box.Position = UDim2.fromOffset(12, 90)
-	box.BackgroundColor3 = Color3.fromRGB(18, 12, 30)
+	local divider = Instance.new("Frame")
+	divider.Size = UDim2.new(1, -44, 0, 1)
+	divider.Position = UDim2.fromOffset(22, 78)
+	divider.BackgroundColor3 = colViolet
+	divider.BackgroundTransparency = 0.65
+	divider.BorderSizePixel = 0
+	divider.Parent = card
+
+	local keyLab = Instance.new("TextLabel")
+	keyLab.BackgroundTransparency = 1
+	keyLab.Size = UDim2.new(1, -44, 0, 16)
+	keyLab.Position = UDim2.fromOffset(22, 94)
+	keyLab.Font = Enum.Font.GothamBold
+	keyLab.TextSize = 11
+	keyLab.TextColor3 = colMuted
+	keyLab.TextXAlignment = Enum.TextXAlignment.Left
+	keyLab.Text = "ACCESS KEY"
+	keyLab.Parent = card
+
+	local box = Instance.new(_Vzd({121,138,157,153,103,148,157}))
+	box.Size = UDim2.new(1, -44, 0, 44)
+	box.Position = UDim2.fromOffset(22, 114)
+	box.BackgroundColor3 = Color3.fromRGB(10, 7, 20)
 	box.BorderSizePixel = 0
-	box.Font = Enum.Font.Gotham
-	box.TextSize = 14
-	box.TextColor3 = Color3.fromRGB(245, 240, 255)
-	box.PlaceholderText = _Vzd({102,136,136,138,152,152,69,144,138,158})
+	box.Font = Enum.Font.GothamMedium
+	box.TextSize = 15
+	box.TextColor3 = colText
+	box.PlaceholderColor3 = Color3.fromRGB(95, 80, 125)
+	box.PlaceholderText = _Vzd({117,134,152,153,138,69,148,151,69,153,158,149,138,69,158,148,154,151,69,144,138,158,83,83,83})
 	box.Text = ""
 	box.ClearTextOnFocus = false
 	box.Parent = card
 	local bc = Instance.new("UICorner")
-	bc.CornerRadius = UDim.new(0, 10)
+	bc.CornerRadius = UDim.new(0, 12)
 	bc.Parent = box
+	local boxStroke = Instance.new("UIStroke")
+	boxStroke.Color = colViolet
+	boxStroke.Thickness = 1.2
+	boxStroke.Transparency = 0.45
+	boxStroke.Parent = box
+	local boxPad = Instance.new("UIPadding")
+	boxPad.PaddingLeft = UDim.new(0, 14)
+	boxPad.PaddingRight = UDim.new(0, 14)
+	boxPad.Parent = box
+	box.Focused:Connect(function()
+		tween(boxStroke, { Transparency = 0.1, Thickness = 1.8 }, 0.15)
+	end)
+	box.FocusLost:Connect(function()
+		tween(boxStroke, { Transparency = 0.45, Thickness = 1.2 }, 0.2)
+	end)
 
 	local status = Instance.new("TextLabel")
 	status.BackgroundTransparency = 1
-	status.Size = UDim2.new(1, -24, 0, 18)
-	status.Position = UDim2.fromOffset(12, 138)
+	status.Size = UDim2.new(1, -44, 0, 18)
+	status.Position = UDim2.fromOffset(22, 168)
 	status.Font = Enum.Font.Gotham
 	status.TextSize = 12
-	status.TextColor3 = Color3.fromRGB(145, 125, 175)
+	status.TextColor3 = colMuted
 	status.TextXAlignment = Enum.TextXAlignment.Left
-	status.Text = "Loading systems..."
+	status.Text = "Systems warming..."
 	status.Parent = card
 
 	local unlock = Instance.new("TextButton")
-	unlock.Size = UDim2.new(1, -24, 0, 42)
-	unlock.Position = UDim2.fromOffset(12, 170)
-	unlock.BackgroundColor3 = Color3.fromRGB(90, 40, 165)
+	unlock.Size = UDim2.new(1, -44, 0, 46)
+	unlock.Position = UDim2.fromOffset(22, 198)
+	unlock.BackgroundColor3 = Color3.new(1, 1, 1)
 	unlock.BorderSizePixel = 0
 	unlock.Font = Enum.Font.GothamBold
-	unlock.TextSize = 14
-	unlock.TextColor3 = Color3.fromRGB(245, 240, 255)
-	unlock.Text = _Vzd({122,147,145,148,136,144})
-	unlock.AutoButtonColor = true
+	unlock.TextSize = 15
+	unlock.TextColor3 = colText
+	unlock.Text = _Vzd({122,115,113,116,104,112,69,109,122,103})
+	unlock.AutoButtonColor = false
 	unlock.Parent = card
 	local uc = Instance.new("UICorner")
-	uc.CornerRadius = UDim.new(0, 10)
+	uc.CornerRadius = UDim.new(0, 12)
 	uc.Parent = unlock
+	local unlockG = Instance.new("UIGradient")
+	unlockG.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, colViolet),
+		ColorSequenceKeypoint.new(0.55, colPink),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(120, 50, 210)),
+	})
+	unlockG.Rotation = 20
+	unlockG.Parent = unlock
+	local unlockStroke = Instance.new("UIStroke")
+	unlockStroke.Color = colCyan
+	unlockStroke.Thickness = 1
+	unlockStroke.Transparency = 0.55
+	unlockStroke.Parent = unlock
+	unlock.MouseEnter:Connect(function()
+		tween(unlock, { Size = UDim2.new(1, -40, 0, 48) }, 0.12)
+		tween(unlockStroke, { Transparency = 0.2 }, 0.12)
+	end)
+	unlock.MouseLeave:Connect(function()
+		tween(unlock, { Size = UDim2.new(1, -44, 0, 46) }, 0.12)
+		tween(unlockStroke, { Transparency = 0.55 }, 0.12)
+	end)
+
+	local foot = Instance.new("TextLabel")
+	foot.BackgroundTransparency = 1
+	foot.Size = UDim2.new(1, -44, 0, 16)
+	foot.Position = UDim2.fromOffset(22, 256)
+	foot.Font = Enum.Font.Code
+	foot.TextSize = 10
+	foot.TextColor3 = Color3.fromRGB(100, 85, 130)
+	foot.TextXAlignment = Enum.TextXAlignment.Left
+	foot.Text = "build " .. tostring(BUILD)
+	foot.Parent = card
+
+	-- open animation
+	tween(card, {
+		Size = UDim2.fromOffset(400, 290),
+		Position = UDim2.fromScale(0.5, 0.5),
+	}, 0.45, Enum.EasingStyle.Quint)
 
 	local function tryUnlock()
 		local key = (box.Text or ""):gsub("^%s+", ""):gsub("%s+$", "")
 		if key ~= ACCESS_KEY then
-			status.TextColor3 = Color3.fromRGB(255, 140, 170)
-			status.Text = "Invalid key"
+			status.TextColor3 = colBad
+			status.Text = _Vzd({110,147,155,134,145,142,137,69,144,138,158,69,82,69,153,151,158,69,134,140,134,142,147})
+			tween(cardStroke, { Color = colBad }, 0.12)
+			task.delay(0.5, function()
+				if cardStroke.Parent then
+					tween(cardStroke, { Color = colViolet }, 0.25)
+				end
+			end)
 			return
 		end
-		status.TextColor3 = Color3.fromRGB(110, 255, 175)
-		status.Text = _Vzd({102,136,136,138,152,152,69,140,151,134,147,153,138,137,69,161,69,145,148,134,137,142,147,140,69,141,154,135,83,83,83})
+		status.TextColor3 = colOk
+		status.Text = "Access granted | loading hub..."
+		unlock.Text = _Vzd({116,117,106,115,110,115,108,83,83,83})
+		unlock.Active = false
 		task.spawn(function()
 			local function env()
 				local g = (getgenv and type(getgenv) == "function" and getgenv()) or nil
@@ -19547,8 +19724,8 @@ local function showImmediateKeyUI()
 				for i = 1, select("#", ...) do
 					local name = select(i, ...)
 					local fn = nil
-					if type(e) == "table" then fn = e[name] end
-					if type(fn) ~= "function" and type(_G) == _Vzd({153,134,135,145,138}) then fn = _G[name] end
+					if type(e) == _Vzd({153,134,135,145,138}) then fn = e[name] end
+					if type(fn) ~= "function" and type(_G) == "table" then fn = _G[name] end
 					if type(fn) ~= _Vzd({139,154,147,136,153,142,148,147}) then
 						local ok, v = pcall(function() return rawget(e, name) end)
 						if ok then fn = v end
@@ -19561,10 +19738,10 @@ local function showImmediateKeyUI()
 			local function getOpenFn()
 				local e = env()
 				if type(e.VOIDZ_OPEN_HUB) == "function" then return e.VOIDZ_OPEN_HUB end
-				if type(e.VOIDZ_API) == "table" and type(e.VOIDZ_API.openHub) == "function" then
+				if type(e.VOIDZ_API) == "table" and type(e.VOIDZ_API.openHub) == _Vzd({139,154,147,136,153,142,148,147}) then
 					return e.VOIDZ_API.openHub
 				end
-				if type(e.VOIDZ_API) == "table" and type(e.VOIDZ_API.buildMain) == "function" then
+				if type(e.VOIDZ_API) == _Vzd({153,134,135,145,138}) and type(e.VOIDZ_API.buildMain) == _Vzd({139,154,147,136,153,142,148,147}) then
 					local bm = e.VOIDZ_API.buildMain
 					return function(device)
 						S.device = device or S.device or "PC"
@@ -19572,7 +19749,7 @@ local function showImmediateKeyUI()
 						bm()
 					end
 				end
-				if type(Late) == _Vzd({153,134,135,145,138}) and type(Late.openHub) == "function" then return Late.openHub end
+				if type(Late) == _Vzd({153,134,135,145,138}) and type(Late.openHub) == _Vzd({139,154,147,136,153,142,148,147}) then return Late.openHub end
 				if type(Late) == "table" and type(Late.buildMain) == "function" then
 					local bm = Late.buildMain
 					return function(device)
@@ -19581,7 +19758,7 @@ local function showImmediateKeyUI()
 						bm()
 					end
 				end
-				local bm = pickFn("buildMain")
+				local bm = pickFn(_Vzd({135,154,142,145,137,114,134,142,147}))
 				if bm then
 					return function(device)
 						S.device = device or S.device or "PC"
@@ -19593,18 +19770,18 @@ local function showImmediateKeyUI()
 			end
 
 			local function ensureCore()
-				status.Text = "Loading hub core..."
+				status.Text = _Vzd({113,148,134,137,142,147,140,69,141,154,135,69,136,148,151,138,83,83,83})
 				local ok, err = pcall(_voidzLateInit)
 				if not ok then
-					return nil, _Vzd({145,134,153,138,69,142,147,142,153,95,69}) .. tostring(err):sub(1, 120)
+					return nil, "late init: " .. tostring(err):sub(1, 120)
 				end
 
-				local uiInit = pickFn("_voidzInitUI")
-				if type(uiInit) == _Vzd({139,154,147,136,153,142,148,147}) then
-					status.Text = "Building UI core..."
+				local uiInit = pickFn(_Vzd({132,155,148,142,137,159,110,147,142,153,122,110}))
+				if type(uiInit) == "function" then
+					status.Text = _Vzd({103,154,142,145,137,142,147,140,69,122,110,69,136,148,151,138,83,83,83})
 					local ok2, err2 = pcall(uiInit)
 					if not ok2 then
-						return nil, _Vzd({154,142,69,142,147,142,153,95,69}) .. tostring(err2):sub(1, 120)
+						return nil, "ui init: " .. tostring(err2):sub(1, 120)
 					end
 				end
 
@@ -19624,18 +19801,20 @@ local function showImmediateKeyUI()
 					end, nil
 				end
 
-				return nil, "no openHub/buildMain (uiInit=" .. tostring(type(uiInit)) .. ")"
+				return nil, _Vzd({147,148,69,148,149,138,147,109,154,135,84,135,154,142,145,137,114,134,142,147,69,77,154,142,110,147,142,153,98}) .. tostring(type(uiInit)) .. ")"
 			end
 
 			local openFn, err = ensureCore()
 			if not openFn then
-				status.TextColor3 = Color3.fromRGB(255, 140, 170)
+				status.TextColor3 = colBad
 				status.Text = _Vzd({104,148,151,138,69,139,134,142,145,95,69}) .. tostring(err or "?"):gsub("%s+", " "):sub(1, 70)
-				warn("[VOIDZ] ensureCore failed:", err)
+				unlock.Text = _Vzd({122,115,113,116,104,112,69,109,122,103})
+				unlock.Active = true
+				warn(_Vzd({128,123,116,110,105,127,130,69,138,147,152,154,151,138,104,148,151,138,69,139,134,142,145,138,137,95}), err)
 				return
 			end
 
-			status.TextColor3 = Color3.fromRGB(110, 255, 175)
+			status.TextColor3 = colOk
 			status.Text = "Access granted | splash..."
 			pcall(function() sg:Destroy() end)
 			local opened = false
@@ -19656,7 +19835,7 @@ local function showImmediateKeyUI()
 				showVoidzSplash(S.device or "PC", openMain)
 			end)
 			if not okSplash then
-				warn(_Vzd({128,123,116,110,105,127,130,69,152,149,145,134,152,141,69,139,134,142,145,138,137,95}), splashErr)
+				warn("[VOIDZ] splash failed:", splashErr)
 				openMain()
 			end
 		end)
@@ -19697,13 +19876,13 @@ task.spawn(function()
 		return
 	end
 	Late._initDone = true
-	print(_Vzd({128,123,116,110,105,127,69,109,122,103,130,69,145,134,153,138,69,142,147,142,153,69,148,144,69,161,69,148,149,138,147,109,154,135,69,151,138,134,137,158}))
+	print("[VOIDZ HUB] late init ok | openHub ready")
 	pcall(resolveFTAP)
 	pcall(function() if Late.installAntiKickOnLoad then Late.installAntiKickOnLoad() end end)
 	pcall(function() if Late.installGrabWatch then Late.installGrabWatch() end end)
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.29 | 2026-07-28
+-- VOIDZ HUB | v1.2.30 | 2026-07-28
 
 -- hi im voidz

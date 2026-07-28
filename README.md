@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-28-1.2.44` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.45` · Access Key: `VOIDZHUB`
 
 1. Join **Fling Things and People** (PlaceId `6961824067`).
 2. Execute the loadstring above in your executor.
@@ -19,9 +19,13 @@ GitHub: https://github.com/fungamer1234/voidz-hub
 
 A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more.
 
+## Recent (1.2.45)
+
+- **Snow grab** — Fixed force-drop: no more permanent FarmSnowball pin after grow, no SNO while holding (that was killing the grab). Grown balls free to hold.
+
 ## Recent (1.2.44)
 
-- **Snow grab** — After farm, balls stay grabbable: strip farm pins without killing hold, SNO assist while holding so server does not force-drop.
+- **Snow grab** — Earlier attempt: pin strip + SNO assist (SNO-while-hold made drops worse).
 
 ## Recent (1.2.43)
 

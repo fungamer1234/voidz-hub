@@ -1,6 +1,10 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.33` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.34` · Access Key: `VOIDZHUB`
+
+## Recent (1.2.34)
+
+- **Key screen** — Stronger purple outline on key field and Unlock button (ring frames so they read clearly).
 
 ## Recent (1.2.33)
 

@@ -1,6 +1,10 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.39` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.40` · Access Key: `VOIDZHUB`
+
+## Recent (1.2.40)
+
+- **Snow farm** — Still gentle under safe size (~4.5), then much faster with long mountain path rolls (big amp + short waits).
 
 ## Recent (1.2.39)
 

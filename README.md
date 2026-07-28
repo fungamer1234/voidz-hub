@@ -1,6 +1,10 @@
 # VOIDZ HUB — Fling Things & People Exploit Hub
 
-Build: `2026-07-28-1.2.34` · Access Key: `VOIDZHUB`
+Build: `2026-07-28-1.2.35` · Access Key: `VOIDZHUB`
+
+## Recent (1.2.35)
+
+- **Key screen** — Real purple borders on key field + Unlock (solid edge Frames, not UIStroke — visible in CoreGui).
 
 ## Recent (1.2.34)
 

@@ -601,7 +601,7 @@ function textToFullwidthLetters(s)
 end
 
 -- Alternating case like "UfDefF" / "VoIdZ" — plain ASCII (Roblox always draws it, no □□□)
--- Letters only flip; spaces stay. Result: "VoIdZ HuB LoAdEd"
+-- Each word starts Upper then flips: "VoIdZ HuB LoAdEd"
 function toAlternatingCase(s)
 	s = tostring(s or "")
 	local out = {}
@@ -613,6 +613,10 @@ function toAlternatingCase(s)
 			upperNext = not upperNext
 		else
 			out[#out + 1] = c
+			-- new word after space/punct starts Upper again
+			if c == " " or c == "\t" then
+				upperNext = true
+			end
 		end
 	end
 	return table.concat(out)
@@ -22644,6 +22648,6 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.70 | 2026-07-28
+-- VOIDZ HUB | v1.2.71 | 2026-07-28
 
 -- hi im voidz

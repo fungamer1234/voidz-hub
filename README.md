@@ -3,26 +3,25 @@
 ## Loadstring (always at top)
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua?v=1.2.99", true))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua?v=1.2.100", true))()
 ```
 
-Build: `2026-07-28-1.2.99` · Access Key: `VOIDZHUB`  
-**Must use `?v=1.2.99`** or you may still get an old cached script.
+Build: `2026-07-29-1.2.100` · Access Key: `VOIDZHUB`  
+**Must use `?v=1.2.100`** or you may still get an old cached script.
 
 1. Join **Fling Things and People** (PlaceId `6961824067`).
-2. Execute the loadstring above in your executor.
-3. Enter key **`VOIDZHUB`** when prompted.
-4. Press **RightShift** to show/hide the hub.
+2. Execute the loadstring above.
+3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
 
----
+## Recent (1.2.100)
 
-A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more.
+- Based on **1.2.78** (stable blobman).
+- **WAR MODE** restored (Protect tab bottom + `/war-mode` `/unwar-mode` `/war-burst`) — isolated, does not flip other toggles.
+- **Gucci** — no more lag-when-grabbed (no anchor spam / no RenderStepped / short anti-toss).
+- **Anti-Fling** — actually stops launches (lower thresholds, strip every tick when hot, FE StopAllVelocity).
 
-## Recent (1.2.99)
-
-- Loop grab: closer park, multi-part CreatureGrab fire, faster instant latch.
 
 ## Recent (1.2.98)
 

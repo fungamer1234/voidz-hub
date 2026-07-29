@@ -3,11 +3,11 @@
 ## Loadstring (always at top)
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua?v=1.2.92", true))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua?v=1.2.93", true))()
 ```
 
-Build: `2026-07-28-1.2.92` · Access Key: `VOIDZHUB`  
-**Must use `?v=1.2.92`** or you may still get an old cached script.
+Build: `2026-07-28-1.2.93` · Access Key: `VOIDZHUB`  
+**Must use `?v=1.2.93`** or you may still get an old cached script.
 
 1. Join **Fling Things and People** (PlaceId `6961824067`).
 2. Execute the loadstring above in your executor.
@@ -19,6 +19,10 @@ GitHub: https://github.com/fungamer1234/voidz-hub
 ---
 
 A full-featured FTAP exploit hub with multi-tab UI, FE-aware toy spawn, network ownership (SNO), combat, auras, server tools, and more.
+
+## Recent (1.2.93)
+
+- **Blobman Loop Grab** — Fully restored original kit (LeftDetector + torso CreatureGrab, 0.35s loop).
 
 ## Recent (1.2.92)
 

@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-29-1.2.118` · Access Key: `VOIDZHUB`  
+Build: `2026-07-29-1.2.119` · Access Key: `VOIDZHUB`  
 
 One loadstring for all updates — always pulls latest `main` from GitHub (no `?v=` needed).
 
@@ -16,9 +16,13 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 
 GitHub: https://github.com/fungamer1234/voidz-hub
 
+## Recent (1.2.119)
+
+- **Load chat text** — Public line is plain `voidz hub loaded` (no symbols that Roblox filters into #).
+
 ## Recent (1.2.118)
 
-- **Load message public again** — Posts `VOIDZ Hub Loaded | build` once to public chat (clean send, no hangul/emoji glitch).
+- **Load message public again** — Posts once to public chat.
 
 ## Recent (1.2.117)
 

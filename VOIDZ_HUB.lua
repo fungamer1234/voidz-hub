@@ -53,7 +53,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,94,82,86,83,87,83,86,87,87})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,94,82,86,83,87,83,86,87,88})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -449,8 +449,6 @@ function addGearButton(parent, opts)
 	return g
 end
 
-do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
-
 function notify(title, text, dur)
 	dur = dur or 2
 	pcall(function()
@@ -469,6 +467,8 @@ function notify(title, text, dur)
 		end)
 	end
 end
+
+do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
 
 function getTextChatChannels(timeout)
 	timeout = timeout or 8
@@ -522,8 +522,6 @@ end
 
 -- Local feedback only. NEVER use legacy ChatMakeSystemMessage while TextChat is on
 -- (that combo is a common "chat freezes / breaks" cause on modern Roblox).
-do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
-
 function voidzChatSystem(msg)
 	msg = sanitizeChatMessage(msg)
 	if msg == "" then return false end
@@ -547,6 +545,8 @@ end
 -- Public chat send. ONE backend only. opts.raw keeps emoji/skulls.
 S._voidzChatLastAt = 0
 S._voidzChatLastMsg = ""
+do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
+
 function voidzChat(msg, opts)
 	opts = opts or {}
 	if opts.raw then
@@ -1100,8 +1100,6 @@ function clearLoopTargets()
 	S.loopName = nil
 end
 
-do local _z604=(3*8); if _z604<0 and _Vj() then _z604=_z604+1 end end
-
 function toggleLoopTarget(p)
 	if not p then return end
 	S.loopTargets = S.loopTargets or {}
@@ -1154,7 +1152,7 @@ local plotBypass = false
 local plotAlertAt = {}
 local plotWatchInstalled = false
 
-do local _z379=(3*10); if _z379<0 and _Vj() then _z379=_z379+1 end end
+do local _z604=(3*8); if _z604<0 and _Vj() then _z604=_z604+1 end end
 
 function isInSafePlot(p)
 	if not p or p == LP then return false end
@@ -1175,6 +1173,8 @@ function isInSafePlot(p)
 	end
 	return false
 end
+
+do local _z379=(3*10); if _z379<0 and _Vj() then _z379=_z379+1 end end
 
 function allTargets(opts)
 	opts = opts or {}
@@ -1410,8 +1410,6 @@ function hasNetOwner(part)
 	return false
 end
 
-do local _z679=(5*4); if _z679<0 and _Vj() then _z679=_z679+1 end end
-
 function applyVel(part, power, up)
 	if not part then return end
 	power = power or S.flingPower or 5000
@@ -1435,6 +1433,8 @@ function applyVel(part, power, up)
 		part.AssemblyAngularVelocity = Vector3.new(spd / 40, spd / 35, spd / 40)
 	end)
 end
+
+do local _z679=(5*4); if _z679<0 and _Vj() then _z679=_z679+1 end end
 
 function skyVel(part)
 	if not part then return end
@@ -1631,8 +1631,6 @@ end
 S._bringGen = S._bringGen or {} -- UserId -> generation (cancel stale bring holds)
 S._bringPinPos = S._bringPinPos or {} -- optional debug
 
-do local _z668=(2*6); if _z668<0 and _Vj() then _z668=_z668+1 end end
-
 function isPlayerHeldByUs(p)
 	if not p or not p.Character then return false end
 	local c = p.Character
@@ -1650,6 +1648,8 @@ function isPlayerHeldByUs(p)
 	end
 	return false
 end
+
+do local _z668=(2*6); if _z668<0 and _Vj() then _z668=_z668+1 end end
 
 function startHeldBringClearLoop()
 	if S._heldBringClearConn then return end
@@ -2202,8 +2202,6 @@ function ensureFreezePart()
 	return freezePart
 end
 
-do local _z266=(7*9); if _z266<0 and _Vj() then _z266=_z266+1 end end
-
 function freezeCam(cf)
 	local p = ensureFreezePart()
 	p.CFrame = typeof(cf) == "CFrame" and cf or CFrame.new(cf)
@@ -2214,6 +2212,8 @@ function freezeCam(cf)
 		pcall(function() cam.CFrame = p.CFrame end)
 	end
 end
+
+do local _z266=(7*9); if _z266<0 and _Vj() then _z266=_z266+1 end end
 
 function unfreezeCam()
 	local cam = workspace.CurrentCamera
@@ -2266,14 +2266,14 @@ local controlState = {
 
 do local _z244=(9*10); if _z244<0 and _Vj() then _z244=_z244+1 end end
 
-do local _z994=(6*8); if _z994<0 and _Vj() then _z994=_z994+1 end end
-
 function clearControlConns()
 	for _, c in pairs(controlState.conns) do
 		pcall(function() c:Disconnect() end)
 	end
 	controlState.conns = {}
 end
+
+do local _z994=(6*8); if _z994<0 and _Vj() then _z994=_z994+1 end end
 
 function setControlQuery(model, can)
 	if not model then return end
@@ -3067,14 +3067,14 @@ function massActive(name)
 	return MASS[name] == true
 end
 
-do local _z654=(9*10); if _z654<0 and _Vj() then _z654=_z654+1 end end
-
 function syncToggleUI(id)
 	local fn = S._toggleRenderers and S._toggleRenderers[id]
 	if fn then pcall(fn) end
 end
 
 do local _z994=(4*3); if _z994<0 and _Vj() then _z994=_z994+1 end end
+
+do local _z654=(9*10); if _z654<0 and _Vj() then _z654=_z654+1 end end
 
 function stopMass(name)
 	MASS[name] = false
@@ -3155,8 +3155,6 @@ end
 
 local statusToyCache = {}
 
-do local _z128=(4*3); if _z128<0 and _Vj() then _z128=_z128+1 end end
-
 function getStatusToy(toyName)
 	local cached = statusToyCache[toyName]
 	if cached and cached.model and cached.model.Parent and cached.primary and cached.primary.Parent then
@@ -3174,6 +3172,8 @@ function getStatusToy(toyName)
 	statusToyCache[toyName] = { model = model, primary = primary, tip = tip }
 	return model, primary, tip
 end
+
+do local _z128=(4*3); if _z128<0 and _Vj() then _z128=_z128+1 end end
 
 function touchPartOnTarget(part, targetRoot, hold)
 	if not part or not targetRoot then return end
@@ -3382,8 +3382,6 @@ function firePlayerBlitz(p)
 	return true
 end
 
-do local _z770=(9*9); if _z770<0 and _Vj() then _z770=_z770+1 end end
-
 function applyStatusToPlayer(kind, p)
 	if not p or not validP(p) then return false end
 	if isInSafePlot(p) and not plotBypass then
@@ -3432,6 +3430,8 @@ function applyStatusToPlayer(kind, p)
 	end
 	return false
 end
+
+do local _z770=(9*9); if _z770<0 and _Vj() then _z770=_z770+1 end end
 
 function setMassToggle(name, on, runner)
 	if not on then
@@ -3679,8 +3679,6 @@ function massFlingLoop(keep)
 	notify(HUB_NAME, _Vzd({107,145,142,147,140,69,102,145,145,69,116,107,107}), 1.5)
 end
 
-do local _z655=(2*3); if _z655<0 and _Vj() then _z655=_z655+1 end end
-
 function massRagdollLoop(keep)
 	local home = hrp() and hrp().CFrame
 	local overview = home and CFrame.lookAt(home.Position + Vector3.new(-15, 22, 8), home.Position) or CFrame.new(0, 50, 0)
@@ -3744,6 +3742,8 @@ function massRagdollLoop(keep)
 	unfreezeCam()
 	notify(HUB_NAME, "Ragdoll All OFF", 1.5)
 end
+
+do local _z655=(2*3); if _z655<0 and _Vj() then _z655=_z655+1 end end
 
 function massFireLoop(keep)
 	local home = hrp() and hrp().CFrame
@@ -3834,11 +3834,11 @@ end
 function flingAllMap()
 	setMassToggle("fling", true, massFlingLoop)
 end
-do local _z537=(9*10); if _z537<0 and _Vj() then _z537=_z537+1 end end
-
 function bringAllHard()
 	setMassToggle(_Vzd({135,151,142,147,140}), true, massBringLoop)
 end
+do local _z537=(9*10); if _z537<0 and _Vj() then _z537=_z537+1 end end
+
 function kickAllMap()
 	setMassToggle("kick", true, massKickLoop)
 end
@@ -3983,8 +3983,6 @@ function massBringOnce()
 	notify(HUB_NAME, "Bring All | done", 1.5)
 end
 
-do local _z307=(5*6); if _z307<0 and _Vj() then _z307=_z307+1 end end
-
 function massRagdollOnce()
 	local model, primary = ensureToy(_Vzd({107,148,148,137,103,134,147,134,147,134}))
 	if not model or not primary then notify(HUB_NAME, _Vzd({107,134,142,145,138,137,69,153,148,69,152,149,134,156,147,69,107,148,148,137,103,134,147,134,147,134}), 2); return end
@@ -4025,6 +4023,8 @@ function massRagdollOnce()
 	pcall(function() peel.Position = primary.Position end)
 	notify(HUB_NAME, "Ragdoll All | done", 1.5)
 end
+
+do local _z307=(5*6); if _z307<0 and _Vj() then _z307=_z307+1 end end
 
 function massFireOnce()
 	local model, primary = ensureToy("Campfire")
@@ -4352,8 +4352,6 @@ function blobmanShouldStickSeat()
 	return S.toggles.blobStickySeat == true
 end
 
-do local _z797=(9*10); if _z797<0 and _Vj() then _z797=_z797+1 end end
-
 function markBlobmanSession(on)
 	S._blobSessionActive = on == true
 	if on then
@@ -4367,6 +4365,8 @@ function markBlobmanSession(on)
 end
 
 -- Hard leave seat (welds / sit / jump away). Used when blob tools turn OFF.
+do local _z797=(9*10); if _z797<0 and _Vj() then _z797=_z797+1 end end
+
 function forceLeaveBlobmanSeat()
 	local h = hum()
 	local me = hrp()
@@ -4606,6 +4606,29 @@ function stopBlobmanStickySeat(force)
 	releaseBlobmanSeatAfterFeaturesOff(force == true)
 end
 
+function findExistingBlobSeat()
+	local h = hum()
+	local seats = {}
+	local function scan(root)
+		if not root then return end
+		for _, d in ipairs(root:GetDescendants()) do
+			if (d:IsA("Seat") or d:IsA("VehicleSeat")) and isBlobSeat(d) then
+				seats[#seats + 1] = d
+			end
+		end
+	end
+	local folder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
+	scan(folder)
+	if #seats == 0 then scan(workspace) end
+	-- prefer empty or ours
+	for _, seat in ipairs(seats) do
+		if not seat.Occupant or seat.Occupant == h then
+			return seat
+		end
+	end
+	return seats[1]
+end
+
 do local _z282=(9*3); if _z282<0 and _Vj() then _z282=_z282+1 end end
 
 function ensureBlobman(quiet)
@@ -4617,7 +4640,41 @@ function ensureBlobman(quiet)
 		return true
 	end
 	local me = hrp()
-	if not me then return false end
+	local h = hum()
+	if not me or not h then return false end
+	-- ALWAYS try sit existing blob first (loop was spawn-spamming)
+	local existing = findExistingBlobSeat()
+	if existing then
+		pcall(function()
+			me.CFrame = existing.CFrame * CFrame.new(0, 2.5, 0)
+			h.Sit = true
+			existing:Sit(h)
+		end)
+		task.wait(0.15)
+		if isOnBlobman() then
+			S._blobStickySeat = existing
+			startBlobmanStickySeat()
+			return true
+		end
+	end
+	-- cooldown: do not Buy/Spawn more than once every 4s
+	local now = os.clock()
+	if S._blobLastSpawnAt and (now - S._blobLastSpawnAt) < 4 then
+		existing = findExistingBlobSeat()
+		if existing then
+			pcall(function()
+				me.CFrame = existing.CFrame * CFrame.new(0, 2.5, 0)
+				existing:Sit(h)
+			end)
+			task.wait(0.12)
+			if isOnBlobman() then
+				S._blobStickySeat = existing
+				return true
+			end
+		end
+		return isOnBlobman()
+	end
+	S._blobLastSpawnAt = now
 	if not FTAP.BuyToy or not FTAP.SpawnToy then pcall(resolveFTAP) end
 	pcall(function()
 		if FTAP.BuyToy then FTAP.BuyToy:InvokeServer("CreatureBlobman") end
@@ -5165,52 +5222,62 @@ end
 
 function forceBlobmanMount()
 	markBlobmanSession(true)
-	if isOnBlobman() then return getBlobmanGrabKit() end
-	pcall(function() ensureBlobman(true) end)
-	if isOnBlobman() then return getBlobmanGrabKit() end
+	local kit = getBlobmanGrabKit()
+	if kit then
+		S._blobGrabKit = kit
+		return kit
+	end
+	-- soft re-sit existing blob (NO spawn)
 	local me = hrp()
 	local h = hum()
-	if not me or not h then return nil end
-	local folder = workspace:FindFirstChild(LP.Name .. "SpawnedInToys")
-	local roots = { folder, workspace }
-	for _, root in ipairs(roots) do
-		if root then
-			for _, d in ipairs(root:GetDescendants()) do
-				if (d:IsA("Seat") or d:IsA("VehicleSeat")) then
-					local par = d.Parent
-					if par and (par.Name:lower():find("blob") or par:FindFirstChild(_Vzd({103,145,148,135,146,134,147,120,138,134,153,102,147,137,116,156,147,138,151,120,136,151,142,149,153}))) then
-						pcall(function()
-							me.CFrame = d.CFrame + Vector3.new(0, 3, 0)
-							d:Sit(h)
-						end)
-						task.wait(0.1)
-						if isOnBlobman() then return getBlobmanGrabKit() end
-					end
-				end
-			end
+	local seat = findExistingBlobSeat()
+	if me and h and seat then
+		pcall(function()
+			me.CFrame = seat.CFrame * CFrame.new(0, 2.2, 0)
+			h.Sit = true
+			seat:Sit(h)
+		end)
+		task.wait(0.12)
+		kit = getBlobmanGrabKit()
+		if kit then
+			S._blobGrabKit = kit
+			return kit
 		end
 	end
-	return getBlobmanGrabKit()
+	-- spawn only via ensure (has cooldown)
+	pcall(function() ensureBlobman(true) end)
+	kit = getBlobmanGrabKit()
+	if kit then S._blobGrabKit = kit end
+	return kit or S._blobGrabKit
 end
 
 function blobGrabInstant(p)
 	if not p or not validP(p) then return false end
-	local kit = forceBlobmanMount()
+	-- reuse kit if still seated — never force-spawn mid-grab
+	local kit = getBlobmanGrabKit() or S._blobGrabKit
+	if not kit or not isOnBlobman() then
+		kit = forceBlobmanMount()
+	end
 	if not kit then return false end
+	S._blobGrabKit = kit
 	local r = rootOf(p)
 	if not r then return false end
 	pcall(function() forceUnsit(p) end)
-	pcall(function() snoPlayer(p, r.Position) end)
-	-- double close park + dense multi-part fire = reliable latch
-	moveBlobNear(kit, r, { dist = 3.0, hard = true })
-	kit = refreshBlobmanKit(kit)
+	-- one close park + grab fire (classic VOIDZ path)
+	moveBlobNear(kit, r, { dist = 4.5, hard = true })
+	kit = getBlobmanGrabKit() or refreshBlobmanKit(kit) or kit
 	if not kit then return false end
+	-- hard re-sit after park (move can desync Sit)
+	pcall(function()
+		local hh = hum()
+		if hh and kit.seat then
+			hh.Sit = true
+			kit.seat:Sit(hh)
+		end
+	end)
 	r = rootOf(p) or r
-	moveBlobNear(kit, r, { dist = 2.5, hard = true })
-	kit = refreshBlobmanKit(kit)
-	if not kit then return false end
-	r = rootOf(p) or r
-	fireCreatureGrabBurst(kit, r, 14)
+	fireCreatureGrabBurst(kit, r, 10)
+	S._blobGrabKit = getBlobmanGrabKit() or kit
 	return true
 end
 
@@ -5287,6 +5354,7 @@ function setBlobGrabLoop(on, p)
 	if not on then
 		stopLoop(id)
 		S.toggles.blobGrabLoop = false
+		S._blobGrabBusy = false
 		notify(HUB_NAME, _Vzd({103,145,148,135,69,108,151,134,135,69,113,148,148,149,69,116,107,107}), 1.2)
 		releaseBlobmanSeatAfterFeaturesOff(true)
 		return true
@@ -5298,38 +5366,48 @@ function setBlobGrabLoop(on, p)
 	end
 	stopLoop(id)
 	S.toggles.blobGrabLoop = true
+	S._blobGrabBusy = false
 	markBlobmanSession(true)
-	-- sticky only if user toggled it (startBlobmanStickySeat no-ops when off)
 	startBlobmanStickySeat()
 	local targetName = p.Name
 	notify(HUB_NAME, _Vzd({103,145,148,135,69,108,151,134,135,69,113,148,148,149,69,116,115,69,82,99,69}) .. playerLabel(p), 1.5)
-	-- immediate first latch (don't wait for loop interval)
+	-- mount ONCE up front (not every loop tick)
 	task.spawn(function()
+		forceBlobmanMount()
 		local target = Players:FindFirstChild(targetName) or p
 		if target and target.Parent then
 			blobGrabInstant(target)
 		end
 	end)
-	-- NO home-TP: teleporting off the blob mid-loop was breaking CreatureGrab while moveBlobNear still "TPs"
-	startLoop(id, 0.30, function()
+	-- slower loop + busy lock so we never stack spawn/grab mid-tick
+	startLoop(id, 0.55, function()
 		if not S.toggles.blobGrabLoop then return end
-		local target = Players:FindFirstChild(targetName) or S.blobTarget or S.selected
-		if not target or not target.Parent then return end
-		if not isOnBlobman() then
-			forceBlobmanMount()
-		end
-		local kit = getBlobmanGrabKit() or forceBlobmanMount()
-		if not kit then return end
-		local r = rootOf(target)
-		if not r then return end
-		if blobmanIsHoldingPlayer(target) then
-			-- keep hold: soft follow + re-fire (hard re-park every tick randomly drops grab)
-			moveBlobNear(kit, r, { dist = 2.4, hard = false })
-			kit = refreshBlobmanKit(kit) or kit
-			if kit then fireCreatureGrabBurst(kit, r, 10) end
-		else
-			blobGrabInstant(target)
-		end
+		if S._blobGrabBusy then return end
+		S._blobGrabBusy = true
+		pcall(function()
+			local target = Players:FindFirstChild(targetName) or S.blobTarget or S.selected
+			if not target or not target.Parent then return end
+			local kit = getBlobmanGrabKit()
+			if not kit then
+				kit = forceBlobmanMount() -- sit existing first; spawn cooldown inside ensure
+			end
+			if not kit then return end
+			S._blobGrabKit = kit
+			local r = rootOf(target)
+			if not r then return end
+			if blobmanIsHoldingPlayer(target) then
+				moveBlobNear(kit, r, { dist = 3.5, hard = false })
+				pcall(function()
+					local hh = hum()
+					if hh and kit.seat then hh.Sit = true; kit.seat:Sit(hh) end
+				end)
+				kit = getBlobmanGrabKit() or kit
+				fireCreatureGrabBurst(kit, r, 6)
+			else
+				blobGrabInstant(target)
+			end
+		end)
+		S._blobGrabBusy = false
 	end)
 	return true
 end
@@ -24560,5 +24638,5 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.122 | 2026-07-29
+-- VOIDZ HUB | v1.2.123 | 2026-07-29
 -- hi im voidz

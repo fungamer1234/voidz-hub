@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-29-1.2.114` · Access Key: `VOIDZHUB`  
+Build: `2026-07-29-1.2.115` · Access Key: `VOIDZHUB`  
 
 One loadstring for all updates — always pulls latest `main` from GitHub (no `?v=` needed).
 
@@ -15,6 +15,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.115)
+
+- **Train sit hard-fix** — Multi-offset CFrame + kick occupant + Seat:Sit + prompt/touch. Won’t cancel whole drive if sit lags (FE SNO continues).
 
 ## Recent (1.2.114)
 

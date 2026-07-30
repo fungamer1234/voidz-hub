@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-29-1.2.100` · Access Key: `VOIDZHUB`  
+Build: `2026-07-29-1.2.101` · Access Key: `VOIDZHUB`  
 
 One loadstring for all updates — always pulls latest `main` from GitHub (no `?v=` needed).
 
@@ -15,6 +15,12 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.101)
+
+- **Gucci MAX** — Deny grab latch before IsHeld (destroy attacking GrabParts + Struggle).
+- **Anti-Fling** removed from Protect UI (still used inside WAR MODE).
+- **Auto Attacker** modes: Repulsion/Fling/Kick/Sky/Freeze/Death/Void/Ragdoll/Bring · force up to **100k**.
 
 ## Recent (1.2.100)
 

@@ -65,7 +65,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,94,82,86,83,87,83,86,85,86})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,94,82,86,83,87,83,86,85,87})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -4347,15 +4347,14 @@ end
 function blobmanShouldStickSeat()
 	if S.trainDriving then return false end
 	if controlState and controlState.running then return false end
-	if S.toggles.blobStickySeat == false then return false end
-	-- only stick while a REAL blob tool is on (not sticky alone)
-	return blobmanFeaturesActive() == true
+	-- Opt-in only: never auto-sticky for grab/wreck/kick — only when Sticky Seat toggle is ON
+	return S.toggles.blobStickySeat == true
 end
 
 function markBlobmanSession(on)
 	S._blobSessionActive = on == true
 	if on then
-		if S.toggles.blobStickySeat == nil then S.toggles.blobStickySeat = true end
+		if S.toggles.blobStickySeat == nil then S.toggles.blobStickySeat = false end
 		if blobmanShouldStickSeat() then
 			startBlobmanStickySeat()
 		end
@@ -4564,7 +4563,10 @@ function blobmanStickySeatTick()
 end
 
 function startBlobmanStickySeat()
-	if not blobmanShouldStickSeat() then return end
+	if not blobmanShouldStickSeat() then
+		stopBlobmanStickyOnly()
+		return
+	end
 	if S._blobStickyLoop then return end
 	S._blobStickyLoop = true
 	startLoop(_Vzd({135,145,148,135,120,153,142,136,144,158,120,138,134,153}), 0.05, function()
@@ -16459,11 +16461,11 @@ _TAB_BUILDERS["blobman"] = function(sc, n)
 		section(sc, _Vzd({120,117,102,124,115,69,84,69,120,110,121}), n())
 		makeToggle(sc, {
 			order = n(), id = "blobStickySeat", title = _Vzd({120,153,142,136,144,158,69,120,138,134,153,69,77,134,147,153,142,82,138,143,138,136,153,78}),
-			tip = "While ON + a Blobman LOOP is running, re-sit if ejected. Turning OFF (or stopping all loops) frees you from the seat.",
+			tip = "Opt-in only. While ON, re-sit if ejected from Blobman. Grab/wreck/kick do NOT turn this on for you.",
 			callback = function(on)
 				S.toggles.blobStickySeat = on == true
 				if on then
-					if blobmanFeaturesActive() then
+					if isOnBlobman() then
 						startBlobmanStickySeat()
 					end
 					notify(HUB_NAME, _Vzd({103,145,148,135,69,152,153,142,136,144,158,69,152,138,134,153,69,116,115,69,77,148,147,145,158,69,156,141,142,145,138,69,134,69,145,148,148,149,69,142,152,69,151,154,147,147,142,147,140,78}), 1.4)
@@ -16478,10 +16480,10 @@ _TAB_BUILDERS["blobman"] = function(sc, n)
 				end
 			end,
 		})
-		if S.toggles.blobStickySeat == nil then S.toggles.blobStickySeat = true end
+		if S.toggles.blobStickySeat == nil then S.toggles.blobStickySeat = false end
 		makeButton(sc, {
 			order = n(), title = "Spawn + Sit Blobman",
-			tip = _Vzd({103,154,158,84,152,149,134,156,147,69,104,151,138,134,153,154,151,138,103,145,148,135,146,134,147,69,134,147,137,69,152,142,153,69,77,152,153,142,136,144,158,69,148,147,145,158,69,156,141,142,145,138,69,134,69,145,148,148,149,69,142,152,69,116,115,78}),
+			tip = _Vzd({103,154,158,84,152,149,134,156,147,69,104,151,138,134,153,154,151,138,103,145,148,135,146,134,147,69,134,147,137,69,152,142,153,69,77,152,153,142,136,144,158,69,152,138,134,153,69,148,147,145,158,69,142,139,69,158,148,154,69,153,148,140,140,145,138,69,142,153,69,116,115,78}),
 			callback = function()
 				task.spawn(function()
 					local ok = ensureBlobman(false)
@@ -23362,6 +23364,6 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.101 | 2026-07-29
+-- VOIDZ HUB | v1.2.102 | 2026-07-29
 
 -- hi im voidz

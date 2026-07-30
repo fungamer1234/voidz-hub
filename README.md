@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-29-1.2.101` · Access Key: `VOIDZHUB`  
+Build: `2026-07-29-1.2.102` · Access Key: `VOIDZHUB`  
 
 One loadstring for all updates — always pulls latest `main` from GitHub (no `?v=` needed).
 
@@ -15,6 +15,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.102)
+
+- **Sticky Seat opt-in** — No longer auto-on for all Blobman grab/wreck/kick tools. Only sticks when you toggle **Sticky Seat** on.
 
 ## Recent (1.2.101)
 

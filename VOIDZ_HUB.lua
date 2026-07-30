@@ -65,7 +65,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,94,82,86,83,87,83,86,85,90})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,94,82,86,83,87,83,86,85,91})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -10091,7 +10091,7 @@ function startTrainDrive()
 	S._trainModel = model
 	S._trainParts = parts
 
-	-- Mount near train
+	-- Stand near train (NEVER force-sit — freestanding SNO control)
 	pcall(function()
 		local cf = (seat:IsA("BasePart") and seat.CFrame) or drivePart.CFrame
 		me.CFrame = cf * CFrame.new(0, 4, 0)
@@ -10099,10 +10099,18 @@ function startTrainDrive()
 	task.wait(0.12)
 	me = hrp()
 	h = hum()
+	-- if already sat from a previous force-sit, free yourself
+	if h then
+		pcall(function()
+			h.Sit = false
+			h.PlatformStand = false
+		end)
+	end
 
-	-- Ownership burst + grab hook (helps SNO stick)
+	-- Ownership burst + grab hook (helps SNO stick) — no seat:Sit
 	for i = 1, 10 do
 		me = hrp()
+		h = hum()
 		if not me or not drivePart.Parent then break end
 		local origin = me.Position
 		if (me.Position - drivePart.Position).Magnitude > 35 then
@@ -10119,13 +10127,9 @@ function startTrainDrive()
 		if i == 2 or i == 5 then
 			trainPrepParts(parts)
 		end
-		if h and seat and (seat:IsA("VehicleSeat") or seat:IsA("Seat")) then
-			pcall(function() seat:Sit(h) end)
-			local prompt = seat:FindFirstChildOfClass("ProximityPrompt")
-				or seat:FindFirstChild("ProximityPrompt", true)
-			if prompt and fireproximityprompt then
-				pcall(function() fireproximityprompt(prompt) end)
-			end
+		-- keep freestanding during arm
+		if h and h.Sit then
+			pcall(function() h.Sit = false end)
 		end
 		task.wait(0.06)
 	end
@@ -10134,8 +10138,12 @@ function startTrainDrive()
 	if restoreGrabLineAfterGucci then pcall(restoreGrabLineAfterGucci) end
 
 	me = hrp()
+	h = hum()
 	if me and drivePart.Parent then
 		pcall(function() me.CFrame = drivePart.CFrame * CFrame.new(0, 3.5, 0) end)
+	end
+	if h then
+		pcall(function() h.Sit = false end)
 	end
 	trainPrepParts(parts)
 
@@ -10171,8 +10179,8 @@ function startTrainDrive()
 	)
 
 	local lastSno = 0
-	local lastSit = 0
 	local lastGrab = 0
+	local lastStick = 0
 	local stickCF = drivePart.CFrame
 	S._trainDriveConn = RunService.Heartbeat:Connect(function(dt)
 		if not S.trainDriving then return end
@@ -10186,14 +10194,28 @@ function startTrainDrive()
 		if not r then return end
 		dt = math.clamp(dt or 0.016, 0.008, 0.05)
 
-		local dist = (r.Position - drivePart.Position).Magnitude
-		-- Stay on train: pull player back (no hard stop at 80 that killed control)
-		if dist > 25 then
+		-- Freestanding only: never re-sit. Unsit if something else plops you in the seat.
+		if hum2 and hum2.Sit then
 			pcall(function()
-				r.CFrame = drivePart.CFrame * CFrame.new(0, 3.2, 0)
+				hum2.Sit = false
+				hum2.PlatformStand = false
+			end)
+		end
+
+		local dist = (r.Position - drivePart.Position).Magnitude
+		-- Soft follow only if you drift far (still no sit)
+		if dist > 40 then
+			pcall(function()
+				r.CFrame = drivePart.CFrame * CFrame.new(0, 4, 0)
 			end)
 			r = hrp() or r
 			dist = (r.Position - drivePart.Position).Magnitude
+		elseif dist > 18 and os.clock() - lastStick > 0.2 then
+			-- gentle pull so SNO range stays good without seat spam
+			lastStick = os.clock()
+			pcall(function()
+				r.CFrame = r.CFrame:Lerp(drivePart.CFrame * CFrame.new(0, 3.5, 0), 0.35)
+			end)
 		end
 
 		local now = os.clock()
@@ -10259,6 +10281,7 @@ function startTrainDrive()
 					end)
 				end
 			end
+			-- optional throttle nudge if seat exists (does NOT sit you)
 			if seat and seat:IsA("VehicleSeat") then
 				pcall(function()
 					seat.Throttle = 1
@@ -10278,19 +10301,6 @@ function startTrainDrive()
 				end)
 			end
 		end
-
-		if hum2 and seat and (seat:IsA("VehicleSeat") or seat:IsA("Seat")) then
-			if hum2.SeatPart ~= seat and now - lastSit > 0.35 then
-				lastSit = now
-				pcall(function() seat:Sit(hum2) end)
-			end
-		elseif hum2 and now - lastSit > 0.5 then
-			-- no seat: keep player on train roof
-			lastSit = now
-			if dist > 6 then
-				pcall(function() r.CFrame = drivePart.CFrame * CFrame.new(0, 3.2, 0) end)
-			end
-		end
 	end)
 
 	S._trainHornConn = UserInputService.InputBegan:Connect(function(input, gp)
@@ -10301,7 +10311,7 @@ function startTrainDrive()
 	end)
 
 	local where = (model and model.Name) or "Train"
-	notify(HUB_NAME, _Vzd({105,151,142,155,142,147,140,69}) .. where .. _Vzd({69,77,152,136,148,151,138,69}) .. math.floor(score) .. _Vzd({78,69,161,69,124,102,120,105,69,120,149,134,136,138,84,104,153,151,145,69,161,69,120,153,148,149,69,121,151,134,142,147,69,153,148,69,138,157,142,153}), 3)
+	notify(HUB_NAME, _Vzd({105,151,142,155,142,147,140,69}) .. where .. _Vzd({69,139,151,138,138,152,153,134,147,137,142,147,140,69,161,69,124,102,120,105,69,120,149,134,136,138,84,104,153,151,145,69,161,69,147,148,69,139,148,151,136,138,82,152,142,153,69,161,69,120,153,148,149,69,121,151,134,142,147,69,153,148,69,138,157,142,153}), 3)
 	return true
 end
 
@@ -21513,7 +21523,7 @@ trainNote.TextColor3 = C.muted
 trainNote.TextXAlignment = Enum.TextXAlignment.Left
 trainNote.TextYAlignment = Enum.TextYAlignment.Top
 trainNote.TextWrapped = true
-trainNote.Text = " Blue map train | SNO + CFrame drive | WASD fly | Space/Ctrl up-down | H horn | Stop Train to exit"
+trainNote.Text = " Blue map train | freestanding (no force-sit) | SNO + CFrame | WASD fly | Space/Ctrl | H horn | Stop Train"
 trainNote.Parent = sc
 corner(trainNote, 8)
 pad(trainNote, 6, 6, 6, 6)
@@ -21533,7 +21543,7 @@ makeSlider(sc, {
 makeButton(sc, {
 	order = n(),
 	title = _Vzd({105,151,142,155,138,69,103,145,154,138,69,121,151,134,142,147}),
-	tip = "Sit + light SNO + WASD (no sticky TP spam)",
+	tip = "Freestanding control: SNO + WASD. Does NOT force-sit you in the train seat.",
 	callback = function()
 		task.spawn(startTrainDrive)
 	end,
@@ -24005,6 +24015,6 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.105 | 2026-07-29
+-- VOIDZ HUB | v1.2.106 | 2026-07-29
 
 -- hi im voidz

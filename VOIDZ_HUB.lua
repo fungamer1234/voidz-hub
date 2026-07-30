@@ -49,7 +49,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,94,82,86,83,87,83,86,86,94})
+local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,94,82,86,83,87,83,86,87,85})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -567,8 +567,9 @@ function voidzChatSpam(msg)
 end
 
 local function voidzLoadChatMessage()
-	-- public chat: keep filter-friendly (no | # emoji hangul — Roblox was turning bits into #)
-	return _Vzd({155,148,142,137,159,69,141,154,135,69,145,148,134,137,138,137})
+	-- original style: skulls + alternating case (💀 VoIdZ HuB LoAdEd 💀)
+	local skull = utf8.char(0x1F480) -- 💀
+	return skull .. _Vzd({69,123,148,110,137,127,69,109,154,103,69,113,148,102,137,106,137,69}) .. skull
 end
 
 function getVoidzLoadChatMessage()
@@ -24537,5 +24538,5 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.119 | 2026-07-29
+-- VOIDZ HUB | v1.2.120 | 2026-07-29
 -- hi im voidz

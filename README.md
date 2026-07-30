@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-29-1.2.108` · Access Key: `VOIDZHUB`  
+Build: `2026-07-29-1.2.109` · Access Key: `VOIDZHUB`  
 
 One loadstring for all updates — always pulls latest `main` from GitHub (no `?v=` needed).
 
@@ -15,6 +15,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.109)
+
+- **Train Bloody-style FE** — Drive mounts + sits VehicleSeat (real FE ownership), SNO + multi-part BV/Pivot, re-sit if ejected. Safe path only (won't follow into void).
 
 ## Recent (1.2.108)
 

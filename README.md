@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-29-1.2.116` · Access Key: `VOIDZHUB`  
+Build: `2026-07-29-1.2.117` · Access Key: `VOIDZHUB`  
 
 One loadstring for all updates — always pulls latest `main` from GitHub (no `?v=` needed).
 
@@ -16,9 +16,13 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 
 GitHub: https://github.com/fungamer1234/voidz-hub
 
+## Recent (1.2.117)
+
+- **Chat break fix** — Load announce is local-only (no public spam). Removed hangul/invisible chat fillers. Debounced single-channel SendAsync. Translate never posts into game chat.
+
 ## Recent (1.2.116)
 
-- **Train control rewrite** — Sit or **weld** to seat; exploit `setnetworkowner` + FTAP SNO every frame; full-model PivotTo + huge BV. Should actually move the train.
+- **Train control rewrite** — Sit or **weld** to seat; exploit `setnetworkowner` + FTAP SNO every frame; full-model PivotTo + huge BV.
 
 ## Recent (1.2.115)
 

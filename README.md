@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-29-1.2.110` · Access Key: `VOIDZHUB`  
+Build: `2026-07-29-1.2.111` · Access Key: `VOIDZHUB`  
 
 One loadstring for all updates — always pulls latest `main` from GitHub (no `?v=` needed).
 
@@ -15,6 +15,11 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.111)
+
+- **War mode lighter** — Less remote spam / no constant house hop (was lagging + kicking). Threat-only protect.
+- **Train stable sit** — One mount TP, then soft re-Sit like Bloody (no loop-TP onto the train).
 
 ## Recent (1.2.110)
 

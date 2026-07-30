@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-29-1.2.121` · Access Key: `VOIDZHUB`  
+Build: `2026-07-29-1.2.122` · Access Key: `VOIDZHUB`  
 
 One loadstring for all updates — always pulls latest `main` from GitHub (no `?v=` needed).
 
@@ -16,9 +16,9 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 
 GitHub: https://github.com/fungamer1234/voidz-hub
 
-## Recent (1.2.121)
+## Recent (1.2.122)
 
-- **Skull load chat fix** — Classic `💀 VoIdZ HuB LoAdEd 💀` sent raw (UTF-8 safe). Byte chopping was turning skulls into `#`.
+- **Chat break fix (keep skulls)** — Still posts `💀 VoIdZ HuB LoAdEd 💀` in public chat. No dual inject with legacy system chat; one announce per server; lighter war chat hooks.
 
 ## Recent (1.2.120)
 

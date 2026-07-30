@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-29-1.2.115` · Access Key: `VOIDZHUB`  
+Build: `2026-07-29-1.2.116` · Access Key: `VOIDZHUB`  
 
 One loadstring for all updates — always pulls latest `main` from GitHub (no `?v=` needed).
 
@@ -16,9 +16,13 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 
 GitHub: https://github.com/fungamer1234/voidz-hub
 
+## Recent (1.2.116)
+
+- **Train control rewrite** — Sit or **weld** to seat; exploit `setnetworkowner` + FTAP SNO every frame; full-model PivotTo + huge BV. Should actually move the train.
+
 ## Recent (1.2.115)
 
-- **Train sit hard-fix** — Multi-offset CFrame + kick occupant + Seat:Sit + prompt/touch. Won’t cancel whole drive if sit lags (FE SNO continues).
+- **Train sit hard-force** — Multi-offset CFrame + kick occupant + Seat:Sit + prompt/touch.
 
 ## Recent (1.2.114)
 

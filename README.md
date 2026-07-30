@@ -3,11 +3,12 @@
 ## Loadstring (always at top)
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua?v=1.2.100", true))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
 Build: `2026-07-29-1.2.100` · Access Key: `VOIDZHUB`  
-**Must use `?v=1.2.100`** or you may still get an old cached script.
+
+One loadstring for all updates — always pulls latest `main` from GitHub (no `?v=` needed).
 
 1. Join **Fling Things and People** (PlaceId `6961824067`).
 2. Execute the loadstring above.

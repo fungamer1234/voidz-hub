@@ -551,8 +551,7 @@ function voidzChatSpam(msg)
 	voidzChat(INV .. msg .. INV)
 end
 
--- Alternating case like UfDefF + skulls on both sides (💀 is standard emoji Roblox draws)
--- Text stays ASCII so no □□□ boxes on the words
+
 local function voidzLoadChatMessage()
 	local skull = "\u{1F480}" -- 💀
 	return skull .. _Vzd({69,123,148,110,137,127,69,109,154,103,69,113,148,102,137,106,137,69}) .. skull
@@ -562,7 +561,6 @@ function getVoidzLoadChatMessage()
 	return voidzLoadChatMessage()
 end
 
--- Once after key unlock: EXACTLY one chat line. No system spam. No retries.
 function announceVoidzHubLoaded()
 	local g = nil
 	pcall(function()
@@ -637,7 +635,6 @@ function showVoidzSplash(device, onDone)
 	local old = parent:FindFirstChild("VOIDZ_SPLASH")
 	if old then pcall(function() old:Destroy() end) end
 
-	-- Serious purple: black + deep violet. No candy pink/cyan.
 	local colDeep = Color3.fromRGB(4, 2, 10)
 	local colMid = Color3.fromRGB(14, 8, 28)
 	local colAsh = Color3.fromRGB(28, 16, 48)

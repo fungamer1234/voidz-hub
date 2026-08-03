@@ -1,41 +1,47 @@
-# VOIDZ HUB V3
+# VOIDZ HUB V3 — **2.0.0**
 
-**Status:** Phase 4 — Anchor + Toys + Ownership  
-**Packed:** [`../VOIDZ_HUB_V3.lua`](../VOIDZ_HUB_V3.lua)  
-**Git branch:** `v3` (V1 stays on `main`)
+Ship tag **2.0.0** (Phase 5 complete).  
+V1 remains on GitHub **`main`**. V3 lives on branch **`v3`**.
 
-## Run
-
-```bash
-python3 voidz_v3/build/pack.py
-```
-
-```lua
-local src = readfile("VOIDZ_HUB_V3.lua") -- or HttpGet raw from branch v3
-local fn, err = loadstring(src)
-if not fn then warn("compile:", err) return end
-fn()
-```
-
-- **Key:** `VOIDZHUB` · **Toggle:** RightShift  
-- **Unload:** `getgenv().VOIDZ_V3_UNLOAD()`
-
-### GitHub (V3 branch, does not replace V1)
+## Loadstring
 
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/v3/VOIDZ_HUB_V3.lua", true))()
 ```
 
-## Phase map
+Or local:
 
-| Phase | Status |
-|-------|--------|
-| 0–3 | done |
-| 4 Anchor + toys | done |
-| 5 Polish → 2.0.0 | next |
+```lua
+local src = readfile("VOIDZ_HUB_V3.lua")
+local fn, err = loadstring(src)
+if not fn then warn("compile:", err) return end
+fn()
+```
 
-## Phase 4
+- **Key:** `VOIDZHUB`  
+- **Toggle UI:** RightShift  
+- **Unload:** Settings, or `getgenv().VOIDZ_V3_UNLOAD()`
 
-- **World tab:** ray/mouse select, Highlight, anchor toggle, auto-replace (max 4/10s), SNO  
-- **Toys tab:** common spawn list, destroy nearest, safe Buy/Spawn  
-- **Ownership:** visit/SNO helpers, remote status  
+## Build from source
+
+```bash
+python3 voidz_v3/build/pack.py
+# writes ../VOIDZ_HUB_V3.lua
+```
+
+## What’s in 2.0.0
+
+| Area | Features |
+|------|----------|
+| Defense | Gucci, Anti-Grab (15 strategies), War — **separate** |
+| Blobman | 1.2.75 park + CreatureGrab, sticky opt-in, no home-TP spam |
+| Combat | Phoenix / Velocity / Sky / Hard / Void / Ragdoll / Blobman / GrabKick / StackKick |
+| Grab | Grab-line latch + loop |
+| World | Anchor select, highlight, auto-replace (rate limited) |
+| Toys | Spawn list + destroy nearest |
+| Move | Walk speed, noclip, simple fly |
+| Core | Config save/load, error ring, loop perf, load chat once/JobId |
+
+## Phases (all done)
+
+0 Design → 1 UI → 2 Defense → 3 Grab/Blob/Kicks → 4 Anchor/Toys → **5 Polish 2.0.0**

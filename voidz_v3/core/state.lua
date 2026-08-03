@@ -1,11 +1,8 @@
---[[ VOIDZ V3 — single source of truth ]]
+--[[ VOIDZ V3 - single source of truth ]]
 return function(require)
 	local State = {
-		version = "3.0.0-dev.p4",
-		phase = 4,
-
-
-
+		version = "2.0.0",
+		phase = 5,
 		hubOpen = false,
 		unlocked = false,
 		device = "PC",
@@ -36,7 +33,9 @@ return function(require)
 
 	function State.getValue(id, default)
 		local v = State.values[id]
-		if v == nil then return default end
+		if v == nil then
+			return default
+		end
 		return v
 	end
 

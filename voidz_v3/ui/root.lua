@@ -159,14 +159,29 @@ return function(require)
 		end
 		Root.gui = gui
 
+		local vs = Vector2.new(1280, 720)
+		pcall(function()
+			local cam = workspace.CurrentCamera
+			if cam then
+				vs = cam.ViewportSize
+			end
+		end)
+		local winW = math.clamp(math.floor(vs.X * 0.58), 320, 740)
+		local winH = math.clamp(math.floor(vs.Y * 0.62), 360, 520)
+		if Services.UserInputService.TouchEnabled and vs.X < 900 then
+			winW = math.clamp(math.floor(vs.X * 0.92), 300, 420)
+			winH = math.clamp(math.floor(vs.Y * 0.72), 380, 560)
+		end
+
 		local win = Instance.new("Frame")
 		win.Name = "Main"
 		win.BackgroundColor3 = Theme.bg
 		win.BorderSizePixel = 0
-		win.Size = UDim2.new(0, 720, 0, 460)
-		win.Position = UDim2.new(0.5, -360, 0.5, -230)
+		win.Size = UDim2.new(0, winW, 0, winH)
+		win.Position = UDim2.new(0.5, -math.floor(winW / 2), 0.5, -math.floor(winH / 2))
 		win.Parent = gui
 		Root.main = win
+
 		C.corner(win, UDim.new(0, 14))
 		C.stroke(win, Theme.accent, 1.5)
 		local stroke = win:FindFirstChildOfClass("UIStroke")
@@ -198,7 +213,7 @@ return function(require)
 		titleMask.Size = UDim2.new(1, 0, 0, 10)
 		titleMask.Parent = titleBar
 
-		C.label(titleBar, "VOIDZ HUB", {
+		C.label(titleBar, "VOIDZ HUB 2.0", {
 			bold = true,
 			size = 14,
 			color = Theme.accentGlow,
@@ -206,13 +221,14 @@ return function(require)
 			sizeUDim = UDim2.new(0, 160, 1, 0),
 			pos = UDim2.new(0, 16, 0, 0),
 		})
-		C.label(titleBar, State.version, {
+		C.label(titleBar, tostring(State.version or "2.0.0"), {
 			size = 11,
 			color = Theme.textDim,
 			h = Theme.titleH,
-			sizeUDim = UDim2.new(0, 120, 1, 0),
-			pos = UDim2.new(0, 140, 0, 0),
+			sizeUDim = UDim2.new(0, 100, 1, 0),
+			pos = UDim2.new(0, 150, 0, 0),
 		})
+
 
 		local closeBtn = C.button(titleBar, "X", function()
 			Root.setVisible(false)

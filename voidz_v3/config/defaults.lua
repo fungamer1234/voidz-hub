@@ -1,4 +1,4 @@
---[[ VOIDZ V3 — default feature flags / values for Phase 1+ ]]
+--[[ VOIDZ V3 - default feature flags / values (2.0.0) ]]
 return function(_require)
 	return {
 		toggles = {
@@ -16,14 +16,15 @@ return function(_require)
 			anchorAutoReplace = false,
 			anchorKeepAnchored = true,
 			uiAnimations = true,
+			publicLoadChat = true,
+			noclip = false,
+			fly = false,
 		},
-
-
 		values = {
 			flingPower = 12000,
 			trainSpeed = 140,
 			kickType = "Phoenix",
+			flySpeed = 60,
 		},
-
 	}
 end

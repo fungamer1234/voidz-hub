@@ -1,6 +1,6 @@
 --[[
   VOIDZ HUB V3 - entry
-  Phase 4: Anchor grab + toys / ownership
+  Ship: 2.0.0 (Phase 5 polish)
 ]]
 
 return function(require)
@@ -8,7 +8,9 @@ return function(require)
 	local Bootstrap = require("core.bootstrap")
 	local Bus = require("core.bus")
 	local Loop = require("core.loop")
+	local Config = require("core.config")
 	local Root = require("ui.root")
+
 	local Notify = require("ui.notify")
 	local Gucci = require("systems.defense.gucci")
 	local AntiGrab = require("systems.defense.anti_grab")
@@ -19,16 +21,18 @@ return function(require)
 	local Anchor = require("systems.grab.anchor")
 	local Toys = require("systems.object.toys")
 	local Ownership = require("systems.object.ownership")
+	local Chat = require("systems.utility.chat")
 
 	local VOIDZ = {
-		version = State.version,
-		phase = 4,
+		version = "2.0.0",
+		phase = 5,
 		Blobman = Blobman,
 		Grab = Grab,
 		Kick = Kick,
 		Anchor = Anchor,
 		Toys = Toys,
 		Ownership = Ownership,
+		Chat = Chat,
 	}
 
 	local function env()
@@ -42,6 +46,13 @@ return function(require)
 	end
 
 	local function unload()
+		pcall(function()
+			Config.save()
+		end)
+		pcall(function()
+			State.setToggle("fly", false)
+			State.setToggle("noclip", false)
+		end)
 		pcall(function()
 			Anchor.destroy()
 		end)
@@ -80,7 +91,7 @@ return function(require)
 		g.VOIDZ_V3 = nil
 		g.VOIDZ_V3_UNLOAD = nil
 		g.VOIDZ_UNLOAD_V3 = nil
-		print("[VOIDZ V3] unloaded")
+		print("[VOIDZ V3] unloaded 2.0.0")
 	end
 
 	function VOIDZ.unload()
@@ -93,14 +104,15 @@ return function(require)
 			pcall(g.VOIDZ_V3_UNLOAD)
 		end
 
-		State.phase = 4
-		State.version = "3.0.0-dev.p4"
-		VOIDZ.version = State.version
-		VOIDZ.phase = 4
+		State.phase = 5
+		State.version = "2.0.0"
+		VOIDZ.version = "2.0.0"
+		VOIDZ.phase = 5
 
 		Bootstrap.run()
 		pcall(Ownership.resolve)
 
+		-- never auto-enable heavy systems beyond saved toggles
 		pcall(function()
 			Gucci.sync()
 		end)
@@ -117,7 +129,17 @@ return function(require)
 			Anchor.sync()
 		end)
 
+		-- force move loops off on fresh boot (safety)
+		State.setToggle("fly", false)
+		State.setToggle("noclip", false)
+
 		Root.mount()
+
+		if State.getToggle("publicLoadChat") then
+			pcall(function()
+				Chat.announceLoadOnce()
+			end)
+		end
 
 		g.VOIDZ_V3 = VOIDZ
 		g.VOIDZ_V3_UNLOAD = unload
@@ -144,8 +166,15 @@ return function(require)
 				War.disable()
 			end
 		end)
+		Bus.on("error", function(scope, err)
+			-- soft surface for critical scopes only
+			if type(scope) == "string" and string.find(scope, "loop:", 1, true) then
+				-- already warned via Errors.report
+			end
+		end)
 
 		Bus.emit("voidz.ready", VOIDZ)
+		print("[VOIDZ V3] 2.0.0 ready")
 		return VOIDZ
 	end
 

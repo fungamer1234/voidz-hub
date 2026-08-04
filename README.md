@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.132` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.133` · Access Key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,13 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.133) — UI toward your panel mock
+
+- **Shell** — Wider hub, purple logo mark, version chip, top **search** (jumps to matching features/tabs).
+- **Sidebar** — Numbered nav + purple **pill** active state; Premium Lifetime chip; reordered toward mock (Dashboard first).
+- **Dashboard** — Card grid: Player Overview (live stats), Base Options (god/noclip/infjump), Player Info (target), Quick Jump, mini Console, Quick Actions (fling/bring/kill/kick…).
+- **Footer** — Status bar with player count + build.
 
 ## Recent (1.2.131) — power polish (Blitz/Res-pattern)
 

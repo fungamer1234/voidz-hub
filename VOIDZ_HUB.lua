@@ -193,7 +193,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,93,82,85,88,82,86,83,87,83,86,88,93})
+local BUILD = _Vzd({87,85,87,91,82,85,93,82,85,88,82,86,83,87,83,86,88,93,135})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -25149,6 +25149,7 @@ task.spawn(function()
 end)
 
 -- Blob loop MacSploit fix: no home-TP, soft park, spawn cooldown, re-sit only.
+-- cache-bust stamp 2026-08-03b
 
 -- VOIDZ HUB | v1.2.138 | 2026-08-03
 -- hi im voidz

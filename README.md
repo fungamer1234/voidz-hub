@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.134` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.135` · Access Key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.135) — hub scale fix
+
+- **Hub Scale** — Real UIScale on the whole panel (was hard-coded to 520×340). Fits viewport, 60–130%, survives reopen/resize.
 
 ## Recent (1.2.134) — blob loop fix + simple Home
 

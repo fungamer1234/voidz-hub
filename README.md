@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.127` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.128` · Access Key: `VOIDZHUB`  
 
 **Use this `main` loadstring only.** Do **not** use the experimental `v3` branch for daily play.
 
@@ -18,11 +18,15 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 
 GitHub: https://github.com/fungamer1234/voidz-hub
 
+## Recent (1.2.128)
+
+- **Blobman Loop Grab fixed** — Walks up seat → real blob model, Left+Right detectors, non-blocking CreatureGrab (no hung InvokeServer), SNO before fire, hard re-sit after park, UserId target lock, soft remount if ejected.
+
 ## Recent (1.2.127)
 
 - **Res-style UI polish** — Deeper glass purple theme, cleaner sections/buttons, larger hub shell.
 - **Splash overhaul** — Premium glass boot card, ring loader, animated status, skip-to-open.
-- Full V1 feature set unchanged (combat, blobman, auras, loops, protect, etc.).
+
 
 ## Recent (1.2.126)
 

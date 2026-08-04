@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.138b` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.139` · Access Key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,12 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.139) — Gucci non-body + blob bring + wreck fling
+
+- **Gucci** — Non-body free-hold: limbs massless/no-collide while held, grab visual stays, you still walk/jump.
+- **Blob loop** — Brings targets *to* your blob; soft re-sit only (2s CD, no force-sit thrash / hop spam).
+- **Wreck Server (blob)** — Loop: bring everyone to blob → CreatureGrab → fling.
 
 ## Recent (1.2.138b) — cache bust
 

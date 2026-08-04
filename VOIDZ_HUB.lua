@@ -18162,7 +18162,7 @@ _TAB_BUILDERS["blobman"] = function(sc, n)
 		section(sc, _Vzd({124,119,106,104,112,69,84,69,112,110,104,112}), n())
 		makeToggle(sc, {
 			order = n(), id = "destroyServer", title = _Vzd({124,151,138,136,144,69,120,138,151,155,138,151,69,77,103,145,148,135,146,134,147,78}),
-			tip = _Vzd({116,115,69,98,69,152,142,153,69,103,145,148,135,146,134,147,69,134,147,137,69,104,151,138,134,153,154,151,138,108,151,134,135,69,138,155,138,151,158,148,147,138,69,148,147,69,134,69,145,148,148,149,69,161,69,116,107,107,69,98,69,152,153,148,149}),
+			tip = "Sit blob once. Loop: BRING everyone to blob → CreatureGrab → FLING. Soft re-sit only.",
 			callback = function(on)
 				S.toggles.blobDestroyServer = on
 				if on then

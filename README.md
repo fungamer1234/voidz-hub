@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.142` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.143` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -16,9 +16,15 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 
 1. Join **Fling Things and People** (PlaceId `6961824067`).
 2. Execute the loadstring above.
-3. Key **`VOIDZHUB`**. RightShift show/hide.
+3. Key **`FREMIUM`** (free) or **`VOIDZHUB`** (premium). RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.143) — Free + Premium keys
+
+- **Free key:** `FREMIUM` — full core hub (combat, blob single, gucci, protect, movement…).
+- **Premium key:** `VOIDZHUB` — unlocks wreck server, loop grab all, war mode, destroy hybrid, etc.
+- Key screen accepts either (case-insensitive).
 
 ## Recent (1.2.142) — Blitz Gucci/Antis + banana feet + Bloody limbs
 

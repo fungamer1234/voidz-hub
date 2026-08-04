@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.128` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.129` · Access Key: `VOIDZHUB`  
 
 **Use this `main` loadstring only.** Do **not** use the experimental `v3` branch for daily play.
 
@@ -18,9 +18,15 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 
 GitHub: https://github.com/fungamer1234/voidz-hub
 
+## Recent (1.2.129)
+
+- **Gucci vs Anti-Grab (Res-style)** — Gucci = free while held (keeps grab visual, no kit nuke). Anti-Grab = hard break (Struggle / DestroyGrabLine / kill GrabParts). No longer the same toggle.
+- **Blobman loop grab** — Stops force-unseat spam: park blob while you stay seated, re-sit only if you actually fell off.
+
 ## Recent (1.2.128)
 
-- **Blobman Loop Grab fixed** — Walks up seat → real blob model, Left+Right detectors, non-blocking CreatureGrab (no hung InvokeServer), SNO before fire, hard re-sit after park, UserId target lock, soft remount if ejected.
+- **Blobman Loop Grab kit fix** — Seat→blob resolve, L+R detectors, non-blocking CreatureGrab, SNO, UserId target lock.
+
 
 ## Recent (1.2.127)
 

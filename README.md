@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.129` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.130` · Access Key: `VOIDZHUB`  
 
 **Use this `main` loadstring only.** Do **not** use the experimental `v3` branch for daily play.
 
@@ -18,10 +18,18 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 
 GitHub: https://github.com/fungamer1234/voidz-hub
 
+## Recent (1.2.130)
+
+- **Menacing splash** — BloodyV2-style black/crimson boot (glitch VOIDZ, scanlines, READY TO KILL).
+- **kickPlayer restored** — Was missing entirely (kicks never ran). Full types + **BlobHover** (hover over target on blob + stack fling, Res-style).
+- **Gucci** — Strong free-move BV + optional train VehicleSeat freedom while held (not anti-grab).
+- **Anti-Grab** — Separate hard break only.
+- **Blob loop** — No spawn spam (8s CD, reuse seat); loop never thrash-sits if already mounted.
+
 ## Recent (1.2.129)
 
-- **Gucci vs Anti-Grab (Res-style)** — Gucci = free while held (keeps grab visual, no kit nuke). Anti-Grab = hard break (Struggle / DestroyGrabLine / kill GrabParts). No longer the same toggle.
-- **Blobman loop grab** — Stops force-unseat spam: park blob while you stay seated, re-sit only if you actually fell off.
+- Gucci/Anti-Grab toggle split + blob park without CFrame hop.
+
 
 ## Recent (1.2.128)
 

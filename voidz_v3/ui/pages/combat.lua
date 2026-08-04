@@ -4,67 +4,101 @@ return function(require)
 	local State = require("core.state")
 	local Config = require("core.config")
 	local Notify = require("ui.notify")
-	local Kick = require("systems.combat.kick")
 	local Select = require("systems.player.select")
+	local Kick = require("systems.combat.kick")
+	local Actions = require("systems.combat.actions")
+
+	local function eachTarget(fn)
+		local t = Select.targets()
+		if #t == 0 then
+			Notify.warn("Combat", "Select a player (right rail)")
+			return
+		end
+		for _, p in ipairs(t) do
+			task.spawn(fn, p)
+		end
+	end
 
 	return function(parent)
 		local scroll = C.scroll(parent)
+		local _, lab = C.targetBanner(scroll, Select)
+		lab.Text = "Selected: " .. Select.label()
 
-		local head = C.section(scroll, "KICK")
-		C.label(head, "Target: " .. Select.label(), { size = 12, color = Theme.textMuted, h = 18 })
-		C.label(head, "Type: " .. tostring(State.getValue("kickType", "Phoenix")), {
-			size = 12,
-			color = Theme.accentGlow,
-			h = 18,
-		})
-
-		local types = C.section(scroll, "KICK TYPE")
-		for _, kt in ipairs(Kick.TYPES) do
-			C.button(types, kt, function()
-				State.setValue("kickType", kt)
+		local power = C.section(scroll, "FLING POWER")
+		local prow = C.row(power)
+		for _, v in ipairs({ 4000, 8000, 12000, 20000 }) do
+			C.chip(prow, tostring(v), function()
+				State.setValue("flingPower", v)
 				Config.save()
-				Notify.info("Kick", "Type = " .. kt)
-			end, {
-				w = 100,
-				h = 28,
-				accent = State.getValue("kickType", "Phoenix") == kt,
-			})
+				Notify.info("Power", tostring(v))
+			end, { on = State.getValue("flingPower", 12000) == v, w = 72 })
 		end
 
-		local act = C.section(scroll, "ACTIONS")
-		C.button(act, "Kick selected", function()
-			local t = Select.get()
-			if not t then
-				Notify.warn("Kick", "Pick a player in Player tab")
-				return
-			end
-			task.spawn(function()
-				local ok = Kick.run(t, State.getValue("kickType", "Phoenix"))
-				Notify.info("Kick", ok and ("Done -> " .. t.Name) or "Failed")
-			end)
-		end, { w = 150, accent = true })
-
-		C.button(act, "Stack Kick selected", function()
-			local t = Select.get()
-			if not t then
-				Notify.warn("Kick", "Pick a player first")
-				return
-			end
-			task.spawn(function()
-				Kick.run(t, "StackKick")
-				Notify.info("Kick", "StackKick -> " .. t.Name)
-			end)
-		end, { w = 160 })
-
-		C.toggle(act, "Loop kick selected", function()
-			return State.getToggle("kickLoop")
-		end, function(v)
-			if v and not Select.get() then
-				Notify.warn("Kick", "Pick a player first")
-				return
-			end
-			Kick.loop(v, State.getValue("kickType", "Phoenix"))
-			Config.save()
+		local acts = C.section(scroll, "ACTIONS")
+		local grid = C.grid(acts, 128, 36, 8)
+		local function abtn(name, danger, fn)
+			C.button(grid, name, function()
+				eachTarget(fn)
+			end, { w = 128, h = 36, danger = danger, fill = false })
+		end
+		abtn("Fling", true, function(p)
+			Actions.fling(p)
+			Notify.success("Fling", p.Name)
 		end)
+		abtn("Kill", true, function(p)
+			Actions.kill(p)
+			Notify.success("Kill", p.Name)
+		end)
+		abtn("Bring", false, function(p)
+			Actions.bring(p)
+			Notify.success("Bring", p.Name)
+		end)
+		abtn("Void", true, function(p)
+			Actions.void(p)
+			Notify.success("Void", p.Name)
+		end)
+		abtn("Ragdoll", false, function(p)
+			Actions.ragdoll(p)
+		end)
+		abtn("Sky Launch", false, function(p)
+			Actions.sky(p)
+		end)
+		abtn("Spin", false, function(p)
+			Actions.spin(p)
+		end)
+		abtn("Destroy Grab", false, function(p)
+			Actions.destroyGrab(p)
+		end)
+		abtn("TP To", false, function(p)
+			Actions.tpTo(p)
+		end)
+		abtn("Spectate", false, function(p)
+			Actions.spectate(p)
+		end)
+		C.button(grid, "Unspectate", function()
+			Actions.unspectate()
+		end, { w = 128, h = 36 })
+
+		local kicks = C.section(scroll, "KICK TYPE")
+		local krow = C.row(kicks)
+		for _, kt in ipairs(Kick.TYPES) do
+			C.chip(krow, kt, function()
+				State.setValue("kickType", kt)
+				Config.save()
+				Notify.info("Kick", kt)
+			end, { on = State.getValue("kickType", "Phoenix") == kt, w = 90 })
+		end
+		local kact = C.row(kicks)
+		C.button(kact, "Kick Selected", function()
+			eachTarget(function(p)
+				Kick.run(p, State.getValue("kickType", "Phoenix"))
+				Notify.success("Kick", p.Name)
+			end)
+		end, { w = 140, h = 36, accent = true, danger = true })
+		C.button(kact, "Stack Kick", function()
+			eachTarget(function(p)
+				Kick.run(p, "StackKick")
+			end)
+		end, { w = 120, h = 36, danger = true })
 	end
 end

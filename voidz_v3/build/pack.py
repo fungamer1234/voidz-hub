@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""
-Pack voidz_v3 modules into one executor-friendly Lua file.
-Each source file must end with: return function(require) ... end
-"""
+"""Pack voidz_v3 modules into one executor-friendly Lua file."""
 from __future__ import annotations
 
 import sys
@@ -11,7 +8,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT.parent / "VOIDZ_HUB_V3.lua"
 
-# Dependencies first; init last.
 MODULES: list[tuple[str, str]] = [
 	("core.services", "core/services.lua"),
 	("core.state", "core/state.lua"),
@@ -32,9 +28,14 @@ MODULES: list[tuple[str, str]] = [
 	("systems.grab.core", "systems/grab/core.lua"),
 	("systems.grab.anchor", "systems/grab/anchor.lua"),
 	("systems.combat.kick", "systems/combat/kick.lua"),
+	("systems.combat.actions", "systems/combat/actions.lua"),
+	("systems.combat.aura", "systems/combat/aura.lua"),
+	("systems.combat.loops", "systems/combat/loops.lua"),
 	("systems.utility.chat", "systems/utility/chat.lua"),
+	("systems.utility.visuals", "systems/utility/visuals.lua"),
+	("systems.utility.antiafk", "systems/utility/antiafk.lua"),
+	("systems.world.train", "systems/world/train.lua"),
 	("ui.theme", "ui/theme.lua"),
-
 	("ui.components", "ui/components.lua"),
 	("ui.notify", "ui/notify.lua"),
 	("ui.pages.home", "ui/pages/home.lua"),
@@ -46,11 +47,14 @@ MODULES: list[tuple[str, str]] = [
 	("ui.pages.toys", "ui/pages/toys.lua"),
 	("ui.pages.player", "ui/pages/player.lua"),
 	("ui.pages.move", "ui/pages/move.lua"),
+	("ui.pages.auras", "ui/pages/auras.lua"),
+	("ui.pages.loops", "ui/pages/loops.lua"),
+	("ui.pages.visuals", "ui/pages/visuals.lua"),
+	("ui.pages.server", "ui/pages/server.lua"),
 	("ui.pages.settings", "ui/pages/settings.lua"),
 	("ui.root", "ui/root.lua"),
 	("init", "init.lua"),
 ]
-
 
 
 def strip_bom(text: str) -> str:
@@ -60,12 +64,11 @@ def strip_bom(text: str) -> str:
 
 
 def to_ascii_safe(text: str) -> str:
-	"""Replace common unicode that breaks some executor loaders."""
 	repl = {
-		"\u2014": "-",  # em dash
-		"\u2013": "-",  # en dash
+		"\u2014": "-",
+		"\u2013": "-",
 		"\u2022": "*",
-		"\u00b7": "*",  # middle dot
+		"\u00b7": "*",
 		"\u2026": "...",
 		"\u00d7": "x",
 		"\u2018": "'",
@@ -76,7 +79,6 @@ def to_ascii_safe(text: str) -> str:
 	}
 	for a, b in repl.items():
 		text = text.replace(a, b)
-	# drop any remaining non-ascii in comments/strings risk
 	return "".join(ch if ord(ch) < 128 else "?" for ch in text)
 
 
@@ -88,13 +90,11 @@ def pack_module(name: str, source: str) -> str:
 	source = to_ascii_safe(strip_bom(source)).rstrip() + "\n"
 	if "return function" not in source:
 		print(f"warning: {name} missing factory return", file=sys.stderr)
-	# Source is a chunk that returns factory function(require) -> module
 	return (
 		f"__vz_modules[{_lua_string(name)}] = (function()\n"
 		f"{source}"
 		f"end)()\n"
 	)
-
 
 
 HEADER = r'''--[[
@@ -189,7 +189,6 @@ end
 '''
 
 FOOTER = r'''
--- entry (never return a function that callers must invoke twice)
 local __vz_ok, __vz_err = pcall(function()
 	__vz_require("init")
 end)
@@ -208,23 +207,15 @@ def main() -> int:
 		if not path.is_file():
 			missing.append(rel)
 			continue
-		source = path.read_text(encoding="utf-8")
 		parts.append(f"-- ===== module: {name} =====\n")
-		parts.append(pack_module(name, source))
+		parts.append(pack_module(name, path.read_text(encoding="utf-8")))
 		parts.append("\n")
-
 	if missing:
-		print("ERROR: missing modules:", file=sys.stderr)
-		for m in missing:
-			print(f"  - {m}", file=sys.stderr)
+		print("ERROR missing:", missing, file=sys.stderr)
 		return 1
-
 	parts.append(FOOTER)
-	out = to_ascii_safe("".join(parts))
-	OUT.write_text(out, encoding="utf-8")
-
-	print(f"packed {len(MODULES)} modules -> {OUT}")
-	print(f"size: {OUT.stat().st_size} bytes")
+	OUT.write_text(to_ascii_safe("".join(parts)), encoding="utf-8")
+	print(f"packed {len(MODULES)} modules -> {OUT} ({OUT.stat().st_size} bytes)")
 	return 0
 
 

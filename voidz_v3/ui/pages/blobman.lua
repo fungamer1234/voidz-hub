@@ -6,26 +6,54 @@ return function(require)
 	local Notify = require("ui.notify")
 	local Blobman = require("systems.grab.blobman")
 	local Select = require("systems.player.select")
+	local Kick = require("systems.combat.kick")
 
 	return function(parent)
 		local scroll = C.scroll(parent)
+		C.targetBanner(scroll, Select)
 
-		local sec = C.section(scroll, "BLOBMAN (1.2.75 path)")
-		C.label(sec, "Target: " .. Select.label(), { size = 12, color = Theme.textMuted, h = 18 })
+		local sec = C.section(scroll, "BLOBMAN (1.2.75)")
+		C.label(sec, "Reuse seat, spawn CD, park (0,1,7), re-sit, CreatureGrab. Sticky is opt-in only.", {
+			size = 12,
+			color = Theme.textMuted,
+			wrap = true,
+			h = 36,
+		})
 
-		C.button(sec, "Spawn / Sit", function()
+		local g = C.grid(sec, 140, 34, 8)
+		C.button(g, "Spawn / Sit", function()
 			task.spawn(function()
-				local ok = Blobman.ensure(false)
-				Notify.info("Blobman", ok and "Seated" or "Spawn failed")
+				Notify.info("Blobman", Blobman.ensure(false) and "Seated" or "Failed")
 			end)
-		end, { w = 140, accent = true })
-
-		C.button(sec, "Dismount", function()
+		end, { w = 140, h = 34, accent = true })
+		C.button(g, "Dismount", function()
 			Blobman.dismount()
 			Notify.info("Blobman", "Dismounted")
-		end, { w = 140 })
+		end, { w = 140, h = 34 })
+		C.button(g, "Grab Selected", function()
+			local t = Select.get()
+			if not t then
+				Notify.warn("Blobman", "Pick a player")
+				return
+			end
+			task.spawn(function()
+				Notify.info("Blobman", Blobman.grabOnce(t) and ("Grabbed " .. t.Name) or "Failed")
+			end)
+		end, { w = 140, h = 34, danger = true })
+		C.button(g, "Grab ALL", function()
+			task.spawn(function()
+				Blobman.grabAll()
+				Notify.info("Blobman", "Grab all")
+			end)
+		end, { w = 140, h = 34, danger = true })
+		C.button(g, "Blob Kick", function()
+			local t = Select.get()
+			if t then
+				task.spawn(Kick.run, t, "Blobman")
+			end
+		end, { w = 140, h = 34, danger = true })
 
-		C.toggle(sec, "Sticky seat (opt-in only)", function()
+		C.toggle(sec, "Sticky seat (opt-in)", function()
 			return State.getToggle("blobStickySeat")
 		end, function(v)
 			State.setToggle("blobStickySeat", v)
@@ -36,54 +64,22 @@ return function(require)
 			end
 			Config.save()
 		end)
-
-		local grab = C.section(scroll, "GRAB")
-		C.button(grab, "Grab selected once", function()
-			local t = Select.get()
-			if not t then
-				Notify.warn("Blobman", "Pick a player in Player tab")
-				return
-			end
-			task.spawn(function()
-				local ok = Blobman.grabOnce(t)
-				Notify.info("Blobman", ok and ("Grabbed " .. t.Name) or "Grab failed")
-			end)
-		end, { w = 160, accent = true })
-
-		C.button(grab, "Grab ALL once", function()
-			task.spawn(function()
-				Blobman.grabAll()
-				Notify.info("Blobman", "Grab all fired")
-			end)
-		end, { w = 160 })
-
-		C.toggle(grab, "Loop grab selected", function()
+		C.toggle(sec, "Loop grab selected", function()
 			return State.getToggle("blobGrabLoop")
 		end, function(v)
 			local t = Select.get()
 			if v and not t then
-				Notify.warn("Blobman", "Pick a player first")
-				State.setToggle("blobGrabLoop", false)
+				Notify.warn("Blobman", "Pick a player")
 				return
 			end
 			Blobman.setLoopGrab(v, t)
 			Config.save()
-			Notify.info("Blobman", v and ("Loop ON -> " .. t.Name) or "Loop OFF")
 		end)
-
-		C.toggle(grab, "Loop grab ALL", function()
+		C.toggle(sec, "Loop grab ALL", function()
 			return State.getToggle("blobGrabAllLoop")
 		end, function(v)
 			Blobman.setLoopGrabAll(v)
 			Config.save()
-			Notify.info("Blobman", v and "Grab all loop ON" or "Grab all loop OFF")
 		end)
-
-		C.label(scroll, "Reuse seat + 3.5s spawn CD + park (0,1,7) + re-sit + CreatureGrab. No home-TP unseat.", {
-			size = 11,
-			color = Theme.textDim,
-			wrap = true,
-			h = 40,
-		})
 	end
 end

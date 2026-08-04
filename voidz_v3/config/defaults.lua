@@ -19,12 +19,18 @@ return function(_require)
 			publicLoadChat = true,
 			noclip = false,
 			fly = false,
+			fullbright = false,
+			antiafk = true,
+			wlFriends = true,
+			trainDrive = false,
 		},
 		values = {
 			flingPower = 12000,
 			trainSpeed = 140,
 			kickType = "Phoenix",
 			flySpeed = 60,
+			auraRadius = 45,
 		},
+
 	}
 end

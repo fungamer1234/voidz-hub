@@ -626,13 +626,19 @@ return function(_require)
 			publicLoadChat = true,
 			noclip = false,
 			fly = false,
+			fullbright = false,
+			antiafk = true,
+			wlFriends = true,
+			trainDrive = false,
 		},
 		values = {
 			flingPower = 12000,
 			trainSpeed = 140,
 			kickType = "Phoenix",
 			flySpeed = 60,
+			auraRadius = 45,
 		},
+
 	}
 end
 end)()
@@ -1924,7 +1930,7 @@ end)()
 
 -- ===== module: systems.player.select =====
 __vz_modules["systems.player.select"] = (function()
---[[ Player target selection helpers ]]
+--[[ Player selection + multi loop-targets + whitelist ]]
 return function(require)
 	local Services = require("core.services")
 	local State = require("core.state")
@@ -1933,11 +1939,18 @@ return function(require)
 
 	local Select = {}
 
-	function Select.list()
+	State.loopTargets = State.loopTargets or {}
+	State.whitelist = State.whitelist or {}
+
+	function Select.list(filter)
 		local out = {}
+		local f = filter and string.lower(filter) or nil
 		for _, p in ipairs(Services.Players:GetPlayers()) do
 			if p ~= Services.LP then
-				out[#out + 1] = p
+				local lab = Util.playerLabel(p)
+				if not f or string.find(string.lower(p.Name), f, 1, true) or string.find(string.lower(lab), f, 1, true) then
+					out[#out + 1] = p
+				end
 			end
 		end
 		table.sort(out, function(a, b)
@@ -1971,16 +1984,68 @@ return function(require)
 		return s and Util.playerLabel(s) or "(none)"
 	end
 
+	function Select.toggleLoopTarget(player)
+		if not player then
+			return
+		end
+		if State.loopTargets[player] then
+			State.loopTargets[player] = nil
+		else
+			State.loopTargets[player] = true
+			State.selected = player
+		end
+		Bus.emit("player.loopTargets")
+	end
+
+	function Select.isLoopTarget(player)
+		return State.loopTargets[player] == true
+	end
+
+	function Select.targets()
+		local out = {}
+		for p in pairs(State.loopTargets) do
+			if p and p.Parent and p ~= Services.LP then
+				out[#out + 1] = p
+			else
+				State.loopTargets[p] = nil
+			end
+		end
+		if #out == 0 then
+			local s = Select.get()
+			if s then
+				out[1] = s
+			end
+		end
+		return out
+	end
+
+	function Select.clearLoops()
+		State.loopTargets = {}
+		Bus.emit("player.loopTargets")
+	end
+
+	function Select.whitelist(player, on)
+		if not player then
+			return
+		end
+		if on then
+			State.whitelist[player.Name] = true
+		else
+			State.whitelist[player.Name] = nil
+		end
+	end
+
+	function Select.isWhitelisted(player)
+		return player and State.whitelist[player.Name] == true
+	end
+
 	function Select.byName(name)
 		if not name or name == "" then
 			return nil
 		end
 		local lower = string.lower(name)
 		for _, p in ipairs(Select.list()) do
-			if string.lower(p.Name) == lower or string.lower(p.DisplayName or "") == lower then
-				return p
-			end
-			if string.find(string.lower(p.Name), lower, 1, true) then
+			if string.lower(p.Name) == lower or string.find(string.lower(p.Name), lower, 1, true) then
 				return p
 			end
 		end
@@ -3273,6 +3338,611 @@ return function(require)
 end
 end)()
 
+-- ===== module: systems.combat.actions =====
+__vz_modules["systems.combat.actions"] = (function()
+--[[ Core player actions: fling, bring, kill, void, ragdoll, tp, spectate ]]
+return function(require)
+	local Services = require("core.services")
+	local State = require("core.state")
+	local Util = require("core.util")
+	local Bus = require("core.bus")
+	local Ownership = require("systems.object.ownership")
+
+	local Actions = {}
+
+	local function power()
+		return tonumber(State.getValue("flingPower", 12000)) or 12000
+	end
+
+	local function forceUnsit(p)
+		local h = p.Character and p.Character:FindFirstChildOfClass("Humanoid")
+		if h then
+			pcall(function()
+				h.Sit = false
+				h.PlatformStand = false
+			end)
+		end
+	end
+
+	local function applyVel(part, pwr, up)
+		if not part then
+			return
+		end
+		pwr = pwr or power()
+		up = up == nil and 0.5 or up
+		local cam = workspace.CurrentCamera
+		local look = cam and cam.CFrame.LookVector or Vector3.new(0, 0, -1)
+		local dir = Vector3.new(look.X, up, look.Z)
+		if dir.Magnitude < 1e-3 then
+			dir = Vector3.new(0, 1, 0)
+		end
+		dir = dir.Unit
+		local spd = math.clamp(pwr, 400, 1e5)
+		pcall(function()
+			local old = part:FindFirstChild("FlingAuraVelocity") or part:FindFirstChild("VOIDZ_BV")
+			if old then
+				old:Destroy()
+			end
+			local bv = Instance.new("BodyVelocity")
+			bv.Name = "FlingAuraVelocity"
+			bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+			bv.Velocity = dir * spd
+			bv.Parent = part
+			Services.Debris:AddItem(bv, 0.55)
+			part.AssemblyLinearVelocity = dir * spd
+			part.AssemblyAngularVelocity = Vector3.new(spd / 40, spd / 35, spd / 40)
+		end)
+	end
+
+	local function skyVel(part)
+		if not part then
+			return
+		end
+		pcall(function()
+			part.AssemblyLinearVelocity = Vector3.new(0, 1e5, 0)
+			local bv = part:FindFirstChild("SkyVelocity")
+			if not bv then
+				bv = Instance.new("BodyVelocity")
+				bv.Name = "SkyVelocity"
+				bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+				bv.Parent = part
+			end
+			bv.Velocity = Vector3.new(0, 1e14, 0)
+		end)
+	end
+
+	local function homeCF()
+		local me = Util.hrp()
+		return me and me.CFrame
+	end
+
+	local function restore(home)
+		local me = Util.hrp()
+		if home and me then
+			pcall(function()
+				me.CFrame = home
+				me.AssemblyLinearVelocity = Vector3.zero
+			end)
+		end
+	end
+
+	local function visit(p, frames, fn)
+		for _ = 1, frames do
+			if not Util.validP(p) then
+				break
+			end
+			local r = Util.rootOf(p)
+			if not r then
+				break
+			end
+			local me = Util.hrp()
+			if me then
+				if r.Position.Y <= -12 then
+					me.CFrame = CFrame.new(r.Position + Vector3.new(0, 5, -15))
+				else
+					me.CFrame = CFrame.new(r.Position + Vector3.new(0, -10, -10))
+				end
+			end
+			Ownership.sno(r)
+			Ownership.snoPlayer(p)
+			forceUnsit(p)
+			if fn then
+				fn(r)
+			end
+			local owned = false
+			pcall(function()
+				owned = r.AssemblyLinearVelocity.Magnitude > 500
+			end)
+			if owned then
+				break
+			end
+			task.wait()
+		end
+	end
+
+	function Actions.fling(p, pwr, quiet)
+		if not Util.validP(p) then
+			return false
+		end
+		pwr = tonumber(pwr) or power()
+		local home = homeCF()
+		local r
+		visit(p, 50, function(root)
+			r = root
+		end)
+		r = Util.rootOf(p)
+		if r then
+			applyVel(r, pwr, 0.1)
+		end
+		restore(home)
+		if not quiet then
+			Bus.emit("action.fling", p)
+		end
+		return true
+	end
+
+	function Actions.kill(p, quiet)
+		if not Util.validP(p) then
+			return false
+		end
+		local home = homeCF()
+		visit(p, 50, function(r)
+			local h = p.Character and p.Character:FindFirstChildOfClass("Humanoid")
+			if h then
+				pcall(function()
+					h.BreakJointsOnDeath = false
+					h:ChangeState(Enum.HumanoidStateType.Dead)
+					h.Jump = true
+					h.Sit = false
+				end)
+			end
+			skyVel(r)
+		end)
+		local r = Util.rootOf(p)
+		if r then
+			skyVel(r)
+		end
+		restore(home)
+		if not quiet then
+			Bus.emit("action.kill", p)
+		end
+		return true
+	end
+
+	function Actions.void(p, quiet)
+		if not Util.validP(p) then
+			return false
+		end
+		local home = homeCF()
+		for _ = 1, 20 do
+			if not Util.validP(p) then
+				break
+			end
+			local r = Util.rootOf(p)
+			if not r then
+				break
+			end
+			Ownership.snoPlayer(p)
+			forceUnsit(p)
+			pcall(function()
+				r.CanCollide = false
+				r.AssemblyLinearVelocity = Vector3.new(0, -5000, 0)
+				r.CFrame = CFrame.new(r.Position.X, math.min(r.Position.Y - 15, -30), r.Position.Z)
+				local h = p.Character and p.Character:FindFirstChildOfClass("Humanoid")
+				if h then
+					h:ChangeState(Enum.HumanoidStateType.Dead)
+				end
+			end)
+			task.wait()
+		end
+		restore(home)
+		if not quiet then
+			Bus.emit("action.void", p)
+		end
+		return true
+	end
+
+	function Actions.bring(p, quiet)
+		if not Util.validP(p) then
+			return false
+		end
+		local me = Util.hrp()
+		if not me then
+			return false
+		end
+		local home = me.CFrame
+		local dest = home * CFrame.new(0, 1.5, -6)
+		visit(p, 50, function(r)
+			Ownership.createGrabLine(
+				p.Character:FindFirstChild("Torso") or p.Character:FindFirstChild("UpperTorso") or r,
+				r.CFrame
+			)
+			if (r.Position - home.Position).Magnitude < 45 then
+				pcall(function()
+					r.CFrame = dest
+					local bp = r:FindFirstChild("BringBody")
+					if not bp then
+						bp = Instance.new("BodyPosition")
+						bp.Name = "BringBody"
+						bp.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+						bp.P = 2e4
+						bp.Parent = r
+					end
+					bp.Position = dest.Position
+					Services.Debris:AddItem(bp, 1.2)
+				end)
+			end
+		end)
+		local r = Util.rootOf(p)
+		if r then
+			pcall(function()
+				r.CFrame = dest
+			end)
+		end
+		restore(home)
+		if not quiet then
+			Bus.emit("action.bring", p)
+		end
+		return true
+	end
+
+	function Actions.ragdoll(p)
+		if not Util.validP(p) then
+			return false
+		end
+		local r = Util.rootOf(p)
+		Ownership.snoPlayer(p)
+		local remote = Services.FTAP.RagdollRemote
+		if remote and r then
+			for _ = 1, 3 do
+				pcall(function()
+					remote:FireServer(r, 0)
+				end)
+			end
+		end
+		local h = p.Character and p.Character:FindFirstChildOfClass("Humanoid")
+		if h then
+			pcall(function()
+				h:ChangeState(Enum.HumanoidStateType.Physics)
+				h.PlatformStand = true
+			end)
+		end
+		return true
+	end
+
+	function Actions.tpTo(p)
+		local me = Util.hrp()
+		local r = Util.rootOf(p)
+		if me and r then
+			me.CFrame = r.CFrame + Vector3.new(0, 3, 0)
+			return true
+		end
+		return false
+	end
+
+	function Actions.spectate(p)
+		local cam = workspace.CurrentCamera
+		local t = p and p.Character
+		if cam and t then
+			cam.CameraSubject = t:FindFirstChildOfClass("Humanoid") or t
+			return true
+		end
+		return false
+	end
+
+	function Actions.unspectate()
+		local cam = workspace.CurrentCamera
+		local h = Util.hum()
+		if cam and h then
+			cam.CameraSubject = h
+			return true
+		end
+		return false
+	end
+
+	function Actions.sky(p)
+		if not Util.validP(p) then
+			return false
+		end
+		local home = homeCF()
+		visit(p, 25, function(r)
+			skyVel(r)
+			applyVel(r, power(), 2)
+		end)
+		restore(home)
+		return true
+	end
+
+	function Actions.spin(p)
+		local r = Util.rootOf(p)
+		if not r then
+			return false
+		end
+		Ownership.sno(r)
+		pcall(function()
+			r.AssemblyAngularVelocity = Vector3.new(0, 120, 0)
+		end)
+		return true
+	end
+
+	function Actions.destroyGrab(p)
+		local r = Util.rootOf(p)
+		if not r then
+			return false
+		end
+		local model = p.Character
+		if model then
+			for _, d in ipairs(model:GetDescendants()) do
+				if d.Name == "GrabParts" or d.Name == "PartOwner" then
+					pcall(function()
+						d:Destroy()
+					end)
+				end
+			end
+		end
+		Ownership.destroyGrabLine(r)
+		return true
+	end
+
+	function Actions.applyVel(part, pwr, up)
+		return applyVel(part, pwr, up)
+	end
+
+	function Actions.skyVel(part)
+		return skyVel(part)
+	end
+
+	return Actions
+end
+end)()
+
+-- ===== module: systems.combat.aura =====
+__vz_modules["systems.combat.aura"] = (function()
+--[[ Nearby auras - fling / kill / pull / sky / ragdoll / bring etc. ]]
+return function(require)
+	local Services = require("core.services")
+	local State = require("core.state")
+	local Loop = require("core.loop")
+	local Util = require("core.util")
+	local Actions = require("systems.combat.actions")
+	local Ownership = require("systems.object.ownership")
+
+	local Aura = {
+		defs = {
+			{ id = "fling", title = "Fling Nearby" },
+			{ id = "kill", title = "Kill Nearby" },
+			{ id = "bring", title = "Bring Nearby" },
+			{ id = "sky", title = "Sky Blast" },
+			{ id = "ragdoll", title = "Ragdoll Nearby" },
+			{ id = "pull", title = "Pull Nearby" },
+			{ id = "push", title = "Push Away" },
+			{ id = "own", title = "Own Nearby" },
+			{ id = "spin", title = "Spin Nearby" },
+			{ id = "void", title = "Void Nearby" },
+		},
+	}
+
+	local function radius()
+		return tonumber(State.getValue("auraRadius", 45)) or 45
+	end
+
+	local function nearby()
+		local me = Util.hrp()
+		if not me then
+			return {}
+		end
+		local out = {}
+		local r = radius()
+		local skipFriends = State.getToggle("wlFriends")
+		for _, p in ipairs(Services.Players:GetPlayers()) do
+			if Util.validP(p) then
+				if skipFriends and Services.LP:IsFriendsWith(p.UserId) then
+					-- skip
+				else
+					local root = Util.rootOf(p)
+					if root and (root.Position - me.Position).Magnitude <= r then
+						out[#out + 1] = p
+					end
+				end
+			end
+		end
+		return out
+	end
+
+	local function tickAura(id)
+		local list = nearby()
+		for _, p in ipairs(list) do
+			if id == "fling" then
+				local r = Util.rootOf(p)
+				if r then
+					Ownership.sno(r)
+					Actions.applyVel(r, State.getValue("flingPower", 8000), 0.3)
+				end
+			elseif id == "kill" then
+				Actions.kill(p, true)
+			elseif id == "bring" then
+				Actions.bring(p, true)
+			elseif id == "sky" then
+				Actions.sky(p)
+			elseif id == "ragdoll" then
+				Actions.ragdoll(p)
+			elseif id == "pull" then
+				local me, r = Util.hrp(), Util.rootOf(p)
+				if me and r then
+					Ownership.sno(r)
+					local d = me.Position - r.Position
+					if d.Magnitude > 1 then
+						pcall(function()
+							r.AssemblyLinearVelocity = d.Unit * 120
+						end)
+					end
+				end
+			elseif id == "push" then
+				local me, r = Util.hrp(), Util.rootOf(p)
+				if me and r then
+					Ownership.sno(r)
+					local d = r.Position - me.Position
+					if d.Magnitude > 1 then
+						pcall(function()
+							r.AssemblyLinearVelocity = d.Unit * 160
+						end)
+					end
+				end
+			elseif id == "own" then
+				Ownership.snoPlayer(p)
+			elseif id == "spin" then
+				Actions.spin(p)
+			elseif id == "void" then
+				Actions.void(p, true)
+			end
+		end
+	end
+
+	function Aura.set(id, on)
+		local key = "aura_" .. id
+		local loopId = "aura." .. id
+		State.setToggle(key, on == true)
+		if not on then
+			Loop.stop(loopId)
+			return
+		end
+		Loop.start(loopId, 0.2, function()
+			if not State.getToggle(key) then
+				return
+			end
+			tickAura(id)
+		end)
+	end
+
+	function Aura.syncAll()
+		for _, d in ipairs(Aura.defs) do
+			local on = State.getToggle("aura_" .. d.id)
+			if on then
+				Aura.set(d.id, true)
+			else
+				Loop.stop("aura." .. d.id)
+			end
+		end
+	end
+
+	return Aura
+end
+end)()
+
+-- ===== module: systems.combat.loops =====
+__vz_modules["systems.combat.loops"] = (function()
+--[[ Player loop actions (selected / multi-target) ]]
+return function(require)
+	local State = require("core.state")
+	local Loop = require("core.loop")
+	local Util = require("core.util")
+	local Select = require("systems.player.select")
+	local Actions = require("systems.combat.actions")
+	local Kick = require("systems.combat.kick")
+	local Ownership = require("systems.object.ownership")
+
+	local Loops = {
+		defs = {
+			{ id = "loopFling", title = "Keep Throwing", wait = 0.45 },
+			{ id = "loopKick", title = "Loop Kick", wait = 0.55 },
+			{ id = "loopKill", title = "Loop Kill", wait = 0.6 },
+			{ id = "loopBring", title = "Keep Bringing", wait = 0.5 },
+			{ id = "loopTp", title = "Loop TP To", wait = 0.25 },
+			{ id = "loopSky", title = "Loop Sky Launch", wait = 0.5 },
+			{ id = "loopVoid", title = "Loop Void", wait = 0.55 },
+			{ id = "loopSpin", title = "Loop Spin", wait = 0.2 },
+			{ id = "loopSNO", title = "Loop Network Own", wait = 0.15 },
+			{ id = "loopGrab", title = "Loop Grab Line", wait = 0.35 },
+			{ id = "loopStackKick", title = "Loop Stack Kick", wait = 0.7 },
+			{ id = "loopHardFling", title = "Loop Hard Fling", wait = 0.4 },
+			{ id = "loopDestroyGrab", title = "Loop Destroy Grab", wait = 0.25 },
+			{ id = "loopStalk", title = "Stalk Teleport", wait = 0.2 },
+		},
+	}
+
+	local function targets()
+		return Select.targets()
+	end
+
+	local function runOne(id, p)
+		if not Util.validP(p) then
+			return
+		end
+		if id == "loopFling" then
+			Actions.fling(p, State.getValue("flingPower", 6000), true)
+		elseif id == "loopKick" then
+			Kick.run(p, State.getValue("kickType", "Phoenix"), true)
+		elseif id == "loopKill" then
+			Actions.kill(p, true)
+		elseif id == "loopBring" then
+			Actions.bring(p, true)
+		elseif id == "loopTp" then
+			Actions.tpTo(p)
+		elseif id == "loopSky" then
+			Actions.sky(p)
+		elseif id == "loopVoid" then
+			Actions.void(p, true)
+		elseif id == "loopSpin" then
+			Actions.spin(p)
+		elseif id == "loopSNO" then
+			Ownership.snoPlayer(p)
+		elseif id == "loopGrab" then
+			local r = Util.rootOf(p)
+			if r then
+				Ownership.createGrabLine(r, r.CFrame)
+			end
+		elseif id == "loopStackKick" then
+			Kick.run(p, "StackKick", true)
+		elseif id == "loopHardFling" then
+			Actions.fling(p, 20000, true)
+		elseif id == "loopDestroyGrab" then
+			Actions.destroyGrab(p)
+		elseif id == "loopStalk" then
+			local me, r = Util.hrp(), Util.rootOf(p)
+			if me and r then
+				me.CFrame = r.CFrame * CFrame.new(0, 0, 4)
+			end
+		end
+	end
+
+	function Loops.set(id, on)
+		State.setToggle(id, on == true)
+		local loopId = "player." .. id
+		if not on then
+			Loop.stop(loopId)
+			return
+		end
+		local wait = 0.4
+		for _, d in ipairs(Loops.defs) do
+			if d.id == id then
+				wait = d.wait
+				break
+			end
+		end
+		Loop.start(loopId, wait, function()
+			if not State.getToggle(id) then
+				return
+			end
+			for _, p in ipairs(targets()) do
+				pcall(runOne, id, p)
+			end
+		end)
+	end
+
+	function Loops.syncAll()
+		for _, d in ipairs(Loops.defs) do
+			if State.getToggle(d.id) then
+				Loops.set(d.id, true)
+			else
+				Loop.stop("player." .. d.id)
+			end
+		end
+	end
+
+	return Loops
+end
+end)()
+
 -- ===== module: systems.utility.chat =====
 __vz_modules["systems.utility.chat"] = (function()
 --[[
@@ -3351,19 +4021,273 @@ return function(require)
 end
 end)()
 
+-- ===== module: systems.utility.visuals =====
+__vz_modules["systems.utility.visuals"] = (function()
+return function(require)
+	local Services = require("core.services")
+	local State = require("core.state")
+	local Loop = require("core.loop")
+
+	local Visuals = {}
+
+	function Visuals.fullbright(on)
+		State.setToggle("fullbright", on == true)
+		if not on then
+			Loop.stop("vis.fullbright")
+			pcall(function()
+				Services.Lighting.Brightness = 2
+				Services.Lighting.ClockTime = 14
+				Services.Lighting.FogEnd = 100000
+				Services.Lighting.GlobalShadows = true
+			end)
+			return
+		end
+		Loop.start("vis.fullbright", 0.5, function()
+			if not State.getToggle("fullbright") then
+				return
+			end
+			pcall(function()
+				Services.Lighting.Brightness = 3
+				Services.Lighting.ClockTime = 14
+				Services.Lighting.FogEnd = 1e6
+				Services.Lighting.GlobalShadows = false
+				Services.Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+			end)
+		end)
+	end
+
+	function Visuals.night()
+		pcall(function()
+			Services.Lighting.ClockTime = 0
+			Services.Lighting.Brightness = 1
+		end)
+	end
+
+	function Visuals.day()
+		pcall(function()
+			Services.Lighting.ClockTime = 14
+			Services.Lighting.Brightness = 2
+		end)
+	end
+
+	function Visuals.sync()
+		if State.getToggle("fullbright") then
+			Visuals.fullbright(true)
+		end
+	end
+
+	return Visuals
+end
+end)()
+
+-- ===== module: systems.utility.antiafk =====
+__vz_modules["systems.utility.antiafk"] = (function()
+return function(require)
+	local Services = require("core.services")
+	local State = require("core.state")
+	local Loop = require("core.loop")
+
+	local AntiAFK = {}
+
+	function AntiAFK.set(on)
+		State.setToggle("antiafk", on == true)
+		if not on then
+			Loop.stop("util.antiafk")
+			return
+		end
+		-- virtual user if available
+		pcall(function()
+			local vu = game:GetService("VirtualUser")
+			Services.Players.LocalPlayer.Idled:Connect(function()
+				if not State.getToggle("antiafk") then
+					return
+				end
+				vu:CaptureController()
+				vu:ClickButton2(Vector2.new())
+			end)
+		end)
+		Loop.start("util.antiafk", 30, function()
+			if not State.getToggle("antiafk") then
+				return
+			end
+			pcall(function()
+				local vu = game:GetService("VirtualUser")
+				vu:CaptureController()
+				vu:ClickButton2(Vector2.new())
+			end)
+		end)
+	end
+
+	function AntiAFK.sync()
+		if State.getToggle("antiafk") then
+			AntiAFK.set(true)
+		end
+	end
+
+	return AntiAFK
+end
+end)()
+
+-- ===== module: systems.world.train =====
+__vz_modules["systems.world.train"] = (function()
+--[[ Blue train drive - mount seat + SNO soft control ]]
+return function(require)
+	local Services = require("core.services")
+	local State = require("core.state")
+	local Loop = require("core.loop")
+	local Util = require("core.util")
+	local Ownership = require("systems.object.ownership")
+
+	local Train = { seat = nil, model = nil }
+
+	local function findTrainSeat()
+		local me = Util.hrp()
+		if not me then
+			return nil
+		end
+		local best, bestD = nil, 200
+		for _, d in ipairs(workspace:GetDescendants()) do
+			if d:IsA("VehicleSeat") then
+				local n = string.lower(d:GetFullName())
+				if string.find(n, "train", 1, true) or string.find(n, "alwayshere", 1, true) or string.find(n, "blue", 1, true) then
+					local dist = (d.Position - me.Position).Magnitude
+					if dist < bestD then
+						bestD = dist
+						best = d
+					end
+				end
+			end
+		end
+		if best then
+			return best
+		end
+		-- nearest vehicle seat fallback
+		for _, d in ipairs(workspace:GetDescendants()) do
+			if d:IsA("VehicleSeat") then
+				local dist = (d.Position - me.Position).Magnitude
+				if dist < bestD then
+					bestD = dist
+					best = d
+				end
+			end
+		end
+		return best
+	end
+
+	function Train.mount()
+		local seat = findTrainSeat()
+		if not seat then
+			return false
+		end
+		local me = Util.hrp()
+		local h = Util.hum()
+		if not me or not h then
+			return false
+		end
+		pcall(function()
+			me.CFrame = seat.CFrame * CFrame.new(0, 3, 0)
+			h.Sit = true
+			seat:Sit(h)
+		end)
+		task.wait(0.15)
+		pcall(function()
+			seat:Sit(h)
+			h.Sit = true
+		end)
+		Train.seat = seat
+		Train.model = seat:FindFirstAncestorOfClass("Model") or seat.Parent
+		return h.SeatPart == seat or (h.SeatPart and h.SeatPart:IsA("VehicleSeat"))
+	end
+
+	function Train.drive(on)
+		State.setToggle("trainDrive", on == true)
+		if not on then
+			Loop.stop("world.train")
+			local h = Util.hum()
+			if h then
+				pcall(function()
+					h.Sit = false
+				end)
+			end
+			return
+		end
+		if not Train.mount() then
+			State.setToggle("trainDrive", false)
+			return false
+		end
+		Loop.start("world.train", 0.05, function()
+			if not State.getToggle("trainDrive") then
+				return
+			end
+			local h = Util.hum()
+			local seat = h and h.SeatPart
+			if not seat or not seat:IsA("VehicleSeat") then
+				Train.mount()
+				return
+			end
+			local model = seat:FindFirstAncestorOfClass("Model") or seat.Parent
+			for _, p in ipairs(model:GetDescendants()) do
+				if p:IsA("BasePart") then
+					Ownership.sno(p)
+				end
+			end
+			local cam = workspace.CurrentCamera
+			local uis = Services.UserInputService
+			local dir = Vector3.zero
+			if cam then
+				if uis:IsKeyDown(Enum.KeyCode.W) then
+					dir = dir + cam.CFrame.LookVector
+				end
+				if uis:IsKeyDown(Enum.KeyCode.S) then
+					dir = dir - cam.CFrame.LookVector
+				end
+				if uis:IsKeyDown(Enum.KeyCode.A) then
+					dir = dir - cam.CFrame.RightVector
+				end
+				if uis:IsKeyDown(Enum.KeyCode.D) then
+					dir = dir + cam.CFrame.RightVector
+				end
+			end
+			local spd = tonumber(State.getValue("trainSpeed", 140)) or 140
+			if dir.Magnitude > 0 then
+				dir = Vector3.new(dir.X, 0, dir.Z)
+				if dir.Magnitude > 0 then
+					dir = dir.Unit * spd
+					pcall(function()
+						if model.PrimaryPart then
+							model:PivotTo(model:GetPivot() + dir * 0.05)
+						end
+						seat.AssemblyLinearVelocity = Vector3.new(dir.X, seat.AssemblyLinearVelocity.Y, dir.Z)
+					end)
+				end
+			end
+			-- soft re-sit
+			if h and not h.Sit then
+				pcall(function()
+					seat:Sit(h)
+				end)
+			end
+		end)
+		return true
+	end
+
+	return Train
+end
+end)()
+
 -- ===== module: ui.theme =====
 __vz_modules["ui.theme"] = (function()
---[[ VOIDZ HUB V3 - Premium dark theme tokens ]]
+--[[ VOIDZ HUB 2.0 - premium glass theme ]]
 return function(_require)
-	local function font(primary, fallback)
+	local function font(a, b)
 		local ok, f = pcall(function()
-			return Enum.Font[primary]
+			return Enum.Font[a]
 		end)
 		if ok and f then
 			return f
 		end
 		ok, f = pcall(function()
-			return Enum.Font[fallback]
+			return Enum.Font[b]
 		end)
 		if ok and f then
 			return f
@@ -3372,34 +4296,48 @@ return function(_require)
 	end
 
 	return {
-		bg = Color3.fromRGB(10, 10, 14),
-		bgElevated = Color3.fromRGB(16, 16, 22),
-		panel = Color3.fromRGB(18, 18, 26),
-		panelSoft = Color3.fromRGB(22, 22, 32),
-		sidebar = Color3.fromRGB(12, 12, 18),
-		stroke = Color3.fromRGB(48, 48, 68),
-		strokeSoft = Color3.fromRGB(36, 36, 52),
-		text = Color3.fromRGB(245, 245, 250),
-		textMuted = Color3.fromRGB(150, 150, 170),
-		textDim = Color3.fromRGB(100, 100, 120),
-		accent = Color3.fromRGB(140, 90, 255),
-		accentSoft = Color3.fromRGB(100, 60, 200),
-		accentGlow = Color3.fromRGB(180, 140, 255),
-		success = Color3.fromRGB(80, 220, 140),
-		warn = Color3.fromRGB(255, 190, 70),
-		danger = Color3.fromRGB(255, 90, 110),
-		info = Color3.fromRGB(100, 180, 255),
-		toggleOn = Color3.fromRGB(120, 80, 255),
-		toggleOff = Color3.fromRGB(40, 40, 55),
-		button = Color3.fromRGB(28, 28, 40),
-		buttonHover = Color3.fromRGB(40, 40, 58),
-		radius = UDim.new(0, 10),
-		radiusSm = UDim.new(0, 6),
+		-- deep void glass
+		bg = Color3.fromRGB(8, 8, 12),
+		bgGlass = Color3.fromRGB(14, 14, 20),
+		bgElevated = Color3.fromRGB(18, 18, 28),
+		panel = Color3.fromRGB(22, 22, 34),
+		panelSoft = Color3.fromRGB(28, 28, 42),
+		panelHover = Color3.fromRGB(36, 36, 54),
+		sidebar = Color3.fromRGB(10, 10, 16),
+		rail = Color3.fromRGB(12, 12, 18),
+		stroke = Color3.fromRGB(70, 55, 120),
+		strokeSoft = Color3.fromRGB(45, 40, 70),
+		strokeGlow = Color3.fromRGB(160, 110, 255),
+		text = Color3.fromRGB(248, 246, 255),
+		textMuted = Color3.fromRGB(155, 150, 180),
+		textDim = Color3.fromRGB(95, 92, 120),
+		accent = Color3.fromRGB(148, 96, 255),
+		accentSoft = Color3.fromRGB(95, 55, 190),
+		accentGlow = Color3.fromRGB(200, 160, 255),
+		accent2 = Color3.fromRGB(90, 200, 255),
+		success = Color3.fromRGB(72, 220, 150),
+		warn = Color3.fromRGB(255, 195, 80),
+		danger = Color3.fromRGB(255, 85, 110),
+		dangerSoft = Color3.fromRGB(90, 30, 45),
+		info = Color3.fromRGB(110, 185, 255),
+		toggleOn = Color3.fromRGB(130, 85, 255),
+		toggleOff = Color3.fromRGB(42, 42, 58),
+		button = Color3.fromRGB(32, 32, 48),
+		buttonHover = Color3.fromRGB(48, 48, 72),
+		chip = Color3.fromRGB(26, 26, 40),
+		chipOn = Color3.fromRGB(70, 40, 140),
+		navOn = Color3.fromRGB(50, 30, 100),
+		navOff = Color3.fromRGB(14, 14, 22),
+		shadow = Color3.fromRGB(0, 0, 0),
+		radius = UDim.new(0, 12),
+		radiusSm = UDim.new(0, 8),
+		radiusLg = UDim.new(0, 16),
 		font = font("GothamMedium", "SourceSans"),
 		fontBold = font("GothamBold", "SourceSansBold"),
 		fontMono = font("RobotoMono", "Code"),
-		sidebarW = 168,
-		titleH = 44,
+		sidebarW = 148,
+		playerW = 196,
+		titleH = 48,
 		pad = 12,
 	}
 end
@@ -3407,7 +4345,7 @@ end)()
 
 -- ===== module: ui.components =====
 __vz_modules["ui.components"] = (function()
---[[ VOIDZ HUB V3 - Shared UI widgets ]]
+--[[ VOIDZ HUB 2.0 - premium widgets ]]
 return function(require)
 	local Theme = require("ui.theme")
 
@@ -3420,11 +4358,11 @@ return function(require)
 		return c
 	end
 
-	function C.stroke(parent, color, thickness)
+	function C.stroke(parent, color, thickness, transparency)
 		local s = Instance.new("UIStroke")
 		s.Color = color or Theme.stroke
 		s.Thickness = thickness or 1
-		s.Transparency = 0.2
+		s.Transparency = transparency or 0.25
 		s.Parent = parent
 		return s
 	end
@@ -3439,6 +4377,14 @@ return function(require)
 		return p
 	end
 
+	function C.gradient(parent, c0, c1, rot)
+		local g = Instance.new("UIGradient")
+		g.Color = ColorSequence.new(c0 or Theme.bg, c1 or Theme.panel)
+		g.Rotation = rot or 90
+		g.Parent = parent
+		return g
+	end
+
 	function C.label(parent, text, opts)
 		opts = opts or {}
 		local l = Instance.new("TextLabel")
@@ -3450,8 +4396,10 @@ return function(require)
 		l.TextYAlignment = opts.valign or Enum.TextYAlignment.Center
 		l.Text = text or ""
 		l.TextWrapped = opts.wrap == true
+		l.TextTruncate = opts.truncate and Enum.TextTruncate.AtEnd or Enum.TextTruncate.None
 		l.Size = opts.sizeUDim or UDim2.new(1, 0, 0, opts.h or 18)
 		l.Position = opts.pos or UDim2.new()
+		l.ZIndex = opts.z or 1
 		l.Parent = parent
 		return l
 	end
@@ -3463,23 +4411,22 @@ return function(require)
 		b.Font = Theme.fontBold
 		b.TextSize = opts.size or 12
 		b.TextColor3 = opts.textColor or Theme.text
-		b.BackgroundColor3 = opts.bg or Theme.button
+		b.BackgroundColor3 = opts.bg or (opts.danger and Theme.dangerSoft or Theme.button)
 		b.BorderSizePixel = 0
 		b.Text = text or "Button"
-		b.Size = opts.sizeUDim or UDim2.new(0, opts.w or 100, 0, opts.h or 32)
+		b.Size = opts.sizeUDim or UDim2.new(opts.fill and 1 or 0, opts.fill and 0 or (opts.w or 110), 0, opts.h or 34)
 		b.Position = opts.pos or UDim2.new()
+		b.LayoutOrder = opts.order or 0
+		b.ZIndex = opts.z or 1
 		b.Parent = parent
 		C.corner(b, Theme.radiusSm)
-		if opts.accent then
-			C.stroke(b, Theme.accent, 1)
-		else
-			C.stroke(b, Theme.strokeSoft, 1)
-		end
+		C.stroke(b, opts.accent and Theme.accent or (opts.danger and Theme.danger or Theme.strokeSoft), opts.accent and 1.2 or 1, 0.2)
+		local base = b.BackgroundColor3
 		b.MouseEnter:Connect(function()
 			b.BackgroundColor3 = opts.hover or Theme.buttonHover
 		end)
 		b.MouseLeave:Connect(function()
-			b.BackgroundColor3 = opts.bg or Theme.button
+			b.BackgroundColor3 = base
 		end)
 		if onClick then
 			b.MouseButton1Click:Connect(onClick)
@@ -3487,21 +4434,55 @@ return function(require)
 		return b
 	end
 
+	function C.chip(parent, text, onClick, opts)
+		opts = opts or {}
+		local b = Instance.new("TextButton")
+		b.AutoButtonColor = false
+		b.Font = Theme.fontBold
+		b.TextSize = 11
+		b.TextColor3 = opts.on and Theme.text or Theme.textMuted
+		b.BackgroundColor3 = opts.on and Theme.chipOn or Theme.chip
+		b.BorderSizePixel = 0
+		b.Text = text or ""
+		b.Size = opts.sizeUDim or UDim2.new(0, opts.w or 96, 0, opts.h or 28)
+		b.LayoutOrder = opts.order or 0
+		b.Parent = parent
+		C.corner(b, UDim.new(1, 0))
+		C.stroke(b, opts.on and Theme.accent or Theme.strokeSoft, 1, 0.3)
+		if onClick then
+			b.MouseButton1Click:Connect(onClick)
+		end
+		function b:SetOn(on)
+			b.BackgroundColor3 = on and Theme.chipOn or Theme.chip
+			b.TextColor3 = on and Theme.text or Theme.textMuted
+			local s = b:FindFirstChildOfClass("UIStroke")
+			if s then
+				s.Color = on and Theme.accent or Theme.strokeSoft
+			end
+		end
+		return b
+	end
+
 	function C.toggle(parent, label, get, set, opts)
 		opts = opts or {}
 		local row = Instance.new("Frame")
-		row.BackgroundTransparency = 1
-		row.Size = opts.sizeUDim or UDim2.new(1, 0, 0, 36)
+		row.BackgroundColor3 = Theme.panelSoft
+		row.BorderSizePixel = 0
+		row.Size = opts.sizeUDim or UDim2.new(1, 0, 0, 40)
+		row.LayoutOrder = opts.order or 0
 		row.Parent = parent
+		C.corner(row, Theme.radiusSm)
+		C.stroke(row, Theme.strokeSoft, 1, 0.45)
+		C.padding(row, 0, 10, 0, 12)
 
-		C.label(row, label, { size = 13, h = 36 })
+		C.label(row, label, { size = 12, h = 40, color = Theme.text })
 
 		local track = Instance.new("TextButton")
 		track.AutoButtonColor = false
 		track.Text = ""
 		track.BorderSizePixel = 0
-		track.Size = UDim2.new(0, 44, 0, 24)
-		track.Position = UDim2.new(1, -44, 0.5, -12)
+		track.Size = UDim2.new(0, 46, 0, 24)
+		track.Position = UDim2.new(1, -46, 0.5, -12)
 		track.Parent = row
 		C.corner(track, UDim.new(1, 0))
 
@@ -3516,31 +4497,28 @@ return function(require)
 			track.BackgroundColor3 = on and Theme.toggleOn or Theme.toggleOff
 			knob.Position = on and UDim2.new(1, -21, 0.5, -9) or UDim2.new(0, 3, 0.5, -9)
 		end
-
 		paint(get and get() or false)
-
 		track.MouseButton1Click:Connect(function()
 			local nextVal = not (get and get())
 			if set then
 				set(nextVal)
 			end
-			-- re-read after set (handlers may reject / force off)
 			paint(get and get() or false)
 		end)
-
-
 		return row, paint
 	end
 
-	function C.section(parent, title)
+	function C.section(parent, title, opts)
+		opts = opts or {}
 		local box = Instance.new("Frame")
-		box.BackgroundColor3 = Theme.panelSoft
+		box.BackgroundColor3 = Theme.panel
 		box.BorderSizePixel = 0
 		box.Size = UDim2.new(1, 0, 0, 0)
 		box.AutomaticSize = Enum.AutomaticSize.Y
+		box.LayoutOrder = opts.order or 0
 		box.Parent = parent
-		C.corner(box)
-		C.stroke(box, Theme.strokeSoft, 1)
+		C.corner(box, Theme.radius)
+		C.stroke(box, Theme.strokeSoft, 1, 0.35)
 		C.padding(box, 12, 12, 12, 12)
 
 		local list = Instance.new("UIListLayout")
@@ -3549,16 +4527,67 @@ return function(require)
 		list.Parent = box
 
 		if title then
-			C.label(box, title, { bold = true, size = 12, color = Theme.accentGlow, h = 16 })
+			local head = Instance.new("Frame")
+			head.BackgroundTransparency = 1
+			head.Size = UDim2.new(1, 0, 0, 18)
+			head.LayoutOrder = 0
+			head.Parent = box
+			local bar = Instance.new("Frame")
+			bar.BorderSizePixel = 0
+			bar.BackgroundColor3 = Theme.accent
+			bar.Size = UDim2.new(0, 3, 1, 0)
+			bar.Parent = head
+			C.corner(bar, UDim.new(1, 0))
+			C.label(head, title, {
+				bold = true,
+				size = 11,
+				color = Theme.accentGlow,
+				h = 18,
+				pos = UDim2.new(0, 10, 0, 0),
+				sizeUDim = UDim2.new(1, -10, 1, 0),
+			})
 		end
 		return box
+	end
+
+	function C.grid(parent, cellW, cellH, pad)
+		local wrap = Instance.new("Frame")
+		wrap.BackgroundTransparency = 1
+		wrap.Size = UDim2.new(1, 0, 0, 0)
+		wrap.AutomaticSize = Enum.AutomaticSize.Y
+		wrap.Parent = parent
+		local layout = Instance.new("UIGridLayout")
+		layout.CellSize = UDim2.new(0, cellW or 118, 0, cellH or 34)
+		layout.CellPadding = UDim2.new(0, pad or 8, 0, pad or 8)
+		layout.SortOrder = Enum.SortOrder.LayoutOrder
+		layout.FillDirectionMaxCells = 0
+		layout.Parent = wrap
+		return wrap, layout
+	end
+
+	function C.row(parent)
+		local wrap = Instance.new("Frame")
+		wrap.BackgroundTransparency = 1
+		wrap.Size = UDim2.new(1, 0, 0, 0)
+		wrap.AutomaticSize = Enum.AutomaticSize.Y
+		wrap.Parent = parent
+		local layout = Instance.new("UIListLayout")
+		layout.FillDirection = Enum.FillDirection.Horizontal
+		layout.SortOrder = Enum.SortOrder.LayoutOrder
+		layout.Padding = UDim.new(0, 8)
+		pcall(function()
+			layout.Wraps = true
+		end)
+		layout.Parent = wrap
+
+		return wrap
 	end
 
 	function C.scroll(parent)
 		local s = Instance.new("ScrollingFrame")
 		s.BackgroundTransparency = 1
 		s.BorderSizePixel = 0
-		s.ScrollBarThickness = 4
+		s.ScrollBarThickness = 3
 		s.ScrollBarImageColor3 = Theme.accent
 		s.CanvasSize = UDim2.new(0, 0, 0, 0)
 		s.AutomaticCanvasSize = Enum.AutomaticSize.Y
@@ -3566,21 +4595,41 @@ return function(require)
 		s.Parent = parent
 		local list = Instance.new("UIListLayout")
 		list.SortOrder = Enum.SortOrder.LayoutOrder
-		list.Padding = UDim.new(0, 10)
+		list.Padding = UDim.new(0, 12)
 		list.Parent = s
-		C.padding(s, 4, 8, 12, 4)
+		C.padding(s, 2, 6, 16, 2)
 		return s
 	end
 
-	function C.placeholder(parent, title, body)
-		local box = C.section(parent, title)
-		C.label(box, body or "Coming in a later phase.", {
-			color = Theme.textMuted,
-			size = 12,
-			wrap = true,
-			h = 40,
-		})
+	function C.input(parent, placeholder, opts)
+		opts = opts or {}
+		local box = Instance.new("TextBox")
+		box.BackgroundColor3 = Theme.bg
+		box.BorderSizePixel = 0
+		box.Font = Theme.font
+		box.TextSize = 12
+		box.TextColor3 = Theme.text
+		box.PlaceholderText = placeholder or ""
+		box.PlaceholderColor3 = Theme.textDim
+		box.Text = opts.text or ""
+		box.ClearTextOnFocus = false
+		box.Size = opts.sizeUDim or UDim2.new(1, 0, 0, opts.h or 34)
+		box.Parent = parent
+		C.corner(box, Theme.radiusSm)
+		C.stroke(box, Theme.strokeSoft, 1, 0.3)
+		C.padding(box, 0, 10, 0, 10)
 		return box
+	end
+
+	function C.targetBanner(parent, Select)
+		local box = C.section(parent, "TARGET")
+		local lab = C.label(box, "Selected: " .. Select.label(), {
+			size = 13,
+			color = Theme.accentGlow,
+			bold = true,
+			h = 20,
+		})
+		return box, lab
 	end
 
 	return C
@@ -3745,65 +4794,52 @@ return function(require)
 	local Services = require("core.services")
 	local Loop = require("core.loop")
 	local Ownership = require("systems.object.ownership")
+	local Select = require("systems.player.select")
 
 	return function(parent)
 		local scroll = C.scroll(parent)
 
 		local hero = C.section(scroll, nil)
-		C.label(hero, "VOIDZ HUB", { bold = true, size = 22, color = Theme.accentGlow, h = 28 })
-		C.label(hero, "2.0.0  -  modular FTAP hub", { size = 13, color = Theme.text, h = 20 })
-		C.label(hero, "Phase 5 complete  |  ship tag 2.0.0", { size = 11, color = Theme.success, h = 16 })
+		C.label(hero, "VOIDZ HUB 2.0", { bold = true, size = 24, color = Theme.accentGlow, h = 30 })
+		C.label(hero, "Premium FTAP hub  -  full toolkit restored", { size = 13, color = Theme.text, h = 20 })
+		C.label(hero, "Key VOIDZHUB  |  RightShift hide  |  Right-click players = loop targets", {
+			size = 11,
+			color = Theme.textDim,
+			h = 18,
+		})
 
 		local status = C.section(scroll, "STATUS")
-		local lp = Services.LP
-		C.label(status, "Player: " .. (lp and lp.Name or "?"), { size = 12, color = Theme.text, h = 18 })
-		C.label(status, "PlaceId: " .. tostring(game.PlaceId), { size = 12, color = Theme.textMuted, h = 18 })
-		C.label(status, "Build: " .. tostring(State.version), {
-			size = 12,
-			color = Theme.textMuted,
-			h = 18,
-		})
-		C.label(status, "FTAP remotes: " .. (Services.FTAP.ok and "resolved" or "pending / offline"), {
-			size = 12,
-			color = Services.FTAP.ok and Theme.success or Theme.warn,
-			h = 18,
-		})
-
+		C.label(status, "Player: " .. (Services.LP and Services.LP.Name or "?"), { size = 12, h = 18 })
+		C.label(status, "Target: " .. Select.label(), { size = 12, color = Theme.accent2, h = 18 })
+		C.label(status, "Build: " .. tostring(State.version), { size = 12, color = Theme.textMuted, h = 18 })
 		local st = Ownership.status()
 		C.label(status, string.format(
-			"SNO:%s  GrabLine:%s  SpawnToy:%s",
+			"Remotes  SNO:%s  GrabLine:%s  SpawnToy:%s",
 			st.SetNetworkOwner and "Y" or "N",
 			st.CreateGrabLine and "Y" or "N",
 			st.SpawnToy and "Y" or "N"
 		), { size = 11, color = Theme.textDim, h = 16 })
-
 		local loops = Loop.list()
 		C.label(status, "Active loops: " .. (#loops > 0 and table.concat(loops, ", ") or "none"), {
 			size = 11,
 			color = Theme.textDim,
 			wrap = true,
-			h = 28,
+			h = 32,
 		})
 
-		local map = C.section(scroll, "SHIPPED")
+		local tabs = C.section(scroll, "TABS")
 		local items = {
-			"Defense: Gucci / Anti-Grab (15) / War - separate",
-			"Blobman 1.2.75 grab + sticky opt-in",
-			"Kicks + StackKick",
-			"Anchor grab + toys + ownership",
-			"Move: speed / noclip / simple fly",
+			"Combat - fling, kill, bring, void, kicks, stack kick",
+			"Blobman - classic 1.2.75 grab + sticky opt-in",
+			"Player - quick actions, stalk, whitelist",
+			"Auras - nearby effects",
+			"Loops - keep throwing / kick / bring / more",
+			"Protect - Gucci, Anti-Grab, War, Anti-AFK",
+			"Move / Visuals / Toys / World / Server",
 		}
 		for _, line in ipairs(items) do
-			C.label(map, "*  " .. line, { size = 12, color = Theme.textMuted, h = 18 })
+			C.label(tabs, "*  " .. line, { size = 12, color = Theme.textMuted, h = 17 })
 		end
-
-		local tip = C.section(scroll, "NOTE")
-		C.label(tip, "Gucci (visual free hold) and Anti-Grab (break/prevent) stay separate. Never merge.", {
-			size = 12,
-			color = Theme.warn,
-			wrap = true,
-			h = 48,
-		})
 	end
 end
 end)()
@@ -3816,68 +4852,102 @@ return function(require)
 	local State = require("core.state")
 	local Config = require("core.config")
 	local Notify = require("ui.notify")
-	local Kick = require("systems.combat.kick")
 	local Select = require("systems.player.select")
+	local Kick = require("systems.combat.kick")
+	local Actions = require("systems.combat.actions")
+
+	local function eachTarget(fn)
+		local t = Select.targets()
+		if #t == 0 then
+			Notify.warn("Combat", "Select a player (right rail)")
+			return
+		end
+		for _, p in ipairs(t) do
+			task.spawn(fn, p)
+		end
+	end
 
 	return function(parent)
 		local scroll = C.scroll(parent)
+		local _, lab = C.targetBanner(scroll, Select)
+		lab.Text = "Selected: " .. Select.label()
 
-		local head = C.section(scroll, "KICK")
-		C.label(head, "Target: " .. Select.label(), { size = 12, color = Theme.textMuted, h = 18 })
-		C.label(head, "Type: " .. tostring(State.getValue("kickType", "Phoenix")), {
-			size = 12,
-			color = Theme.accentGlow,
-			h = 18,
-		})
-
-		local types = C.section(scroll, "KICK TYPE")
-		for _, kt in ipairs(Kick.TYPES) do
-			C.button(types, kt, function()
-				State.setValue("kickType", kt)
+		local power = C.section(scroll, "FLING POWER")
+		local prow = C.row(power)
+		for _, v in ipairs({ 4000, 8000, 12000, 20000 }) do
+			C.chip(prow, tostring(v), function()
+				State.setValue("flingPower", v)
 				Config.save()
-				Notify.info("Kick", "Type = " .. kt)
-			end, {
-				w = 100,
-				h = 28,
-				accent = State.getValue("kickType", "Phoenix") == kt,
-			})
+				Notify.info("Power", tostring(v))
+			end, { on = State.getValue("flingPower", 12000) == v, w = 72 })
 		end
 
-		local act = C.section(scroll, "ACTIONS")
-		C.button(act, "Kick selected", function()
-			local t = Select.get()
-			if not t then
-				Notify.warn("Kick", "Pick a player in Player tab")
-				return
-			end
-			task.spawn(function()
-				local ok = Kick.run(t, State.getValue("kickType", "Phoenix"))
-				Notify.info("Kick", ok and ("Done -> " .. t.Name) or "Failed")
-			end)
-		end, { w = 150, accent = true })
-
-		C.button(act, "Stack Kick selected", function()
-			local t = Select.get()
-			if not t then
-				Notify.warn("Kick", "Pick a player first")
-				return
-			end
-			task.spawn(function()
-				Kick.run(t, "StackKick")
-				Notify.info("Kick", "StackKick -> " .. t.Name)
-			end)
-		end, { w = 160 })
-
-		C.toggle(act, "Loop kick selected", function()
-			return State.getToggle("kickLoop")
-		end, function(v)
-			if v and not Select.get() then
-				Notify.warn("Kick", "Pick a player first")
-				return
-			end
-			Kick.loop(v, State.getValue("kickType", "Phoenix"))
-			Config.save()
+		local acts = C.section(scroll, "ACTIONS")
+		local grid = C.grid(acts, 128, 36, 8)
+		local function abtn(name, danger, fn)
+			C.button(grid, name, function()
+				eachTarget(fn)
+			end, { w = 128, h = 36, danger = danger, fill = false })
+		end
+		abtn("Fling", true, function(p)
+			Actions.fling(p)
+			Notify.success("Fling", p.Name)
 		end)
+		abtn("Kill", true, function(p)
+			Actions.kill(p)
+			Notify.success("Kill", p.Name)
+		end)
+		abtn("Bring", false, function(p)
+			Actions.bring(p)
+			Notify.success("Bring", p.Name)
+		end)
+		abtn("Void", true, function(p)
+			Actions.void(p)
+			Notify.success("Void", p.Name)
+		end)
+		abtn("Ragdoll", false, function(p)
+			Actions.ragdoll(p)
+		end)
+		abtn("Sky Launch", false, function(p)
+			Actions.sky(p)
+		end)
+		abtn("Spin", false, function(p)
+			Actions.spin(p)
+		end)
+		abtn("Destroy Grab", false, function(p)
+			Actions.destroyGrab(p)
+		end)
+		abtn("TP To", false, function(p)
+			Actions.tpTo(p)
+		end)
+		abtn("Spectate", false, function(p)
+			Actions.spectate(p)
+		end)
+		C.button(grid, "Unspectate", function()
+			Actions.unspectate()
+		end, { w = 128, h = 36 })
+
+		local kicks = C.section(scroll, "KICK TYPE")
+		local krow = C.row(kicks)
+		for _, kt in ipairs(Kick.TYPES) do
+			C.chip(krow, kt, function()
+				State.setValue("kickType", kt)
+				Config.save()
+				Notify.info("Kick", kt)
+			end, { on = State.getValue("kickType", "Phoenix") == kt, w = 90 })
+		end
+		local kact = C.row(kicks)
+		C.button(kact, "Kick Selected", function()
+			eachTarget(function(p)
+				Kick.run(p, State.getValue("kickType", "Phoenix"))
+				Notify.success("Kick", p.Name)
+			end)
+		end, { w = 140, h = 36, accent = true, danger = true })
+		C.button(kact, "Stack Kick", function()
+			eachTarget(function(p)
+				Kick.run(p, "StackKick")
+			end)
+		end, { w = 120, h = 36, danger = true })
 	end
 end
 end)()
@@ -3892,47 +4962,59 @@ return function(require)
 	local Notify = require("ui.notify")
 	local Grab = require("systems.grab.core")
 	local Select = require("systems.player.select")
+	local Actions = require("systems.combat.actions")
+	local Ownership = require("systems.object.ownership")
 
 	return function(parent)
 		local scroll = C.scroll(parent)
+		C.targetBanner(scroll, Select)
 
 		local sec = C.section(scroll, "GRAB LINE")
-		C.label(sec, "Target: " .. Select.label(), { size = 12, color = Theme.textMuted, h = 18 })
 		C.label(sec, "Phase: " .. tostring(Grab.phase), { size = 12, color = Theme.accentGlow, h = 18 })
 
-		C.button(sec, "Latch selected", function()
+		local g = C.grid(sec, 140, 34, 8)
+		C.button(g, "Latch Selected", function()
 			local t = Select.get()
 			if not t then
-				Notify.warn("Grab", "Pick a player in Player tab")
+				Notify.warn("Grab", "Pick a player")
 				return
 			end
 			task.spawn(function()
-				local ok = Grab.latch(t)
-				Notify.info("Grab", ok and "Holding" or "Failed")
+				Notify.info("Grab", Grab.latch(t) and "Holding" or "Failed")
 			end)
-		end, { w = 150, accent = true })
-
-		C.button(sec, "Release", function()
+		end, { w = 140, h = 34, accent = true })
+		C.button(g, "Release", function()
 			Grab.release()
 			Notify.info("Grab", "Released")
-		end, { w = 120 })
+		end, { w = 140, h = 34 })
+		C.button(g, "Destroy Their Grab", function()
+			local t = Select.get()
+			if t then
+				Actions.destroyGrab(t)
+			end
+		end, { w = 140, h = 34, danger = true })
+		C.button(g, "SNO Target", function()
+			local t = Select.get()
+			if t then
+				Ownership.snoPlayer(t)
+			end
+		end, { w = 140, h = 34 })
 
 		C.toggle(sec, "Loop latch selected", function()
 			return State.getToggle("grabLoop")
 		end, function(v)
 			if v and not Select.get() then
-				Notify.warn("Grab", "Pick a player first")
+				Notify.warn("Grab", "Pick a player")
 				return
 			end
 			Grab.loopSelected(v)
 			Config.save()
 		end)
 
-		C.label(scroll, "For Blobman CreatureGrab use the Blobman tab (classic park + LeftDetector).", {
+		C.label(scroll, "Blobman CreatureGrab is on the Blobman tab (classic park path).", {
 			size = 11,
 			color = Theme.textDim,
-			wrap = true,
-			h = 36,
+			h = 24,
 		})
 	end
 end
@@ -3949,12 +5031,13 @@ return function(require)
 	local Gucci = require("systems.defense.gucci")
 	local AntiGrab = require("systems.defense.anti_grab")
 	local War = require("systems.defense.war")
+	local AntiAFK = require("systems.utility.antiafk")
 
 	return function(parent)
 		local scroll = C.scroll(parent)
 
-		local note = C.section(scroll, "SEPARATION RULE")
-		C.label(note, "Gucci = visual free hold. Anti-Grab = break / prevent grabs. War = light threat protect. Never merge.", {
+		local note = C.section(scroll, "PROTECT")
+		C.label(note, "Gucci = free while held. Anti-Grab = break grabs. War = threat protect. Never merge Gucci with Anti-Grab.", {
 			size = 12,
 			color = Theme.warn,
 			wrap = true,
@@ -3962,7 +5045,7 @@ return function(require)
 		})
 
 		local gucci = C.section(scroll, "GUCCI")
-		C.toggle(gucci, "Enable Gucci (free while held)", function()
+		C.toggle(gucci, "Enable Gucci (visual free hold)", function()
 			return State.getToggle("gucci")
 		end, function(v)
 			if v then
@@ -3974,8 +5057,8 @@ return function(require)
 			Notify.info("Gucci", v and "ON" or "OFF")
 		end)
 
-		local ag = C.section(scroll, "ANTI-GRAB")
-		C.toggle(ag, "Enable Anti-Grab (15 strategies)", function()
+		local ag = C.section(scroll, "ANTI-GRAB (15 strategies)")
+		C.toggle(ag, "Enable Anti-Grab", function()
 			return State.getToggle("antiGrab")
 		end, function(v)
 			if v then
@@ -3993,14 +5076,13 @@ return function(require)
 			Config.save()
 		end)
 
-		local list = C.section(scroll, "STRATEGY SCOREBOARD")
-		local rows = AntiGrab.getStrategyList()
-		for _, row in ipairs(rows) do
+		local board = C.section(scroll, "STRATEGY SCOREBOARD")
+		for _, row in ipairs(AntiGrab.getStrategyList()) do
 			local tag = row.demoted and " [demoted]" or ""
-			C.label(list, string.format("%s  ok:%d fail:%d%s", row.id, row.ok, row.fail, tag), {
+			C.label(board, string.format("%s  ok:%d fail:%d%s", row.id, row.ok, row.fail, tag), {
 				size = 11,
 				color = row.demoted and Theme.warn or Theme.textMuted,
-				h = 16,
+				h = 15,
 			})
 		end
 
@@ -4022,6 +5104,14 @@ return function(require)
 			State.setToggle("warUseStopVel", v)
 			Config.save()
 		end)
+
+		local util = C.section(scroll, "UTILITY")
+		C.toggle(util, "Anti-AFK", function()
+			return State.getToggle("antiafk")
+		end, function(v)
+			AntiAFK.set(v)
+			Config.save()
+		end)
 	end
 end
 end)()
@@ -4036,26 +5126,54 @@ return function(require)
 	local Notify = require("ui.notify")
 	local Blobman = require("systems.grab.blobman")
 	local Select = require("systems.player.select")
+	local Kick = require("systems.combat.kick")
 
 	return function(parent)
 		local scroll = C.scroll(parent)
+		C.targetBanner(scroll, Select)
 
-		local sec = C.section(scroll, "BLOBMAN (1.2.75 path)")
-		C.label(sec, "Target: " .. Select.label(), { size = 12, color = Theme.textMuted, h = 18 })
+		local sec = C.section(scroll, "BLOBMAN (1.2.75)")
+		C.label(sec, "Reuse seat, spawn CD, park (0,1,7), re-sit, CreatureGrab. Sticky is opt-in only.", {
+			size = 12,
+			color = Theme.textMuted,
+			wrap = true,
+			h = 36,
+		})
 
-		C.button(sec, "Spawn / Sit", function()
+		local g = C.grid(sec, 140, 34, 8)
+		C.button(g, "Spawn / Sit", function()
 			task.spawn(function()
-				local ok = Blobman.ensure(false)
-				Notify.info("Blobman", ok and "Seated" or "Spawn failed")
+				Notify.info("Blobman", Blobman.ensure(false) and "Seated" or "Failed")
 			end)
-		end, { w = 140, accent = true })
-
-		C.button(sec, "Dismount", function()
+		end, { w = 140, h = 34, accent = true })
+		C.button(g, "Dismount", function()
 			Blobman.dismount()
 			Notify.info("Blobman", "Dismounted")
-		end, { w = 140 })
+		end, { w = 140, h = 34 })
+		C.button(g, "Grab Selected", function()
+			local t = Select.get()
+			if not t then
+				Notify.warn("Blobman", "Pick a player")
+				return
+			end
+			task.spawn(function()
+				Notify.info("Blobman", Blobman.grabOnce(t) and ("Grabbed " .. t.Name) or "Failed")
+			end)
+		end, { w = 140, h = 34, danger = true })
+		C.button(g, "Grab ALL", function()
+			task.spawn(function()
+				Blobman.grabAll()
+				Notify.info("Blobman", "Grab all")
+			end)
+		end, { w = 140, h = 34, danger = true })
+		C.button(g, "Blob Kick", function()
+			local t = Select.get()
+			if t then
+				task.spawn(Kick.run, t, "Blobman")
+			end
+		end, { w = 140, h = 34, danger = true })
 
-		C.toggle(sec, "Sticky seat (opt-in only)", function()
+		C.toggle(sec, "Sticky seat (opt-in)", function()
 			return State.getToggle("blobStickySeat")
 		end, function(v)
 			State.setToggle("blobStickySeat", v)
@@ -4066,55 +5184,23 @@ return function(require)
 			end
 			Config.save()
 		end)
-
-		local grab = C.section(scroll, "GRAB")
-		C.button(grab, "Grab selected once", function()
-			local t = Select.get()
-			if not t then
-				Notify.warn("Blobman", "Pick a player in Player tab")
-				return
-			end
-			task.spawn(function()
-				local ok = Blobman.grabOnce(t)
-				Notify.info("Blobman", ok and ("Grabbed " .. t.Name) or "Grab failed")
-			end)
-		end, { w = 160, accent = true })
-
-		C.button(grab, "Grab ALL once", function()
-			task.spawn(function()
-				Blobman.grabAll()
-				Notify.info("Blobman", "Grab all fired")
-			end)
-		end, { w = 160 })
-
-		C.toggle(grab, "Loop grab selected", function()
+		C.toggle(sec, "Loop grab selected", function()
 			return State.getToggle("blobGrabLoop")
 		end, function(v)
 			local t = Select.get()
 			if v and not t then
-				Notify.warn("Blobman", "Pick a player first")
-				State.setToggle("blobGrabLoop", false)
+				Notify.warn("Blobman", "Pick a player")
 				return
 			end
 			Blobman.setLoopGrab(v, t)
 			Config.save()
-			Notify.info("Blobman", v and ("Loop ON -> " .. t.Name) or "Loop OFF")
 		end)
-
-		C.toggle(grab, "Loop grab ALL", function()
+		C.toggle(sec, "Loop grab ALL", function()
 			return State.getToggle("blobGrabAllLoop")
 		end, function(v)
 			Blobman.setLoopGrabAll(v)
 			Config.save()
-			Notify.info("Blobman", v and "Grab all loop ON" or "Grab all loop OFF")
 		end)
-
-		C.label(scroll, "Reuse seat + 3.5s spawn CD + park (0,1,7) + re-sit + CreatureGrab. No home-TP unseat.", {
-			size = 11,
-			color = Theme.textDim,
-			wrap = true,
-			h = 40,
-		})
 	end
 end
 end)()
@@ -4129,48 +5215,62 @@ return function(require)
 	local Notify = require("ui.notify")
 	local Anchor = require("systems.grab.anchor")
 	local Ownership = require("systems.object.ownership")
+	local Train = require("systems.world.train")
 
 	return function(parent)
 		local scroll = C.scroll(parent)
 
+		local train = C.section(scroll, "TRAIN")
+		C.label(train, "Drive Blue/map train (mount seat + SNO). WASD while seated.", {
+			size = 12,
+			color = Theme.textMuted,
+			wrap = true,
+			h = 32,
+		})
+		local trow = C.row(train)
+		C.button(trow, "Mount Train", function()
+			Notify.info("Train", Train.mount() and "Mounted" or "No seat found")
+		end, { w = 130, h = 34, accent = true })
+		C.toggle(train, "Drive Train", function()
+			return State.getToggle("trainDrive")
+		end, function(v)
+			local ok = Train.drive(v)
+			if v and not ok then
+				Notify.warn("Train", "Mount failed")
+			else
+				Notify.info("Train", v and "Drive ON" or "OFF")
+			end
+			Config.save()
+		end)
+
 		local sec = C.section(scroll, "ANCHOR GRAB")
 		C.label(sec, "Selection: " .. Anchor.label(), { size = 12, color = Theme.accentGlow, h = 18 })
-
-		C.button(sec, "Ray select (look)", function()
+		local g = C.grid(sec, 140, 34, 8)
+		C.button(g, "Ray Select", function()
 			local p = Anchor.raySelect()
-			Notify.info("Anchor", p and ("Selected " .. p.Name) or "No hit")
-		end, { w = 160, accent = true })
-
-		C.button(sec, "Mouse select", function()
+			Notify.info("Anchor", p and p.Name or "No hit")
+		end, { w = 140, h = 34, accent = true })
+		C.button(g, "Mouse Select", function()
 			local p = Anchor.mouseSelect()
-			Notify.info("Anchor", p and ("Selected " .. p.Name) or "No hit")
-		end, { w = 140 })
-
-		C.button(sec, "Toggle anchor", function()
-			if Anchor.toggle() then
-				Notify.success("Anchor", "Toggled")
-			else
-				Notify.warn("Anchor", "Nothing selected")
-			end
-		end, { w = 140 })
-
-		C.button(sec, "Force anchored ON", function()
-			if Anchor.setAnchored(true) then
-				Notify.success("Anchor", "Anchored")
-			else
-				Notify.warn("Anchor", "Failed")
-			end
-		end, { w = 150 })
-
-		C.button(sec, "Unanchor", function()
+			Notify.info("Anchor", p and p.Name or "No hit")
+		end, { w = 140, h = 34 })
+		C.button(g, "Toggle Anchor", function()
+			Notify.info("Anchor", Anchor.toggle() and "Toggled" or "None")
+		end, { w = 140, h = 34 })
+		C.button(g, "Force Anchor", function()
+			Anchor.setAnchored(true)
+		end, { w = 140, h = 34 })
+		C.button(g, "Unanchor", function()
 			Anchor.setAnchored(false)
-			Notify.info("Anchor", "Unanchored")
-		end, { w = 120 })
-
-		C.button(sec, "Clear selection", function()
+		end, { w = 140, h = 34 })
+		C.button(g, "SNO Selection", function()
+			if Anchor.selection then
+				Ownership.sno(Anchor.selection)
+			end
+		end, { w = 140, h = 34 })
+		C.button(g, "Clear", function()
 			Anchor.clear()
-			Notify.info("Anchor", "Cleared")
-		end, { w = 140 })
+		end, { w = 140, h = 34 })
 
 		local auto = C.section(scroll, "AUTO-REPLACE")
 		C.toggle(auto, "Watch selection", function()
@@ -4178,15 +5278,12 @@ return function(require)
 		end, function(v)
 			if v then
 				Anchor.startWatch()
-			else
-				if not State.getToggle("anchorAutoReplace") then
-					Anchor.stopWatch()
-				end
-				State.setToggle("anchorWatch", v)
+			elseif not State.getToggle("anchorAutoReplace") then
+				Anchor.stopWatch()
 			end
+			State.setToggle("anchorWatch", v)
 			Config.save()
 		end)
-
 		C.toggle(auto, "Auto-replace if destroyed", function()
 			return State.getToggle("anchorAutoReplace")
 		end, function(v)
@@ -4195,40 +5292,13 @@ return function(require)
 				Anchor.startWatch()
 			end
 			Config.save()
-			Notify.info("Anchor", v and "Auto-replace ON (max 4/10s)" or "Auto-replace OFF")
 		end)
-
 		C.toggle(auto, "Keep anchored after replace", function()
 			return State.getToggle("anchorKeepAnchored")
 		end, function(v)
 			State.setToggle("anchorKeepAnchored", v)
 			Config.save()
 		end)
-
-		local own = C.section(scroll, "OWNERSHIP")
-		C.button(own, "SNO selection", function()
-			local p = Anchor.selection
-			if not p then
-				Notify.warn("SNO", "No selection")
-				return
-			end
-			Ownership.sno(p)
-			if Anchor.model then
-				for _, d in ipairs(Anchor.model:GetDescendants()) do
-					if d:IsA("BasePart") then
-						Ownership.sno(d)
-					end
-				end
-			end
-			Notify.info("SNO", "Fired")
-		end, { w = 140, accent = true })
-
-		C.label(scroll, "Highlight on select. Auto-replace rate-limited (max 4 per 10s).", {
-			size = 11,
-			color = Theme.textDim,
-			wrap = true,
-			h = 36,
-		})
 	end
 end
 end)()
@@ -4244,52 +5314,40 @@ return function(require)
 
 	return function(parent)
 		local scroll = C.scroll(parent)
-
 		local head = C.section(scroll, "TOYS")
-		C.label(head, Toys.canSpawn() and "SpawnToy remote: OK" or "SpawnToy remote: missing (resolve FTAP)", {
+		C.label(head, Toys.canSpawn() and "SpawnToy remote OK" or "SpawnToy missing - rejoin FTAP", {
 			size = 12,
 			color = Toys.canSpawn() and Theme.success or Theme.warn,
 			h = 18,
 		})
-
 		C.button(head, "Re-resolve remotes", function()
 			Toys.resolve()
-			Notify.info("Toys", Toys.canSpawn() and "OK" or "Still missing")
-		end, { w = 150 })
+			Notify.info("Toys", Toys.canSpawn() and "OK" or "Missing")
+		end, { w = 150, h = 32 })
 
 		local list = C.section(scroll, "SPAWN")
+		local g = C.grid(list, 150, 32, 8)
 		for _, name in ipairs(Toys.COMMON) do
-			C.button(list, name, function()
+			C.button(g, name, function()
 				task.spawn(function()
 					local ok, model = Toys.spawnInFront(name)
 					if ok and model then
-						Notify.success("Toys", "Spawned " .. name)
+						Notify.success("Toys", name)
 						local pp = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart", true)
 						if pp then
 							Anchor.set(pp)
 						end
 					else
-						Notify.warn("Toys", "Failed: " .. name)
+						Notify.warn("Toys", "Failed " .. name)
 					end
 				end)
-			end, { w = 220, h = 30 })
+			end, { w = 150, h = 32 })
 		end
 
 		local util = C.section(scroll, "UTILITY")
 		C.button(util, "Destroy nearest owned toy", function()
-			if Toys.destroyNearest() then
-				Notify.info("Toys", "Destroyed nearest")
-			else
-				Notify.warn("Toys", "None found")
-			end
-		end, { w = 200 })
-
-		C.button(util, "Spawn Blobman (front)", function()
-			task.spawn(function()
-				local ok = Toys.spawnInFront("CreatureBlobman")
-				Notify.info("Toys", ok and "Blobman spawned" or "Failed")
-			end)
-		end, { w = 180, accent = true })
+			Notify.info("Toys", Toys.destroyNearest() and "Destroyed" or "None")
+		end, { w = 200, h = 34, danger = true })
 	end
 end
 end)()
@@ -4299,29 +5357,104 @@ __vz_modules["ui.pages.player"] = (function()
 return function(require)
 	local C = require("ui.components")
 	local Theme = require("ui.theme")
+	local State = require("core.state")
+	local Config = require("core.config")
 	local Notify = require("ui.notify")
 	local Select = require("systems.player.select")
+	local Actions = require("systems.combat.actions")
+	local Kick = require("systems.combat.kick")
+	local Loop = require("core.loop")
 	local Util = require("core.util")
 
 	return function(parent)
 		local scroll = C.scroll(parent)
+		C.targetBanner(scroll, Select)
 
-		local head = C.section(scroll, "SELECTED")
-		C.label(head, Select.label(), { size = 14, color = Theme.accentGlow, bold = true, h = 22 })
+		local tip = C.section(scroll, "HOW TO TARGET")
+		C.label(tip, "Left-click a player on the right rail to select. Right-click to add/remove loop multi-target.", {
+			size = 12,
+			color = Theme.textMuted,
+			wrap = true,
+			h = 40,
+		})
 
-		C.button(head, "Clear selection", function()
-			Select.set(nil)
-			Notify.info("Player", "Cleared")
-		end, { w = 140 })
+		local quick = C.section(scroll, "QUICK")
+		local g = C.grid(quick, 130, 34, 8)
+		C.button(g, "Fling", function()
+			local p = Select.get()
+			if p then
+				task.spawn(Actions.fling, p)
+			end
+		end, { w = 130, h = 34, danger = true })
+		C.button(g, "Kick", function()
+			local p = Select.get()
+			if p then
+				task.spawn(Kick.run, p, State.getValue("kickType", "Phoenix"))
+			end
+		end, { w = 130, h = 34, danger = true })
+		C.button(g, "Kill", function()
+			local p = Select.get()
+			if p then
+				task.spawn(Actions.kill, p)
+			end
+		end, { w = 130, h = 34, danger = true })
+		C.button(g, "Bring", function()
+			local p = Select.get()
+			if p then
+				task.spawn(Actions.bring, p)
+			end
+		end, { w = 130, h = 34, accent = true })
+		C.button(g, "TP To", function()
+			local p = Select.get()
+			if p then
+				Actions.tpTo(p)
+			end
+		end, { w = 130, h = 34 })
+		C.button(g, "Spectate", function()
+			Actions.spectate(Select.get())
+		end, { w = 130, h = 34 })
+		C.button(g, "Unspectate", function()
+			Actions.unspectate()
+		end, { w = 130, h = 34 })
+		C.button(g, "Whitelist", function()
+			local p = Select.get()
+			if p then
+				Select.whitelist(p, true)
+				Notify.info("WL", p.Name)
+			end
+		end, { w = 130, h = 34 })
+		C.button(g, "Un-Whitelist", function()
+			local p = Select.get()
+			if p then
+				Select.whitelist(p, false)
+			end
+		end, { w = 130, h = 34 })
 
-		local list = C.section(scroll, "PLAYERS")
-		for _, p in ipairs(Select.list()) do
-			local label = Util.playerLabel(p)
-			C.button(list, label, function()
-				Select.set(p)
-				Notify.success("Player", "Selected " .. p.Name)
-			end, { w = 260, h = 30 })
+		local stalk = C.section(scroll, "STALK")
+		C.toggle(stalk, "Stalk teleport (behind target)", function()
+			return State.getToggle("loopStalk")
+		end, function(v)
+			local Loops = require("systems.combat.loops")
+			Loops.set("loopStalk", v)
+			Config.save()
+		end)
+
+		C.toggle(stalk, "Skip friends in auras", function()
+			return State.getToggle("wlFriends")
+		end, function(v)
+			State.setToggle("wlFriends", v)
+			Config.save()
+		end)
+
+		local n = 0
+		for _ in pairs(State.loopTargets or {}) do
+			n = n + 1
 		end
+		C.label(scroll, "Loop multi-targets: " .. n .. "  |  Selected: " .. Select.label(), {
+			size = 11,
+			color = Theme.textDim,
+			h = 20,
+		})
 	end
 end
 end)()
@@ -4341,36 +5474,41 @@ return function(require)
 	return function(parent)
 		local scroll = C.scroll(parent)
 
-		local note = C.section(scroll, "MOVEMENT")
-		C.label(note, "Light utilities for 2.0.0. Full movement suite can expand later.", {
-			size = 12,
-			color = Theme.textMuted,
-			wrap = true,
-			h = 36,
-		})
-
 		local speed = C.section(scroll, "WALK SPEED")
-		C.button(speed, "Speed 16 (default)", function()
+		local g = C.grid(speed, 100, 34, 8)
+		for _, v in ipairs({ 16, 24, 32, 48, 64, 100 }) do
+			C.button(g, "SPD " .. v, function()
+				local h = Util.hum()
+				if h then
+					h.WalkSpeed = v
+					Notify.info("Move", "WalkSpeed " .. v)
+				end
+			end, { w = 100, h = 34, accent = v == 32 })
+		end
+
+		local jump = C.section(scroll, "JUMP")
+		local jg = C.grid(jump, 100, 34, 8)
+		for _, v in ipairs({ 50, 75, 100, 150 }) do
+			C.button(jg, "JP " .. v, function()
+				local h = Util.hum()
+				if h then
+					pcall(function()
+						h.UseJumpPower = true
+						h.JumpPower = v
+					end)
+					Notify.info("Move", "JumpPower " .. v)
+				end
+			end, { w = 100, h = 34 })
+		end
+		C.button(jg, "Reset", function()
 			local h = Util.hum()
 			if h then
 				h.WalkSpeed = 16
-				Notify.info("Move", "WalkSpeed 16")
+				pcall(function()
+					h.JumpPower = 50
+				end)
 			end
-		end, { w = 150 })
-		C.button(speed, "Speed 32", function()
-			local h = Util.hum()
-			if h then
-				h.WalkSpeed = 32
-				Notify.info("Move", "WalkSpeed 32")
-			end
-		end, { w = 120, accent = true })
-		C.button(speed, "Speed 64", function()
-			local h = Util.hum()
-			if h then
-				h.WalkSpeed = 64
-				Notify.info("Move", "WalkSpeed 64")
-			end
-		end, { w = 120 })
+		end, { w = 100, h = 34 })
 
 		local nclip = C.section(scroll, "NOCLIP")
 		C.toggle(nclip, "Noclip", function()
@@ -4388,7 +5526,6 @@ return function(require)
 						end
 					end
 				end
-				Notify.info("Move", "Noclip OFF")
 				return
 			end
 			Loop.start("move.noclip", 0.08, function()
@@ -4402,11 +5539,17 @@ return function(require)
 					end
 				end
 			end)
-			Notify.info("Move", "Noclip ON")
 		end)
 
-		local fly = C.section(scroll, "FLY (simple)")
-		C.toggle(fly, "Fly", function()
+		local fly = C.section(scroll, "FLY")
+		local frow = C.row(fly)
+		for _, v in ipairs({ 40, 60, 90, 140 }) do
+			C.chip(frow, "Fly " .. v, function()
+				State.setValue("flySpeed", v)
+				Config.save()
+			end, { on = State.getValue("flySpeed", 60) == v, w = 72 })
+		end
+		C.toggle(fly, "Fly (WASD Space/Ctrl)", function()
 			return State.getToggle("fly")
 		end, function(v)
 			State.setToggle("fly", v)
@@ -4414,10 +5557,16 @@ return function(require)
 			if not v then
 				Loop.stop("move.fly")
 				local h = Util.hum()
+				local hrp = Util.hrp()
 				if h then
 					h.PlatformStand = false
 				end
-				Notify.info("Move", "Fly OFF")
+				if hrp then
+					local bv = hrp:FindFirstChild("VOIDZ_V3_Fly")
+					if bv then
+						bv:Destroy()
+					end
+				end
 				return
 			end
 			local bv
@@ -4455,18 +5604,205 @@ return function(require)
 				if uis:IsKeyDown(Enum.KeyCode.Space) then
 					dir = dir + Vector3.new(0, 1, 0)
 				end
-				if uis:IsKeyDown(Enum.KeyCode.LeftControl) or uis:IsKeyDown(Enum.KeyCode.LeftShift) then
+				if uis:IsKeyDown(Enum.KeyCode.LeftControl) then
 					dir = dir - Vector3.new(0, 1, 0)
 				end
 				local spd = tonumber(State.getValue("flySpeed", 60)) or 60
-				if dir.Magnitude > 0 then
-					bv.Velocity = dir.Unit * spd
-				else
-					bv.Velocity = Vector3.zero
-				end
+				bv.Velocity = dir.Magnitude > 0 and dir.Unit * spd or Vector3.zero
 			end)
-			Notify.info("Move", "Fly ON (WASD Space/Ctrl)")
+			Notify.info("Move", "Fly ON")
 		end)
+	end
+end
+end)()
+
+-- ===== module: ui.pages.auras =====
+__vz_modules["ui.pages.auras"] = (function()
+return function(require)
+	local C = require("ui.components")
+	local Theme = require("ui.theme")
+	local State = require("core.state")
+	local Config = require("core.config")
+	local Notify = require("ui.notify")
+	local Aura = require("systems.combat.aura")
+
+	return function(parent)
+		local scroll = C.scroll(parent)
+		local head = C.section(scroll, "AURAS")
+		C.label(head, "Affect nearby players (radius " .. tostring(State.getValue("auraRadius", 45)) .. ").", {
+			size = 12,
+			color = Theme.textMuted,
+			h = 20,
+		})
+
+		local rad = C.section(scroll, "RADIUS")
+		local row = C.row(rad)
+		for _, v in ipairs({ 25, 45, 75, 120 }) do
+			C.chip(row, tostring(v), function()
+				State.setValue("auraRadius", v)
+				Config.save()
+				Notify.info("Aura", "Radius " .. v)
+			end, { on = State.getValue("auraRadius", 45) == v, w = 64 })
+		end
+
+		local list = C.section(scroll, "NEARBY EFFECTS")
+		for _, d in ipairs(Aura.defs) do
+			C.toggle(list, d.title, function()
+				return State.getToggle("aura_" .. d.id)
+			end, function(v)
+				Aura.set(d.id, v)
+				Config.save()
+				Notify.info(d.title, v and "ON" or "OFF")
+			end)
+		end
+	end
+end
+end)()
+
+-- ===== module: ui.pages.loops =====
+__vz_modules["ui.pages.loops"] = (function()
+return function(require)
+	local C = require("ui.components")
+	local Theme = require("ui.theme")
+	local State = require("core.state")
+	local Config = require("core.config")
+	local Notify = require("ui.notify")
+	local Select = require("systems.player.select")
+	local Loops = require("systems.combat.loops")
+
+	return function(parent)
+		local scroll = C.scroll(parent)
+		local head = C.section(scroll, "LOOPS")
+		C.label(head, "Runs on selected + multi-targets (right-click players). Target: " .. Select.label(), {
+			size = 12,
+			color = Theme.textMuted,
+			wrap = true,
+			h = 36,
+		})
+
+		local list = C.section(scroll, "PLAYER LOOPS")
+		for _, d in ipairs(Loops.defs) do
+			C.toggle(list, d.title, function()
+				return State.getToggle(d.id)
+			end, function(v)
+				if v and #Select.targets() == 0 then
+					Notify.warn("Loops", "Pick a player first")
+					return
+				end
+				Loops.set(d.id, v)
+				Config.save()
+				Notify.info(d.title, v and "ON" or "OFF")
+			end)
+		end
+	end
+end
+end)()
+
+-- ===== module: ui.pages.visuals =====
+__vz_modules["ui.pages.visuals"] = (function()
+return function(require)
+	local C = require("ui.components")
+	local State = require("core.state")
+	local Config = require("core.config")
+	local Notify = require("ui.notify")
+	local Visuals = require("systems.utility.visuals")
+
+	return function(parent)
+		local scroll = C.scroll(parent)
+		local sec = C.section(scroll, "LIGHTING")
+		C.toggle(sec, "Fullbright", function()
+			return State.getToggle("fullbright")
+		end, function(v)
+			Visuals.fullbright(v)
+			Config.save()
+			Notify.info("Visuals", v and "Fullbright ON" or "OFF")
+		end)
+		local row = C.row(sec)
+		C.button(row, "Day", function()
+			Visuals.day()
+		end, { w = 100, h = 34 })
+		C.button(row, "Night", function()
+			Visuals.night()
+		end, { w = 100, h = 34 })
+	end
+end
+end)()
+
+-- ===== module: ui.pages.server =====
+__vz_modules["ui.pages.server"] = (function()
+return function(require)
+	local C = require("ui.components")
+	local Theme = require("ui.theme")
+	local Notify = require("ui.notify")
+	local Services = require("core.services")
+	local Util = require("core.util")
+	local Actions = require("systems.combat.actions")
+	local Kick = require("systems.combat.kick")
+	local Select = require("systems.player.select")
+	local Ownership = require("systems.object.ownership")
+
+	local function everyone(fn)
+		for _, p in ipairs(Services.Players:GetPlayers()) do
+			if Util.validP(p) and not Select.isWhitelisted(p) then
+				task.spawn(fn, p)
+			end
+		end
+	end
+
+	return function(parent)
+		local scroll = C.scroll(parent)
+		local warn = C.section(scroll, "SERVER / MASS")
+		C.label(warn, "Hits all non-whitelisted players. Use carefully.", {
+			size = 12,
+			color = Theme.warn,
+			wrap = true,
+			h = 32,
+		})
+
+		local g = C.grid(warn, 140, 36, 8)
+		C.button(g, "Mass Fling", function()
+			everyone(function(p)
+				Actions.fling(p, nil, true)
+			end)
+			Notify.warn("Server", "Mass fling")
+		end, { w = 140, h = 36, danger = true })
+		C.button(g, "Mass Kick", function()
+			everyone(function(p)
+				Kick.run(p, "Phoenix", true)
+			end)
+			Notify.warn("Server", "Mass kick")
+		end, { w = 140, h = 36, danger = true })
+		C.button(g, "Mass Kill", function()
+			everyone(function(p)
+				Actions.kill(p, true)
+			end)
+			Notify.warn("Server", "Mass kill")
+		end, { w = 140, h = 36, danger = true })
+		C.button(g, "Mass Bring", function()
+			everyone(function(p)
+				Actions.bring(p, true)
+			end)
+		end, { w = 140, h = 36 })
+		C.button(g, "Mass Void", function()
+			everyone(function(p)
+				Actions.void(p, true)
+			end)
+		end, { w = 140, h = 36, danger = true })
+		C.button(g, "Mass SNO", function()
+			everyone(function(p)
+				Ownership.snoPlayer(p)
+			end)
+		end, { w = 140, h = 36, accent = true })
+		C.button(g, "Mass Ragdoll", function()
+			everyone(function(p)
+				Actions.ragdoll(p)
+			end)
+		end, { w = 140, h = 36 })
+		C.button(g, "Mass Sky", function()
+			everyone(function(p)
+				Actions.sky(p)
+			end)
+		end, { w = 140, h = 36 })
 	end
 end
 end)()
@@ -4487,12 +5823,6 @@ return function(require)
 		local scroll = C.scroll(parent)
 
 		local ui = C.section(scroll, "INTERFACE")
-		C.toggle(ui, "Animations", function()
-			return State.getToggle("uiAnimations")
-		end, function(v)
-			State.setToggle("uiAnimations", v)
-			Config.save()
-		end)
 		C.toggle(ui, "Public load chat line", function()
 			return State.getToggle("publicLoadChat")
 		end, function(v)
@@ -4500,33 +5830,27 @@ return function(require)
 			Config.save()
 		end)
 
-
 		local data = C.section(scroll, "CONFIG")
-		C.button(data, "Save config", function()
-			if Config.save() then
-				Notify.success("Config", "Saved")
-			else
-				Notify.error("Config", "Save failed")
-			end
-		end, { w = 140, accent = true })
-
-		C.button(data, "Reload defaults", function()
+		local row = C.row(data)
+		C.button(row, "Save", function()
+			Notify.info("Config", Config.save() and "Saved" or "Failed")
+		end, { w = 100, h = 34, accent = true })
+		C.button(row, "Defaults", function()
 			Config.reset()
-			Notify.warn("Config", "Reset to defaults - reopen hub to refresh UI")
-		end, { w = 140 })
+			Notify.warn("Config", "Reset")
+		end, { w = 100, h = 34 })
 
 		local perf = C.section(scroll, "PERFORMANCE")
-		C.button(perf, "Stop all feature loops", function()
+		C.button(perf, "Stop ALL loops", function()
 			Loop.stopAll()
-			Notify.warn("Perf", "All loops stopped")
-		end, { w = 180 })
-
+			Notify.warn("Perf", "Stopped")
+		end, { w = 160, h = 34, danger = true })
 		local loops = Loop.list()
 		C.label(perf, "Running: " .. (#loops > 0 and table.concat(loops, ", ") or "none"), {
 			size = 11,
 			color = Theme.textDim,
 			wrap = true,
-			h = 32,
+			h = 36,
 		})
 
 		local err = C.section(scroll, "ERRORS")
@@ -4534,23 +5858,18 @@ return function(require)
 		if #recent == 0 then
 			C.label(err, "No recent errors", { size = 12, color = Theme.textMuted, h = 18 })
 		else
-			for i = math.max(1, #recent - 4), #recent do
+			for i = math.max(1, #recent - 5), #recent do
 				local e = recent[i]
-				C.label(err, e.scope .. ": " .. e.err, {
-					size = 11,
-					color = Theme.danger,
-					wrap = true,
-					h = 28,
-				})
+				C.label(err, e.scope .. ": " .. e.err, { size = 11, color = Theme.danger, wrap = true, h = 28 })
 			end
 		end
 
 		local hub = C.section(scroll, "HUB")
-		C.button(hub, "Unload VOIDZ V3", function()
+		C.button(hub, "Unload VOIDZ", function()
 			Bus.emit("hub:unload")
-		end, { w = 160, bg = Theme.danger, hover = Color3.fromRGB(220, 70, 90) })
+		end, { w = 150, h = 36, danger = true })
 
-		C.label(scroll, "VOIDZ HUB 2.0.0  |  key VOIDZHUB  |  RightShift toggle", {
+		C.label(scroll, "VOIDZ HUB 2.0.0  |  VOIDZHUB  |  RightShift", {
 			size = 11,
 			color = Theme.textDim,
 			h = 20,
@@ -4561,7 +5880,7 @@ end)()
 
 -- ===== module: ui.root =====
 __vz_modules["ui.root"] = (function()
---[[ VOIDZ HUB V3 - Premium shell: key gate + main window + tabs ]]
+--[[ VOIDZ HUB 2.0 - premium dual-pane shell ]]
 return function(require)
 	local Services = require("core.services")
 	local State = require("core.state")
@@ -4571,41 +5890,51 @@ return function(require)
 	local Theme = require("ui.theme")
 	local C = require("ui.components")
 	local Notify = require("ui.notify")
+	local Select = require("systems.player.select")
 
 	local Root = {
 		gui = nil,
 		main = nil,
 		content = nil,
+		playerList = nil,
 		navButtons = {},
 		_conns = {},
+		_targetLab = nil,
 	}
 
 	local TABS = {
-		{ id = "home", label = "Home" },
-		{ id = "combat", label = "Combat" },
-		{ id = "grab", label = "Grab" },
-		{ id = "defense", label = "Defense" },
-		{ id = "blobman", label = "Blobman" },
-		{ id = "world", label = "World" },
-		{ id = "toys", label = "Toys" },
-		{ id = "player", label = "Player" },
-		{ id = "move", label = "Move" },
-		{ id = "settings", label = "Settings" },
+		{ id = "home", label = "Home", icon = "01" },
+		{ id = "combat", label = "Combat", icon = "02" },
+		{ id = "blobman", label = "Blobman", icon = "BM" },
+		{ id = "player", label = "Player", icon = "03" },
+		{ id = "grab", label = "Grab", icon = "04" },
+		{ id = "auras", label = "Auras", icon = "05" },
+		{ id = "loops", label = "Loops", icon = "06" },
+		{ id = "defense", label = "Protect", icon = "07" },
+		{ id = "move", label = "Move", icon = "08" },
+		{ id = "visuals", label = "Visuals", icon = "09" },
+		{ id = "toys", label = "Toys", icon = "10" },
+		{ id = "world", label = "World", icon = "11" },
+		{ id = "server", label = "Server", icon = "12" },
+		{ id = "settings", label = "Settings", icon = "13" },
 	}
 
 	local PAGE_MODS = {
 		home = "ui.pages.home",
 		combat = "ui.pages.combat",
-		grab = "ui.pages.grab",
-		defense = "ui.pages.defense",
 		blobman = "ui.pages.blobman",
-		world = "ui.pages.world",
-		toys = "ui.pages.toys",
 		player = "ui.pages.player",
+		grab = "ui.pages.grab",
+		auras = "ui.pages.auras",
+		loops = "ui.pages.loops",
+		defense = "ui.pages.defense",
 		move = "ui.pages.move",
+		visuals = "ui.pages.visuals",
+		toys = "ui.pages.toys",
+		world = "ui.pages.world",
+		server = "ui.pages.server",
 		settings = "ui.pages.settings",
 	}
-
 
 	local KEY = "VOIDZHUB"
 
@@ -4627,14 +5956,10 @@ return function(require)
 		Root._conns = {}
 	end
 
-
 	local function makeDrag(handle, target)
-		local dragging = false
-		local startPos, startInput
+		local dragging, startPos, startInput = false, nil, nil
 		track(handle.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1
-				or input.UserInputType == Enum.UserInputType.Touch
-			then
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 				dragging = true
 				startPos = target.Position
 				startInput = input.Position
@@ -4653,16 +5978,9 @@ return function(require)
 			if not dragging then
 				return
 			end
-			if input.UserInputType == Enum.UserInputType.MouseMovement
-				or input.UserInputType == Enum.UserInputType.Touch
-			then
-				local delta = input.Position - startInput
-				target.Position = UDim2.new(
-					startPos.X.Scale,
-					startPos.X.Offset + delta.X,
-					startPos.Y.Scale,
-					startPos.Y.Offset + delta.Y
-				)
+			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+				local d = input.Position - startInput
+				target.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + d.X, startPos.Y.Scale, startPos.Y.Offset + d.Y)
 			end
 		end))
 	end
@@ -4681,30 +5999,83 @@ return function(require)
 	local function paintNav(activeId)
 		for id, btn in pairs(Root.navButtons) do
 			local on = id == activeId
-			btn.BackgroundColor3 = on and Theme.accentSoft or Theme.sidebar
+			btn.BackgroundColor3 = on and Theme.navOn or Theme.navOff
 			btn.TextColor3 = on and Theme.text or Theme.textMuted
+			local s = btn:FindFirstChildOfClass("UIStroke")
+			if s then
+				s.Color = on and Theme.accent or Theme.strokeSoft
+				s.Transparency = on and 0.15 or 0.5
+			end
 		end
 	end
 
 	function Root.showPage(id)
-		id = id or "home"
-		if not PAGE_MODS[id] then
-			id = "home"
-		end
+		id = PAGE_MODS[id] and id or "home"
 		State.page = id
 		clearContent()
 		paintNav(id)
 		local ok, mount = pcall(require, PAGE_MODS[id])
 		if not ok or type(mount) ~= "function" then
-			Notify.error("UI", "Failed to load page: " .. tostring(id))
+			Notify.error("UI", "Failed page: " .. tostring(id))
 			return
 		end
 		local mok, err = pcall(mount, Root.content)
 		if not mok then
 			Notify.error("UI", tostring(err))
 		end
+		if Root._targetLab then
+			Root._targetLab.Text = Select.label()
+		end
 	end
 
+	local function refreshPlayers()
+		if not Root.playerList then
+			return
+		end
+		for _, ch in ipairs(Root.playerList:GetChildren()) do
+			if ch:IsA("TextButton") then
+				ch:Destroy()
+			end
+		end
+		local filter = Root._search and Root._search.Text or ""
+		for _, p in ipairs(Select.list(filter)) do
+			local selected = State.selected == p
+			local looped = Select.isLoopTarget(p)
+			local b = Instance.new("TextButton")
+			b.AutoButtonColor = false
+			b.Font = Theme.font
+			b.TextSize = 11
+			b.TextXAlignment = Enum.TextXAlignment.Left
+			b.TextColor3 = Theme.text
+			b.BackgroundColor3 = selected and Theme.navOn or Theme.panelSoft
+			b.BorderSizePixel = 0
+			b.Size = UDim2.new(1, -4, 0, 30)
+			b.Text = "  "
+				.. Util.playerLabel(p)
+				.. (selected and "  *" or "")
+				.. (looped and "  L" or "")
+			b.Parent = Root.playerList
+			C.corner(b, Theme.radiusSm)
+			if looped then
+				C.stroke(b, Theme.accent, 1, 0.2)
+			end
+			b.MouseButton1Click:Connect(function()
+				Select.set(p)
+				refreshPlayers()
+				if Root._targetLab then
+					Root._targetLab.Text = Select.label()
+				end
+				Notify.info("Target", p.Name)
+			end)
+			b.MouseButton2Click:Connect(function()
+				Select.set(p)
+				Select.toggleLoopTarget(p)
+				refreshPlayers()
+				Notify.info("Loop", p.Name .. (Select.isLoopTarget(p) and " ON" or " OFF"))
+			end)
+
+		end
+	end
 
 	local function buildMain()
 		local parent = Util.getUiParent()
@@ -4724,17 +6095,27 @@ return function(require)
 
 		local vs = Vector2.new(1280, 720)
 		pcall(function()
-			local cam = workspace.CurrentCamera
-			if cam then
-				vs = cam.ViewportSize
+			if workspace.CurrentCamera then
+				vs = workspace.CurrentCamera.ViewportSize
 			end
 		end)
-		local winW = math.clamp(math.floor(vs.X * 0.58), 320, 740)
-		local winH = math.clamp(math.floor(vs.Y * 0.62), 360, 520)
+		local winW = math.clamp(math.floor(vs.X * 0.72), 720, 980)
+		local winH = math.clamp(math.floor(vs.Y * 0.7), 460, 620)
 		if Services.UserInputService.TouchEnabled and vs.X < 900 then
-			winW = math.clamp(math.floor(vs.X * 0.92), 300, 420)
-			winH = math.clamp(math.floor(vs.Y * 0.72), 380, 560)
+			winW = math.clamp(math.floor(vs.X * 0.96), 340, 520)
+			winH = math.clamp(math.floor(vs.Y * 0.78), 420, 640)
 		end
+
+		-- drop shadow
+		local shadow = Instance.new("Frame")
+		shadow.Name = "Shadow"
+		shadow.BackgroundColor3 = Theme.shadow
+		shadow.BackgroundTransparency = 0.55
+		shadow.BorderSizePixel = 0
+		shadow.Size = UDim2.new(0, winW + 16, 0, winH + 16)
+		shadow.Position = UDim2.new(0.5, -math.floor(winW / 2) - 4, 0.5, -math.floor(winH / 2) + 6)
+		shadow.Parent = gui
+		C.corner(shadow, Theme.radiusLg)
 
 		local win = Instance.new("Frame")
 		win.Name = "Main"
@@ -4744,87 +6125,96 @@ return function(require)
 		win.Position = UDim2.new(0.5, -math.floor(winW / 2), 0.5, -math.floor(winH / 2))
 		win.Parent = gui
 		Root.main = win
+		C.corner(win, Theme.radiusLg)
+		C.stroke(win, Theme.strokeGlow, 1.5, 0.35)
+		C.gradient(win, Theme.bg, Theme.bgGlass, 120)
 
-		C.corner(win, UDim.new(0, 14))
-		C.stroke(win, Theme.accent, 1.5)
-		local stroke = win:FindFirstChildOfClass("UIStroke")
-		if stroke then
-			stroke.Transparency = 0.35
-		end
+		-- top accent line
+		local top = Instance.new("Frame")
+		top.BorderSizePixel = 0
+		top.BackgroundColor3 = Theme.accent
+		top.Size = UDim2.new(1, 0, 0, 2)
+		top.Parent = win
+		C.gradient(top, Theme.accent2, Theme.accent, 0)
 
-		-- soft gradient accent bar
-		local topGlow = Instance.new("Frame")
-		topGlow.BorderSizePixel = 0
-		topGlow.BackgroundColor3 = Theme.accent
-		topGlow.BackgroundTransparency = 0.85
-		topGlow.Size = UDim2.new(1, 0, 0, 3)
-		topGlow.Parent = win
-
+		-- title bar
 		local titleBar = Instance.new("Frame")
-		titleBar.Name = "TitleBar"
 		titleBar.BackgroundColor3 = Theme.bgElevated
 		titleBar.BorderSizePixel = 0
 		titleBar.Size = UDim2.new(1, 0, 0, Theme.titleH)
 		titleBar.Parent = win
-		C.corner(titleBar, UDim.new(0, 14))
+		C.corner(titleBar, Theme.radiusLg)
 
-		-- square bottom corners of title
-		local titleMask = Instance.new("Frame")
-		titleMask.BackgroundColor3 = Theme.bgElevated
-		titleMask.BorderSizePixel = 0
-		titleMask.Position = UDim2.new(0, 0, 1, -10)
-		titleMask.Size = UDim2.new(1, 0, 0, 10)
-		titleMask.Parent = titleBar
+		local titleFill = Instance.new("Frame")
+		titleFill.BackgroundColor3 = Theme.bgElevated
+		titleFill.BorderSizePixel = 0
+		titleFill.Position = UDim2.new(0, 0, 1, -12)
+		titleFill.Size = UDim2.new(1, 0, 0, 12)
+		titleFill.Parent = titleBar
 
-		C.label(titleBar, "VOIDZ HUB 2.0", {
+		C.label(titleBar, "VOIDZ", {
 			bold = true,
-			size = 14,
+			size = 16,
 			color = Theme.accentGlow,
 			h = Theme.titleH,
-			sizeUDim = UDim2.new(0, 160, 1, 0),
+			sizeUDim = UDim2.new(0, 90, 1, 0),
 			pos = UDim2.new(0, 16, 0, 0),
+		})
+		C.label(titleBar, "HUB  2.0", {
+			bold = true,
+			size = 16,
+			color = Theme.text,
+			h = Theme.titleH,
+			sizeUDim = UDim2.new(0, 90, 1, 0),
+			pos = UDim2.new(0, 78, 0, 0),
 		})
 		C.label(titleBar, tostring(State.version or "2.0.0"), {
 			size = 11,
 			color = Theme.textDim,
 			h = Theme.titleH,
-			sizeUDim = UDim2.new(0, 100, 1, 0),
-			pos = UDim2.new(0, 150, 0, 0),
+			sizeUDim = UDim2.new(0, 80, 1, 0),
+			pos = UDim2.new(0, 175, 0, 0),
 		})
 
+		Root._targetLab = C.label(titleBar, Select.label(), {
+			size = 11,
+			color = Theme.accent2,
+			h = Theme.titleH,
+			sizeUDim = UDim2.new(0, 220, 1, 0),
+			pos = UDim2.new(0, 260, 0, 0),
+			truncate = true,
+		})
 
 		local closeBtn = C.button(titleBar, "X", function()
 			Root.setVisible(false)
-		end, {
-
-			w = 32,
-			h = 28,
-			pos = UDim2.new(1, -40, 0.5, -14),
-			bg = Theme.button,
-		})
-		closeBtn.TextSize = 18
-
+		end, { w = 34, h = 28, pos = UDim2.new(1, -44, 0.5, -14), danger = true })
+		closeBtn.TextSize = 14
 		makeDrag(titleBar, win)
+		makeDrag(titleBar, shadow)
 
+		-- body
 		local body = Instance.new("Frame")
-		body.Name = "Body"
 		body.BackgroundTransparency = 1
 		body.Position = UDim2.new(0, 0, 0, Theme.titleH)
 		body.Size = UDim2.new(1, 0, 1, -Theme.titleH)
 		body.Parent = win
 
-		local sidebar = Instance.new("Frame")
+		-- left nav
+		local sidebar = Instance.new("ScrollingFrame")
 		sidebar.Name = "Sidebar"
 		sidebar.BackgroundColor3 = Theme.sidebar
 		sidebar.BorderSizePixel = 0
+		sidebar.ScrollBarThickness = 2
+		sidebar.ScrollBarImageColor3 = Theme.accent
+		sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
+		sidebar.AutomaticCanvasSize = Enum.AutomaticSize.Y
 		sidebar.Size = UDim2.new(0, Theme.sidebarW, 1, 0)
 		sidebar.Parent = body
-
 		local navList = Instance.new("UIListLayout")
 		navList.SortOrder = Enum.SortOrder.LayoutOrder
 		navList.Padding = UDim.new(0, 4)
 		navList.Parent = sidebar
-		C.padding(sidebar, 10, 8, 10, 8)
+		C.padding(sidebar, 10, 8, 14, 8)
 
 		Root.navButtons = {}
 		for i, tab in ipairs(TABS) do
@@ -4834,14 +6224,15 @@ return function(require)
 			btn.Font = Theme.fontBold
 			btn.TextSize = 12
 			btn.TextXAlignment = Enum.TextXAlignment.Left
-			btn.Text = "  " .. tab.label
+			btn.Text = "  " .. tab.icon .. "  " .. tab.label
 			btn.TextColor3 = Theme.textMuted
-			btn.BackgroundColor3 = Theme.sidebar
+			btn.BackgroundColor3 = Theme.navOff
 			btn.BorderSizePixel = 0
 			btn.Size = UDim2.new(1, 0, 0, 34)
 			btn.LayoutOrder = i
 			btn.Parent = sidebar
 			C.corner(btn, Theme.radiusSm)
+			C.stroke(btn, Theme.strokeSoft, 1, 0.5)
 			Root.navButtons[tab.id] = btn
 			track(btn.MouseButton1Click:Connect(function()
 				Root.showPage(tab.id)
@@ -4849,30 +6240,86 @@ return function(require)
 			end))
 		end
 
+		-- center content
 		local contentHost = Instance.new("Frame")
 		contentHost.Name = "Content"
 		contentHost.BackgroundColor3 = Theme.bg
 		contentHost.BorderSizePixel = 0
 		contentHost.Position = UDim2.new(0, Theme.sidebarW, 0, 0)
-		contentHost.Size = UDim2.new(1, -Theme.sidebarW, 1, 0)
+		contentHost.Size = UDim2.new(1, -(Theme.sidebarW + Theme.playerW), 1, 0)
 		contentHost.Parent = body
-		C.padding(contentHost, 12, 12, 12, 12)
+		C.padding(contentHost, 12, 10, 10, 12)
 		Root.content = contentHost
 
-		local footer = Instance.new("TextLabel")
-		footer.BackgroundTransparency = 1
-		footer.Font = Theme.font
-		footer.TextSize = 10
-		footer.TextColor3 = Theme.textDim
-		footer.TextXAlignment = Enum.TextXAlignment.Right
-		footer.Text = "RightShift = toggle  |  key VOIDZHUB"
+		-- right player rail
+		local rail = Instance.new("Frame")
+		rail.Name = "PlayerRail"
+		rail.BackgroundColor3 = Theme.rail
+		rail.BorderSizePixel = 0
+		rail.Position = UDim2.new(1, -Theme.playerW, 0, 0)
+		rail.Size = UDim2.new(0, Theme.playerW, 1, 0)
+		rail.Parent = body
 
-		footer.Size = UDim2.new(1, -16, 0, 16)
-		footer.Position = UDim2.new(0, 0, 1, -18)
-		footer.Parent = win
+		C.label(rail, "PLAYERS", {
+			bold = true,
+			size = 11,
+			color = Theme.accentGlow,
+			h = 28,
+			sizeUDim = UDim2.new(1, -16, 0, 28),
+			pos = UDim2.new(0, 10, 0, 6),
+		})
+
+		Root._search = C.input(rail, "Search...", {
+			sizeUDim = UDim2.new(1, -16, 0, 30),
+		})
+		Root._search.Position = UDim2.new(0, 8, 0, 34)
+
+		local list = Instance.new("ScrollingFrame")
+		list.BackgroundTransparency = 1
+		list.BorderSizePixel = 0
+		list.ScrollBarThickness = 3
+		list.ScrollBarImageColor3 = Theme.accent
+		list.Position = UDim2.new(0, 6, 0, 72)
+		list.Size = UDim2.new(1, -10, 1, -110)
+		list.CanvasSize = UDim2.new(0, 0, 0, 0)
+		list.AutomaticCanvasSize = Enum.AutomaticSize.Y
+		list.Parent = rail
+		Root.playerList = list
+		local ll = Instance.new("UIListLayout")
+		ll.SortOrder = Enum.SortOrder.LayoutOrder
+		ll.Padding = UDim.new(0, 4)
+		ll.Parent = list
+
+		C.button(rail, "Clear loops", function()
+			Select.clearLoops()
+			refreshPlayers()
+			Notify.info("Players", "Loop targets cleared")
+		end, { w = Theme.playerW - 16, h = 28, pos = UDim2.new(0, 8, 1, -36) })
+
+		track(Root._search:GetPropertyChangedSignal("Text"):Connect(refreshPlayers))
+		track(Services.Players.PlayerAdded:Connect(function()
+			task.defer(refreshPlayers)
+		end))
+		track(Services.Players.PlayerRemoving:Connect(function()
+			task.defer(refreshPlayers)
+		end))
+		refreshPlayers()
 
 		Root.showPage(State.page or "home")
 		State.hubOpen = true
+
+		-- keep shadow with window when dragging title only moves both if we drag shadow too - sync on render
+		track(Services.RunService.RenderStepped:Connect(function()
+			if win and shadow and win.Parent then
+				shadow.Position = UDim2.new(
+					win.Position.X.Scale,
+					win.Position.X.Offset - 4,
+					win.Position.Y.Scale,
+					win.Position.Y.Offset + 6
+				)
+			end
+		end))
+
 		return gui
 	end
 
@@ -4892,7 +6339,7 @@ return function(require)
 
 		local dim = Instance.new("Frame")
 		dim.BackgroundColor3 = Color3.new(0, 0, 0)
-		dim.BackgroundTransparency = 0.45
+		dim.BackgroundTransparency = 0.4
 		dim.BorderSizePixel = 0
 		dim.Size = UDim2.new(1, 0, 1, 0)
 		dim.Parent = gui
@@ -4900,39 +6347,21 @@ return function(require)
 		local card = Instance.new("Frame")
 		card.BackgroundColor3 = Theme.panel
 		card.BorderSizePixel = 0
-		card.Size = UDim2.new(0, 340, 0, 200)
-		card.Position = UDim2.new(0.5, -170, 0.5, -100)
+		card.Size = UDim2.new(0, 360, 0, 220)
+		card.Position = UDim2.new(0.5, -180, 0.5, -110)
 		card.Parent = gui
-		C.corner(card, UDim.new(0, 14))
-		C.stroke(card, Theme.accent, 1.5)
-		C.padding(card, 20, 20, 20, 20)
-
+		C.corner(card, Theme.radiusLg)
+		C.stroke(card, Theme.accent, 1.5, 0.25)
+		C.padding(card, 22, 22, 22, 22)
 		local list = Instance.new("UIListLayout")
 		list.SortOrder = Enum.SortOrder.LayoutOrder
 		list.Padding = UDim.new(0, 10)
 		list.Parent = card
 
-		C.label(card, "VOIDZ HUB V3", { bold = true, size = 18, color = Theme.accentGlow, h = 24 })
-		C.label(card, "Enter key to unlock", { size = 12, color = Theme.textMuted, h = 18 })
-
-		local box = Instance.new("TextBox")
-		box.BackgroundColor3 = Theme.bg
-		box.BorderSizePixel = 0
-		box.Font = Theme.font
-		box.TextSize = 14
-		box.TextColor3 = Theme.text
-		box.PlaceholderText = "Key..."
-
-		box.PlaceholderColor3 = Theme.textDim
-		box.Text = ""
-		box.ClearTextOnFocus = false
-		box.Size = UDim2.new(1, 0, 0, 36)
-		box.Parent = card
-		C.corner(box, Theme.radiusSm)
-		C.stroke(box, Theme.stroke, 1)
-
+		C.label(card, "VOIDZ HUB 2.0", { bold = true, size = 20, color = Theme.accentGlow, h = 26 })
+		C.label(card, "Enter access key", { size = 12, color = Theme.textMuted, h = 18 })
+		local box = C.input(card, "Key...")
 		local status = C.label(card, "", { size = 11, color = Theme.danger, h = 16 })
-
 		local function tryUnlock()
 			local typed = string.upper(string.gsub(box.Text or "", "%s+", ""))
 			if typed == KEY then
@@ -4944,19 +6373,21 @@ return function(require)
 				box.Text = ""
 			end
 		end
-
-		C.button(card, "Unlock", tryUnlock, { w = 120, h = 34, accent = true })
+		C.button(card, "Unlock", tryUnlock, { w = 130, h = 36, accent = true })
 		track(box.FocusLost:Connect(function(enter)
 			if enter then
 				tryUnlock()
 			end
 		end))
-		return gui
 	end
 
 	function Root.setVisible(vis)
 		if Root.main then
 			Root.main.Visible = vis == true
+		end
+		local sh = Root.gui and Root.gui:FindFirstChild("Shadow")
+		if sh then
+			sh.Visible = vis == true
 		end
 		State.hubOpen = vis == true
 	end
@@ -4968,24 +6399,24 @@ return function(require)
 		Root.setVisible(not Root.main.Visible)
 	end
 
+	function Root.refreshPlayers()
+		refreshPlayers()
+	end
+
 	function Root.mount()
 		if Root.gui then
 			return Root
 		end
-
 		local function openHub()
 			buildMain()
-			Notify.success("VOIDZ", "Hub loaded - " .. State.version)
-
+			Notify.success("VOIDZ 2.0", "Loaded - pick a player on the right")
 			Bus.emit("hub:ready")
 		end
-
 		if State.unlocked then
 			openHub()
 		else
 			buildKeyGate(openHub)
 		end
-
 		track(Services.UserInputService.InputBegan:Connect(function(input, gp)
 			if gp then
 				return
@@ -4994,7 +6425,6 @@ return function(require)
 				Root.toggle()
 			end
 		end))
-
 		track(Bus.on("hub:unload", function()
 			local g = (getgenv and getgenv()) or _G
 			if type(g.VOIDZ_V3_UNLOAD) == "function" then
@@ -5003,7 +6433,12 @@ return function(require)
 				Root.destroy()
 			end
 		end))
-
+		track(Bus.on("player.selected", function()
+			if Root._targetLab then
+				Root._targetLab.Text = Select.label()
+			end
+			refreshPlayers()
+		end))
 		return Root
 	end
 
@@ -5022,24 +6457,12 @@ return function(require)
 					g:Destroy()
 				end)
 			end
-			local pg = Services.LP:FindFirstChild("PlayerGui")
-			if pg then
-				local g2 = pg:FindFirstChild(name)
-				if g2 then
-					pcall(function()
-						g2:Destroy()
-					end)
-				end
-			end
 		end
 		Notify.destroy()
-		Root.gui = nil
-		Root.main = nil
-		Root.content = nil
+		Root.gui, Root.main, Root.content, Root.playerList = nil, nil, nil, nil
 		Root.navButtons = {}
 		State.hubOpen = false
 	end
-
 
 	return Root
 end
@@ -5047,11 +6470,7 @@ end)()
 
 -- ===== module: init =====
 __vz_modules["init"] = (function()
---[[
-  VOIDZ HUB V3 - entry
-  Ship: 2.0.0 (Phase 5 polish)
-]]
-
+--[[ VOIDZ HUB 2.0 - entry ]]
 return function(require)
 	local State = require("core.state")
 	local Bootstrap = require("core.bootstrap")
@@ -5059,7 +6478,6 @@ return function(require)
 	local Loop = require("core.loop")
 	local Config = require("core.config")
 	local Root = require("ui.root")
-
 	local Notify = require("ui.notify")
 	local Gucci = require("systems.defense.gucci")
 	local AntiGrab = require("systems.defense.anti_grab")
@@ -5067,10 +6485,16 @@ return function(require)
 	local Blobman = require("systems.grab.blobman")
 	local Grab = require("systems.grab.core")
 	local Kick = require("systems.combat.kick")
+	local Actions = require("systems.combat.actions")
+	local Aura = require("systems.combat.aura")
+	local Loops = require("systems.combat.loops")
 	local Anchor = require("systems.grab.anchor")
 	local Toys = require("systems.object.toys")
 	local Ownership = require("systems.object.ownership")
 	local Chat = require("systems.utility.chat")
+	local Visuals = require("systems.utility.visuals")
+	local AntiAFK = require("systems.utility.antiafk")
+	local Train = require("systems.world.train")
 
 	local VOIDZ = {
 		version = "2.0.0",
@@ -5078,10 +6502,14 @@ return function(require)
 		Blobman = Blobman,
 		Grab = Grab,
 		Kick = Kick,
+		Actions = Actions,
+		Aura = Aura,
+		Loops = Loops,
 		Anchor = Anchor,
 		Toys = Toys,
 		Ownership = Ownership,
 		Chat = Chat,
+		Train = Train,
 	}
 
 	local function env()
@@ -5095,12 +6523,11 @@ return function(require)
 	end
 
 	local function unload()
-		pcall(function()
-			Config.save()
-		end)
+		pcall(Config.save)
 		pcall(function()
 			State.setToggle("fly", false)
 			State.setToggle("noclip", false)
+			Train.drive(false)
 		end)
 		pcall(function()
 			Anchor.destroy()
@@ -5139,8 +6566,7 @@ return function(require)
 		local g = env()
 		g.VOIDZ_V3 = nil
 		g.VOIDZ_V3_UNLOAD = nil
-		g.VOIDZ_UNLOAD_V3 = nil
-		print("[VOIDZ V3] unloaded 2.0.0")
+		print("[VOIDZ] unloaded 2.0.0")
 	end
 
 	function VOIDZ.unload()
@@ -5156,38 +6582,28 @@ return function(require)
 		State.phase = 5
 		State.version = "2.0.0"
 		VOIDZ.version = "2.0.0"
-		VOIDZ.phase = 5
 
 		Bootstrap.run()
 		pcall(Ownership.resolve)
 
-		-- never auto-enable heavy systems beyond saved toggles
-		pcall(function()
-			Gucci.sync()
-		end)
-		pcall(function()
-			AntiGrab.sync()
-		end)
-		pcall(function()
-			War.sync()
-		end)
-		pcall(function()
-			Blobman.sync()
-		end)
-		pcall(function()
-			Anchor.sync()
-		end)
+		pcall(Gucci.sync)
+		pcall(AntiGrab.sync)
+		pcall(War.sync)
+		pcall(Blobman.sync)
+		pcall(Anchor.sync)
+		pcall(Aura.syncAll)
+		pcall(Loops.syncAll)
+		pcall(Visuals.sync)
+		pcall(AntiAFK.sync)
 
-		-- force move loops off on fresh boot (safety)
 		State.setToggle("fly", false)
 		State.setToggle("noclip", false)
+		State.setToggle("trainDrive", false)
 
 		Root.mount()
 
 		if State.getToggle("publicLoadChat") then
-			pcall(function()
-				Chat.announceLoadOnce()
-			end)
+			pcall(Chat.announceLoadOnce)
 		end
 
 		g.VOIDZ_V3 = VOIDZ
@@ -5215,15 +6631,9 @@ return function(require)
 				War.disable()
 			end
 		end)
-		Bus.on("error", function(scope, err)
-			-- soft surface for critical scopes only
-			if type(scope) == "string" and string.find(scope, "loop:", 1, true) then
-				-- already warned via Errors.report
-			end
-		end)
 
 		Bus.emit("voidz.ready", VOIDZ)
-		print("[VOIDZ V3] 2.0.0 ready")
+		print("[VOIDZ] 2.0.0 ready")
 		return VOIDZ
 	end
 
@@ -5232,7 +6642,6 @@ end
 end)()
 
 
--- entry (never return a function that callers must invoke twice)
 local __vz_ok, __vz_err = pcall(function()
 	__vz_require("init")
 end)

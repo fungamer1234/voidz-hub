@@ -7,12 +7,13 @@ return function(require)
 	local Gucci = require("systems.defense.gucci")
 	local AntiGrab = require("systems.defense.anti_grab")
 	local War = require("systems.defense.war")
+	local AntiAFK = require("systems.utility.antiafk")
 
 	return function(parent)
 		local scroll = C.scroll(parent)
 
-		local note = C.section(scroll, "SEPARATION RULE")
-		C.label(note, "Gucci = visual free hold. Anti-Grab = break / prevent grabs. War = light threat protect. Never merge.", {
+		local note = C.section(scroll, "PROTECT")
+		C.label(note, "Gucci = free while held. Anti-Grab = break grabs. War = threat protect. Never merge Gucci with Anti-Grab.", {
 			size = 12,
 			color = Theme.warn,
 			wrap = true,
@@ -20,7 +21,7 @@ return function(require)
 		})
 
 		local gucci = C.section(scroll, "GUCCI")
-		C.toggle(gucci, "Enable Gucci (free while held)", function()
+		C.toggle(gucci, "Enable Gucci (visual free hold)", function()
 			return State.getToggle("gucci")
 		end, function(v)
 			if v then
@@ -32,8 +33,8 @@ return function(require)
 			Notify.info("Gucci", v and "ON" or "OFF")
 		end)
 
-		local ag = C.section(scroll, "ANTI-GRAB")
-		C.toggle(ag, "Enable Anti-Grab (15 strategies)", function()
+		local ag = C.section(scroll, "ANTI-GRAB (15 strategies)")
+		C.toggle(ag, "Enable Anti-Grab", function()
 			return State.getToggle("antiGrab")
 		end, function(v)
 			if v then
@@ -51,14 +52,13 @@ return function(require)
 			Config.save()
 		end)
 
-		local list = C.section(scroll, "STRATEGY SCOREBOARD")
-		local rows = AntiGrab.getStrategyList()
-		for _, row in ipairs(rows) do
+		local board = C.section(scroll, "STRATEGY SCOREBOARD")
+		for _, row in ipairs(AntiGrab.getStrategyList()) do
 			local tag = row.demoted and " [demoted]" or ""
-			C.label(list, string.format("%s  ok:%d fail:%d%s", row.id, row.ok, row.fail, tag), {
+			C.label(board, string.format("%s  ok:%d fail:%d%s", row.id, row.ok, row.fail, tag), {
 				size = 11,
 				color = row.demoted and Theme.warn or Theme.textMuted,
-				h = 16,
+				h = 15,
 			})
 		end
 
@@ -78,6 +78,14 @@ return function(require)
 			return State.getToggle("warUseStopVel")
 		end, function(v)
 			State.setToggle("warUseStopVel", v)
+			Config.save()
+		end)
+
+		local util = C.section(scroll, "UTILITY")
+		C.toggle(util, "Anti-AFK", function()
+			return State.getToggle("antiafk")
+		end, function(v)
+			AntiAFK.set(v)
 			Config.save()
 		end)
 	end

@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.141` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.142` · Access Key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,13 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.142) — Blitz Gucci/Antis + banana feet + Bloody limbs
+
+- **Gucci / Anti-Grab**: Blitz path — on `IsHeld` Heartbeat: Anchor + `Struggle` + `RagdollRemote(0)` + DestroyGrabLine stack.
+- **Anti-Banana**: removes **feet/legs** (Motor6D detach then destroy) when slip/sit pins you; peels no-collide.
+- **Limb rip**: Bloody-style `Motor6D.Part0 = nil` then Destroy.
+- **Anti-Burn**: Blitz extinguish `firetouchinterest` on map ExtinguishPart.
 
 ## Recent (1.2.141) — Gucci SERVER ungrab + blob sit fix
 

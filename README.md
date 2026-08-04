@@ -6,7 +6,9 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.131` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.132` · Access Key: `VOIDZHUB`  
+
+**Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
 **Use this `main` loadstring only.** Do **not** use the experimental `v3` branch for daily play.
 

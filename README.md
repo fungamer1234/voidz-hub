@@ -6,7 +6,9 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-07-29-1.2.125` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.126` · Access Key: `VOIDZHUB`  
+
+**Use this `main` loadstring only.** Do **not** use the experimental `v3` / `VOIDZ_HUB_V3.lua` branch for daily play — it was a rewrite experiment and is not production.
 
 One loadstring for all updates — always pulls latest `main` from GitHub (no `?v=` needed).
 
@@ -15,6 +17,11 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.126)
+
+- **Official restore** — Confirmed full V1 hub (all tabs / tools) is what ships on `main` again. Ignore V3 experiment for play.
+- Same stable kit as 1.2.125 (blobman 1.2.75 path, kicks, defense, auras, loops, etc.).
 
 ## Recent (1.2.125)
 

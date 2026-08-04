@@ -53,7 +53,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,92,82,87,94,82,86,83,87,83,86,87,90})
+local BUILD = _Vzd({87,85,87,91,82,85,93,82,85,88,82,86,83,87,83,86,87,91})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -24238,5 +24238,7 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- VOIDZ HUB | v1.2.125 | 2026-07-29
+-- Official hub is this V1 file (main). Modular V3 on branch v3 is experimental only.
+
+-- VOIDZ HUB | v1.2.126 | 2026-08-03
 -- hi im voidz

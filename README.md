@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.135` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.136` · Access Key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,11 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.136) — BloodyV2-style blob loop grab
+
+- **Loop Grab** rebuilt like BloodyV2: force sticky seat while loop is on, aggressive spawn/sit, close park (2.5–3 studs), hard latch + soft hold, burst CreatureGrab multi-part fire.
+- Remounts if ejected; keeps following while held.
 
 ## Recent (1.2.135) — hub scale fix
 

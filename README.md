@@ -6,9 +6,9 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.126` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.127` · Access Key: `VOIDZHUB`  
 
-**Use this `main` loadstring only.** Do **not** use the experimental `v3` / `VOIDZ_HUB_V3.lua` branch for daily play — it was a rewrite experiment and is not production.
+**Use this `main` loadstring only.** Do **not** use the experimental `v3` branch for daily play.
 
 One loadstring for all updates — always pulls latest `main` from GitHub (no `?v=` needed).
 
@@ -18,10 +18,16 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 
 GitHub: https://github.com/fungamer1234/voidz-hub
 
+## Recent (1.2.127)
+
+- **Res-style UI polish** — Deeper glass purple theme, cleaner sections/buttons, larger hub shell.
+- **Splash overhaul** — Premium glass boot card, ring loader, animated status, skip-to-open.
+- Full V1 feature set unchanged (combat, blobman, auras, loops, protect, etc.).
+
 ## Recent (1.2.126)
 
-- **Official restore** — Confirmed full V1 hub (all tabs / tools) is what ships on `main` again. Ignore V3 experiment for play.
-- Same stable kit as 1.2.125 (blobman 1.2.75 path, kicks, defense, auras, loops, etc.).
+- **Official restore** — Full V1 hub on `main` again. Ignore V3 experiment for play.
+
 
 ## Recent (1.2.125)
 

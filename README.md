@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.143` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.144` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,11 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`FREMIUM`** (free) or **`VOIDZHUB`** (premium). RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.144) — faster loop explode
+
+- Missile auto-strike / fire once: explode **as soon as bomb spawns** (no sky-park batch wait).
+- `explodeBombAt` no longer waits 6×0.03s — hop + double FireServer.
 
 ## Recent (1.2.143) — Free + Premium keys
 

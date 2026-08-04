@@ -24611,7 +24611,7 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- Gucci free-hold vs Anti-Grab split (Res-style). Blob grab no sit spam.
+-- Menacing splash, real kickPlayer + BlobHover, train Gucci, blob no spawn spam.
 
--- VOIDZ HUB | v1.2.129 | 2026-08-03
+-- VOIDZ HUB | v1.2.130 | 2026-08-03
 -- hi im voidz

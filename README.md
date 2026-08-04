@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.136` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.137` · Access Key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,11 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.137) — load chat + classic blob loop
+
+- **Load chat message** — Settings → LOAD CHAT: set your auto-load line (default skulls). Saves to `voidz_hub_settings.json` on the executor.
+- **Blob Loop Grab** — Restored **v1.2.50 classic** path (before sticky seat): mount → park → CreatureGrab → home-TP loop.
 
 ## Recent (1.2.136) — BloodyV2-style blob loop grab
 

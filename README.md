@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.140` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.141` · Access Key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,11 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.141) — Gucci SERVER ungrab + blob sit fix
+
+- **Gucci** fires Struggle + DestroyGrabLine + kill GrabParts every ~0.05s (server remotes) so holds cannot stick; free-move if still held.
+- **Blob** finds VehicleSeat on CreatureBlobman, mounts reliably, loop parks without HRP hop (no unseat), remount CD 2.5s only if ejected.
 
 ## Recent (1.2.140) — Blitz + Endoris patterns
 

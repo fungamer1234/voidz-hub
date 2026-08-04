@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.139` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.140` · Access Key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,13 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.140) — Blitz + Endoris patterns
+
+- Scanned readable **Blitz (25ms leak)** + **Endoris** sources into `_ref/`.
+- **Blob grab/wreck**: Blitz seated-only `CreatureGrab` fire (no force-sit loops). Sit first, then loop.
+- **Destroy Server**: while on blob → grab all → fling (Blitz BringAll style).
+- **Gucci**: Blitz `CanQuery=false` not-grabbable + free walk / non-body while held.
 
 ## Recent (1.2.139) — Gucci non-body + blob bring + wreck fling
 

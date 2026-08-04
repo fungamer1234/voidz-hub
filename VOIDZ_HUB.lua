@@ -23081,7 +23081,6 @@ function buildMain()
 
 	local logo = Instance.new(_Vzd({121,138,157,153,113,134,135,138,145}))
 	logo.BackgroundTransparency = 1
-	logo.Size = UDim2.new(0, mobile and 120 or 100, 1, 0)
 	logo.Position = UDim2.fromOffset(14, 0)
 	logo.Font = Enum.Font.GothamBlack
 	logo.Size = UDim2.new(0, mobile and 150 or 140, 1, 0)
@@ -23091,6 +23090,7 @@ function buildMain()
 	logo.Text = "VOIDZ  HUB"
 	logo.ZIndex = 7
 	logo.Parent = header
+
 	local logoGrad = Instance.new("UIGradient")
 	logoGrad.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, C.accent2 or C.accent),

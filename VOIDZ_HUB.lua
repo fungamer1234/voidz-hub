@@ -16281,14 +16281,13 @@ function installAntiVoiceBan(quiet)
 		end)
 	end)
 
-	-- 5) getconnections: mute voice-ban related signals if executor supports it
+	-- 5) getconnections: optional on Xeno (often missing) — no-op if unsupported
 	pcall(function()
-		if type(getconnections) ~= _Vzd({139,154,147,136,153,142,148,147}) then return end
-		-- Player.Kick connections sometimes used by custom ban UIs
-		for _, conn in ipairs(getconnections(LP.Changed)) do
-			-- leave alone — too broad
-		end
+		if not voidzGetConnections then return end
+		-- probe only; do not disable broad signals (can break chat on some execs)
+		local _ = voidzGetConnections(LP.Changed)
 	end)
+
 
 	print(_Vzd({128,123,116,110,105,127,130,69,134,147,153,142,82,155,148,142,136,138,82,135,134,147,69,116,115,69,77,136,145,142,138,147,153,69,135,138,152,153,82,138,139,139,148,151,153,78}))
 	if not quiet then

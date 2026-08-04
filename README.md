@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.144` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.145` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,13 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`FREMIUM`** (free) or **`VOIDZHUB`** (premium). RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.2.145) — auto attack fixed
+
+- Auto Attacker: light `findGrabAttacker` + throttled counter (no 0.08s full-body weld scans).
+- All Attack Modes fixed (Kick used invalid type "Phoenix" → now uses Kick Type).
+- Sever-grab before counter is light (2 Struggle, not 6× + full workspace thrash).
+- Auto Fling/Kick Nearest: nil-safe roots, one target per tick.
 
 ## Recent (1.2.144) — faster loop explode
 

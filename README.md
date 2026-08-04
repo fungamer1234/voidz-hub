@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.130` · Access Key: `VOIDZHUB`  
+Build: `2026-08-03-1.2.131` · Access Key: `VOIDZHUB`  
 
 **Use this `main` loadstring only.** Do **not** use the experimental `v3` branch for daily play.
 
@@ -18,13 +18,13 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 
 GitHub: https://github.com/fungamer1234/voidz-hub
 
-## Recent (1.2.130)
+## Recent (1.2.131) — power polish (Blitz/Res-pattern)
 
-- **Menacing splash** — BloodyV2-style black/crimson boot (glitch VOIDZ, scanlines, READY TO KILL).
-- **kickPlayer restored** — Was missing entirely (kicks never ran). Full types + **BlobHover** (hover over target on blob + stack fling, Res-style).
-- **Gucci** — Strong free-move BV + optional train VehicleSeat freedom while held (not anti-grab).
-- **Anti-Grab** — Separate hard break only.
-- **Blob loop** — No spawn spam (8s CD, reuse seat); loop never thrash-sits if already mounted.
+- **Blob grab** — No more anchor/unseat thrash; classic PivotTo park only while seated. Loop never spawns; must Spawn+Sit first then loop only fires CreatureGrab.
+- **Gucci** — Every Heartbeat free-move while held (huge BV + SNO self + step CFrame). Never nukes their GrabParts.
+- **Anti-Grab** — When held: freeFromGrabInstant + hard break stack every tick.
+- **BlobHover kick** — Hover 12 studs on blob, shake, hard sky slam (public kick pattern).
+
 
 ## Recent (1.2.129)
 

@@ -53,7 +53,7 @@ local Mouse = LP:GetMouse()
 
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,93,82,85,88,82,86,83,87,83,86,88,85})
+local BUILD = _Vzd({87,85,87,91,82,85,93,82,85,88,82,86,83,87,83,86,88,86})
 local GuiService = game:GetService("GuiService")
 
 local THEMES = {
@@ -4198,67 +4198,73 @@ function kickPlayer(p, ktype, quiet)
 	local power = tonumber(S.flingPower) or 12000
 
 	if ktype == "Blobman" or ktype == "BlobHover" then
-		-- sit blob once, hover above target, ownership stack, sky fling (Res hover kick)
-		pcall(function()
-			if not isOnBlobman() then
-				ensureBlobman(true)
-			end
-		end)
-		for i = 1, 22 do
+		-- Wiki/Res pattern: sit blob once, hover over target, hard sky fling = lag kick
+		if not isOnBlobman() then
+			pcall(function() ensureBlobman(true) end)
+		end
+		for i = 1, 28 do
 			r = rootOf(p)
 			if not r or not validP(p) then break end
 			local kit = getBlobmanGrabKit and getBlobmanGrabKit()
-			local me = hrp()
 			if kit and kit.blob and isOnBlobman() then
-				local hover = r.CFrame * CFrame.new(0, (ktype == "BlobHover") and 10 or 4, (ktype == "BlobHover") and 0 or -2)
+				-- BlobHover: sit high above them (stack-kick style); Blobman: closer park
+				local hoverY = (ktype == "BlobHover") and 12 or 5
+				local hover = r.CFrame * CFrame.new(0, hoverY, 0)
 				pcall(function()
 					if kit.blob.PrimaryPart then
 						kit.blob:PivotTo(hover)
-					elseif kit.seat then
-						kit.seat.CFrame = hover
 					end
 				end)
-				if kit.creatureGrab and fireCreatureGrab then
-					fireCreatureGrab(kit, r)
+				if fireCreatureGrab then fireCreatureGrab(kit, r) end
+				-- shake for hard lag kick
+				if ktype == "BlobHover" and i % 2 == 0 then
+					pcall(function()
+						if kit.blob.PrimaryPart then
+							kit.blob:PivotTo(hover * CFrame.Angles(0, math.rad(i * 40), 0))
+						end
+					end)
 				end
-			elseif me then
-				pcall(function() me.CFrame = r.CFrame * CFrame.new(0, 8, 0) end)
 			end
 			snoPlayer(p, r.Position)
 			sno(r, r.Position)
-			if hasNetOwner(r) or r.AssemblyLinearVelocity.Magnitude > 400 or i > 14 then
+			if hasNetOwner(r) or r.AssemblyLinearVelocity.Magnitude > 350 or i > 16 then
 				destroyGrabOn(r)
 				skyVel(r)
-				applyVel(r, 22000, 0.15)
+				applyVel(r, 28000, 0.2)
 				createKickPhysical(r, "Sky Anchor")
+				-- extra sky slam
+				for _ = 1, 4 do
+					r = rootOf(p)
+					if r then skyVel(r); applyVel(r, 30000, 0.3) end
+					task.wait()
+				end
 				break
 			end
 			task.wait()
 		end
 	elseif ktype == "StackKick" then
-		for i = 0, 50 do
+		-- phased stack: below target for ownership then sky
+		for i = 0, 55 do
 			r = rootOf(p)
 			if not r or not validP(p) then break end
 			snoPlayer(p, r.Position)
 			sno(r, r.Position)
-			local me = hrp()
-			if me then
-				if r.Position.Y <= -12 then
-					teleportSelf(CFrame.new(r.Position + Vector3.new(0, 5, -15)))
-				else
-					teleportSelf(CFrame.new(r.Position + Vector3.new(0, -10, -10)))
-				end
+			if r.Position.Y <= -12 then
+				teleportSelf(CFrame.new(r.Position + Vector3.new(0, 5, -15)))
+			else
+				teleportSelf(CFrame.new(r.Position + Vector3.new(0, -12, -8)))
 			end
-			if hasNetOwner(r) or r.AssemblyLinearVelocity.Magnitude > 500 or i > 40 then
+			if hasNetOwner(r) or r.AssemblyLinearVelocity.Magnitude > 500 or i > 42 then
 				destroyGrabOn(r)
 				task.wait()
 				skyVel(r)
-				applyVel(r, 22000, 0.1)
+				applyVel(r, 26000, 0.12)
 				createKickPhysical(r, _Vzd({120,144,158,69,102,147,136,141,148,151}))
 				break
 			end
 			task.wait()
 		end
+
 	elseif ktype == "GrabKick" then
 		for _ = 1, 15 do
 			r = rootOf(p)
@@ -4911,19 +4917,17 @@ function resitBlobKit(kit, force)
 	return isOnBlobman()
 end
 
--- Park blob near target while STAYING seated. No player CFrame hop (that unseats).
+-- Classic 1.2.75 park: PivotTo only. NEVER anchor (anchor unseats). NEVER teleport local HRP.
 function moveBlobNear(kit, targetRoot)
 	if not kit or not targetRoot or not kit.blob then return false end
 	local pivot = kit.blob.PrimaryPart or kit.seat
 	if not pivot or not pivot.Parent then return false end
+	if not isOnBlobman() then return false end
 	local ok = pcall(function()
 		local dest = targetRoot.CFrame * CFrame.new(0, 1, 7)
-		-- brief freeze for clean pivot (do not teleport local HRP)
-		local anchored = {}
+		-- zero vel then pivot (stay seated; seat rides with model)
 		for _, part in ipairs(kit.blob:GetDescendants()) do
 			if part:IsA("BasePart") then
-				anchored[#anchored + 1] = part
-				part.Anchored = true
 				part.AssemblyLinearVelocity = Vector3.zero
 				part.AssemblyAngularVelocity = Vector3.zero
 			end
@@ -4933,33 +4937,15 @@ function moveBlobNear(kit, targetRoot)
 		else
 			pivot.CFrame = dest
 		end
-		-- keep sit without lifting off seat
+		-- soft keep-sit only (no CFrame hop onto seat)
 		local h = hum()
-		if h and kit.seat then
+		if h and kit.seat and h.SeatPart == kit.seat then
 			h.Sit = true
-			pcall(function() kit.seat:Sit(h) end)
-		end
-		task.wait(0.04)
-		for _, part in ipairs(anchored) do
-			if part.Parent then
-				part.Anchored = false
-			end
-		end
-		-- one soft re-sit only if we actually lost the seat
-		if not isOnBlobman() then
-			resitBlobKit(kit, true)
-		else
-			local h2 = hum()
-			if h2 and kit.seat then
-				pcall(function()
-					h2.Sit = true
-					kit.seat:Sit(h2)
-				end)
-			end
 		end
 	end)
 	return ok == true
 end
+
 
 
 -- Never block the loop on RemoteFunction:Fire/Invoke hangs
@@ -5058,21 +5044,19 @@ function forceBlobmanMount()
 	return kit or S._blobGrabKit
 end
 
--- park + fire ONLY. Never spawn. Never hop sit if already seated.
+-- park + fire ONLY while already seated. Never spawn. Never force-sit thrash.
 function blobGrabTick(p)
 	if not p or not p.Parent then return false end
-	if not validP(p) and not (p.Character and rootOf(p)) then return false end
 	local r = rootOf(p)
 	if not r then return false end
 
-	local kit = getBlobmanGrabKit()
+	-- MUST already be on blob — loop never mounts (user hits Spawn+Sit once)
 	if not isOnBlobman() then
-		-- remount existing only; forceBlobmanMount won't spam spawn (8s CD)
-		kit = forceBlobmanMount()
+		return false
 	end
-	if not kit or not kit.creatureGrab then return false end
-	if not isOnBlobman() then
-		return false -- do not thrash sit; user/spawn button handles mount
+	local kit = getBlobmanGrabKit()
+	if not kit or not kit.creatureGrab then
+		return false
 	end
 
 	pcall(function()
@@ -5082,10 +5066,9 @@ function blobGrabTick(p)
 	end)
 	snoPlayer(p, r.Position)
 	moveBlobNear(kit, r)
-	kit = getBlobmanGrabKit() or kit
-	if not kit or not isOnBlobman() then return false end
+	if not isOnBlobman() then return false end
 
-	for _ = 1, 3 do
+	for _ = 1, 4 do
 		r = rootOf(p)
 		if not r then break end
 		fireCreatureGrab(kit, r)
@@ -5093,6 +5076,7 @@ function blobGrabTick(p)
 	end
 	return true
 end
+
 
 
 
@@ -5166,25 +5150,33 @@ function setBlobGrabLoop(on, p)
 	S._blobGrabTargetName = p.Name
 	S._blobGrabTargetUserId = p.UserId
 	markBlobmanSession(true)
-	if blobmanShouldStickSeat() then startBlobmanStickySeat() end
+	-- sticky is opt-in; grab loop does not force sticky re-sit spam
 	notify(HUB_NAME, "Blob Grab Loop ON -> " .. playerLabel(p), 1.5)
 
-	-- mount + first latch immediately
+	-- ONE mount at start only (never inside loop)
 	task.spawn(function()
-		local kit = forceBlobmanMount()
-		if not kit then
-			notify(HUB_NAME, _Vzd({103,145,148,135,146,134,147,69,146,148,154,147,153,69,139,134,142,145,138,137,69,82,69,152,149,134,156,147,69,152,138,134,153,69,139,142,151,152,153}), 2)
-			return
+		if not isOnBlobman() then
+			local kit = forceBlobmanMount()
+			if not kit then
+				notify(HUB_NAME, _Vzd({120,142,153,69,148,147,69,103,145,148,135,146,134,147,69,139,142,151,152,153,69,77,120,149,134,156,147,69,80,69,120,142,153,78,81,69,153,141,138,147,69,138,147,134,135,145,138,69,145,148,148,149}), 2.5)
+				S.toggles.blobGrabLoop = false
+				stopLoop(id)
+				if S._toggleRenderers and S._toggleRenderers.blobGrabLoop then
+					pcall(S._toggleRenderers.blobGrabLoop)
+				end
+				return
+			end
 		end
-		blobGrabSingle(p)
+		blobGrabTick(p)
 	end)
 
-	-- steady maintain loop (no home-TP, no stacked ticks)
-	startLoop(id, 0.35, function()
+	-- maintain: park + CreatureGrab only (no spawn, no sit thrash)
+	startLoop(id, 0.32, function()
 		if not S.toggles.blobGrabLoop then return end
 		if S._blobGrabBusy then return end
+		if not isOnBlobman() then return end -- wait until seated; never auto-spawn
 		S._blobGrabBusy = true
-		local ok, err = pcall(function()
+		pcall(function()
 			local target = nil
 			if S._blobGrabTargetUserId then
 				for _, pl in ipairs(Players:GetPlayers()) do
@@ -5194,21 +5186,16 @@ function setBlobGrabLoop(on, p)
 					end
 				end
 			end
-			target = target
-				or Players:FindFirstChild(S._blobGrabTargetName or "")
-				or S.blobTarget
-				or S.selected
+			target = target or S.blobTarget or S.selected
 			if not target or not target.Parent then return end
 			S.blobTarget = target
 			blobGrabTick(target)
 		end)
-		if not ok then
-			warn("[VOIDZ] blobGrabLoop", err)
-		end
 		S._blobGrabBusy = false
 	end)
 	return true
 end
+
 
 function startBlobGrabLoop(p)
 	if S.toggles.blobGrabLoop or S.loops.blobGrabLoop then
@@ -5223,7 +5210,7 @@ function setBlobGrabAllLoop(on)
 		stopLoop(id)
 		S.toggles.blobGrabAllLoop = false
 		S._blobGrabBusy = false
-		notify(HUB_NAME, _Vzd({103,145,148,135,69,108,151,134,135,69,102,145,145,69,113,148,148,149,69,116,107,107}), 1.2)
+		notify(HUB_NAME, "Blob Grab All Loop OFF", 1.2)
 		if not blobmanFeaturesActive() then
 			releaseBlobmanSeatAfterFeaturesOff(false)
 		end
@@ -5263,7 +5250,7 @@ function setBlobExtractPlotsLoop(on)
 	S.toggles.blobExtractPlotsLoop = true
 	markBlobmanSession(true)
 	startBlobmanStickySeat()
-	notify(HUB_NAME, _Vzd({106,157,153,151,134,136,153,69,117,145,148,153,152,69,113,148,148,149,69,116,115}), 1.5)
+	notify(HUB_NAME, "Extract Plots Loop ON", 1.5)
 	startLoop(id, 1.0, function()
 		if not S.toggles.blobExtractPlotsLoop then return end
 		for _, p in ipairs(Players:GetPlayers()) do
@@ -5344,7 +5331,7 @@ destroyServerLoop = function(keep)
 end
 
 destroyServerHybridLoop = function(keep)
-	notify(HUB_NAME, "Destroy Server Hybrid ON (no blobman needed)", 3)
+	notify(HUB_NAME, _Vzd({105,138,152,153,151,148,158,69,120,138,151,155,138,151,69,109,158,135,151,142,137,69,116,115,69,77,147,148,69,135,145,148,135,146,134,147,69,147,138,138,137,138,137,78}), 3)
 	while keep() do
 		if FTAP.CreateGrabLine then
 			for _, p in ipairs(Players:GetPlayers()) do
@@ -5372,7 +5359,7 @@ destroyServerHybridLoop = function(keep)
 						h.BreakJointsOnDeath = false
 						h:ChangeState(Enum.HumanoidStateType.Dead)
 					end
-					touchToyPartToPlayer(_Vzd({104,134,146,149,139,142,151,138}), r)
+					touchToyPartToPlayer("Campfire", r)
 					touchToyPartToPlayer(_Vzd({107,148,148,137,103,134,147,134,147,134}), r)
 				end
 			end)
@@ -5380,7 +5367,7 @@ destroyServerHybridLoop = function(keep)
 		end
 		local me = hrp()
 		if me and FTAP.SpawnToy then
-			for _, toy in ipairs({ "Missile", "VoidBomb", "Firework", "BombBalloon", "Snowball" }) do
+			for _, toy in ipairs({ _Vzd({114,142,152,152,142,145,138}), "VoidBomb", "Firework", "BombBalloon", "Snowball" }) do
 				pcall(function()
 					if FTAP.BuyToy then FTAP.BuyToy:InvokeServer(toy) end
 					FTAP.SpawnToy:InvokeServer(toy, me.CFrame * CFrame.new(0, 5, -8), Vector3.zero)
@@ -5397,7 +5384,7 @@ do local _z485=(8*6); if _z485<0 and _Vj() then _z485=_z485+1 end end
 
 function _voidzLateInit()
 Late = Late or {}
-Late._phase = "entered"
+Late._phase = _Vzd({138,147,153,138,151,138,137})
 print("[VOIDZ] late init entered")
 local orbitAngles = {}
 local buriedPartState = setmetatable({}, { __mode = "k" })
@@ -5433,9 +5420,9 @@ function cleanupAura(id)
 		elseif id == _Vzd({139,151,138,138,159,138}) then
 			clearAuraEffect(root, { "VOIDZ_FreezeBP" })
 		elseif id == "orbit" then
-			clearAuraEffect(root, { _Vzd({123,116,110,105,127,132,116,151,135,142,153,103,117}) })
+			clearAuraEffect(root, { "VOIDZ_OrbitBP" })
 		elseif id == _Vzd({139,145,142,147,140}) then
-			clearAuraEffect(root, { "FlingAuraVelocity", "VOIDZ_BV" })
+			clearAuraEffect(root, { _Vzd({107,145,142,147,140,102,154,151,134,123,138,145,148,136,142,153,158}), "VOIDZ_BV" })
 		end
 	end
 end
@@ -5452,7 +5439,7 @@ end
 
 local auraHomeCF = nil
 function eachAuraTarget(cfg, fnPlayers, fnObjects, serverWide)
-	if type(cfg) ~= _Vzd({153,134,135,145,138}) then cfg = auraDefaults() end
+	if type(cfg) ~= "table" then cfg = auraDefaults() end
 	if cfg._id then cfg = getAura(cfg._id) end
 	local power = tonumber(cfg.power) or tonumber(S.flingPower) or 2500
 	if not cfg._customPower then power = tonumber(S.flingPower) or power end
@@ -5468,7 +5455,7 @@ function eachAuraTarget(cfg, fnPlayers, fnObjects, serverWide)
 				if isInSafePlot(p) and not plotBypass then
 					if S.toggles.plotAmbush ~= false then
 						plotWatch[p.UserId] = {
-							kind = "fling", quiet = true, power = power, mapWide = true,
+							kind = _Vzd({139,145,142,147,140}), quiet = true, power = power, mapWide = true,
 						}
 					end
 				else
@@ -5594,7 +5581,7 @@ function applyVelBurst(part, power, up)
 end
 
 function tick_netown(cfg, serverWide)
-	cfg = getAura("netown")
+	cfg = getAura(_Vzd({147,138,153,148,156,147}))
 	if not hrp() or not FTAP.SetNetworkOwner then return end
 	eachAuraTarget(cfg, function(p, r)
 		snoQuick(p, r)
@@ -5664,7 +5651,7 @@ end
 do local _z282=(9*3); if _z282<0 and _Vj() then _z282=_z282+1 end end
 
 function tick_attract(cfg, serverWide)
-	cfg = getAura(_Vzd({134,153,153,151,134,136,153}))
+	cfg = getAura("attract")
 	eachAuraTarget(cfg, function(p, r, power)
 		local center = auraHomeCF and auraHomeCF.Position or (hrp() and hrp().Position) or Vector3.zero
 		local d = center - r.Position
@@ -5708,7 +5695,7 @@ function tick_spin(cfg, serverWide)
 end
 
 function tick_ragdoll(cfg, serverWide)
-	cfg = getAura("ragdoll")
+	cfg = getAura(_Vzd({151,134,140,137,148,145,145}))
 	local bananaModel, bananaPrimary, peel = nil, nil, nil
 	local function ensurePeel()
 		if bananaModel and bananaModel.Parent and peel and peel.Parent then return true end
@@ -5717,7 +5704,7 @@ function tick_ragdoll(cfg, serverWide)
 		bananaModel, bananaPrimary = m, pp
 		peel = nil
 		for _, d in ipairs(m:GetDescendants()) do
-			if d.Name == "BananaPeel" and d:FindFirstChildOfClass(_Vzd({121,148,154,136,141,121,151,134,147,152,146,142,153,153,138,151})) then
+			if d.Name == "BananaPeel" and d:FindFirstChildOfClass("TouchTransmitter") then
 				peel = d; break
 			end
 		end
@@ -5728,7 +5715,7 @@ function tick_ragdoll(cfg, serverWide)
 		end
 		pcall(function()
 			for _, d in ipairs(m:GetDescendants()) do
-				if d:IsA("BasePart") then d.CanCollide = false end
+				if d:IsA(_Vzd({103,134,152,138,117,134,151,153})) then d.CanCollide = false end
 			end
 			local ao = pp:FindFirstChildOfClass("AlignOrientation")
 			if ao then ao.Enabled = false end
@@ -5885,7 +5872,7 @@ function tick_stomp(cfg, serverWide)
 			local bp = root:FindFirstChild("VOIDZ_BuryBP")
 			if not bp then
 				bp = Instance.new("BodyPosition")
-				bp.Name = _Vzd({123,116,110,105,127,132,103,154,151,158,103,117})
+				bp.Name = "VOIDZ_BuryBP"
 				bp.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
 				bp.D = 2000
 				bp.P = 1e5
@@ -5903,7 +5890,7 @@ end
 do local _z753=(3*5); if _z753<0 and _Vj() then _z753=_z753+1 end end
 
 function tick_orbit(cfg, serverWide)
-	cfg = getAura("orbit")
+	cfg = getAura(_Vzd({148,151,135,142,153}))
 	local radius = math.clamp((cfg.range or 50) * 0.35, 8, 40)
 	local power = cfg.power or 2500
 	local speed = math.clamp(power / 800, 1.5, 8)
@@ -5980,7 +5967,7 @@ function tick_soft(cfg, serverWide)
 end
 
 function tick_chaos(cfg, serverWide)
-	cfg = getAura(_Vzd({136,141,134,148,152}))
+	cfg = getAura("chaos")
 	eachAuraTarget(cfg, function(p, r, power)
 		snoQuick(p, r)
 		local v = Vector3.new(math.random(-10, 10), math.random(2, 10), math.random(-10, 10))
@@ -5995,7 +5982,7 @@ function tick_chaos(cfg, serverWide)
 end
 
 function tick_freeze(cfg, serverWide)
-	cfg = getAura("freeze")
+	cfg = getAura(_Vzd({139,151,138,138,159,138}))
 	eachAuraTarget(cfg, function(p, r)
 		pcall(function()
 			r.AssemblyLinearVelocity = Vector3.zero
@@ -6043,7 +6030,7 @@ function tick_launch(cfg, serverWide)
 end
 
 function tick_spike(cfg, serverWide)
-	cfg = getAura("spike")
+	cfg = getAura(_Vzd({152,149,142,144,138}))
 	eachAuraTarget(cfg, function(p, r, power)
 		applyVelBurst(r, power, 2.5)
 		task.delay(0.12, function()
@@ -6056,7 +6043,7 @@ function tick_spike(cfg, serverWide)
 end
 
 function tick_repel(cfg, serverWide)
-	cfg = getAura(_Vzd({151,138,149,138,145}))
+	cfg = getAura("repel")
 	eachAuraTarget(cfg, function(p, r, power)
 		local center = auraHomeCF and auraHomeCF.Position or (hrp() and hrp().Position) or Vector3.zero
 		local d = r.Position - center
@@ -6109,7 +6096,7 @@ function tick_flatten(cfg, serverWide)
 end
 
 function tick_poison(cfg, serverWide)
-	cfg = getAura(_Vzd({149,148,142,152,148,147}))
+	cfg = getAura("poison")
 	eachAuraTarget(cfg, function(p)
 		local head = p.Character and p.Character:FindFirstChild("Head")
 		if not head then return end
@@ -6121,7 +6108,7 @@ function tick_poison(cfg, serverWide)
 end
 
 function tick_burnaura(cfg, serverWide)
-	cfg = getAura("burnaura")
+	cfg = getAura(_Vzd({135,154,151,147,134,154,151,134}))
 	local model, primary, tip = getStatusToy("Campfire")
 	if not tip or not tip:IsA("BasePart") then return end
 	tip.Size = Vector3.new(2, 2, 2)
@@ -6251,29 +6238,29 @@ local SERVER_TICKS = {
 }
 
 local AURA_META = {
-	{ id = "netown", title = "Own Nearby", tip = _Vzd({115,138,153,156,148,151,144,69,148,156,147,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
+	{ id = "netown", title = _Vzd({116,156,147,69,115,138,134,151,135,158}), tip = _Vzd({115,138,153,156,148,151,144,69,148,156,147,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
 	{ id = "fling", title = "Fling Nearby", tip = "Fling nearby players (proximity)." },
 	{ id = "kick", title = _Vzd({112,142,136,144,69,115,138,134,151,135,158}), tip = _Vzd({120,144,158,69,144,142,136,144,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
-	{ id = _Vzd({137,138,134,153,141}), title = "Kill Nearby", tip = "Kill nearby players (proximity)." },
-	{ id = "poison", title = _Vzd({117,148,142,152,148,147,69,115,138,134,151,135,158}), tip = _Vzd({117,148,142,152,148,147,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
+	{ id = "death", title = _Vzd({112,142,145,145,69,115,138,134,151,135,158}), tip = "Kill nearby players (proximity)." },
+	{ id = "poison", title = "Poison Nearby", tip = _Vzd({117,148,142,152,148,147,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
 	{ id = _Vzd({135,154,151,147,134,154,151,134}), title = _Vzd({103,154,151,147,69,115,138,134,151,135,158}), tip = _Vzd({103,154,151,147,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
-	{ id = "anchor", title = _Vzd({103,151,142,138,139,69,107,151,138,138,159,138,69,115,138,134,151,135,158}), tip = _Vzd({102,147,136,141,148,151,69,153,141,138,146,69,139,148,151,69,134,69,146,148,146,138,147,153,69,82,69,150,154,142,136,144,69,149,134,154,152,138,69,153,141,138,147,69,151,138,145,138,134,152,138,83}) },
-	{ id = "tornado", title = _Vzd({121,148,151,147,134,137,148,69,115,138,134,151,135,158}), tip = _Vzd({120,149,142,147,82,145,142,139,153,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
+	{ id = _Vzd({134,147,136,141,148,151}), title = "Brief Freeze Nearby", tip = _Vzd({102,147,136,141,148,151,69,153,141,138,146,69,139,148,151,69,134,69,146,148,146,138,147,153,69,82,69,150,154,142,136,144,69,149,134,154,152,138,69,153,141,138,147,69,151,138,145,138,134,152,138,83}) },
+	{ id = _Vzd({153,148,151,147,134,137,148}), title = _Vzd({121,148,151,147,134,137,148,69,115,138,134,151,135,158}), tip = _Vzd({120,149,142,147,82,145,142,139,153,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
 	{ id = "blackhole", title = _Vzd({117,154,145,145,69,121,148,69,104,154,151,152,148,151}), tip = _Vzd({120,154,136,144,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,153,148,69,136,154,151,152,148,151,69,137,142,151,138,136,153,142,148,147,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
-	{ id = "attract", title = "Pull Nearby To Me", tip = "Suck nearby players toward you (proximity)." },
+	{ id = _Vzd({134,153,153,151,134,136,153}), title = _Vzd({117,154,145,145,69,115,138,134,151,135,158,69,121,148,69,114,138}), tip = "Suck nearby players toward you (proximity)." },
 	{ id = _Vzd({151,138,149,138,145}), title = "Push Nearby Away", tip = "Push nearby players away (proximity)." },
-	{ id = "sky", title = "Sky Blast", tip = _Vzd({103,142,140,69,155,138,151,153,142,136,134,145,69,142,146,149,154,145,152,138,69,82,69,153,141,138,158,69,139,145,158,69,154,149,69,141,142,140,141,69,134,147,137,69,139,134,145,145,69,135,134,136,144,83}) },
+	{ id = "sky", title = "Sky Blast", tip = "Big vertical impulse - they fly up high and fall back." },
 	{ id = "ragdoll", title = "Ragdoll Nearby", tip = _Vzd({119,134,140,137,148,145,145,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
 	{ id = "bring", title = _Vzd({103,151,142,147,140,69,115,138,134,151,135,158}), tip = _Vzd({103,151,142,147,140,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,142,147,69,139,151,148,147,153,69,148,139,69,158,148,154,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
-	{ id = "void", title = "Phase Through Floor", tip = "Disable collision + drop - they phase through the ground." },
-	{ id = "stomp", title = "Bury Underground", tip = _Vzd({115,148,136,145,142,149,69,80,69,152,145,134,146,69,153,141,138,146,69,154,147,137,138,151,140,151,148,154,147,137,69,134,147,137,69,141,148,145,137,69,153,141,138,146,69,153,141,138,151,138,83}) },
-	{ id = "orbit", title = _Vzd({116,151,135,142,153,69,115,138,134,151,135,158}), tip = _Vzd({120,149,142,147,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,134,151,148,154,147,137,69,158,148,154,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
+	{ id = "void", title = _Vzd({117,141,134,152,138,69,121,141,151,148,154,140,141,69,107,145,148,148,151}), tip = "Disable collision + drop - they phase through the ground." },
+	{ id = "stomp", title = _Vzd({103,154,151,158,69,122,147,137,138,151,140,151,148,154,147,137}), tip = _Vzd({115,148,136,145,142,149,69,80,69,152,145,134,146,69,153,141,138,146,69,154,147,137,138,151,140,151,148,154,147,137,69,134,147,137,69,141,148,145,137,69,153,141,138,146,69,153,141,138,151,138,83}) },
+	{ id = "orbit", title = "Orbit Nearby", tip = _Vzd({120,149,142,147,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,134,151,148,154,147,137,69,158,148,154,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
 	{ id = "yeet", title = _Vzd({126,138,138,153,69,115,138,134,151,135,158}), tip = _Vzd({109,148,151,142,159,148,147,153,134,145,69,145,134,154,147,136,141,69,153,148,156,134,151,137,69,153,134,151,140,138,153,69,137,142,151,138,136,153,142,148,147,69,77,145,142,144,138,69,153,141,151,148,156,142,147,140,69,134,69,135,134,145,145,78,83}) },
-	{ id = "soft", title = "Soft Push", tip = "Gentle camera-direction nudge (light poke, no spin)." },
-	{ id = "launch", title = _Vzd({113,138,155,142,153,134,153,138,69,115,138,134,151,135,158}), tip = _Vzd({104,148,147,153,142,147,154,148,154,152,69,154,149,156,134,151,137,69,139,148,151,136,138,69,82,69,144,138,138,149,152,69,145,142,139,153,142,147,140,69,153,141,138,146,69,156,141,142,145,138,69,148,147,83}) },
-	{ id = "spike", title = _Vzd({120,149,142,144,138,69,115,138,134,151,135,158}), tip = "Quick up then down burst nearby (proximity)." },
-	{ id = _Vzd({139,151,138,138,159,138}), title = _Vzd({109,148,145,137,69,115,138,134,151,135,158,69,120,153,142,145,145}), tip = "Continuous BodyPosition pin - frozen in place while on." },
-	{ id = "chaos", title = _Vzd({119,134,147,137,148,146,69,107,145,142,147,140,69,115,138,134,151,135,158}), tip = "Random directions on nearby players (proximity)." },
+	{ id = "soft", title = _Vzd({120,148,139,153,69,117,154,152,141}), tip = "Gentle camera-direction nudge (light poke, no spin)." },
+	{ id = "launch", title = "Levitate Nearby", tip = _Vzd({104,148,147,153,142,147,154,148,154,152,69,154,149,156,134,151,137,69,139,148,151,136,138,69,82,69,144,138,138,149,152,69,145,142,139,153,142,147,140,69,153,141,138,146,69,156,141,142,145,138,69,148,147,83}) },
+	{ id = _Vzd({152,149,142,144,138}), title = _Vzd({120,149,142,144,138,69,115,138,134,151,135,158}), tip = "Quick up then down burst nearby (proximity)." },
+	{ id = "freeze", title = _Vzd({109,148,145,137,69,115,138,134,151,135,158,69,120,153,142,145,145}), tip = _Vzd({104,148,147,153,142,147,154,148,154,152,69,103,148,137,158,117,148,152,142,153,142,148,147,69,149,142,147,69,82,69,139,151,148,159,138,147,69,142,147,69,149,145,134,136,138,69,156,141,142,145,138,69,148,147,83}) },
+	{ id = "chaos", title = _Vzd({119,134,147,137,148,146,69,107,145,142,147,140,69,115,138,134,151,135,158}), tip = _Vzd({119,134,147,137,148,146,69,137,142,151,138,136,153,142,148,147,152,69,148,147,69,147,138,134,151,135,158,69,149,145,134,158,138,151,152,69,77,149,151,148,157,142,146,142,153,158,78,83}) },
 	{ id = "flatten", title = _Vzd({108,151,148,154,147,137,69,117,151,138,152,152,69,115,138,134,151,135,158}), tip = _Vzd({104,148,147,153,142,147,154,148,154,152,69,137,148,156,147,156,134,151,137,69,149,151,138,152,152,154,151,138,69,82,69,149,151,138,152,152,69,142,147,153,148,69,140,151,148,154,147,137,69,156,142,153,141,148,154,153,69,135,154,151,158,142,147,140,83}) },
 }
 
@@ -6283,7 +6270,7 @@ for _, m in ipairs(AURA_META) do
 end
 
 function setAura(id, on)
-	stopLoop("aura_" .. id)
+	stopLoop(_Vzd({134,154,151,134,132}) .. id)
 	if on and AURA_TICKS[id] then
 		local interval = 0.15
 		startLoop("aura_" .. id, interval, AURA_TICKS[id])
@@ -6300,7 +6287,7 @@ function setServerFx(id, on)
 		startLoop("srv_" .. id, 0.15, SERVER_TICKS[id])
 		notify(HUB_NAME, "Server " .. id .. _Vzd({69,116,115,69,161,69,146,134,149,82,156,142,137,138}), 1.5)
 	elseif not on then
-		notify(HUB_NAME, _Vzd({120,138,151,155,138,151,69}) .. id .. " OFF", 1)
+		notify(HUB_NAME, "Server " .. id .. " OFF", 1)
 	end
 end
 
@@ -6332,8 +6319,8 @@ function extinguishFire()
 	if not r then return end
 	local fpp = r:FindFirstChild(_Vzd({107,142,151,138,117,145,134,158,138,151,117,134,151,153}))
 	if not fpp then return end
-	local canBurn = fpp:FindFirstChild(_Vzd({104,134,147,103,154,151,147}))
-	if canBurn and canBurn:IsA("BoolValue") and not canBurn.Value then return end
+	local canBurn = fpp:FindFirstChild("CanBurn")
+	if canBurn and canBurn:IsA(_Vzd({103,148,148,145,123,134,145,154,138})) and not canBurn.Value then return end
 	local ep = getExtinguishPart()
 	if not ep then
 		for _, d in ipairs(char() and char():GetDescendants() or {}) do
@@ -6367,9 +6354,9 @@ function antiBurnTick()
 	local c = char()
 	if not c then return end
 	for _, d in ipairs(c:GetDescendants()) do
-		if d:IsA("Fire") or d:IsA(_Vzd({120,146,148,144,138})) then pcall(function() d:Destroy() end) end
+		if d:IsA("Fire") or d:IsA("Smoke") then pcall(function() d:Destroy() end) end
 		local n = d.Name:lower()
-		if n:find("fire") or n:find("burn") or n:find("poison") then
+		if n:find("fire") or n:find("burn") or n:find(_Vzd({149,148,142,152,148,147})) then
 			if d:IsA("BoolValue") then pcall(function() d.Value = false end) end
 		end
 	end
@@ -6381,7 +6368,7 @@ function antiPaintTick()
 	if not c then return end
 	for _, d in ipairs(c:GetDescendants()) do
 		local n = d.Name:lower()
-		if n:find("paint") or n:find(_Vzd({152,149,151,134,158})) or n:find(_Vzd({136,148,145,148,151})) then
+		if n:find("paint") or n:find("spray") or n:find(_Vzd({136,148,145,148,151})) then
 			if d:IsA("Decal") or d:IsA(_Vzd({121,138,157,153,154,151,138})) or d:IsA("ParticleEmitter") then
 				pcall(function() d:Destroy() end)
 			elseif d:IsA("BoolValue") or d:IsA(_Vzd({120,153,151,142,147,140,123,134,145,154,138})) or d:IsA("NumberValue") then
@@ -6391,7 +6378,7 @@ function antiPaintTick()
 			end
 		end
 	end
-	local bc = c:FindFirstChildOfClass(_Vzd({103,148,137,158,104,148,145,148,151,152}))
+	local bc = c:FindFirstChildOfClass("BodyColors")
 	if bc then
 		pcall(function()
 		end)
@@ -6410,9 +6397,9 @@ function antiBananaTick()
 	local me = hrp()
 	if me then
 		for _, d in ipairs(workspace:GetChildren()) do
-			if d.Name:lower():find("banana") or d.Name == "FoodBanana" then
+			if d.Name:lower():find(_Vzd({135,134,147,134,147,134})) or d.Name == "FoodBanana" then
 				for _, part in ipairs(d:GetDescendants()) do
-					if part:IsA(_Vzd({103,134,152,138,117,134,151,153})) and (part.Position - me.Position).Magnitude < 14 then
+					if part:IsA("BasePart") and (part.Position - me.Position).Magnitude < 14 then
 						pcall(function() part.CanCollide = false; part.CanTouch = false end)
 					end
 				end
@@ -6445,10 +6432,10 @@ end
 -- Blitz-style: kill fling movers named like their hub uses
 function isFlingMoverName(n)
 	n = tostring(n or "")
-	return n == "FlingAuraVelocity" or n == "SkyVelocity" or n == "KickAuraP" or n == "KickAuraP1"
+	return n == _Vzd({107,145,142,147,140,102,154,151,134,123,138,145,148,136,142,153,158}) or n == "SkyVelocity" or n == "KickAuraP" or n == "KickAuraP1"
 		or n == "KickAuraG" or n == "VOIDZ_BV" or n == "VOIDZ_VoidBV" or n == "BringBody"
-		or n == "VOIDZ_Counter" or n == "BodyVelocity" or n == _Vzd({103,148,137,158,107,148,151,136,138}) or n == _Vzd({103,148,137,158,102,147,140,154,145,134,151,123,138,145,148,136,142,153,158})
-		or n:find("Fling", 1, true) or n:find("fling", 1, true) or n:find("Counter", 1, true)
+		or n == "VOIDZ_Counter" or n == "BodyVelocity" or n == _Vzd({103,148,137,158,107,148,151,136,138}) or n == "BodyAngularVelocity"
+		or n:find(_Vzd({107,145,142,147,140}), 1, true) or n:find("fling", 1, true) or n:find("Counter", 1, true)
 end
 
 function stripFlingMoversOnSelf(c)
@@ -6483,9 +6470,9 @@ end
 function ensureAntiFlingCollisionGroups()
 	if S._antiFlingGroupsReady then return end
 	pcall(function()
-		PhysicsService:RegisterCollisionGroup(_Vzd({123,116,110,105,127,132,113,148,136,134,145}))
+		PhysicsService:RegisterCollisionGroup("VOIDZ_Local")
 		PhysicsService:RegisterCollisionGroup(_Vzd({123,116,110,105,127,132,116,153,141,138,151,152}))
-		PhysicsService:CollisionGroupSetCollidable("VOIDZ_Local", _Vzd({123,116,110,105,127,132,116,153,141,138,151,152}), false)
+		PhysicsService:CollisionGroupSetCollidable(_Vzd({123,116,110,105,127,132,113,148,136,134,145}), _Vzd({123,116,110,105,127,132,116,153,141,138,151,152}), false)
 	end)
 	S._antiFlingGroupsReady = true
 end
@@ -6635,8 +6622,8 @@ function antiStickyTick()
 			pcall(function() d.Massless = false end)
 		end
 		local n = d.Name:lower()
-		if n:find(_Vzd({152,153,142,136,144,158}), 1, true) then
-			if d:IsA("Weld") or d:IsA("WeldConstraint") or d:IsA("RigidConstraint") then
+		if n:find("sticky", 1, true) then
+			if d:IsA("Weld") or d:IsA(_Vzd({124,138,145,137,104,148,147,152,153,151,134,142,147,153})) or d:IsA("RigidConstraint") then
 				pcall(function() d:Destroy() end)
 			end
 		end
@@ -6704,9 +6691,9 @@ function setAntiLag(on)
 			or ps:FindFirstChild("CharacterAndBeamMove", true)
 		if beam and (beam:IsA("LocalScript") or beam:IsA("Script")) then
 			beam.Disabled = on == true
-			notify(HUB_NAME, _Vzd({102,147,153,142,82,113,134,140,69}) .. (on and _Vzd({116,115,69,77,141,142,137,138,152,69,140,151,134,135,69,145,142,147,138,78}) or _Vzd({116,107,107,69,161,69,151,138,152,153,148,151,142,147,140,69,145,142,147,138})), 2)
+			notify(HUB_NAME, _Vzd({102,147,153,142,82,113,134,140,69}) .. (on and "ON (hides grab line)" or _Vzd({116,107,107,69,161,69,151,138,152,153,148,151,142,147,140,69,145,142,147,138})), 2)
 		else
-			notify(HUB_NAME, "Anti-Lag: CharacterAndBeamMove not found", 2)
+			notify(HUB_NAME, _Vzd({102,147,153,142,82,113,134,140,95,69,104,141,134,151,134,136,153,138,151,102,147,137,103,138,134,146,114,148,155,138,69,147,148,153,69,139,148,154,147,137}), 2)
 		end
 	end)
 	if not on and not S.toggles.invisLine then
@@ -6730,7 +6717,7 @@ local function isWaterishPart(part)
 	if part.Material == Enum.Material.Water then return true end
 	local n = part.Name:lower()
 	if n:find(_Vzd({156,134,153,138,151}), 1, true) or n:find(_Vzd({148,136,138,134,147}), 1, true) or n:find("sea", 1, true)
-		or n:find("lake", 1, true) or n:find("pool", 1, true) or n:find("river", 1, true) then
+		or n:find("lake", 1, true) or n:find("pool", 1, true) or n:find(_Vzd({151,142,155,138,151}), 1, true) then
 		return true
 	end
 	local p = part.Parent
@@ -6938,7 +6925,7 @@ setWaterWalk = function(on)
 		end
 	end)
 
-	notify(HUB_NAME, "Water solid | " .. partCount .. _Vzd({69,149,134,151,153,152,69,161,69}) .. cellCount .. " terrain cells", 2.2)
+	notify(HUB_NAME, _Vzd({124,134,153,138,151,69,152,148,145,142,137,69,161,69}) .. partCount .. _Vzd({69,149,134,151,153,152,69,161,69}) .. cellCount .. " terrain cells", 2.2)
 end
 end)()
 
@@ -7043,13 +7030,13 @@ function getPlotInteriorCF(plot)
 	end
 	for _, name in ipairs({ "Spawn", "SpawnLocation", "HouseSpawn", "InteriorSpawn", _Vzd({107,145,148,148,151}), "Base" }) do
 		local p = plot:FindFirstChild(name, true)
-		if p and p:IsA(_Vzd({103,134,152,138,117,134,151,153})) then
+		if p and p:IsA("BasePart") then
 			return p.CFrame * CFrame.new(0, 3, 0)
 		end
 	end
 	local best, bestVol = nil, 0
 	for _, d in ipairs(plot:GetDescendants()) do
-		if d:IsA("BasePart") and d.Anchored and d.Size.X * d.Size.Z > bestVol and d.Size.Y < 6 then
+		if d:IsA(_Vzd({103,134,152,138,117,134,151,153})) and d.Anchored and d.Size.X * d.Size.Z > bestVol and d.Size.Y < 6 then
 			bestVol = d.Size.X * d.Size.Z
 			best = d
 		end
@@ -7084,10 +7071,10 @@ function collectHouseSpots()
 	end
 	if #free == 0 and #owned == 0 then
 		for _, d in ipairs(workspace:GetDescendants()) do
-			if d.Name == "PlotArea" and d:IsA(_Vzd({103,134,152,138,117,134,151,153})) then
+			if d.Name == "PlotArea" and d:IsA("BasePart") then
 				local plot = d.Parent
 				local cf = CFrame.new(d.Position + Vector3.new(0, 4, 0))
-				local entry = { cf = cf, name = plot and plot.Name or "House", free = not plotHasOwner(plot) }
+				local entry = { cf = cf, name = plot and plot.Name or _Vzd({109,148,154,152,138}), free = not plotHasOwner(plot) }
 				if entry.free then free[#free + 1] = entry else owned[#owned + 1] = entry end
 			end
 		end
@@ -7324,7 +7311,7 @@ function startAntiKillLoop()
 	S.lastSafeHP = hum() and hum().Health
 	S.lastSafeCF = hrp() and hrp().CFrame
 	stopLoop("antiKill")
-	startLoop(_Vzd({134,147,153,142,112,142,145,145}), warModeOn() and 0.04 or 0.1, antiKillTick)
+	startLoop("antiKill", warModeOn() and 0.04 or 0.1, antiKillTick)
 	if S.conns.antiKillHealth then
 		pcall(function() S.conns.antiKillHealth:Disconnect() end)
 		S.conns.antiKillHealth = nil
@@ -7340,7 +7327,7 @@ function startAntiKillLoop()
 			local prev = S.lastSafeHP or h.MaxHealth
 			if hp < prev - 0.5 or hp < h.MaxHealth * 0.95 then
 				pcall(function() h.Health = h.MaxHealth end)
-				tpToRandomHouse("damage")
+				tpToRandomHouse(_Vzd({137,134,146,134,140,138}))
 				hardenSelfVsKill()
 				S.lastSafeHP = h.Health
 			else
@@ -7377,9 +7364,9 @@ end
 
 -- ========== WAR MODE — light FE protect (threat-based; no lag spam) ==========
 local WAR_LOOP_IDS = {
-	"warProtect", "warGucci", "warAntiKill", _Vzd({156,134,151,102,147,153,142,107,145,142,147,140}),
-	"warAntiExplode", "warAntiBurn", "warAntiSticky", "warAntiVoid",
-	_Vzd({156,134,151,109,148,154,152,138,109,148,149}),
+	"warProtect", "warGucci", "warAntiKill", "warAntiFling",
+	_Vzd({156,134,151,102,147,153,142,106,157,149,145,148,137,138}), "warAntiBurn", "warAntiSticky", "warAntiVoid",
+	"warHouseHop",
 }
 
 function stopAllWarLoops()
@@ -7406,7 +7393,7 @@ function installWarKillHooks()
 			local prev = S.lastSafeHP or h.MaxHealth
 			if hp < prev - 0.1 or hp < h.MaxHealth * 0.99 then
 				pcall(function() h.Health = h.MaxHealth end)
-				tpToRandomHouse("war-dmg", true)
+				tpToRandomHouse(_Vzd({156,134,151,82,137,146,140}), true)
 				hardenSelfVsKill()
 				S.lastSafeHP = h.Health
 			else
@@ -7428,7 +7415,7 @@ function installWarKillHooks()
 		S.conns.warKillHeld = nil
 	end
 	task.spawn(function()
-		local isHeld = LP:FindFirstChild("IsHeld") or LP:WaitForChild(_Vzd({110,152,109,138,145,137}), 12)
+		local isHeld = LP:FindFirstChild("IsHeld") or LP:WaitForChild("IsHeld", 12)
 		if not isHeld or not S._warKillHooks then return end
 		S.conns.warKillHeld = isHeld.Changed:Connect(function(v)
 			if v == true and warModeOn() then
@@ -7446,7 +7433,7 @@ end
 
 function uninstallWarKillHooks()
 	S._warKillHooks = false
-	for _, k in ipairs({ "warKillHealth", "warKillHeld", "warKillChar" }) do
+	for _, k in ipairs({ _Vzd({156,134,151,112,142,145,145,109,138,134,145,153,141}), "warKillHeld", "warKillChar" }) do
 		if S.conns[k] then
 			pcall(function() S.conns[k]:Disconnect() end)
 			S.conns[k] = nil
@@ -7566,7 +7553,7 @@ function warHouseEscapeFE(reason)
 		warFireStruggle(8)
 		warFireDestroyGrabOnSelf()
 		warSnoSelf()
-		pcall(function() tpToRandomHouse(_Vzd({156,134,151,82,139,138,82,87}), true) end)
+		pcall(function() tpToRandomHouse("war-fe-2", true) end)
 	end)
 end
 
@@ -7607,7 +7594,7 @@ function voidzWarProtectBurst()
 	if stripFlingMoversOnSelf then stripFlingMoversOnSelf(c) end
 	-- house escape only on real grab (not every fling blip)
 	if underAttack then
-		warHouseEscapeFE("war-grab")
+		warHouseEscapeFE(_Vzd({156,134,151,82,140,151,134,135}))
 	end
 	pcall(function()
 		r.AssemblyLinearVelocity = Vector3.zero
@@ -7640,13 +7627,13 @@ function startWarMode()
 		if not warModeOn() then return end
 		if gucciAntiTick then gucciAntiTick() end
 	end)
-	startLoop(_Vzd({156,134,151,102,147,153,142,112,142,145,145}), 0.12, function()
+	startLoop("warAntiKill", 0.12, function()
 		if not warModeOn() then return end
 		if S.trainDriving then return end
 		antiKillTick()
 	end)
 	-- NO constant house hop (that lagged + kicked). Occasional hop only if recently threatened.
-	startLoop("warHouseHop", 2.2, function()
+	startLoop(_Vzd({156,134,151,109,148,154,152,138,109,148,149}), 2.2, function()
 		if not warModeOn() then return end
 		if S.trainDriving then return end
 		local last = S._warLastThreatAt or 0
@@ -7656,9 +7643,9 @@ function startWarMode()
 			return
 		end
 		hardenSelfVsKill()
-		tpToRandomHouse(_Vzd({156,134,151,82,141,148,149}), true)
+		tpToRandomHouse("war-hop", true)
 	end)
-	startLoop("warAntiFling", 0.1, function()
+	startLoop(_Vzd({156,134,151,102,147,153,142,107,145,142,147,140}), 0.1, function()
 		if not warModeOn() then return end
 		local prev = S.toggles.antiFling
 		S.toggles.antiFling = true
@@ -7725,26 +7712,26 @@ function stopWarMode()
 	if S._toggleRenderers and S._toggleRenderers.warMode then
 		pcall(S._toggleRenderers.warMode)
 	end
-	notify(HUB_NAME, _Vzd({124,102,119,69,114,116,105,106,69,116,107,107,69,161,69,135,134,136,144,69,153,148,69,158,148,154,151,69,152,138,153,153,142,147,140,152}), 1.4)
+	notify(HUB_NAME, "WAR MODE OFF | back to your settings", 1.4)
 end
 
 function installWarModeChatCommands()
 	if S._warChatInstalled then return end
 	S._warChatInstalled = true
 	local function handle(msg)
-		if type(msg) ~= "string" then return end
+		if type(msg) ~= _Vzd({152,153,151,142,147,140}) then return end
 		local m = msg:lower():gsub("^%s+", ""):gsub("%s+$", "")
 		-- only exact command forms — bare "war" in normal chat was accidental before
 		if m:sub(1, 1) == "/" then m = m:sub(2) end
-		if m == _Vzd({154,147,156,134,151,82,146,148,137,138}) or m == "unwarmode" or m == "unwar" or m == _Vzd({156,134,151,82,148,139,139}) or m == "waroff" then
+		if m == "unwar-mode" or m == _Vzd({154,147,156,134,151,146,148,137,138}) or m == "unwar" or m == "war-off" or m == _Vzd({156,134,151,148,139,139}) then
 			if warModeOn() then stopWarMode() else notify(HUB_NAME, "WAR already OFF", 1) end
-		elseif m == "war-mode" or m == _Vzd({156,134,151,146,148,137,138}) or m == "voidz-war" then
+		elseif m == "war-mode" or m == "warmode" or m == _Vzd({155,148,142,137,159,82,156,134,151}) then
 			if warModeOn() then notify(HUB_NAME, _Vzd({124,102,119,69,134,145,151,138,134,137,158,69,116,115,69,161,69,84,154,147,156,134,151,82,146,148,137,138}), 1.2) else startWarMode() end
-		elseif m == "war-burst" or m == "warburst" then
+		elseif m == _Vzd({156,134,151,82,135,154,151,152,153}) or m == "warburst" then
 			if not warModeOn() then startWarMode() end
 			voidzWarProtectBurst()
-			warHouseEscapeFE(_Vzd({136,141,134,153,82,135,154,151,152,153}))
-			notify(HUB_NAME, "WAR BURST (house hop)", 1.1)
+			warHouseEscapeFE("chat-burst")
+			notify(HUB_NAME, _Vzd({124,102,119,69,103,122,119,120,121,69,77,141,148,154,152,138,69,141,148,149,78}), 1.1)
 		end
 	end
 	-- LP.Chatted only (one hook). MessageReceived double-fire was stressing TextChat.
@@ -7837,8 +7824,8 @@ function hardRestartGrabBeamScript(force)
 				end
 			end
 			-- Ensure grab script stays enabled
-			local gs = root:FindFirstChild("GrabbingScript") or root:FindFirstChild(_Vzd({108,151,134,135,135,142,147,140,120,136,151,142,149,153}), true)
-			if gs and (gs:IsA(_Vzd({113,148,136,134,145,120,136,151,142,149,153})) or gs:IsA("Script")) then
+			local gs = root:FindFirstChild("GrabbingScript") or root:FindFirstChild("GrabbingScript", true)
+			if gs and (gs:IsA(_Vzd({113,148,136,134,145,120,136,151,142,149,153})) or gs:IsA(_Vzd({120,136,151,142,149,153}))) then
 				gs.Disabled = false
 			end
 		end
@@ -7895,7 +7882,7 @@ function forceAllGrabBeamsVisible()
 		end
 		-- Only exact GrabParts / GrabLine (not every model with "line" in the name)
 		for _, ch in ipairs(workspace:GetChildren()) do
-			if ch.Name == _Vzd({108,151,134,135,117,134,151,153,152}) or ch.Name == _Vzd({108,151,134,135,113,142,147,138}) then
+			if ch.Name == _Vzd({108,151,134,135,117,134,151,153,152}) or ch.Name == "GrabLine" then
 				scan(ch)
 			end
 		end
@@ -7940,15 +7927,15 @@ function gucciStripForeignConstraints(c)
 	if not isLocalBeingHeldFlag() and not gucciThrowGuardActive() then return end
 
 	for _, d in ipairs(c:GetDescendants()) do
-		if d:IsA(_Vzd({124,138,145,137,104,148,147,152,153,151,134,142,147,153})) or d:IsA("Weld") or d:IsA("RigidConstraint")
+		if d:IsA(_Vzd({124,138,145,137,104,148,147,152,153,151,134,142,147,153})) or d:IsA("Weld") or d:IsA(_Vzd({119,142,140,142,137,104,148,147,152,153,151,134,142,147,153}))
 			or d:IsA("AlignPosition") or d:IsA("AlignOrientation")
 			or d:IsA("BallSocketConstraint") or d:IsA("HingeConstraint") then
 			local p0 = d.Part0
 			local p1 = d.Part1
-			local a0 = d:IsA(_Vzd({104,148,147,152,153,151,134,142,147,153})) and d.Attachment0
+			local a0 = d:IsA("Constraint") and d.Attachment0
 			local a1 = d:IsA(_Vzd({104,148,147,152,153,151,134,142,147,153})) and d.Attachment1
 			local foreign = false
-			if d:IsA("WeldConstraint") or d:IsA("Weld") then
+			if d:IsA(_Vzd({124,138,145,137,104,148,147,152,153,151,134,142,147,153})) or d:IsA("Weld") then
 				-- Only strip if WE are the held side (Part1 on us) or grab infra welded onto us
 				if p1 and p1:IsDescendantOf(c) and p0 and not p0:IsDescendantOf(c) then
 					foreign = true
@@ -7965,9 +7952,9 @@ function gucciStripForeignConstraints(c)
 		if isLocalBeingHeldFlag() or gucciThrowGuardActive() then
 			if d:IsA("BodyVelocity") or d:IsA("BodyPosition") or d:IsA("BodyAngularVelocity")
 				or d:IsA("BodyForce") or d:IsA("LinearVelocity") or d:IsA("VectorForce")
-				or d:IsA(_Vzd({102,147,140,154,145,134,151,123,138,145,148,136,142,153,158})) then
+				or d:IsA("AngularVelocity") then
 				local n = d.Name
-				if not gucciIsKeepMover(n) and n ~= "BringBody" then
+				if not gucciIsKeepMover(n) and n ~= _Vzd({103,151,142,147,140,103,148,137,158}) then
 					local par = d.Parent
 					if par and par:IsA("BasePart") and par:IsDescendantOf(c) then
 						pcall(function() d:Destroy() end)
@@ -8005,7 +7992,7 @@ function gucciDestroyAttackingGrabs(c)
 			for _, d in ipairs(child:GetDescendants()) do
 				if d:IsA("WeldConstraint") or d:IsA("Weld") or d:IsA("AlignPosition")
 					or d:IsA("AlignOrientation") or d:IsA("Motor6D") or d:IsA("RigidConstraint")
-					or d:IsA(_Vzd({103,134,145,145,120,148,136,144,138,153,104,148,147,152,153,151,134,142,147,153})) then
+					or d:IsA("BallSocketConstraint") then
 					pcall(function() d:Destroy() end)
 				end
 			end
@@ -8024,7 +8011,7 @@ function gucciDenyGrabLatch()
 	gucciDestroyAttackingGrabs(c)
 	pcall(function()
 		for _, d in ipairs(c:GetDescendants()) do
-			if d:IsA("WeldConstraint") or d:IsA("Weld") then
+			if d:IsA(_Vzd({124,138,145,137,104,148,147,152,153,151,134,142,147,153})) or d:IsA("Weld") then
 				local p0, p1 = d.Part0, d.Part1
 				if p1 and p1:IsDescendantOf(c) and p0 and not p0:IsDescendantOf(c) then
 					d:Destroy()
@@ -8060,7 +8047,7 @@ function gucciReclaimSelf()
 	local me = hrp()
 	if not c or not me then return end
 	for _, n in ipairs({ "HumanoidRootPart", "Head", "Torso", "UpperTorso", "LowerTorso",
-		"Left Arm", _Vzd({119,142,140,141,153,69,102,151,146}), "Left Leg", _Vzd({119,142,140,141,153,69,113,138,140}),
+		"Left Arm", _Vzd({119,142,140,141,153,69,102,151,146}), "Left Leg", "Right Leg",
 		"LeftUpperArm", _Vzd({119,142,140,141,153,122,149,149,138,151,102,151,146}), "LeftLowerArm", "RightLowerArm",
 		"LeftUpperLeg", "RightUpperLeg", "LeftLowerLeg", "RightLowerLeg" }) do
 		local p = c:FindFirstChild(n)
@@ -8090,8 +8077,8 @@ function gucciArmThrowGuard(sec)
 end
 
 function gucciIsKeepMover(name)
-	return name == "VOIDZ_Fly" or name == "VOIDZ_FlyG" or name == _Vzd({123,116,110,105,127,132,108,154,136,136,142,103,123})
-		or name == "VOIDZ_GucciHold" or name == "TrainDriveBV" or name == "TrainDriveBG"
+	return name == "VOIDZ_Fly" or name == "VOIDZ_FlyG" or name == "VOIDZ_GucciBV"
+		or name == _Vzd({123,116,110,105,127,132,108,154,136,136,142,109,148,145,137}) or name == "TrainDriveBV" or name == "TrainDriveBG"
 end
 
 function gucciStripThrowMovers(c)
@@ -8105,11 +8092,11 @@ function gucciStripThrowMovers(c)
 			-- keep
 		elseif d:IsA("BodyVelocity") or d:IsA("BodyAngularVelocity") or d:IsA(_Vzd({103,148,137,158,107,148,151,136,138}))
 			or d:IsA("BodyPosition") or d:IsA("BodyThrust") or d:IsA("LinearVelocity")
-			or d:IsA(_Vzd({102,147,140,154,145,134,151,123,138,145,148,136,142,153,158})) or d:IsA(_Vzd({123,138,136,153,148,151,107,148,151,136,138})) then
+			or d:IsA(_Vzd({102,147,140,154,145,134,151,123,138,145,148,136,142,153,158})) or d:IsA("VectorForce") then
 			-- Do NOT destroy AlignPosition/AlignOrientation on character — CharacterAndBeamMove
 			-- uses them for the grab rope; stripping them makes the line invisible forever.
 			pcall(function() d:Destroy() end)
-		elseif n == "SkyVelocity" or n == "BringBody" or n == "KickAuraP" or n == "KickAuraP1"
+		elseif n == _Vzd({120,144,158,123,138,145,148,136,142,153,158}) or n == "BringBody" or n == "KickAuraP" or n == "KickAuraP1"
 			or n == _Vzd({107,145,142,147,140,102,154,151,134,123,138,145,148,136,142,153,158}) or n == _Vzd({123,116,110,105,127,132,103,123}) or n == "VOIDZ_VoidBV" then
 			pcall(function() d:Destroy() end)
 		end
@@ -8236,29 +8223,15 @@ function gucciForceFreeMove()
 		r.Anchored = false
 	end)
 
-	-- optional train freedom seat (Res-style FE free while "held")
-	if victim and gucciProtectOn() and not antiGrabProtectOn() then
-		if not isOnBlobman() and not (h.SeatPart and h.SeatPart:IsA("VehicleSeat")) then
-			local seat = gucciFindFreedomSeat()
-			if seat and seat.Parent then
-				pcall(function()
-					-- soft sit: don't thrash if already free-walking well
-					if (S._gucciSeatTryAt or 0) + 1.2 < os.clock() then
-						S._gucciSeatTryAt = os.clock()
-						h.Sit = true
-						seat:Sit(h)
-					end
-				end)
-			end
-		end
-	elseif not (isOnBlobman and isOnBlobman()) then
+	-- never sit-thrash on train (that made Gucci feel broken); pure free-move power
+	if not (isOnBlobman and isOnBlobman()) then
 		pcall(function() h.Sit = false end)
 	end
 
 	if not victim and guarding then
 		local v = r.AssemblyLinearVelocity
-		if v.Magnitude > 45 or math.abs(v.Y) > 55 then
-			r.AssemblyLinearVelocity = Vector3.new(v.X * 0.08, math.clamp(v.Y, -25, 18), v.Z * 0.08)
+		if v.Magnitude > 40 or math.abs(v.Y) > 50 then
+			r.AssemblyLinearVelocity = Vector3.new(v.X * 0.05, math.clamp(v.Y, -20, 15), v.Z * 0.05)
 			r.AssemblyAngularVelocity = Vector3.zero
 			if stripFlingMoversOnSelf then stripFlingMoversOnSelf(c) end
 		end
@@ -8268,45 +8241,51 @@ function gucciForceFreeMove()
 	if S._counterKickbackUntil and os.clock() < S._counterKickbackUntil then
 		if stripFlingMoversOnSelf then stripFlingMoversOnSelf(c) end
 		local v = r.AssemblyLinearVelocity
-		r.AssemblyLinearVelocity = Vector3.new(v.X * 0.1, math.clamp(v.Y, -35, 20), v.Z * 0.1)
+		r.AssemblyLinearVelocity = Vector3.new(v.X * 0.08, math.clamp(v.Y, -30, 18), v.Z * 0.08)
 		r.AssemblyAngularVelocity = Vector3.zero
 		return
 	end
 
-	-- kill grab-throw movers on us only
+	-- kill grab-throw movers on us only (keep grab visual / their kit)
 	gucciStripThrowMovers(c)
 	if stripFlingMoversOnSelf then stripFlingMoversOnSelf(c) end
 
+	-- reclaim ownership of OUR roots so we can walk free
+	local mePos = r.Position
+	for _, n in ipairs({ "HumanoidRootPart", "Torso", "UpperTorso", "LowerTorso", "Head" }) do
+		local part = c:FindFirstChild(n)
+		if part then sno(part, mePos) end
+	end
+
 	local md = h.MoveDirection
-	local spd = math.max(tonumber(h.WalkSpeed) or 16, 18)
+	local spd = math.max(tonumber(h.WalkSpeed) or 16, 20)
 	if S.toggles.speed then spd = tonumber(S.walkSpeed) or spd end
 	if S.toggles.speedCFrame then spd = spd * (tonumber(S.speedMult) or 1.5) end
-	spd = math.clamp(spd, 16, 80)
+	spd = math.clamp(spd, 18, 90)
 
 	local bv = r:FindFirstChild("VOIDZ_GucciBV")
 	if not bv then
 		bv = Instance.new("BodyVelocity")
 		bv.Name = "VOIDZ_GucciBV"
-		bv.P = 5000
+		bv.P = 12000
 		bv.Parent = r
 	end
-	-- full free walk force (horizontal + mild vertical for steps)
-	bv.MaxForce = Vector3.new(1e6, 4e4, 1e6)
+	bv.MaxForce = Vector3.new(1e9, 1e5, 1e9)
 
-	if md.Magnitude > 0.05 then
+	if md.Magnitude > 0.04 then
 		local dir = md.Unit
-		local push = dir * (spd * 1.45)
+		local push = dir * (spd * 1.75)
 		pcall(function()
-			r.CFrame = r.CFrame + dir * 0.55
-			local y = math.clamp(r.AssemblyLinearVelocity.Y, -90, 60)
+			-- hard free step (Res free-hold feel)
+			r.CFrame = r.CFrame + dir * 0.85
+			local y = math.clamp(r.AssemblyLinearVelocity.Y, -100, 70)
 			r.AssemblyLinearVelocity = Vector3.new(push.X, y, push.Z)
 			bv.Velocity = Vector3.new(push.X, 0, push.Z)
 		end)
 	else
 		bv.Velocity = Vector3.zero
 		local v = r.AssemblyLinearVelocity
-		-- damp grabber drag when idle
-		r.AssemblyLinearVelocity = Vector3.new(v.X * 0.15, v.Y, v.Z * 0.15)
+		r.AssemblyLinearVelocity = Vector3.new(v.X * 0.08, v.Y, v.Z * 0.08)
 	end
 
 	local space = false
@@ -8315,12 +8294,13 @@ function gucciForceFreeMove()
 		if not S._gucciSpaceHeld then
 			S._gucciSpaceHeld = true
 			local v = r.AssemblyLinearVelocity
-			r.AssemblyLinearVelocity = Vector3.new(v.X, math.max(v.Y, 52), v.Z)
+			r.AssemblyLinearVelocity = Vector3.new(v.X, math.max(v.Y, 58), v.Z)
 		end
 	else
 		S._gucciSpaceHeld = false
 	end
 end
+
 
 
 do local _z950=(4*4); if _z950<0 and _Vj() then _z950=_z950+1 end end
@@ -8460,11 +8440,11 @@ function installAntis()
 	local function bindCharacter(c)
 		if not c then return end
 		local r = c:WaitForChild("HumanoidRootPart", 8)
-		local h = c:WaitForChild(_Vzd({109,154,146,134,147,148,142,137}), 8)
+		local h = c:WaitForChild("Humanoid", 8)
 		if not r or not h then return end
 
 		task.spawn(function()
-			local fpp = r:FindFirstChild("FirePlayerPart") or r:WaitForChild("FirePlayerPart", 5)
+			local fpp = r:FindFirstChild(_Vzd({107,142,151,138,117,145,134,158,138,151,117,134,151,153})) or r:WaitForChild("FirePlayerPart", 5)
 			if not fpp then return end
 			local canBurn = fpp:FindFirstChild("CanBurn") or fpp:WaitForChild("CanBurn", 3)
 			if canBurn and canBurn:IsA("BoolValue") then
@@ -8569,7 +8549,7 @@ function installAntis()
 		end)
 
 		local rag = h:FindFirstChild(_Vzd({119,134,140,137,148,145,145,138,137}))
-		if rag and rag:IsA(_Vzd({103,148,148,145,123,134,145,154,138})) then
+		if rag and rag:IsA("BoolValue") then
 			rag.Changed:Connect(function(v)
 				if v and S.toggles.antiExplode then
 					task.spawn(function()
@@ -8605,7 +8585,7 @@ function installAntis()
 
 	local gucciAcc = 0
 	local gucciIdleSkip = 0
-	bind("gucciAntiHB", RunService.Heartbeat:Connect(function(dt)
+	bind(_Vzd({140,154,136,136,142,102,147,153,142,109,103}), RunService.Heartbeat:Connect(function(dt)
 		if not anyGrabDefenseOn() then
 			gucciIdleSkip += 1
 			if gucciIdleSkip < 20 then return end
@@ -8621,37 +8601,32 @@ function installAntis()
 		end
 		gucciIdleSkip = 0
 
-		-- GUCCI free-hold (Res): free walk while held — never destroy GrabParts
+		-- GUCCI free-hold (Res): EVERY heartbeat while held — never destroy GrabParts
 		if gucciProtectOn() and not antiGrabProtectOn() then
-			gucciAcc += dt
-			if gucciAcc >= 0.08 then
-				gucciAcc = 0
-				if isLocalBeingHeldFlag() or isGucciVictim() then
-					gucciForceFreeMove()
-					gucciBlitzHoldPin()
-				elseif gucciThrowGuardActive() then
-					gucciForceFreeMove()
-				end
+			if isLocalBeingHeldFlag() or isGucciVictim() or gucciThrowGuardActive() then
+				gucciForceFreeMove()
+				gucciBlitzHoldPin()
+			else
+				local bv = hrp() and hrp():FindFirstChild("VOIDZ_GucciBV")
+				if bv then pcall(function() bv:Destroy() end) end
 			end
 			return
 		end
 
-		-- ANTI-GRAB: break / prevent
-		if isLocalBeingHeldFlag() then
+		-- ANTI-GRAB: hard break every tick when held
+		if antiGrabProtectOn() and (isLocalBeingHeldFlag() or isGucciVictim()) then
 			gucciAcc += dt
-			if gucciAcc >= 0.1 then
+			if gucciAcc >= 0.06 then
 				gucciAcc = 0
+				if freeFromGrabInstant then pcall(freeFromGrabInstant) end
+				gucciBreakGrabNow()
+				gucciDestroyAttackingGrabs()
+				if doAntiGrabHard then pcall(doAntiGrabHard) end
 				gucciForceFreeMove()
-				S._gucciHeavyN = (S._gucciHeavyN or 0) + 1
-				if S._gucciHeavyN >= 2 then
-					S._gucciHeavyN = 0
-					gucciBreakGrabNow()
-					gucciDestroyAttackingGrabs()
-					gucciStripThrowMovers()
-				end
 			end
 			return
 		end
+
 		if isLocalActivelyGrabbing() then return end
 		local guarding = gucciThrowGuardActive()
 		if guarding then
@@ -24611,7 +24586,7 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- Menacing splash, real kickPlayer + BlobHover, train Gucci, blob no spawn spam.
+-- Power polish: blob grab no anchor, gucci every-frame free, anti-grab freeFromGrabInstant.
 
--- VOIDZ HUB | v1.2.130 | 2026-08-03
+-- VOIDZ HUB | v1.2.131 | 2026-08-03
 -- hi im voidz

@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.5` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.6` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,14 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.6) — kicks actually kick (Bloody)
+
+Kicks were shoving velocity without `Head.PartOwner`, then TPing home the same tick.
+
+- Same as Bloody/Blitz: get within 30, SNO their HRP, wait for ownership (or vel > 500), `DestroyGrabLine`, then `SkyVelocity` + KickAuraP type.
+- Types: **Sky Anchor** (yeet to sky), **Float Pin**, **Silent**. Other names still map onto that core.
+- Stay in range a few frames before TP home.
 
 ## Recent (1.4.5) — Loop Grab Selected actually fires
 

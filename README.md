@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-22-1.3.2` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
+Build: `2026-08-22-1.3.4` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,23 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`FREMIUM`** (free) or **`VOIDZHUB`** (premium). RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.3.4) — Gucci + Anti-Grab actually work
+
+They were unsitting you whenever `Sit` flipped on — including **Blobman** — so grabs never stuck and Gucci felt broken.
+
+- Gucci/Anti-Grab **never** force-unsit Blobman.
+- Gucci seat-break is **train only** (no random VehicleSeat / blob fallback).
+- Anti-Grab no longer **Anchors** you (that froze you and lagged).
+- Both use Struggle + RagdollRemote(0) + DestroyGrabLine while *you* are held.
+
+## Recent (1.3.3) — Loop Grab Selected
+
+Moving the blob **every tick** was ejecting you from the seat, so CreatureGrab almost never fired.
+
+- Park only if you’re farther than ~22 studs.
+- Spam `CreatureGrab(LeftDetector, HRP, LeftWeld)` while seated (Blitz/Endoris).
+- Follows the player you currently have selected (UserId, survives respawn).
 
 ## Recent (1.3.2) — antis no longer lag when grabbed
 

@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.20` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.21` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.21) — Anti-Grab / Gucci / Blob loop
+
+The anti-fling shield was colliding you off the world (no grab), a huge Y BodyVelocity made walk ice-skate, and Blob loop `PivotTo` unsit you so CreatureGrab never fired. Shield is named-fling only; walk BV is XZ-only; Blob loop fires in place while seated.
 
 ## Recent (1.4.20) — Loop Grab Selected
 

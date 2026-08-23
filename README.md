@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-22-1.3.0` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
+Build: `2026-08-22-1.3.1` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,15 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`FREMIUM`** (free) or **`VOIDZHUB`** (premium). RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.3.1) — Gucci = Bloody V2
+
+Gucci was anchoring you (Blitz anti-grab freeze) every Heartbeat while grabbed, so you could not walk and the hold stuck.
+
+- **Bloody-style seat break**: sit AlwaysHere train `VehicleSeat` for 2 frames, then warp back to your CFrame (FE ownership reset).
+- Heartbeat: Struggle + RagdollRemote(0) + DestroyGrabLine + kill attacking GrabParts. **Never Anchor.**
+- CanQuery off while Gucci is on so grab rays miss you.
+- Anti-Grab toggle still uses the old Blitz freeze-struggle path.
 
 ## Recent (1.3.0) — ScriptBlox-reliable fling (last core physics pass)
 

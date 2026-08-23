@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-22-1.3.1` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
+Build: `2026-08-22-1.3.2` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,15 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`FREMIUM`** (free) or **`VOIDZHUB`** (premium). RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.3.2) — antis no longer lag when grabbed
+
+Grab + Gucci/Anti-Grab was running **3 Heartbeats** plus full workspace/descendant scans every frame.
+
+- One cheap walk tick per frame (BodyVelocity only).
+- Struggle / DestroyGrabLine / GrabParts scan at **~8Hz**, not 60.
+- Removed extra Gucci loops (`gucciFree` 0.04 + `gucciHB` 0.05).
+- CanQuery applied once when you turn Gucci on, not every frame.
 
 ## Recent (1.3.1) — Gucci = Bloody V2
 

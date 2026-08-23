@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.25` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.26` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.26) — loops after death
+
+Kill/fling/kick loops were sticking on the corpse (`Ragdolled` still counted as valid) or skipping forever if they respawned in a house. They now wait for a live character, then hit again.
 
 ## Recent (1.4.25) — key + splash
 

@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.17` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.18` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.18) — Gucci / Anti-Grab vs other hubs
+
+Turning Gucci or Anti-Grab on now also fights **other exploits**: steal `SetNetworkOwner` back on your body, delete FlingAura / SkyVelocity / KickAura the frame they land, clamp launches, XZ-leash if they yeet you. Jumping off islands still isn’t snapped (Y is left alone).
 
 ## Recent (1.4.17) — Gucci jump / invis
 

@@ -195,7 +195,7 @@ local Mouse = LP:GetMouse()
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local KEY_PREMIUM = ACCESS_KEY -- legacy alias
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,93,82,87,88,82,86,83,89,83,93})
+local BUILD = _Vzd({87,85,87,91,82,85,93,82,87,88,82,86,83,89,83,94})
 local GuiService = game:GetService("GuiService")
 
 function resolveAccessKey(raw)
@@ -8786,6 +8786,8 @@ function bloodyStripLocalSeatWeld(seat)
 end
 
 function bloodyTrainGucciSit()
+	-- Bloody: sit ONCE this life, wait, Jump+unsit, warp home. Never loop-sit.
+	if S._gucciSatThisLife then return false end
 	if isOnBlobman() or blobmanFeaturesActive() then return false end
 	if isLocalActivelyGrabbing() then return false end
 	local r = hrp()
@@ -8793,30 +8795,34 @@ function bloodyTrainGucciSit()
 	local seat = bloodyFindGucciSeat()
 	if not r or not h or not seat then return false end
 	if seat.Occupant and seat.Occupant ~= h then return false end
-	-- Home CF is never overwritten by the train tick (that trapped people on the train).
-	if not S._gucciHomeCF then
-		S._gucciHomeCF = r.CFrame
-	end
-	S._gucciWalkCF = S._gucciHomeCF
+	S._gucciHomeCF = r.CFrame
+	S._gucciWalkCF = r.CFrame
 	S._gucciSeatBreaking = true
+	S._gucciSatThisLife = true
 	pcall(function()
 		r.Anchored = false
-		r.CFrame = seat.CFrame * CFrame.new(0, 0.55, 0)
+		r.CFrame = seat.CFrame + Vector3.new(0, 0.5, 0)
 		seat:Sit(h)
 	end)
 	S._gucciTrainSat = true
 	S._gucciTrainSeat = seat
 	S._gucciLastSitAt = os.clock()
 	task.spawn(function()
-		RunService.Heartbeat:Wait()
-		RunService.Heartbeat:Wait()
+		task.wait(0.1)
 		if not gucciProtectOn() then
 			S._gucciSeatBreaking = false
 			return
 		end
-		pcall(bloodyStripLocalSeatWeld, seat)
+		local hh = hum()
 		local rr = hrp()
-		local home = S._gucciHomeCF or S._gucciWalkCF
+		pcall(function()
+			if hh then
+				hh:ChangeState(Enum.HumanoidStateType.Jumping)
+				hh.Sit = false
+			end
+		end)
+		task.wait(0.05)
+		local home = S._gucciHomeCF
 		if rr and home then
 			pcall(function() rr.CFrame = home end)
 		end
@@ -8826,21 +8832,13 @@ function bloodyTrainGucciSit()
 end
 
 function bloodyGucciSeatBreak()
-	-- Kept name for old call sites. Sit train for SS occupancy; do not unsit.
-	if isOnBlobman() then return end
-	local h = hum()
-	local seat = bloodyFindGucciSeat()
-	if h and seat and seat.Occupant == h then
-		bloodyStripLocalSeatWeld(seat)
-		return
-	end
-	local now = os.clock()
-	if (S._gucciLastSitAt or 0) + 1.4 > now then return end
+	if S._gucciSatThisLife then return end
 	bloodyTrainGucciSit()
 end
 
 function startBloodyTrainGucci()
 	S._gucciTrainOn = true
+	S._gucciSatThisLife = false
 	local r = hrp()
 	if r then
 		S._gucciHomeCF = r.CFrame
@@ -8853,10 +8851,11 @@ function startBloodyTrainGucci()
 		S.conns.gucciChar = nil
 	end
 	S.conns.gucciChar = LP.CharacterAdded:Connect(function()
+		S._gucciSatThisLife = false
 		S._gucciTrainSat = false
 		S._gucciWalkCF = nil
 		S._gucciHomeCF = nil
-		task.delay(0.7, function()
+		task.delay(0.5, function()
 			if gucciProtectOn() then
 				local rr = hrp()
 				if rr then
@@ -8873,6 +8872,7 @@ end
 function stopBloodyTrainGucci()
 	S._gucciTrainOn = false
 	S._gucciTrainSat = false
+	S._gucciSatThisLife = false
 	S._gucciSeatBreaking = false
 	S._gucciTrainSeat = nil
 	local home = S._gucciHomeCF or S._gucciWalkCF
@@ -8926,39 +8926,19 @@ end
 function tickBloodyTrainGucci(dt)
 	if not gucciProtectOn() then return end
 	if isOnBlobman() or blobmanFeaturesActive() then return end
-	if isLocalActivelyGrabbing() and not isLocalBeingHeldFlag() then return end
-	-- While grabbed, don't re-TP to the train — Anti-Grab walk owns that.
+	if S._gucciSeatBreaking then return end
 	if isLocalBeingHeldFlag() then
 		pcall(walkWhileGrabbedTick)
 		return
 	end
-	if S._gucciSeatBreaking then return end
+	-- Bloody: after the one sit+warp, only RagdollRemote. Never sit the train again.
 	local r = hrp()
-	local h = hum()
-	if not r or not h then return end
-	local seat = bloodyFindGucciSeat()
-	if seat and seat.Occupant ~= h then
-		local now = os.clock()
-		if (S._gucciLastSitAt or 0) + 1.6 < now then
-			pcall(bloodyTrainGucciSit)
-			return
-		end
-	elseif seat then
-		pcall(bloodyStripLocalSeatWeld, seat)
-	end
-
-	pcall(function()
-		r.Anchored = false
-		h.PlatformStand = false
-		h.AutoRotate = true
-	end)
-	pcall(gucciForceFreeMoveLight)
-	-- Only remember walk pos when we are NOT on the train (tick used to save train CF).
-	if r.Parent then
-		local onTrain = seat and (r.Position - seat.Position).Magnitude < 18
-		if not onTrain then
-			S._gucciHomeCF = r.CFrame
-			S._gucciWalkCF = r.CFrame
+	if not r then return end
+	local now = os.clock()
+	if (S._gucciRagAt or 0) + 0.033 <= now then
+		S._gucciRagAt = now
+		if FTAP.RagdollRemote then
+			pcall(function() FTAP.RagdollRemote:FireServer(r, 0) end)
 		end
 	end
 end
@@ -25502,7 +25482,7 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- Anti-Grab = walk while held. Gucci = Bloody train invis.
+-- Gucci sits train once then warps back. Never loop-TPs to the train.
 
--- VOIDZ HUB | v1.4.8 | 2026-08-23
+-- VOIDZ HUB | v1.4.9 | 2026-08-23
 -- hi im voidz

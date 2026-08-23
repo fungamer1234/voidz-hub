@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.2` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.3` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,12 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.3) — Bloody Gucci is train SS invis
+
+Bloody V2 Gucci sits you on the AlwaysHere **train VehicleSeat** so the server Occupant is you on the train (others don’t see you in the arena). Local `SeatWeld` is stripped so you still walk. It does **not** Jump/unsit — that was killing the invis.
+
+Leave Gucci on. Don’t combine with Anti-Grab.
 
 ## Recent (1.4.2) — UI + Protect polish
 

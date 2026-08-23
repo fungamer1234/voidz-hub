@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-03-1.2.145` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
+Build: `2026-08-22-1.3.0` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,16 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`FREMIUM`** (free) or **`VOIDZHUB`** (premium). RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.3.0) — ScriptBlox-reliable fling (last core physics pass)
+
+Fling was missing a lot because ownership used a broken look-at and skipped BodyVelocity when the PartOwner flag never flipped.
+
+- **SetNetworkOwner** now always fires `lookAt(YOUR HumanoidRootPart, target)` like Blitz / ScriptBlox FTAP hubs — never lookAt(target, target).
+- Server only grants ownership inside **~30 studs**. Fling now closes the gap first, then SNO.
+- **CreateGrabLine** fires before the velocity burst.
+- **Always applies `FlingAuraVelocity`** on HRP / Torso / Head after the SNO burst (no more TP-home-with-no-fling).
+- Fling All, Throw All, Keep Throwing, Hard Fling, Bring+Fling, grab-throw, and fling aura all use this path.
 
 ## Recent (1.2.145) — auto attack fixed
 

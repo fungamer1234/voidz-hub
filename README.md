@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.12` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.13` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,14 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.13) — Gucci grab + jump work
+
+Gucci was leaving you seated (`Sit`) with `CanTouch` off and Ragdoll0/BV every frame — no grabbing, jump floated.
+
+- `CanQuery` off (ungrabbable). `CanTouch` on so you can grab.
+- Locally unsit (no Jump) so grab + jump feel normal.
+- No idle BodyVelocity / RagdollRemote. Cam only pinned if you actually fall.
 
 ## Recent (1.4.12) — spam-grab resist + Auto Attacker
 

@@ -195,7 +195,7 @@ local Mouse = LP:GetMouse()
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local KEY_PREMIUM = ACCESS_KEY -- legacy alias
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,93,82,87,88,82,86,83,89,83,87,92})
+local BUILD = _Vzd({87,85,87,91,82,85,93,82,87,88,82,86,83,89,83,87,93})
 local GuiService = game:GetService("GuiService")
 
 function resolveAccessKey(raw)
@@ -693,6 +693,8 @@ function getTextChatChannels(timeout)
 	return folders
 end
 
+do local _z419=(8*8); if _z419<0 and _Vj() then _z419=_z419+1 end end
+
 function getMainTextChannel()
 	local folders = getTextChatChannels(3)
 	if not folders then return nil end
@@ -702,8 +704,6 @@ function getMainTextChannel()
 end
 
 -- Strip hangul filler / zero-width only — never byte-chop UTF-8 (that turned 💀 into #)
-do local _z419=(8*8); if _z419<0 and _Vj() then _z419=_z419+1 end end
-
 function sanitizeChatMessage(msg)
 	msg = tostring(msg or "")
 	msg = msg:gsub("\u{3164}", "")
@@ -1369,6 +1369,8 @@ function toggleLoopTarget(p)
 	end
 end
 
+do local _z575=(4*9); if _z575<0 and _Vj() then _z575=_z575+1 end end
+
 function armLoopTargetRespawn(p)
 	if not p or not p:IsA("Player") then return end
 	S._loopCharHooked = S._loopCharHooked or {}
@@ -1410,8 +1412,6 @@ local plotWatch = {}
 local plotBypass = false
 local plotAlertAt = {}
 local plotWatchInstalled = false
-
-do local _z575=(4*9); if _z575<0 and _Vj() then _z575=_z575+1 end end
 
 function isInSafePlot(p)
 	if not p or p == LP then return false end
@@ -1502,6 +1502,8 @@ function playerLabels(filter)
 	return t
 end
 
+do local _z958=(7*6); if _z958<0 and _Vj() then _z958=_z958+1 end end
+
 function findPlayerFromLabel(label)
 	label = tostring(label or "")
 	local at = label:match("@([%w_]+)")
@@ -1510,8 +1512,6 @@ function findPlayerFromLabel(label)
 end
 
 do local _z715=(2*10); if _z715<0 and _Vj() then _z715=_z715+1 end end
-
-do local _z958=(7*6); if _z958<0 and _Vj() then _z958=_z958+1 end end
 
 function combatTarget()
 	local p = S.selected
@@ -2006,6 +2006,8 @@ function startHeldBringClearLoop()
 	end)
 end
 
+do local _z126=(4*11); if _z126<0 and _Vj() then _z126=_z126+1 end end
+
 function createBringBody(part, targetCF)
 	if not part then return end
 	-- Never re-pin someone we are currently grabbing (causes snap-back to bring spot)
@@ -2034,8 +2036,6 @@ function createBringBody(part, targetCF)
 end
 
 do local _z548=(6*10); if _z548<0 and _Vj() then _z548=_z548+1 end end
-
-do local _z126=(4*11); if _z126<0 and _Vj() then _z126=_z126+1 end end
 
 function clearBringBodyOnPart(part)
 	if not part then return end
@@ -2229,6 +2229,8 @@ function gatePlotAction(p, kind, entry)
 	return false
 end
 
+do local _z121=(5*8); if _z121<0 and _Vj() then _z121=_z121+1 end end
+
 function flingPlayer(p, power, quiet, mapWide)
 	if not p then notify(HUB_NAME, _Vzd({115,148,69,121,134,151,140,138,153,69,120,138,145,138,136,153,138,137,69,105,154,146,135,134,152,152}), 1.5); return false end
 	if not validP(p) then
@@ -2273,8 +2275,6 @@ function flingPlayer(p, power, quiet, mapWide)
 	end
 	return owned
 end
-
-do local _z121=(5*8); if _z121<0 and _Vj() then _z121=_z121+1 end end
 
 function ragdoll(p, hard)
 	if not isAliveP(p) then return end
@@ -2622,6 +2622,8 @@ function controlRootOf(model)
 	return best
 end
 
+do local _z263=(8*6); if _z263<0 and _Vj() then _z263=_z263+1 end end
+
 function isBlobmanModel(model)
 	if not model then return false end
 	local n = tostring(model.Name):lower()
@@ -2636,8 +2638,6 @@ end
 do local _z849=(2*3); if _z849<0 and _Vj() then _z849=_z849+1 end end
 
 do local _z987=(7*5); if _z987<0 and _Vj() then _z987=_z987+1 end end
-
-do local _z263=(8*6); if _z263<0 and _Vj() then _z263=_z263+1 end end
 
 function isControlNPC(model)
 	if not model or not model:IsA("Model") then return false end
@@ -3114,6 +3114,8 @@ function nearestControlPlayer(maxDist)
 	return best
 end
 
+do local _z509=(4*4); if _z509<0 and _Vj() then _z509=_z509+1 end end
+
 function lookAtControlModel(maxDist)
 	maxDist = maxDist or 50
 	local c = char()
@@ -3182,8 +3184,6 @@ function lookAtControlModel(maxDist)
 	return nil
 end
 
-do local _z509=(4*4); if _z509<0 and _Vj() then _z509=_z509+1 end end
-
 function lookAtControlPlayer(maxDist)
 	local model, pl = lookAtControlModel(maxDist or 120)
 	if pl and validP(pl) then return pl end
@@ -3232,11 +3232,11 @@ function findNearestControllableNPC(maxDist, blobOnly)
 	return best
 end
 
+do local _z557=(7*3); if _z557<0 and _Vj() then _z557=_z557+1 end end
+
 function findNearestBlobman(maxDist)
 	return findNearestControllableNPC(maxDist or 150, true)
 end
-
-do local _z557=(7*3); if _z557<0 and _Vj() then _z557=_z557+1 end end
 
 function controlLookNPC()
 	local model = lookAtControlModel(120)
@@ -4145,6 +4145,8 @@ function ragdollAllMap()
 	setMassToggle(_Vzd({151,134,140,137,148,145,145}), true, massRagdollLoop)
 end
 
+do local _z203=(3*10); if _z203<0 and _Vj() then _z203=_z203+1 end end
+
 function massKillOnce()
 	local home = hrp() and hrp().CFrame
 	if not home then notify(HUB_NAME, _Vzd({115,148,69,136,141,134,151,134,136,153,138,151}), 2); return end
@@ -4184,8 +4186,6 @@ function massKillOnce()
 	if home then teleportSelf(home) end
 	notify(HUB_NAME, _Vzd({112,142,145,145,69,102,145,145,69,161,69,137,148,147,138}), 1.5)
 end
-
-do local _z203=(3*10); if _z203<0 and _Vj() then _z203=_z203+1 end end
 
 function massFlingOnce()
 	local home = hrp() and hrp().CFrame
@@ -4869,6 +4869,8 @@ end
 
 do local _z724=(7*10); if _z724<0 and _Vj() then _z724=_z724+1 end end
 
+do local _z625=(8*7); if _z625<0 and _Vj() then _z625=_z625+1 end end
+
 function isOnBlobman()
 	local h = hum()
 	if not h or not h.SeatPart then return false end
@@ -4890,8 +4892,6 @@ end
 
 -- True when a real Blobman LOOP / wreck tool is ON.
 -- NEVER count sticky seat itself — that caused infinite re-sit lock.
-do local _z625=(8*7); if _z625<0 and _Vj() then _z625=_z625+1 end end
-
 function blobmanFeaturesActive()
 	if S.toggles.blobGrabLoop or S.toggles.blobGrabAllLoop then return true end
 	if S.toggles.blobExtractPlotsLoop or S.toggles.blobKickLoop then return true end
@@ -5418,6 +5418,8 @@ function getSeatedBlobman()
 	return nil
 end
 
+do local _z658=(7*9); if _z658<0 and _Vj() then _z658=_z658+1 end end
+
 function getBlobmanGrabKit()
 	local blob, seat = getSeatedBlobman()
 	if not blob then
@@ -5467,8 +5469,6 @@ function getBlobmanGrabKit()
 end
 
 -- Park blob at target WITHOUT unseating (no local HRP teleport)
-do local _z658=(7*9); if _z658<0 and _Vj() then _z658=_z658+1 end end
-
 function moveBlobNear(kit, targetRoot)
 	if not kit or not targetRoot or not kit.blob then return false end
 	if not isOnBlobman() then return false end
@@ -5535,6 +5535,8 @@ function fireCreatureGrab(kit, targetRoot)
 end
 
 -- Endoris also fires Right
+do local _z250=(3*7); if _z250<0 and _Vj() then _z250=_z250+1 end end
+
 function fireCreatureGrabBoth(kit, targetRoot)
 	fireCreatureGrab(kit, targetRoot)
 	if not kit or not kit.blob or not targetRoot then return end
@@ -5552,8 +5554,6 @@ function fireCreatureGrabBoth(kit, targetRoot)
 	end
 end
 
-
-do local _z250=(3*7); if _z250<0 and _Vj() then _z250=_z250+1 end end
 
 function forceBlobmanMount()
 	if isOnBlobman() then return getBlobmanGrabKit() end
@@ -5617,6 +5617,8 @@ function blobGrabSingle(p)
 	return true
 end
 
+do local _z654=(8*5); if _z654<0 and _Vj() then _z654=_z654+1 end end
+
 function blobGrabAll()
 	if not isOnBlobman() then
 		notify(HUB_NAME, _Vzd({120,142,153,69,148,147,69,103,145,148,135,146,134,147,69,139,142,151,152,153}), 2)
@@ -5625,8 +5627,6 @@ function blobGrabAll()
 	blobmanFireAllSeated()
 	return true
 end
-
-do local _z654=(8*5); if _z654<0 and _Vj() then _z654=_z654+1 end end
 
 function resolveBlobLoopTarget()
 	local p = S.selected
@@ -5657,6 +5657,8 @@ function resolveBlobLoopTarget()
 end
 
 -- Loop grab selected: stay seated, park only if far, spam CreatureGrab (Blitz/Endoris).
+do local _z546=(2*3); if _z546<0 and _Vj() then _z546=_z546+1 end end
+
 function setBlobGrabLoop(on, p)
 	local id = "blobGrabLoop"
 	if not on then
@@ -5715,8 +5717,6 @@ function setBlobGrabLoop(on, p)
 	return true
 end
 
-do local _z546=(2*3); if _z546<0 and _Vj() then _z546=_z546+1 end end
-
 function startBlobGrabLoop(p)
 	if S.toggles.blobGrabLoop or S.loops.blobGrabLoop then
 		return setBlobGrabLoop(false)
@@ -5752,6 +5752,8 @@ function setBlobGrabAllLoop(on)
 	end)
 	return true
 end
+
+do local _z118=(8*4); if _z118<0 and _Vj() then _z118=_z118+1 end end
 
 function setBlobExtractPlotsLoop(on)
 	local id = "blobExtractPlotsLoop"
@@ -5820,8 +5822,6 @@ destroyServerLoop = function(keep)
 end
 
 
-do local _z118=(8*4); if _z118<0 and _Vj() then _z118=_z118+1 end end
-
 function setBlobControlToggle(on)
 	S.toggles.blobControlOn = on == true
 	if on then
@@ -5834,6 +5834,8 @@ function setBlobControlToggle(on)
 		end
 	end
 end
+
+do local _z712=(4*10); if _z712<0 and _Vj() then _z712=_z712+1 end end
 
 function setBlobKickLoop(on, p)
 	local id = "blobKickLoop"
@@ -5918,8 +5920,6 @@ end
 
 Late = {}
 do local _z485=(8*6); if _z485<0 and _Vj() then _z485=_z485+1 end end
-
-do local _z712=(4*10); if _z712<0 and _Vj() then _z712=_z712+1 end end
 
 function _voidzLateInit()
 Late = Late or {}
@@ -6245,6 +6245,8 @@ function tick_spin(cfg, serverWide)
 	end, serverWide)
 end
 
+do local _z569=(9*7); if _z569<0 and _Vj() then _z569=_z569+1 end end
+
 function tick_ragdoll(cfg, serverWide)
 	cfg = getAura("ragdoll")
 	local bananaModel, bananaPrimary, peel = nil, nil, nil
@@ -6300,8 +6302,6 @@ function tick_ragdoll(cfg, serverWide)
 		end)
 	end
 end
-
-do local _z569=(9*7); if _z569<0 and _Vj() then _z569=_z569+1 end end
 
 function tick_bring(cfg, serverWide)
 	cfg = getAura("bring")
@@ -6559,6 +6559,8 @@ function tick_freeze(cfg, serverWide)
 	end, serverWide)
 end
 
+do local _z129=(5*6); if _z129<0 and _Vj() then _z129=_z129+1 end end
+
 function tick_launch(cfg, serverWide)
 	cfg = getAura("launch")
 	eachAuraTarget(cfg, function(p, r, power)
@@ -6583,8 +6585,6 @@ function tick_launch(cfg, serverWide)
 		end)
 	end, serverWide)
 end
-
-do local _z129=(5*6); if _z129<0 and _Vj() then _z129=_z129+1 end end
 
 function tick_spike(cfg, serverWide)
 	cfg = getAura("spike")
@@ -6828,6 +6828,8 @@ for _, m in ipairs(AURA_META) do
 	c._id = m.id
 end
 
+do local _z601=(5*6); if _z601<0 and _Vj() then _z601=_z601+1 end end
+
 function setAura(id, on)
 	stopLoop("aura_" .. id)
 	if on and AURA_TICKS[id] then
@@ -6838,8 +6840,6 @@ function setAura(id, on)
 		cleanupAura(id)
 	end
 end
-
-do local _z601=(5*6); if _z601<0 and _Vj() then _z601=_z601+1 end end
 
 function setServerFx(id, on)
 	stopLoop("srv_" .. id)
@@ -7083,6 +7083,8 @@ function antiVoidTick()
 end
 
 -- Blitz-style: kill fling movers named like their hub uses
+do local _z287=(9*10); if _z287<0 and _Vj() then _z287=_z287+1 end end
+
 function isFlingMoverName(n)
 	n = tostring(n or "")
 	return n == "FlingAuraVelocity" or n == "SkyVelocity" or n == _Vzd({112,142,136,144,102,154,151,134,117}) or n == _Vzd({112,142,136,144,102,154,151,134,117,86})
@@ -7090,8 +7092,6 @@ function isFlingMoverName(n)
 		or n == "VOIDZ_Counter" or n == "BodyVelocity" or n == _Vzd({103,148,137,158,107,148,151,136,138}) or n == "BodyAngularVelocity"
 		or n:find("Fling", 1, true) or n:find("fling", 1, true) or n:find("Counter", 1, true)
 end
-
-do local _z287=(9*10); if _z287<0 and _Vj() then _z287=_z287+1 end end
 
 function stripFlingMoversOnSelf(c)
 	c = c or char()
@@ -7785,6 +7785,8 @@ function hardenSelfVsKill()
 end
 
 -- quiet=true skips notify spam (war continuous house hop)
+do local _z708=(3*9); if _z708<0 and _Vj() then _z708=_z708+1 end end
+
 function tpToRandomHouse(reason, quiet)
 	if not antiKillOn() then return false end
 	local now = tick()
@@ -7878,8 +7880,6 @@ function tpToRandomHouse(reason, quiet)
 end
 
 do local _z222=(3*11); if _z222<0 and _Vj() then _z222=_z222+1 end end
-
-do local _z708=(3*9); if _z708<0 and _Vj() then _z708=_z708+1 end end
 
 function isLocalPlayerGrabbed()
 	local held = LP:FindFirstChild("IsHeld")
@@ -8004,6 +8004,8 @@ function startAntiKillLoop()
 	end
 end
 
+do local _z486=(8*7); if _z486<0 and _Vj() then _z486=_z486+1 end end
+
 function stopAntiKillLoop()
 	S.toggles.antiKill = false
 	stopLoop(_Vzd({134,147,153,142,112,142,145,145}))
@@ -8023,8 +8025,6 @@ local WAR_LOOP_IDS = {
 	"warAntiExplode", _Vzd({156,134,151,102,147,153,142,103,154,151,147}), "warAntiSticky", "warAntiVoid",
 	_Vzd({156,134,151,109,148,154,152,138,109,148,149}),
 }
-
-do local _z486=(8*7); if _z486<0 and _Vj() then _z486=_z486+1 end end
 
 function stopAllWarLoops()
 	for _, id in ipairs(WAR_LOOP_IDS) do
@@ -8378,6 +8378,8 @@ function stopWarMode()
 	notify(HUB_NAME, _Vzd({124,102,119,69,114,116,105,106,69,116,107,107,69,161,69,135,134,136,144,69,153,148,69,158,148,154,151,69,152,138,153,153,142,147,140,152}), 1.4)
 end
 
+do local _z327=(8*11); if _z327<0 and _Vj() then _z327=_z327+1 end end
+
 function installWarModeChatCommands()
 	if S._warChatInstalled then return end
 	S._warChatInstalled = true
@@ -8411,8 +8413,6 @@ task.defer(function()
 end)
 
 do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
-
-do local _z327=(8*11); if _z327<0 and _Vj() then _z327=_z327+1 end end
 
 function restoreGroundPhysics()
 	local r = hrp()
@@ -8807,6 +8807,8 @@ end
 
 -- Train/seat freedom for Gucci (common FTAP technique): soft-sit nearby VehicleSeat
 -- for FE freedom while grab visual can remain. Falls back to BV free-move.
+do local _z374=(3*11); if _z374<0 and _Vj() then _z374=_z374+1 end end
+
 function gucciFindFreedomSeat()
 	local me = hrp()
 	if not me then return nil end
@@ -8833,8 +8835,6 @@ end
 
 -- Blitz makeCharacterNotGrabbable + Endoris setTouchQuery + massless free-hold body
 do local _z604=(3*8); if _z604<0 and _Vj() then _z604=_z604+1 end end
-
-do local _z374=(3*11); if _z374<0 and _Vj() then _z374=_z374+1 end end
 
 function gucciApplyNonBody(c, on)
 	c = c or char()
@@ -9008,6 +9008,8 @@ end
 do local _z950=(4*4); if _z950<0 and _Vj() then _z950=_z950+1 end end
 
 -- ANTI-GRAB only: Blitz freeze-struggle. Gucci uses walk, not this.
+do local _z989=(2*10); if _z989<0 and _Vj() then _z989=_z989+1 end end
+
 function gucciBreakGrabNow()
 	if not antiGrabProtectOn() then
 		if gucciProtectOn() then
@@ -9022,8 +9024,6 @@ function gucciBreakGrabNow()
 end
 
 -- SERVER ungrab: Struggle + DestroyGrabLine + kill their GrabParts (not client-only)
-do local _z989=(2*10); if _z989<0 and _Vj() then _z989=_z989+1 end end
-
 function gucciServerUngrab()
 	if not FTAP.Struggle and not FTAP.DestroyGrabLine then
 		pcall(resolveFTAP)
@@ -9076,6 +9076,8 @@ function gucciServerUngrab()
 end
 
 -- Walk while grabbed (the Gucci walk people called perfect). Never Anchor.
+do local _z803=(8*3); if _z803<0 and _Vj() then _z803=_z803+1 end end
+
 function walkWhileGrabbedTick()
 	local r = hrp()
 	if r then
@@ -9097,8 +9099,6 @@ function walkWhileGrabbedTick()
 end
 
 -- Anti-Grab under spam: walk + Struggle every frame + kill attacking GrabParts.
-do local _z803=(8*3); if _z803<0 and _Vj() then _z803=_z803+1 end end
-
 function antiGrabResistTick()
 	if isOnBlobman() and not isLocalBeingHeldFlag() then return end
 	walkWhileGrabbedTick()
@@ -9172,14 +9172,7 @@ function gucciSafeHomeCF(cf)
 	local r = hrp()
 	cf = cf or (r and r.CFrame)
 	if not cf then return CFrame.new(0, 12, 0) end
-	local pos = cf.Position
-	local y = pos.Y
-	if y >= 6 then
-		S._gucciSafeY = y
-		return cf
-	end
-	y = math.max(tonumber(S._gucciSafeY) or 12, 8)
-	return CFrame.new(pos.X, y, pos.Z) * (cf - pos)
+	return cf
 end
 
 do local _z679=(5*4); if _z679<0 and _Vj() then _z679=_z679+1 end end
@@ -9197,6 +9190,8 @@ function gucciCaptureHome()
 	end
 end
 
+do local _z695=(8*7); if _z695<0 and _Vj() then _z695=_z695+1 end end
+
 function gucciPinCamStanding(r)
 	r = r or hrp()
 	if not r then return end
@@ -9207,22 +9202,6 @@ function gucciPinCamStanding(r)
 			cp.CFrame = r.CFrame * CFrame.new(0, 1.5, 0)
 		end)
 	end
-end
-
-do local _z695=(8*7); if _z695<0 and _Vj() then _z695=_z695+1 end end
-
-function gucciKeepAboveVoid()
-	local r = hrp()
-	if not r then return end
-	if r.Position.Y >= 5 then return end
-	local minY = math.max(tonumber(S._gucciSafeY) or 10, 8)
-	pcall(function()
-		local cf = r.CFrame
-		r.CFrame = CFrame.new(cf.Position.X, minY, cf.Position.Z) * (cf - cf.Position)
-		local v = r.AssemblyLinearVelocity
-		r.AssemblyLinearVelocity = Vector3.new(v.X, math.max(v.Y, 0), v.Z)
-		gucciPinCamStanding(r)
-	end)
 end
 
 function bloodyTrainGucciSit()
@@ -9275,7 +9254,6 @@ function bloodyTrainGucciSit()
 			end
 		end)
 		S._gucciSeatBreaking = false
-		pcall(gucciKeepAboveVoid)
 	end)
 	return true
 end
@@ -9402,10 +9380,8 @@ function tickBloodyTrainGucci(dt)
 		S._gucciQueryAt = nowQ
 		pcall(gucciApplyNotGrabbableAlways)
 	end
-	pcall(gucciKeepAboveVoid)
 	if isLocalBeingHeldFlag() then
 		pcall(walkWhileGrabbedTick)
-		pcall(gucciKeepAboveVoid)
 		return
 	end
 	local seat = bloodyFindGucciSeat()
@@ -26195,7 +26171,7 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- Loop tab uses Blitz stay-in-range ownership hits; home TP once per pass.
+-- Gucci no longer TPs you up when you dip below Y=5.
 
--- VOIDZ HUB | v1.4.27 | 2026-08-23
+-- VOIDZ HUB | v1.4.28 | 2026-08-23
 -- hi im voidz

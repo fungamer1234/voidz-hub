@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-22-1.4.0` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
+Build: `2026-08-22-1.4.1` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -16,9 +16,13 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 
 1. Join **Fling Things and People** (PlaceId `6961824067`).
 2. Execute the loadstring above.
-3. Key **`FREMIUM`** (free) or **`VOIDZHUB`** (premium). RightShift show/hide.
+3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.1) — one key
+
+There is no free/premium split anymore. Key **`VOIDZHUB`** unlocks the full hub (loop grab all, destroy server, war mode, everything).
 
 ## Recent (1.4.0) — do it how Blitz / Bloody V2 do it
 

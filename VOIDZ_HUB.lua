@@ -195,7 +195,7 @@ local Mouse = LP:GetMouse()
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local KEY_PREMIUM = ACCESS_KEY -- legacy alias
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,93,82,87,88,82,86,83,89,83,88})
+local BUILD = _Vzd({87,85,87,91,82,85,93,82,87,88,82,86,83,89,83,89})
 local GuiService = game:GetService("GuiService")
 
 function resolveAccessKey(raw)
@@ -426,12 +426,12 @@ function bind(id, conn)
 	S.conns[id] = conn
 	return conn
 end
-do local _z715=(2*10); if _z715<0 and _Vj() then _z715=_z715+1 end end
-
 function stopLoop(id)
 	S.loops[id] = false
 	S.loopGen[id] = (S.loopGen[id] or 0) + 1
 end
+do local _z715=(2*10); if _z715<0 and _Vj() then _z715=_z715+1 end end
+
 function startLoop(id, waitTime, fn)
 	local generation = (S.loopGen[id] or 0) + 1
 	S.loopGen[id] = generation
@@ -926,8 +926,6 @@ function getUiParent()
 	return LP:WaitForChild("PlayerGui")
 end
 
-do local _z376=(3*8); if _z376<0 and _Vj() then _z376=_z376+1 end end
-
 function voidzProtectGui(gui)
 	if not gui then return end
 	pcall(function()
@@ -937,6 +935,8 @@ function voidzProtectGui(gui)
 	end)
 end
 
+
+do local _z376=(3*8); if _z376<0 and _Vj() then _z376=_z376+1 end end
 
 function showVoidzSplash(device, onDone)
 	-- BloodyV2-style menacing boot: pure black, crimson, glitch, skull, scanlines
@@ -1411,8 +1411,6 @@ function findPlayerFromLabel(label)
 	return findPlayer(label)
 end
 
-do local _z987=(7*5); if _z987<0 and _Vj() then _z987=_z987+1 end end
-
 function combatTarget()
 	local p = S.selected
 	if p and p.Parent and p:IsA("Player") and p ~= LP then return p end
@@ -1451,6 +1449,8 @@ local FTAP = {
 	RagdollRemote = nil, Struggle = nil, SpawnToy = nil, DestroyToy = nil, BuyToy = nil,
 	StopAllVelocity = nil, BombExplode = nil,
 }
+
+do local _z987=(7*5); if _z987<0 and _Vj() then _z987=_z987+1 end end
 
 function resolveFTAP()
 	FTAP.ok = false
@@ -1530,8 +1530,6 @@ function grabLineOn(p)
 	return true
 end
 
-do local _z803=(9*5); if _z803<0 and _Vj() then _z803=_z803+1 end end
-
 function approachForSNO(part)
 	local me = hrp()
 	if not me or not part then return false end
@@ -1547,6 +1545,8 @@ function approachForSNO(part)
 end
 
 -- Blitz CheckNetworkOwnerShipOnPlayer: Head.PartOwner == you
+do local _z803=(9*5); if _z803<0 and _Vj() then _z803=_z803+1 end end
+
 function ownsPlayer(p)
 	if not p or not p.Character then return false end
 	local head = p.Character:FindFirstChild("Head")
@@ -2437,8 +2437,6 @@ function freezeCam(cf)
 	end
 end
 
-do local _z389=(5*9); if _z389<0 and _Vj() then _z389=_z389+1 end end
-
 function unfreezeCam()
 	local cam = workspace.CurrentCamera
 	local h = hum()
@@ -2448,12 +2446,14 @@ function unfreezeCam()
 	end
 end
 
-do local _z859=(8*9); if _z859<0 and _Vj() then _z859=_z859+1 end end
+do local _z389=(5*9); if _z389<0 and _Vj() then _z389=_z389+1 end end
 
 function teleportSelf(cf)
 	local me = hrp()
 	if me then pcall(function() me.CFrame = cf end) end
 end
+
+do local _z859=(8*9); if _z859<0 and _Vj() then _z859=_z859+1 end end
 
 function visitForSNO(p, tries)
 	tries = tries or 12
@@ -2488,14 +2488,14 @@ local controlState = {
 
 do local _z244=(9*10); if _z244<0 and _Vj() then _z244=_z244+1 end end
 
-do local _z600=(2*5); if _z600<0 and _Vj() then _z600=_z600+1 end end
-
 function clearControlConns()
 	for _, c in pairs(controlState.conns) do
 		pcall(function() c:Disconnect() end)
 	end
 	controlState.conns = {}
 end
+
+do local _z600=(2*5); if _z600<0 and _Vj() then _z600=_z600+1 end end
 
 function setControlQuery(model, can)
 	if not model then return end
@@ -3393,8 +3393,6 @@ function getStatusToy(toyName)
 	return model, primary, tip
 end
 
-do local _z700=(2*6); if _z700<0 and _Vj() then _z700=_z700+1 end end
-
 function touchPartOnTarget(part, targetRoot, hold)
 	if not part or not targetRoot then return end
 	hold = hold or 0.08
@@ -3433,6 +3431,8 @@ function touchPartOnTarget(part, targetRoot, hold)
 		end
 	end)
 end
+
+do local _z700=(2*6); if _z700<0 and _Vj() then _z700=_z700+1 end end
 
 function touchToyPartToPlayer(toyName, targetRoot)
 	if not targetRoot then return end
@@ -3525,8 +3525,6 @@ function applyMapPoison(targetRoot)
 	end
 end
 
-do local _z464=(8*6); if _z464<0 and _Vj() then _z464=_z464+1 end end
-
 function applyMapPaint(targetRoot)
 	if not targetRoot then return end
 	local paint = nil
@@ -3557,6 +3555,8 @@ function applyMapPaint(targetRoot)
 	end
 	return false
 end
+
+do local _z464=(8*6); if _z464<0 and _Vj() then _z464=_z464+1 end end
 
 function firePlayerBlitz(p)
 	if not p or not validP(p) then return false end
@@ -3877,8 +3877,6 @@ function massFlingLoop(keep)
 	notify(HUB_NAME, "Fling All OFF", 1.5)
 end
 
-do local _z305=(3*8); if _z305<0 and _Vj() then _z305=_z305+1 end end
-
 function massRagdollLoop(keep)
 	local home = hrp() and hrp().CFrame
 	local overview = home and CFrame.lookAt(home.Position + Vector3.new(-15, 22, 8), home.Position) or CFrame.new(0, 50, 0)
@@ -3942,6 +3940,8 @@ function massRagdollLoop(keep)
 	unfreezeCam()
 	notify(HUB_NAME, _Vzd({119,134,140,137,148,145,145,69,102,145,145,69,116,107,107}), 1.5)
 end
+
+do local _z305=(3*8); if _z305<0 and _Vj() then _z305=_z305+1 end end
 
 function massFireLoop(keep)
 	local home = hrp() and hrp().CFrame
@@ -4488,8 +4488,6 @@ local KICK_TYPES = {
 }
 
 -- Full kickPlayer (was missing — all UI calls it). Res-style BlobHover = hover over target on blob + stack fling.
-do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
-
 function kickPlayer(p, ktype, quiet)
 	if not p or not validP(p) then
 		if not quiet then notify(HUB_NAME, "No kick target", 1.2) end
@@ -4645,6 +4643,8 @@ function kickPlayer(p, ktype, quiet)
 end
 
 do local _z705=(7*11); if _z705<0 and _Vj() then _z705=_z705+1 end end
+
+do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
 
 function isBlobSeat(seat)
 	if not seat then return false end
@@ -4826,8 +4826,6 @@ function releaseBlobmanSeatAfterFeaturesOff(forceUnsit)
 	end
 end
 
-do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
-
 function findMyBlobSeat()
 	local h = hum()
 	if h and h.SeatPart and isBlobSeat(h.SeatPart) then
@@ -4864,6 +4862,8 @@ function findMyBlobSeat()
 end
 
 do local _z647=(5*7); if _z647<0 and _Vj() then _z647=_z647+1 end end
+
+do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
 
 function blobmanReseatNow()
 	if S._blobLeaveLockUntil and os.clock() < S._blobLeaveLockUntil then return false end
@@ -5142,8 +5142,6 @@ function resolveBlobModelFromSeat(seat)
 	return m or seat.Parent
 end
 
-do local _z332=(2*5); if _z332<0 and _Vj() then _z332=_z332+1 end end
-
 function findBlobDetector(blob, prefer)
 	if not blob then return nil end
 	prefer = prefer or "Left"
@@ -5165,7 +5163,7 @@ function findBlobDetector(blob, prefer)
 	return nil
 end
 
-do local _z449=(2*9); if _z449<0 and _Vj() then _z449=_z449+1 end end
+do local _z332=(2*5); if _z332<0 and _Vj() then _z332=_z332+1 end end
 
 function findCreatureGrabRemote(blob)
 	if not blob then return nil end
@@ -5189,6 +5187,8 @@ end
 -- ========== BLOB / CREATURE GRAB (Blitz + Endoris patterns) ==========
 -- Blitz: ONLY fire while already seated; no force-sit thrash in loops.
 -- Endoris: FireServer(LeftDetector, targetRoot, LeftWeld) simple.
+
+do local _z449=(2*9); if _z449<0 and _Vj() then _z449=_z449+1 end end
 
 function getSeatedBlobman()
 	local h = hum()
@@ -5310,13 +5310,13 @@ function fireCreatureGrabBoth(kit, targetRoot)
 end
 
 
-do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
-
 function forceBlobmanMount()
 	if isOnBlobman() then return getBlobmanGrabKit() end
 	pcall(ensureBlobman, true)
 	return getBlobmanGrabKit()
 end
+
+do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
 
 function bringPlayerToBlob(p, kit, quiet)
 	if not p or not p.Parent then return false end
@@ -5690,8 +5690,6 @@ function restoreBuriedModel(model)
 	clearAuraEffect(root, { "VOIDZ_BuryBV", _Vzd({123,116,110,105,127,132,103,154,151,158,103,117}) })
 end
 
-do local _z204=(3*9); if _z204<0 and _Vj() then _z204=_z204+1 end end
-
 function cleanupAura(id)
 	for _, p in ipairs(Players:GetPlayers()) do
 		local model, root = p.Character, rootOf(p)
@@ -5706,6 +5704,8 @@ function cleanupAura(id)
 		end
 	end
 end
+
+do local _z204=(3*9); if _z204<0 and _Vj() then _z204=_z204+1 end end
 
 function inRange(pos, range)
 	local me = hrp()
@@ -6208,8 +6208,6 @@ function tick_orbit(cfg, serverWide)
 	end, serverWide)
 end
 
-do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
-
 function tick_yeet(cfg, serverWide)
 	cfg = getAura("yeet")
 	eachAuraTarget(cfg, function(p, r, power)
@@ -6232,6 +6230,8 @@ function tick_yeet(cfg, serverWide)
 		end)
 	end, serverWide)
 end
+
+do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
 
 function tick_soft(cfg, serverWide)
 	cfg = getAura("soft")
@@ -6669,8 +6669,6 @@ function antiBurnTick()
 	end
 end
 
-do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
-
 function antiPaintTick()
 	if not S.toggles.antiPaint then return end
 	local c = char()
@@ -6695,6 +6693,8 @@ function antiPaintTick()
 end
 
 -- Bloody-style limb detach: Motor6D Part0=nil then Destroy (FE-safe client rip)
+do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
+
 function voidzDetachMotorJoints(character, nameFilter)
 	character = character or char()
 	if not character then return 0 end
@@ -6807,8 +6807,6 @@ function antiVoidTick()
 end
 
 -- Blitz-style: kill fling movers named like their hub uses
-do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
-
 function isFlingMoverName(n)
 	n = tostring(n or "")
 	return n == "FlingAuraVelocity" or n == "SkyVelocity" or n == "KickAuraP" or n == "KickAuraP1"
@@ -6816,6 +6814,8 @@ function isFlingMoverName(n)
 		or n == "VOIDZ_Counter" or n == "BodyVelocity" or n == _Vzd({103,148,137,158,107,148,151,136,138}) or n == "BodyAngularVelocity"
 		or n:find("Fling", 1, true) or n:find("fling", 1, true) or n:find("Counter", 1, true)
 end
+
+do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
 
 function stripFlingMoversOnSelf(c)
 	c = c or char()
@@ -7474,18 +7474,18 @@ function gucciProtectOn()
 	return S.toggles.antiGucci == true
 end
 
-do local _z604=(3*8); if _z604<0 and _Vj() then _z604=_z604+1 end end
-
 function antiGrabProtectOn()
 	return warModeOn() or S.toggles.antiGrab == true
 end
 
-do local _z379=(3*10); if _z379<0 and _Vj() then _z379=_z379+1 end end
+do local _z604=(3*8); if _z604<0 and _Vj() then _z604=_z604+1 end end
 
 function anyGrabDefenseOn()
 	return gucciProtectOn() or antiGrabProtectOn()
 end
 
+
+do local _z379=(3*10); if _z379<0 and _Vj() then _z379=_z379+1 end end
 
 function hardenSelfVsKill()
 	local h = hum()
@@ -7850,8 +7850,6 @@ function warFireRagdollClear(n)
 	end
 end
 
-do local _z679=(5*4); if _z679<0 and _Vj() then _z679=_z679+1 end end
-
 function warFireDestroyGrabOnSelf()
 	-- Never bare FireServer() — that kills YOUR grab rope for the whole session
 	if isLocalActivelyGrabbing and isLocalActivelyGrabbing() then
@@ -7876,6 +7874,8 @@ function warFireDestroyGrabOnSelf()
 		end)
 	end
 end
+
+do local _z679=(5*4); if _z679<0 and _Vj() then _z679=_z679+1 end end
 
 function warSnoSelf()
 	-- light only — full body SNO every tick = lag/kick
@@ -8163,8 +8163,6 @@ function restoreGroundPhysics()
 	end
 end
 
-do local _z668=(2*6); if _z668<0 and _Vj() then _z668=_z668+1 end end
-
 function isGucciVictim(c)
 	c = c or char()
 	if not c then return false end
@@ -8185,6 +8183,8 @@ function isGucciVictim(c)
 end
 
 -- Hard-restart beam VISUAL script only — NEVER disable GrabbingScript (that kills grab entirely)
+do local _z668=(2*6); if _z668<0 and _Vj() then _z668=_z668+1 end end
+
 function hardRestartGrabBeamScript(force)
 	if S.toggles.invisLine then return end
 	local now = os.clock()
@@ -8586,8 +8586,6 @@ function gucciApplyNonBody(c, on)
 end
 
 -- Blitz-style: apply not-grabbable while Gucci toggle ON (proactive + while held)
-do local _z266=(7*9); if _z266<0 and _Vj() then _z266=_z266+1 end end
-
 function gucciApplyNotGrabbableAlways()
 	if not gucciProtectOn() then return end
 	local c = char()
@@ -8601,6 +8599,8 @@ function gucciApplyNotGrabbableAlways()
 	end
 end
 
+do local _z266=(7*9); if _z266<0 and _Vj() then _z266=_z266+1 end end
+
 function gucciClearNonBody()
 	if S._gucciNonBodyOn then
 		gucciApplyNonBody(char(), false)
@@ -8608,7 +8608,17 @@ function gucciClearNonBody()
 	end
 end
 
--- Cheap every-frame walk. No workspace scans, no remotes, no GetDescendants.
+function gucciWalkSpeed()
+	if S.toggles.speed then
+		return math.clamp(tonumber(S.walkSpeed) or 16, 1, 300)
+	end
+	local h = hum()
+	local w = tonumber(h and h.WalkSpeed) or 16
+	if w < 1 then w = 16 end
+	return w
+end
+
+-- Cheap every-frame walk. 1x WalkSpeed (or WalkSpeed Override). No extra CFrame shove.
 function gucciForceFreeMoveLight()
 	local h = hum()
 	local r = hrp()
@@ -8619,25 +8629,23 @@ function gucciForceFreeMoveLight()
 		r.Anchored = false
 		S._blitzGrabAnchored = false
 	end)
-	-- Never kick yourself off Blobman (Gucci Sit=false was fighting grab loops)
-	-- Blitz/Bloody Gucci never force-unsits. Sit=false was kicking Blobman.
 	local md = h.MoveDirection
-	local spd = math.max(tonumber(h.WalkSpeed) or 16, 22)
-	if S.toggles.speed then spd = tonumber(S.walkSpeed) or spd end
-	spd = math.clamp(spd, 16, 80)
+	if md.Magnitude < 0.04 and bloodyGucciMoveInput then
+		md = bloodyGucciMoveInput()
+	end
+	local spd = gucciWalkSpeed()
 	local bv = r:FindFirstChild("VOIDZ_GucciBV")
 	if not bv then
 		bv = Instance.new("BodyVelocity")
 		bv.Name = "VOIDZ_GucciBV"
-		bv.P = 9000
+		bv.P = 1250
 		bv.Parent = r
 	end
-	bv.MaxForce = Vector3.new(4e8, 8e4, 4e8)
+	bv.MaxForce = Vector3.new(4e5, 4e4, 4e5)
 	if md.Magnitude > 0.04 then
 		local dir = md.Unit
-		local push = dir * (spd * 1.55)
+		local push = dir * spd
 		pcall(function()
-			r.CFrame = r.CFrame + dir * 0.55
 			local y = math.clamp(r.AssemblyLinearVelocity.Y, -90, 70)
 			r.AssemblyLinearVelocity = Vector3.new(push.X, y, push.Z)
 			bv.Velocity = Vector3.new(push.X, 0, push.Z)
@@ -8648,8 +8656,9 @@ function gucciForceFreeMoveLight()
 	local space = false
 	pcall(function() space = UserInputService:IsKeyDown(Enum.KeyCode.Space) end)
 	if space then
+		local jp = tonumber(h.JumpPower) or 50
 		local v = r.AssemblyLinearVelocity
-		r.AssemblyLinearVelocity = Vector3.new(v.X, math.max(v.Y, 58), v.Z)
+		r.AssemblyLinearVelocity = Vector3.new(v.X, math.max(v.Y, jp), v.Z)
 	end
 end
 
@@ -8991,25 +9000,13 @@ function tickBloodyTrainGucci(dt)
 		bloodyStripLocalSeatWeld(seat)
 	end
 
-	local dir = bloodyGucciMoveInput()
-	local spd = math.max(tonumber(h.WalkSpeed) or 16, 22)
-	if S.toggles.speed then spd = tonumber(S.walkSpeed) or spd end
-	spd = math.clamp(spd, 16, 80)
-	local step = dir * (spd * math.clamp(dt or 0.016, 0.008, 0.05))
-	S._gucciWalkCF = (S._gucciWalkCF or r.CFrame) + step
 	pcall(function()
 		r.Anchored = false
-		r.CFrame = S._gucciWalkCF
 		h.PlatformStand = false
 		h.AutoRotate = true
 	end)
-	local space = false
-	pcall(function() space = UserInputService:IsKeyDown(Enum.KeyCode.Space) end)
-	if space then
-		S._gucciWalkCF = S._gucciWalkCF + Vector3.new(0, 1.15, 0)
-		pcall(function() r.CFrame = S._gucciWalkCF end)
-	end
 	gucciForceFreeMoveLight()
+	S._gucciWalkCF = r.CFrame
 end
 
 function bloodyGucciPulse()
@@ -25552,7 +25549,7 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- Bloody Gucci: train Occupant SS invis, local weld stripped.
+-- Gucci walk = normal WalkSpeed unless speed override is on.
 
--- VOIDZ HUB | v1.4.3 | 2026-08-23
+-- VOIDZ HUB | v1.4.4 | 2026-08-23
 -- hi im voidz

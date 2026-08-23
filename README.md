@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.23` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.24` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.24) — restore last working hub
+
+Rolled the whole script back to the last build that actually worked (1.4.17: Anti-Grab walk-held, Gucci train invis, UI polish). Later stacked patches had broken grab, walk, Gucci, and Blob loop.
 
 ## Recent (1.4.23) — Anti-Grab walk (pre-sticky)
 

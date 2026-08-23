@@ -195,7 +195,7 @@ local Mouse = LP:GetMouse()
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local KEY_PREMIUM = ACCESS_KEY -- legacy alias
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,93,82,87,88,82,86,83,89,83,86,91})
+local BUILD = _Vzd({87,85,87,91,82,85,93,82,87,88,82,86,83,89,83,86,92})
 local GuiService = game:GetService("GuiService")
 
 function resolveAccessKey(raw)
@@ -437,13 +437,13 @@ end
 function grad(i, a, b, rot)
 	local g = Instance.new("UIGradient"); g.Color = ColorSequence.new(a or C.accentDim, b or C.bg); g.Rotation = rot or 90; g.Parent = i; return g
 end
-do local _z360=(5*9); if _z360<0 and _Vj() then _z360=_z360+1 end end
-
 function mix3(a, b, t)
 	t = tonumber(t) or 0.5
 	a, b = a or Color3.new(), b or Color3.new()
 	return Color3.new(a.R + (b.R - a.R) * t, a.G + (b.G - a.G) * t, a.B + (b.B - a.B) * t)
 end
+do local _z360=(5*9); if _z360<0 and _Vj() then _z360=_z360+1 end end
+
 function glass(i)
 	-- Frames only. Never parent this to a TextButton/TextLabel — Roblox tints the glyphs.
 	local g = Instance.new(_Vzd({122,110,108,151,134,137,142,138,147,153}))
@@ -456,8 +456,6 @@ function glass(i)
 	g.Parent = i
 	return g
 end
-do local _z868=(8*10); if _z868<0 and _Vj() then _z868=_z868+1 end end
-
 function panelWash(i, rot)
 	local g = Instance.new("UIGradient")
 	g.Color = ColorSequence.new({
@@ -469,6 +467,8 @@ function panelWash(i, rot)
 	g.Parent = i
 	return g
 end
+
+do local _z868=(8*10); if _z868<0 and _Vj() then _z868=_z868+1 end end
 
 function refreshThemeVisuals()
 	if not S.gui then return end
@@ -832,8 +832,6 @@ function loadVoidzSettings()
 	end)
 end
 
-do local _z382=(5*5); if _z382<0 and _Vj() then _z382=_z382+1 end end
-
 function saveVoidzSettings()
 	if not voidzWriteFile then
 		notify(HUB_NAME, _Vzd({121,141,142,152,69,138,157,138,136,154,153,148,151,69,136,134,147,147,148,153,69,152,134,155,138,69,139,142,145,138,152}), 2)
@@ -870,6 +868,8 @@ local function voidzLoadChatMessage()
 	end
 	return VOIDZ_DEFAULT_LOAD_CHAT
 end
+
+do local _z382=(5*5); if _z382<0 and _Vj() then _z382=_z382+1 end end
 
 function getVoidzLoadChatMessage()
 	return voidzLoadChatMessage()
@@ -1161,9 +1161,9 @@ end
 
 
 function char() return LP.Character end
+function hum() local c=char(); return c and c:FindFirstChildOfClass(_Vzd({109,154,146,134,147,148,142,137})) end
 do local _z148=(2*8); if _z148<0 and _Vj() then _z148=_z148+1 end end
 
-function hum() local c=char(); return c and c:FindFirstChildOfClass(_Vzd({109,154,146,134,147,148,142,137})) end
 function hrp()
 	local c = char()
 	if not c then return end
@@ -1416,8 +1416,6 @@ function findPlayerFromLabel(label)
 	return findPlayer(label)
 end
 
-do local _z715=(2*10); if _z715<0 and _Vj() then _z715=_z715+1 end end
-
 function combatTarget()
 	local p = S.selected
 	if p and p.Parent and p:IsA("Player") and p ~= LP then return p end
@@ -1456,6 +1454,8 @@ local FTAP = {
 	RagdollRemote = nil, Struggle = nil, SpawnToy = nil, DestroyToy = nil, BuyToy = nil,
 	StopAllVelocity = nil, BombExplode = nil,
 }
+
+do local _z715=(2*10); if _z715<0 and _Vj() then _z715=_z715+1 end end
 
 function resolveFTAP()
 	FTAP.ok = false
@@ -1986,8 +1986,6 @@ function clearBringBodyOnPlayer(p)
 	end
 end
 
-do local _z376=(3*8); if _z376<0 and _Vj() then _z376=_z376+1 end end
-
 function cancelBringOnPlayer(p)
 	if not p then return end
 	S._bringGen[p.UserId] = (S._bringGen[p.UserId] or 0) + 1
@@ -1995,6 +1993,8 @@ function cancelBringOnPlayer(p)
 end
 
 -- Soft bring: short follow, then free. Cancelled if you grab them mid-hold.
+do local _z376=(3*8); if _z376<0 and _Vj() then _z376=_z376+1 end end
+
 function releaseBringAfter(p, holdSec)
 	if not p then return end
 	holdSec = holdSec or 0.45
@@ -2536,8 +2536,6 @@ end
 -- Blitz-style: any non-player model with a Humanoid (or known creature) is controllable
 do local _z849=(2*3); if _z849<0 and _Vj() then _z849=_z849+1 end end
 
-do local _z987=(7*5); if _z987<0 and _Vj() then _z987=_z987+1 end end
-
 function isControlNPC(model)
 	if not model or not model:IsA("Model") then return false end
 	if Players:GetPlayerFromCharacter(model) then return false end
@@ -2555,6 +2553,8 @@ function isControlNPC(model)
 	if hum and controlRootOf(model) then return true end
 	return false
 end
+
+do local _z987=(7*5); if _z987<0 and _Vj() then _z987=_z987+1 end end
 
 function controlSnoModel(model, root, origin)
 	if not model or not root then return end
@@ -2671,8 +2671,6 @@ function stopControl(quiet)
 	if not quiet then notify(HUB_NAME, _Vzd({104,148,147,153,151,148,145,69,148,139,139}), 1.2) end
 end
 
-do local _z803=(9*5); if _z803<0 and _Vj() then _z803=_z803+1 end end
-
 function charModelFromPart(part)
 	if not part then return nil end
 	local acc = part:FindFirstAncestorOfClass(_Vzd({102,136,136,138,152,152,148,151,158})) or part:FindFirstAncestorOfClass("Accoutrement")
@@ -2694,6 +2692,8 @@ function charModelFromPart(part)
 end
 
 -- Blitz-style creature control (SNO + Humanoid:Move + BV + stick under target)
+do local _z803=(9*5); if _z803<0 and _Vj() then _z803=_z803+1 end end
+
 function startControl(model)
 	if not model or not model:IsA("Model") then
 		notify(HUB_NAME, _Vzd({115,148,69,153,134,151,140,138,153}), 1.2)
@@ -3869,8 +3869,6 @@ function massFlingLoop(keep)
 	notify(HUB_NAME, "Fling All OFF", 1.5)
 end
 
-do local _z389=(5*9); if _z389<0 and _Vj() then _z389=_z389+1 end end
-
 function massRagdollLoop(keep)
 	local home = hrp() and hrp().CFrame
 	local overview = home and CFrame.lookAt(home.Position + Vector3.new(-15, 22, 8), home.Position) or CFrame.new(0, 50, 0)
@@ -3935,7 +3933,7 @@ function massRagdollLoop(keep)
 	notify(HUB_NAME, _Vzd({119,134,140,137,148,145,145,69,102,145,145,69,116,107,107}), 1.5)
 end
 
-do local _z859=(8*9); if _z859<0 and _Vj() then _z859=_z859+1 end end
+do local _z389=(5*9); if _z389<0 and _Vj() then _z389=_z389+1 end end
 
 function massFireLoop(keep)
 	local home = hrp() and hrp().CFrame
@@ -3994,6 +3992,8 @@ function massFireLoop(keep)
 	notify(HUB_NAME, "Fire All OFF", 1.5)
 end
 
+do local _z859=(8*9); if _z859<0 and _Vj() then _z859=_z859+1 end end
+
 function massBananaLoop(keep)
 	notify(HUB_NAME, _Vzd({103,134,147,134,147,134,69,102,145,145,69,116,115,69,161,69,153,148,158,69,148,147,145,158,69,77,158,148,154,69,152,153,134,158,69,149,154,153,78}), 2)
 	getStatusToy("FoodBanana")
@@ -4009,8 +4009,6 @@ function massBananaLoop(keep)
 	notify(HUB_NAME, _Vzd({103,134,147,134,147,134,69,102,145,145,69,116,107,107}), 1.5)
 end
 
-do local _z600=(2*5); if _z600<0 and _Vj() then _z600=_z600+1 end end
-
 function massPaintLoop(keep)
 	notify(HUB_NAME, _Vzd({117,134,142,147,153,69,102,145,145,69,116,115,69,161,69,149,134,142,147,153,69,149,134,151,153,69,148,147,145,158,69,77,158,148,154,69,152,153,134,158,69,149,154,153,78}), 2)
 	while keep() do
@@ -4024,6 +4022,8 @@ function massPaintLoop(keep)
 	end
 	notify(HUB_NAME, "Paint All OFF", 1.5)
 end
+
+do local _z600=(2*5); if _z600<0 and _Vj() then _z600=_z600+1 end end
 
 function flingAllMap()
 	setMassToggle("fling", true, massFlingLoop)
@@ -4737,8 +4737,6 @@ end
 -- When all real blob tools are OFF: stop sticky + free you from the seat.
 -- forceUnsit=true always tries to leave; still no-ops leave if another loop is ON
 -- (callers that want hard dismount must stop loops first).
-do local _z700=(2*6); if _z700<0 and _Vj() then _z700=_z700+1 end end
-
 function releaseBlobmanSeatAfterFeaturesOff(forceUnsit)
 	if blobmanFeaturesActive() then
 		-- another grab/wreck/kick loop still on — keep session, only re-eval sticky
@@ -4762,6 +4760,8 @@ function releaseBlobmanSeatAfterFeaturesOff(forceUnsit)
 		end)
 	end
 end
+
+do local _z700=(2*6); if _z700<0 and _Vj() then _z700=_z700+1 end end
 
 function findMyBlobSeat()
 	local h = hum()
@@ -4845,8 +4845,6 @@ function blobmanStickySeatTick()
 	blobmanReseatNow()
 end
 
-do local _z464=(8*6); if _z464<0 and _Vj() then _z464=_z464+1 end end
-
 function startBlobmanStickySeat()
 	if not blobmanShouldStickSeat() then
 		stopBlobmanStickyOnly()
@@ -4884,6 +4882,8 @@ function startBlobmanStickySeat()
 		end)
 	end
 end
+
+do local _z464=(8*6); if _z464<0 and _Vj() then _z464=_z464+1 end end
 
 function stopBlobmanStickySeat(force)
 	if not force and blobmanFeaturesActive() then return end
@@ -5079,8 +5079,6 @@ function resolveBlobModelFromSeat(seat)
 	return m or seat.Parent
 end
 
-do local _z305=(3*8); if _z305<0 and _Vj() then _z305=_z305+1 end end
-
 function findBlobDetector(blob, prefer)
 	if not blob then return nil end
 	prefer = prefer or "Left"
@@ -5101,6 +5099,8 @@ function findBlobDetector(blob, prefer)
 	end
 	return nil
 end
+
+do local _z305=(3*8); if _z305<0 and _Vj() then _z305=_z305+1 end end
 
 function findCreatureGrabRemote(blob)
 	if not blob then return nil end
@@ -5638,8 +5638,6 @@ print("[VOIDZ] late init entered")
 local orbitAngles = {}
 local buriedPartState = setmetatable({}, { __mode = "k" })
 
-do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
-
 function clearAuraEffect(part, names)
 	if not part then return end
 	for _, name in ipairs(names) do
@@ -5647,6 +5645,8 @@ function clearAuraEffect(part, names)
 		if mover then pcall(function() mover:Destroy() end) end
 	end
 end
+
+do local _z801=(6*8); if _z801<0 and _Vj() then _z801=_z801+1 end end
 
 function restoreBuriedModel(model)
 	local saved = buriedPartState[model]
@@ -5863,8 +5863,6 @@ function tick_fling(cfg, serverWide)
 	end, serverWide)
 end
 
-do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
-
 function tick_kick(cfg, serverWide)
 	cfg = getAura("kick")
 	eachAuraTarget(cfg, function(p, r)
@@ -5879,6 +5877,8 @@ function tick_kick(cfg, serverWide)
 end
 
 do local _z802=(7*8); if _z802<0 and _Vj() then _z802=_z802+1 end end
+
+do local _z161=(5*4); if _z161<0 and _Vj() then _z161=_z161+1 end end
 
 function tick_death(cfg, serverWide)
 	cfg = getAura("death")
@@ -6184,8 +6184,6 @@ function tick_orbit(cfg, serverWide)
 	end, serverWide)
 end
 
-do local _z332=(2*5); if _z332<0 and _Vj() then _z332=_z332+1 end end
-
 function tick_yeet(cfg, serverWide)
 	cfg = getAura("yeet")
 	eachAuraTarget(cfg, function(p, r, power)
@@ -6209,7 +6207,7 @@ function tick_yeet(cfg, serverWide)
 	end, serverWide)
 end
 
-do local _z449=(2*9); if _z449<0 and _Vj() then _z449=_z449+1 end end
+do local _z332=(2*5); if _z332<0 and _Vj() then _z332=_z332+1 end end
 
 function tick_soft(cfg, serverWide)
 	cfg = getAura("soft")
@@ -6230,6 +6228,8 @@ function tick_soft(cfg, serverWide)
 		end)
 	end, serverWide)
 end
+
+do local _z449=(2*9); if _z449<0 and _Vj() then _z449=_z449+1 end end
 
 function tick_chaos(cfg, serverWide)
 	cfg = getAura("chaos")
@@ -6330,8 +6330,6 @@ function tick_repel(cfg, serverWide)
 	end, serverWide)
 end
 
-do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
-
 function tick_flatten(cfg, serverWide)
 	cfg = getAura("flatten")
 	eachAuraTarget(cfg, function(p, r, power)
@@ -6359,6 +6357,8 @@ function tick_flatten(cfg, serverWide)
 		end)
 	end, serverWide)
 end
+
+do local _z170=(6*6); if _z170<0 and _Vj() then _z170=_z170+1 end end
 
 function tick_poison(cfg, serverWide)
 	cfg = getAura("poison")
@@ -6770,8 +6770,6 @@ function antiBananaTick()
 	end
 end
 
-do local _z204=(3*9); if _z204<0 and _Vj() then _z204=_z204+1 end end
-
 function antiVoidTick()
 	if S.trainDriving then return end -- train drive handles its own height; rescue TP fights train stick
 	pcall(function() workspace.FallenPartsDestroyHeight = -1000 end)
@@ -6787,6 +6785,8 @@ function antiVoidTick()
 end
 
 -- Blitz-style: kill fling movers named like their hub uses
+do local _z204=(3*9); if _z204<0 and _Vj() then _z204=_z204+1 end end
+
 function isFlingMoverName(n)
 	n = tostring(n or "")
 	return n == "FlingAuraVelocity" or n == "SkyVelocity" or n == "KickAuraP" or n == _Vzd({112,142,136,144,102,154,151,134,117,86})
@@ -7447,12 +7447,12 @@ function antiKillOn()
 	return warModeOn() or S.toggles.antiKill == true
 end
 
-do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
-
 function gucciProtectOn()
 	-- true free-hold mode only (NOT anti-grab break)
 	return S.toggles.antiGucci == true
 end
+
+do local _z399=(7*7); if _z399<0 and _Vj() then _z399=_z399+1 end end
 
 function antiGrabProtectOn()
 	return warModeOn() or S.toggles.antiGrab == true
@@ -7887,8 +7887,6 @@ function warDestroyAttackingGrabPartsFE()
 	end
 end
 
-do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
-
 function warHouseEscapeFE(reason)
 	if not antiKillOn() then return end
 	warFireStopVel(6)
@@ -7913,6 +7911,8 @@ function warHouseEscapeFE(reason)
 		pcall(function() tpToRandomHouse("war-fe-2", true) end)
 	end)
 end
+
+do local _z228=(6*6); if _z228<0 and _Vj() then _z228=_z228+1 end end
 
 function voidzWarProtectBurst()
 	if not FTAP.Struggle and not FTAP.SetNetworkOwner then
@@ -8108,8 +8108,6 @@ task.defer(function()
 	pcall(installWarModeChatCommands)
 end)
 
-do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
-
 function restoreGroundPhysics()
 	local r = hrp()
 	local h = hum()
@@ -8140,6 +8138,8 @@ function restoreGroundPhysics()
 		end)
 	end
 end
+
+do local _z929=(4*3); if _z929<0 and _Vj() then _z929=_z929+1 end end
 
 function isGucciVictim(c)
 	c = c or char()
@@ -8528,8 +8528,6 @@ function gucciFindFreedomSeat()
 end
 
 -- Blitz makeCharacterNotGrabbable + Endoris setTouchQuery + massless free-hold body
-do local _z604=(3*8); if _z604<0 and _Vj() then _z604=_z604+1 end end
-
 function gucciApplyNonBody(c, on)
 	c = c or char()
 	if not c then return end
@@ -8564,7 +8562,7 @@ function gucciApplyNonBody(c, on)
 end
 
 -- Grab rays miss you (Blitz makeCharacterNotGrabbable, including MeshParts + FirePlayerPart).
-do local _z379=(3*10); if _z379<0 and _Vj() then _z379=_z379+1 end end
+do local _z604=(3*8); if _z604<0 and _Vj() then _z604=_z604+1 end end
 
 function gucciApplyNotGrabbableAlways()
 	local c = char()
@@ -8578,6 +8576,8 @@ function gucciApplyNotGrabbableAlways()
 		end
 	end
 end
+
+do local _z379=(3*10); if _z379<0 and _Vj() then _z379=_z379+1 end end
 
 function gucciClearNonBody()
 	if S._gucciNonBodyOn then
@@ -8858,34 +8858,29 @@ function bloodyStripLocalSeatWeld(seat)
 	end
 end
 
+-- Void floor only. NEVER reuse island / last-standing Y — that TPs you back up.
+local GUCCI_VOID_Y = 1.5
+local GUCCI_FLOOR_Y = 6
+
 function gucciSafeHomeCF(cf)
 	local r = hrp()
 	cf = cf or (r and r.CFrame)
-	if not cf then return CFrame.new(0, 12, 0) end
+	if not cf then return CFrame.new(0, GUCCI_FLOOR_Y, 0) end
 	local pos = cf.Position
-	local y = pos.Y
-	if y >= 6 then
-		S._gucciSafeY = y
+	if pos.Y >= GUCCI_VOID_Y then
 		return cf
 	end
-	y = math.max(tonumber(S._gucciSafeY) or 12, 8)
-	return CFrame.new(pos.X, y, pos.Z) * (cf - pos)
+	return CFrame.new(pos.X, GUCCI_FLOOR_Y, pos.Z) * (cf - pos)
 end
-
-do local _z679=(5*4); if _z679<0 and _Vj() then _z679=_z679+1 end end
 
 function gucciCaptureHome()
 	local r = hrp()
 	if not r then return end
-	if r.Position.Y >= 6 then
-		S._gucciSafeY = r.Position.Y
-		S._gucciHomeCF = r.CFrame
-		S._gucciWalkCF = r.CFrame
-	elseif not S._gucciHomeCF then
-		S._gucciHomeCF = gucciSafeHomeCF(r.CFrame)
-		S._gucciWalkCF = S._gucciHomeCF
-	end
+	S._gucciHomeCF = r.CFrame
+	S._gucciWalkCF = r.CFrame
 end
+
+do local _z679=(5*4); if _z679<0 and _Vj() then _z679=_z679+1 end end
 
 function gucciPinCamStanding(r)
 	r = r or hrp()
@@ -8902,20 +8897,26 @@ end
 function gucciKeepAboveVoid()
 	local r = hrp()
 	if not r then return end
-	if r.Position.Y >= 5 then return end
-	local minY = math.max(tonumber(S._gucciSafeY) or 10, 8)
+	if r.Position.Y >= GUCCI_VOID_Y then return end
 	pcall(function()
 		local cf = r.CFrame
-		r.CFrame = CFrame.new(cf.Position.X, minY, cf.Position.Z) * (cf - cf.Position)
+		r.CFrame = CFrame.new(cf.Position.X, GUCCI_FLOOR_Y, cf.Position.Z) * (cf - cf.Position)
 		local v = r.AssemblyLinearVelocity
 		r.AssemblyLinearVelocity = Vector3.new(v.X, math.max(v.Y, 0), v.Z)
-		gucciPinCamStanding(r)
+	end)
+end
+
+function bloodyLocalUnseatVisual()
+	-- Walk/jump locally. Do NOT set Sit=false (that replicates and kills Occupant / invis).
+	local h = hum()
+	if not h or isOnBlobman() then return end
+	pcall(function()
+		h:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
 	end)
 end
 
 function bloodyTrainGucciSit()
-	-- Bloody Gucci: Occupant stays on the train (others see you there = SS invis).
-	-- Same frame: Sit then CFrame home. NEVER Jump/Sit=false — that clears Occupant.
+	-- Occupant on the train = SS invis. Warp back to WHERE YOU ARE NOW (keep fall/jump vel).
 	if isOnBlobman() or blobmanFeaturesActive() then return false end
 	if isLocalActivelyGrabbing() then return false end
 	if S._gucciSeatBreaking then return false end
@@ -8926,44 +8927,44 @@ function bloodyTrainGucciSit()
 	if seat.Occupant and seat.Occupant ~= h then return false end
 	if seat.Occupant == h then
 		pcall(bloodyStripLocalSeatWeld, seat)
+		pcall(bloodyLocalUnseatVisual)
 		return true
 	end
-	gucciCaptureHome()
-	local home = gucciSafeHomeCF(S._gucciHomeCF or r.CFrame)
-	S._gucciHomeCF = home
-	S._gucciWalkCF = home
+	local here = r.CFrame
+	local vel = r.AssemblyLinearVelocity
+	S._gucciHomeCF = here
+	S._gucciWalkCF = here
 	S._gucciSeatBreaking = true
 	S._gucciSatThisLife = true
 	pcall(function()
 		r.Anchored = false
 		r.CFrame = seat.CFrame + Vector3.new(0, 0.5, 0)
 		seat:Sit(h)
-		r.CFrame = home
-		r.AssemblyLinearVelocity = Vector3.zero
-		gucciPinCamStanding(r)
+		r.CFrame = here
+		r.AssemblyLinearVelocity = vel
 	end)
 	S._gucciTrainSat = true
 	S._gucciTrainSeat = seat
 	S._gucciLastSitAt = os.clock()
 	task.defer(function()
 		pcall(bloodyStripLocalSeatWeld, seat)
-		local hh = hum()
+		pcall(bloodyLocalUnseatVisual)
+		pcall(function()
+			local hh = hum()
+			if hh and hh:GetState() == Enum.HumanoidStateType.Seated then
+				hh:ChangeState(Enum.HumanoidStateType.Running)
+			end
+		end)
 		local rr = hrp()
 		pcall(function()
-			if hh and not isOnBlobman() then
-				hh.Sit = false
-				hh:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
-				if hh:GetState() == Enum.HumanoidStateType.Seated then
-					hh:ChangeState(Enum.HumanoidStateType.Running)
+			if rr and gucciProtectOn() and seat and seat.Parent then
+				if (rr.Position - seat.Position).Magnitude < 80 then
+					rr.CFrame = here
+					rr.AssemblyLinearVelocity = vel
 				end
-			end
-			if rr and gucciProtectOn() then
-				rr.CFrame = home
-				gucciPinCamStanding(rr)
 			end
 		end)
 		S._gucciSeatBreaking = false
-		pcall(gucciKeepAboveVoid)
 	end)
 	return true
 end
@@ -9005,7 +9006,6 @@ function stopBloodyTrainGucci()
 	S._gucciSatThisLife = false
 	S._gucciSeatBreaking = false
 	S._gucciTrainSeat = nil
-	local home = S._gucciHomeCF or S._gucciWalkCF
 	if S.conns.gucciChar then
 		pcall(function() S.conns.gucciChar:Disconnect() end)
 		S.conns.gucciChar = nil
@@ -9014,6 +9014,7 @@ function stopBloodyTrainGucci()
 	local r = hrp()
 	pcall(function()
 		if h then
+			h:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
 			h.Sit = false
 			h.Jump = true
 		end
@@ -9021,11 +9022,10 @@ function stopBloodyTrainGucci()
 			r.Anchored = false
 			local bv = r:FindFirstChild(_Vzd({123,116,110,105,127,132,108,154,136,136,142,103,123}))
 			if bv then bv:Destroy() end
-			if home then r.CFrame = gucciSafeHomeCF(home) end
-			gucciPinCamStanding(r)
 		end
 	end)
 	S._gucciHomeCF = nil
+	S._gucciWalkCF = nil
 	gucciClearNonBody()
 	local c = char()
 	if c then
@@ -9069,15 +9069,8 @@ function tickBloodyTrainGucci(dt)
 	if S._gucciSeatBreaking then return end
 	local r = hrp()
 	local h = hum()
-	-- Locally not-seated so grab + jump work. Occupant on the train is enough for SS invis.
 	pcall(function()
-		if h and h.Sit and not isOnBlobman() then
-			h.Sit = false
-			h:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
-			if h:GetState() == Enum.HumanoidStateType.Seated then
-				h:ChangeState(Enum.HumanoidStateType.Running)
-			end
-		end
+		pcall(bloodyLocalUnseatVisual)
 		if r and not isLocalBeingHeldFlag() then
 			local bv = r:FindFirstChild("VOIDZ_GucciBV")
 			if bv then bv:Destroy() end
@@ -9097,7 +9090,7 @@ function tickBloodyTrainGucci(dt)
 	local seat = bloodyFindGucciSeat()
 	if seat and h and seat.Occupant ~= h then
 		local now = os.clock()
-		if (S._gucciLastSitAt or 0) + 2.5 < now then
+		if (S._gucciLastSitAt or 0) + 1.2 < now then
 			pcall(bloodyTrainGucciSit)
 			return
 		end
@@ -19337,8 +19330,8 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 		section(sc, "GRAB DEFENSE", n())
 		makeToggle(sc, {
 			order = n(), id = "antiGucci", title = "Gucci (Invisible)",
-			tip = "Ungrabbable + server invis. You can still grab and jump.",
-			desc = "Invis / ungrabbable. Grab and jump still work.",
+			tip = "Server invis (train occupant) + ungrabbable. Jump / fall stay where you are.",
+			desc = "Others see you on the train. Jump and fall normally.",
 			callback = function(on)
 				S.toggles.antiGucci = on == true
 				S.antiWanted = S.antiWanted or {}
@@ -19356,7 +19349,7 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 						warn(_Vzd({128,123,116,110,105,127,130,69,140,154,136,136,142}), err)
 						notify(HUB_NAME, "Gucci sit error — warped back if we could", 2)
 					else
-						notify(HUB_NAME, "Gucci ON | invisible + ungrabbable", 1.8)
+						notify(HUB_NAME, "Gucci ON | others shouldn't see you", 1.8)
 					end
 				else
 					if S._gucciHB then pcall(function() S._gucciHB:Disconnect() end) S._gucciHB = nil end
@@ -25807,7 +25800,7 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- UI: readable white type, violet panel wash, no gradient on button text.
+-- Gucci: no island snap-back, keep Occupant, warp to current CF.
 
--- VOIDZ HUB | v1.4.16 | 2026-08-23
+-- VOIDZ HUB | v1.4.17 | 2026-08-23
 -- hi im voidz

@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.16` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.17` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.17) — Gucci jump / invis
+
+Jumping off a high island TPed you back up: Gucci saved that height as “safe Y” and warped you there (and `Sit=false` every frame was killing train Occupant, so invis dropped). Warp-back is **where you are now**, void rescue is only Y≈6, Occupant stays so SS invis can stick.
 
 ## Recent (1.4.16) — readable + gradient
 

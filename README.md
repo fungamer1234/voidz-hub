@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.6` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.7` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.7) — Gucci warp-back
+
+Train sit worked, then the tick saved the **train** CFrame as home so warp-back left you there (and could error). Home CF is sticky now; tick is pcall’d.
 
 ## Recent (1.4.6) — kicks actually kick (Bloody)
 

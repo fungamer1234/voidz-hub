@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-22-1.3.4` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
+Build: `2026-08-22-1.4.0` · Free key: `FREMIUM` · Premium key: `VOIDZHUB`  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,16 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`FREMIUM`** (free) or **`VOIDZHUB`** (premium). RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.0) — do it how Blitz / Bloody V2 do it
+
+Custom scans, unsits, and unanchors were fighting the real FTAP remotes, so fling/grab/gucci all felt random.
+
+- **Fling (Blitz):** `SetNetworkOwner` on their **HRP only**, and only inside **30 studs**. Wait for `Head.PartOwner == you`, then one `FlingAuraVelocity`. Stay in range a few frames before TP home. Aura is 0.1s and skips if that BV already exists.
+- **Anti-Grab (Blitz):** `IsHeld` → Heartbeat `Velocity=0`, **Anchor**, `Struggle(you)`, `RagdollRemote(HRP, 0)`. Unanchor when released. No workspace GrabParts thrash, no `Sit=false`.
+- **Gucci (Bloody):** walk while held + `CanQuery=false` + train seat-break once. **Never Anchor.** Never unsit Blobman.
+- **Loop Grab:** still FireServer(`LeftDetector`, HRP, `LeftWeld`) **only while seated** on your Blobman.
+- Sit on **your** Blobman first for loop grab.
 
 ## Recent (1.3.4) — Gucci + Anti-Grab actually work
 

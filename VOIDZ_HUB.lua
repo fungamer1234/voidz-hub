@@ -195,7 +195,7 @@ local Mouse = LP:GetMouse()
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local KEY_PREMIUM = ACCESS_KEY -- legacy alias
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,93,82,87,88,82,86,83,89,83,86,85})
+local BUILD = _Vzd({87,85,87,91,82,85,93,82,87,88,82,86,83,89,83,86,86})
 local GuiService = game:GetService("GuiService")
 
 function resolveAccessKey(raw)
@@ -8524,15 +8524,15 @@ function gucciApplyNonBody(c, on)
 	end
 end
 
--- Blitz-style: apply not-grabbable while Gucci toggle ON (proactive + while held)
+-- Grab rays miss you (Blitz makeCharacterNotGrabbable, including MeshParts + FirePlayerPart).
 function gucciApplyNotGrabbableAlways()
-	if not gucciProtectOn() then return end
 	local c = char()
 	if not c then return end
-	for _, p in ipairs(c:GetChildren()) do
-		if p:IsA(_Vzd({103,134,152,138,117,134,151,153})) or p:IsA("Part") or p:IsA("MeshPart") then
+	for _, p in ipairs(c:GetDescendants()) do
+		if p:IsA(_Vzd({103,134,152,138,117,134,151,153})) then
 			pcall(function()
 				p.CanQuery = false
+				p.CanTouch = false
 			end)
 		end
 	end
@@ -8689,8 +8689,8 @@ function gucciServerUngrab()
 	-- Destroy grab line on our body (server)
 	if FTAP.DestroyGrabLine then
 		for _, n in ipairs({ "HumanoidRootPart", "Torso", "UpperTorso", "LowerTorso", "Head",
-			"Left Arm", "Right Arm", "Left Leg", "Right Leg",
-			_Vzd({113,138,139,153,122,149,149,138,151,102,151,146}), "RightUpperArm", "LeftLowerArm", _Vzd({119,142,140,141,153,113,148,156,138,151,102,151,146}) }) do
+			_Vzd({113,138,139,153,69,102,151,146}), "Right Arm", "Left Leg", "Right Leg",
+			"LeftUpperArm", _Vzd({119,142,140,141,153,122,149,149,138,151,102,151,146}), "LeftLowerArm", "RightLowerArm" }) do
 			local p = c:FindFirstChild(n)
 			if p then pcall(function() FTAP.DestroyGrabLine:FireServer(p) end) end
 		end
@@ -8704,7 +8704,7 @@ function gucciServerUngrab()
 	-- Clear IsHeld-related welds on us
 	pcall(function()
 		for _, d in ipairs(c:GetDescendants()) do
-			if d:IsA("WeldConstraint") or d:IsA("Weld") then
+			if d:IsA(_Vzd({124,138,145,137,104,148,147,152,153,151,134,142,147,153})) or d:IsA("Weld") then
 				local p0, p1 = d.Part0, d.Part1
 				if (p1 and p1:IsDescendantOf(c) and p0 and not p0:IsDescendantOf(c))
 					or (p0 and p0:IsDescendantOf(c) and p1 and not p1:IsDescendantOf(c)) then
@@ -8840,17 +8840,22 @@ function gucciKeepAboveVoid()
 end
 
 function bloodyTrainGucciSit()
-	-- Bloody: sit ONCE this life (1 frame), unsit, warp to SAFE height. Never loop-sit.
-	if S._gucciSatThisLife then return false end
+	-- Bloody Gucci: Occupant stays on the train (others see you there = SS invis).
+	-- Same frame: Sit then CFrame home. NEVER Jump/Sit=false — that clears Occupant.
 	if isOnBlobman() or blobmanFeaturesActive() then return false end
 	if isLocalActivelyGrabbing() then return false end
+	if S._gucciSeatBreaking then return false end
 	local r = hrp()
 	local h = hum()
 	local seat = bloodyFindGucciSeat()
 	if not r or not h or not seat then return false end
 	if seat.Occupant and seat.Occupant ~= h then return false end
+	if seat.Occupant == h then
+		pcall(bloodyStripLocalSeatWeld, seat)
+		return true
+	end
 	gucciCaptureHome()
-	local home = gucciSafeHomeCF(S._gucciHomeCF)
+	local home = gucciSafeHomeCF(S._gucciHomeCF or r.CFrame)
 	S._gucciHomeCF = home
 	S._gucciWalkCF = home
 	S._gucciSeatBreaking = true
@@ -8859,29 +8864,23 @@ function bloodyTrainGucciSit()
 		r.Anchored = false
 		r.CFrame = seat.CFrame + Vector3.new(0, 0.5, 0)
 		seat:Sit(h)
+		r.CFrame = home
+		r.AssemblyLinearVelocity = Vector3.zero
+		gucciPinCamStanding(r)
 	end)
 	S._gucciTrainSat = true
 	S._gucciTrainSeat = seat
 	S._gucciLastSitAt = os.clock()
-	task.spawn(function()
-		RunService.Heartbeat:Wait()
-		if not gucciProtectOn() then
-			S._gucciSeatBreaking = false
-			return
-		end
-		local hh = hum()
+	task.defer(function()
+		pcall(bloodyStripLocalSeatWeld, seat)
 		local rr = hrp()
-		pcall(function()
-			if hh then
-				hh:ChangeState(Enum.HumanoidStateType.Jumping)
-				hh.Sit = false
-			end
-			if rr then
+		if rr and gucciProtectOn() then
+			pcall(function()
 				rr.CFrame = home
 				rr.AssemblyLinearVelocity = Vector3.zero
-			end
-			gucciPinCamStanding(rr)
-		end)
+				gucciPinCamStanding(rr)
+			end)
+		end
 		S._gucciSeatBreaking = false
 		pcall(gucciKeepAboveVoid)
 	end)
@@ -8941,11 +8940,23 @@ function stopBloodyTrainGucci()
 			r.Anchored = false
 			local bv = r:FindFirstChild("VOIDZ_GucciBV")
 			if bv then bv:Destroy() end
-			if home then r.CFrame = home end
+			if home then r.CFrame = gucciSafeHomeCF(home) end
+			gucciPinCamStanding(r)
 		end
 	end)
 	S._gucciHomeCF = nil
 	gucciClearNonBody()
+	local c = char()
+	if c then
+		for _, p in ipairs(c:GetDescendants()) do
+			if p:IsA("BasePart") then
+				pcall(function()
+					p.CanQuery = true
+					p.CanTouch = true
+				end)
+			end
+		end
+	end
 end
 
 function bloodyGucciMoveInput()
@@ -8977,17 +8988,28 @@ function tickBloodyTrainGucci(dt)
 	if not gucciProtectOn() then return end
 	if isOnBlobman() or blobmanFeaturesActive() then return end
 	if S._gucciSeatBreaking then return end
+	pcall(gucciApplyNotGrabbableAlways)
 	pcall(gucciKeepAboveVoid)
 	if isLocalBeingHeldFlag() then
 		pcall(walkWhileGrabbedTick)
 		pcall(gucciKeepAboveVoid)
 		return
 	end
-	-- Bloody: after the one sit+warp, RagdollRemote only. Never sit the train again.
 	local r = hrp()
-	if not r then return end
+	local h = hum()
+	local seat = bloodyFindGucciSeat()
+	-- Occupancy dropped = invis gone. Same-frame Sit + warp home (never stay at the train).
+	if seat and h and seat.Occupant ~= h then
+		local now = os.clock()
+		if (S._gucciLastSitAt or 0) + 2.5 < now then
+			pcall(bloodyTrainGucciSit)
+			return
+		end
+	elseif seat then
+		pcall(bloodyStripLocalSeatWeld, seat)
+	end
 	local now = os.clock()
-	if (S._gucciRagAt or 0) + 0.033 <= now then
+	if r and (S._gucciRagAt or 0) + 0.033 <= now then
 		S._gucciRagAt = now
 		if FTAP.RagdollRemote then
 			pcall(function() FTAP.RagdollRemote:FireServer(r, 0) end)
@@ -9302,13 +9324,21 @@ function installAntis()
 		end
 		gucciIdleSkip = 0
 
-		-- GUCCI: Bloody train occupancy when you are NOT grabbed.
-		if gucciProtectOn() and not isLocalBeingHeldFlag() then
+		-- GUCCI: keep train Occupant (SS invis) + not-grabbable. Walk if held.
+		if gucciProtectOn() then
 			pcall(tickBloodyTrainGucci, dt)
+			if isLocalBeingHeldFlag() then
+				gucciAcc = gucciAcc + dt
+				if gucciAcc >= 0.12 then
+					gucciAcc = 0
+					pcall(bloodyGucciPulse)
+				end
+				return
+			end
 		end
 
-		-- ANTI-GRAB (and Gucci-while-held): the walk that felt perfect. Never Anchor.
-		if isLocalBeingHeldFlag() and (antiGrabProtectOn() or gucciProtectOn()) then
+		-- ANTI-GRAB only: walk while held (no train).
+		if antiGrabProtectOn() and isLocalBeingHeldFlag() then
 			pcall(walkWhileGrabbedTick)
 			gucciAcc = gucciAcc + dt
 			if gucciAcc >= 0.12 then
@@ -19124,8 +19154,8 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 		section(sc, "GRAB DEFENSE", n())
 		makeToggle(sc, {
 			order = n(), id = "antiGucci", title = "Gucci (Train Invis)",
-			tip = "Bloody V2: sit AlwaysHere train so the server sees you there (SS invis). Warps you back to walk.",
-			desc = "Train occupancy invis. Anti-Grab is the walk-while-held.",
+			tip = "Bloody: Occupant stays on the train (others see you there). You stay at play height. CanQuery off = ungrabbable.",
+			desc = "SS invis + ungrabbable. Better Anti-Grab.",
 			callback = function(on)
 				S.toggles.antiGucci = on == true
 				S.antiWanted = S.antiWanted or {}
@@ -19143,7 +19173,7 @@ _TAB_BUILDERS["anti"] = function(sc, n)
 						warn("[VOIDZ] gucci", err)
 						notify(HUB_NAME, "Gucci sit error — warped back if we could", 2)
 					else
-						notify(HUB_NAME, "Gucci ON | train occupancy (SS invis)", 1.8)
+						notify(HUB_NAME, "Gucci ON | invisible + ungrabbable", 1.8)
 					end
 				else
 					if S._gucciHB then pcall(function() S._gucciHB:Disconnect() end) S._gucciHB = nil end
@@ -25534,7 +25564,7 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- Gucci: 1-frame train sit, warp to safe height, pin CamPart.
+-- Gucci: keep train Occupant (SS invis), never unsit, CanQuery off, safe height.
 
--- VOIDZ HUB | v1.4.10 | 2026-08-23
+-- VOIDZ HUB | v1.4.11 | 2026-08-23
 -- hi im voidz

@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.10` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.11` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.11) — Gucci is Bloody occupancy invis
+
+Unsit after the train sit was killing invis (server saw you at play again). Gucci now **keeps Occupant on the train**, warps you home the same frame, strips the local weld, `CanQuery` off. No Jump/Sit=false. Cam stays at standing height.
 
 ## Recent (1.4.10) — Gucci no void death / cam height
 

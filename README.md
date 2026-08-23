@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.11` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.12` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.12) — spam-grab resist + Auto Attacker
+
+Anti-Grab: Struggle every frame, huge XZ hold so spam grabs can't drag you; WASD still walks. Auto Attacker fires the instant PartOwner/GrabParts/IsHeld shows a grabber (no 0.55s cooldown / 0.18s poll).
 
 ## Recent (1.4.11) — Gucci is Bloody occupancy invis
 

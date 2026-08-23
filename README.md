@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-22-1.4.1` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.2` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,13 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.2) — UI + Protect polish
+
+- Cleaner rows: no junk `*` gear on every button, toggles light up when on, section hairlines.
+- Protect tab grouped: Grab Defense / Counter / Status. **Gucci and Anti-Grab are exclusive** (turning one off the other).
+- Anti-Banana no longer scans the whole workspace every tick.
+- Home / footer / key screen copy matches the one-key hub.
 
 ## Recent (1.4.1) — one key
 

@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.15` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.16` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.16) — readable + gradient
+
+Combat labels were getting eaten by a UIGradient on the buttons (Roblox tints the text). Gradients now sit on panels/cards only. Type is white. Hub chrome has a real violet wash.
 
 ## Recent (1.4.15) — UI polish
 

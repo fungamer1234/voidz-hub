@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.9` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.10` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.10) — Gucci no void death / cam height
+
+Train sit was leaving you (and CamPart) at void Y. Sit is **1 frame**, then warp to last standing height (at least Y=8). If you dip below Y=5, lift. CamPart stays at standing height on HRP.
 
 ## Recent (1.4.9) — Gucci sits the train once
 

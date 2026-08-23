@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.4` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-08-23-1.4.5` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,14 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.4.5) — Loop Grab Selected actually fires
+
+Gucci train occupancy was sitting you on the train so Blobman `Sit` was never true and the loop did nothing.
+
+- Train Gucci **pauses** while you’re on Blobman or a grab loop is on.
+- Loop fires Blitz `CreatureGrab(LeftDetector, HRP, LeftWeld)` from the seated blob.
+- If you hop off, it remounts your existing blob (no PivotTo).
 
 ## Recent (1.4.4) — Gucci walk speed
 

@@ -195,7 +195,7 @@ local Mouse = LP:GetMouse()
 local ACCESS_KEY = _Vzd({123,116,110,105,127,109,122,103})
 local KEY_PREMIUM = ACCESS_KEY -- legacy alias
 local HUB_NAME = _Vzd({123,116,110,105,127,69,109,122,103})
-local BUILD = _Vzd({87,85,87,91,82,85,93,82,87,88,82,86,83,89,83,87,87})
+local BUILD = _Vzd({87,85,87,91,82,85,93,82,87,88,82,86,83,89,83,87,88})
 local GuiService = game:GetService("GuiService")
 
 function resolveAccessKey(raw)
@@ -8854,11 +8854,10 @@ function gucciForceFreeMoveLight()
 		if not bv then
 			bv = Instance.new("BodyVelocity")
 			bv.Name = "VOIDZ_GucciBV"
+			bv.MaxForce = Vector3.new(4e5, 4e4, 4e5)
 			bv.Parent = r
 		end
-		-- Anti-Grab: fight spam-grab drag with huge XZ force. Idle = hold still.
-		local xz = antiGrabProtectOn() and 1e12 or 4e5
-		bv.MaxForce = Vector3.new(xz, 8e4, xz)
+		bv.MaxForce = Vector3.new(4e5, 4e4, 4e5)
 		if md.Magnitude > 0.04 then
 			local dir = md.Unit
 			local push = dir * spd
@@ -8867,11 +8866,6 @@ function gucciForceFreeMoveLight()
 			bv.Velocity = Vector3.new(push.X, 0, push.Z)
 		else
 			bv.Velocity = Vector3.zero
-			if antiGrabProtectOn() then
-				local v = r.AssemblyLinearVelocity
-				r.AssemblyLinearVelocity = Vector3.new(0, math.clamp(v.Y, -80, 40), 0)
-				r.AssemblyAngularVelocity = Vector3.zero
-			end
 		end
 		local space = UserInputService:IsKeyDown(Enum.KeyCode.Space)
 		if space then
@@ -26027,7 +26021,7 @@ task.spawn(function()
 	pcall(function() if Late.installAntis then Late.installAntis() end end)
 end)
 
--- Anti-Grab restored to 1.4.17 walk-held. Gucci left for later.
+-- Anti-Grab walk: 1.4.8 forces (no 1e12 sticky hold).
 
--- VOIDZ HUB | v1.4.22 | 2026-08-23
+-- VOIDZ HUB | v1.4.23 | 2026-08-23
 -- hi im voidz

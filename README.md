@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-08-23-1.4.30` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-10-12-1.5.0` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,15 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.5.0) — FTAP link + cleaner hub
+
+Checked against current Fling Things and People hubs (October 2026). Grab remotes are still `GrabEvents` / `CharacterEvents` / `MenuToys`.
+
+- Ownership claim uses your HRP CFrame inside ~30 studs, then the fling velocity. Throws also set assembly velocity after you own the part.
+- Remotes are found even if those folders are nested, and they relink when you respawn.
+- Home shows link status. RightShift still hides the hub. Toggle labels no longer run under the switch.
+- Server lag, line-spam, and destroy-hybrid are off in this build. Fling, grab, protect, blobman, and the other tabs stay.
 
 ## Recent (1.4.30) — Gucci walk + real invis
 

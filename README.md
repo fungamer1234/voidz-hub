@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-10-12-1.5.0` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-10-12-1.6.0` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,14 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.6.0) — one action path
+
+Fling, ragdoll, and auras go through visit, own, apply, release. Ownership still needs you inside about 30 studs. If it fails, you get one toast and one warp home.
+
+Home lists each remote as linked or missing, the place id, and the selected player. Link Game Remotes retries for 10 seconds. The target bar stays on every tab. Click a player in the world to select them. Whitelist skips them. The ! button stops loops and clears movers. Friends whitelist controls live on Settings only.
+
+Blobman states are none, spawning, seated, grabbing, and paused-for-gucci. Gucci pauses blob grabs. The blob is not pivoted every frame.
 
 ## Recent (1.5.0) — FTAP link + cleaner hub
 

@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-10-12-1.6.0` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-10-12-1.6.1` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.6.1) — chat bar stays
+
+The free-cursor button was modal, and Roblox hides the chat bar while any modal button is up. The cursor still unlocks. The chat bar stays.
 
 ## Recent (1.6.0) — one action path
 

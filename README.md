@@ -6,7 +6,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/fungamer1234/voidz-hub/main/VOIDZ_HUB.lua", true))()
 ```
 
-Build: `2026-10-12-1.6.1` · Key: `VOIDZHUB` (unlocks everything)  
+Build: `2026-10-12-1.6.2` · Key: `VOIDZHUB` (unlocks everything)  
 
 **Xeno-compatible** (also Delta / MacSploit / Solara / Fluxus / UNC). Missing exploit APIs fall back safely — hub still opens on PlayerGui.
 
@@ -19,6 +19,10 @@ One loadstring for all updates — always pulls latest `main` from GitHub (no `?
 3. Key **`VOIDZHUB`**. RightShift show/hide.
 
 GitHub: https://github.com/fungamer1234/voidz-hub
+
+## Recent (1.6.2) — whole-server actions
+
+Server throw, kick, kill, bring, burn, and the other map actions walk up beside every player, including people across the map. Players inside a house or plot are still skipped. The old lag-spam buttons are gone, so that “off in this build” toast is gone too.
 
 ## Recent (1.6.1) — chat bar stays
 
